@@ -2,7 +2,11 @@
 
 ### A simple state management library flutter using beacons/signals
 
-### Example
+### Usage
+
+Click [here](https://github.com/jinyus/flutter_state_beacon/blob/main/flutter_beacon/example/lib/main.dart) for the full code.
+
+#### Create a beacon
 
 ```dart
 import 'package:flutter/material.dart';
@@ -17,84 +21,14 @@ final derivedFutureCounter = Beacon.derivedFuture(() async {
 });
 
 Future<String> counterFuture(int count) async {
-  if (count > 3) {
-    throw Exception('Count($count) cannot be greater than 3');
-  }
   await Future.delayed(Duration(seconds: count));
   return '$count second has passed.';
 }
+```
 
-void main() => runApp(const MyApp());
+#### Watch it in a widget
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        brightness: Brightness.light,
-        useMaterial3: true,
-        textTheme: TextTheme(
-          headlineMedium: TextStyle(fontSize: 48),
-        ),
-      ),
-      themeMode: ThemeMode.light,
-      home: const MyHomePage(title: 'Flutter Beacon Demo'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            counter.watch(context) < 10 ? Counter() : Container(),
-            FutureCounter(),
-          ],
-        ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () => counter.value--,
-            tooltip: 'Decrement',
-            child: const Icon(Icons.remove),
-          ),
-          SizedBox(width: 10),
-          FloatingActionButton(
-            onPressed: () => counter.value++,
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
+```dart
 class Counter extends StatelessWidget {
   const Counter({super.key});
 
@@ -112,10 +46,9 @@ class FutureCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme.headlineSmall;
     return switch (derivedFutureCounter.watch(context)) {
-      AsyncData<String>(value: final v) => Text(v, style: textTheme),
-      AsyncError(error: final e) => Text('$e', style: textTheme),
+      AsyncData<String>(value: final v) => Text(v),
+      AsyncError(error: final e) => Text('$e'),
       AsyncLoading() => const CircularProgressIndicator(),
     };
   }
