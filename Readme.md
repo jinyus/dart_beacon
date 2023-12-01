@@ -1,6 +1,8 @@
 # <center>Beacon</center>
 
-<img src="https://github.com/jinyus/dart_beacon/blob/master/logo.png?raw=true">
+<p align="center">
+  <img width="200" src="https://github.com/jinyus/dart_beacon/blob/master/logo.png?raw=true">
+</p>
 
 ## Overview
 
