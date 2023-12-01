@@ -85,6 +85,5 @@ Flutter examples can be found [here](https://github.com/jinyus/dart_beacon/blob/
 
 ### Inspiration
 
-This package is inspired by:<br>
 [Preact Signals for dart](https://github.com/rodydavis/signals.dart) by Rody Davis  
 [SolidJS](https://www.solidjs.com/) by Ryan Carniato.
