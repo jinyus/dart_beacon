@@ -39,7 +39,9 @@ dependencies:
 To use Beacon in your Dart project, first import the package:
 
 ```dart
-import 'package:beacon/beacon.dart';
+import 'package:state_beacon/state_beacon.dart';
+// or
+import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 ```
 
 Then, you can create and use different types of beacons as needed:
