@@ -1,5 +1,7 @@
 # <center>Beacon</center>
 
+<img src="https://github.com/jinyus/dart_beacon/blob/master/logo.png?raw=true">
+
 ## Overview
 
 The Beacon package is a powerful reactive primitive for dart. It provides facilities for executing any code when a value is updated.
