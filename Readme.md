@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Beacon package is a powerful reactive primitive for dart. It provides facilities for executing any code when a value is updated.
+A Beacon is a powerful reactive primitive for dart. It provides facilities for executing any code when a value is updated.
 
 ## Features
 
