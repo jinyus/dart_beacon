@@ -1,0 +1,482 @@
+import 'dart:async';
+
+import 'package:state_beacon/src/base_beacon.dart';
+import 'package:state_beacon/state_beacon.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('BaseBeacon Tests', () {
+    test('Initial value is set correctly', () {
+      var beacon = Beacon.writable<int>(10);
+      expect(beacon.peek(), equals(10));
+    });
+  });
+
+  group('Beacon Tests', () {
+    test('Value updates notify listeners', () {
+      var beacon = Beacon.writable<int>(10);
+      var called = false;
+      beacon.subscribe((_) => called = true);
+      beacon.value = 20;
+      expect(called, isTrue);
+    });
+
+    test('Should conditionally stop listening to beacons', () {
+      final name = Beacon.writable("Bob");
+      final age = Beacon.writable(20);
+      final college = Beacon.writable("MIT");
+
+      var called = 0;
+      Beacon.createEffect(() {
+        called++;
+        // ignore: unused_local_variable
+        var msg = '${name.value} is ${age.value} years old';
+
+        if (age.value > 21) {
+          msg += ' and can go to ${college.value}';
+        }
+
+        // print(msg);
+      });
+
+      name.value = "Alice";
+      age.value = 21;
+      college.value = "Stanford";
+      age.value = 22;
+      college.value = "Harvard";
+      age.value = 18;
+
+      // Should stop listening to college beacon because age is less than 21
+      college.value = "Yale";
+
+      expect(called, equals(6));
+    });
+
+    test('Subscription should fire immediately', () async {
+      final a = Beacon.writable(1);
+      final completer = Completer<int>();
+
+      a.subscribe(completer.complete, runImmediately: true);
+
+      final result = await completer.future;
+
+      expect(result, 1);
+    });
+
+    test('Listeners are not notified when the value remains unchanged', () {
+      var beacon = Beacon.writable<int>(10);
+      var callCount = 0;
+      beacon.subscribe((_) => callCount++);
+      beacon.value = 10;
+      expect(callCount, equals(0));
+    });
+
+    test('Notifications are batched across multiple beacons', () {
+      final age = Beacon.writable<int>(10);
+      var callCount = 0;
+      age.subscribe((_) => callCount++);
+
+      Beacon.doBatchUpdate(() {
+        age.value = 15;
+        age.value = 16;
+        age.value = 20;
+        age.value = 23;
+      });
+
+      // There were 4 updates, but only 1 notification
+      expect(callCount, equals(1));
+    });
+
+    test('Nested batch updates only notify once', () {
+      final age = Beacon.writable<int>(10);
+      var callCount = 0;
+      age.subscribe((_) => callCount++);
+
+      Beacon.doBatchUpdate(() {
+        age.value = 15;
+        age.value = 16;
+        Beacon.doBatchUpdate(() {
+          age.value = 50;
+          age.value = 51;
+          Beacon.doBatchUpdate(() {
+            age.value = 100;
+            age.value = 200;
+          });
+          age.value = 52;
+        });
+        age.value = 20;
+      });
+
+      // There were 6 updates, but only 1 notification
+      expect(callCount, equals(1));
+
+      // The last value should be the one that was set last
+      expect(age.value, equals(20));
+    });
+
+    test('Reset method resets value to initial state', () {
+      var beacon = Beacon.writable<int>(10);
+      beacon.value = 20;
+      beacon.reset();
+      expect(beacon.value, equals(10));
+    });
+
+    test('Subscribing and unsubscribing works correctly', () {
+      var beacon = Beacon.writable<int>(10);
+      var callCount = 0;
+
+      var unsubscribe = beacon.subscribe((_) => callCount++);
+      beacon.value = 20;
+      expect(callCount, equals(1));
+
+      unsubscribe();
+      beacon.value = 30;
+      expect(callCount, equals(1)); // No additional call after unsubscribing
+    });
+
+    test('Multiple listeners are notified correctly', () {
+      var beacon = Beacon.writable<int>(10);
+      var callCount1 = 0;
+      var callCount2 = 0;
+
+      beacon.subscribe((_) => callCount1++);
+      beacon.subscribe((_) => callCount2++);
+
+      beacon.value = 20;
+      expect(callCount1, equals(1));
+      expect(callCount2, equals(1));
+    });
+
+    test('should update value only after specified duration', () async {
+      final beacon =
+          Beacon.debounced('', duration: Duration(milliseconds: 100));
+      var called = 0;
+
+      beacon.subscribe((_) => called++);
+
+      beacon.value = 'a';
+      beacon.value = 'ap';
+      beacon.value = 'app';
+      beacon.value = 'appl';
+      beacon.value = 'apple';
+
+      // Value should still be 0 immediately after setting it
+      expect(beacon.value, equals(''));
+
+      await Future.delayed(Duration(milliseconds: 150));
+
+      expect(beacon.value, equals('apple')); // Value should be updated now
+
+      expect(called, equals(1)); // Only one notification should be sent
+    });
+
+    test('should update value at most once in specified duration', () async {
+      final beacon = Beacon.throttled(0, duration: Duration(milliseconds: 100));
+      var called = 0;
+
+      beacon.subscribe((_) => called++);
+
+      beacon.value = 10;
+      expect(beacon.value, equals(10));
+
+      beacon.value = 20;
+      beacon.value = 30;
+      beacon.value = 40;
+
+      await Future.delayed(Duration(milliseconds: 50));
+
+      expect(beacon.value, equals(10));
+
+      await Future.delayed(Duration(milliseconds: 60));
+
+      beacon.value = 30;
+
+      expect(beacon.value, equals(30));
+
+      // only ran twice even though value was updated 5 times
+      expect(called, equals(2));
+    });
+
+    test('should update value only if it satisfies the filter criteria', () {
+      var beacon = Beacon.filtered(0, (prev, next) => next > 5);
+      beacon.value = 4;
+      expect(beacon.value, equals(0)); // Value should not update
+
+      beacon.value = 6;
+      expect(beacon.value, equals(6)); // Value should update
+    });
+
+    test('should lazily initialize its value', () {
+      final beacon = Beacon.lazy<int>();
+
+      expect(() => beacon.value, throwsA(isA<UninitializeLazyReadException>()));
+
+      beacon.value = 10;
+
+      expect(beacon.value, equals(10));
+    });
+
+    test('should attach a timestamp to each value', () {
+      var beacon = Beacon.timestamped(0);
+      var timestampBefore = DateTime.now();
+      beacon.set(10);
+      var timestampAfter = DateTime.now();
+
+      expect(beacon.value.value, equals(10)); // Check value
+      expect(
+        beacon.value.timestamp.isAfter(timestampBefore) &&
+            beacon.value.timestamp.isBefore(timestampAfter),
+        isTrue,
+      );
+    });
+
+    test('ListBeacon should notify listeners when it\'s value is modified', () {
+      var nums = Beacon.list<int>([1, 2, 3]);
+
+      nums.add(4);
+
+      expect(nums.value, equals([1, 2, 3, 4]));
+
+      nums.remove(2);
+
+      expect(nums.value, equals([1, 3, 4]));
+
+      nums[0] = 10;
+
+      expect(nums.value, equals([10, 3, 4]));
+
+      nums.addAll([5, 6, 7]);
+
+      expect(nums.value, equals([10, 3, 4, 5, 6, 7]));
+
+      nums.length = 2;
+
+      expect(nums.value, equals([10, 3]));
+
+      nums.clear();
+
+      expect(nums.value, equals([]));
+
+      try {
+        nums.first;
+      } catch (e) {
+        expect(e, isA<StateError>());
+      }
+    });
+  });
+
+  group('createEffect Tests', () {
+    test('Effect runs when a dependency changes', () {
+      var beacon = Beacon.writable<int>(10);
+      var effectCalled = false;
+
+      Beacon.createEffect(() {
+        effectCalled = true;
+        beacon.value; // Dependency
+      });
+
+      // Should be true immediately after createEffect
+      expect(effectCalled, isTrue);
+
+      effectCalled = false; // Resetting for the next check
+      beacon.value = 20;
+      expect(effectCalled, isTrue);
+    });
+
+    test('Effect does not run when dependencies are unchanged', () {
+      var beacon = Beacon.writable<int>(10);
+      var effectCalled = false;
+
+      Beacon.createEffect(() {
+        effectCalled = true;
+        beacon.value; // Dependency
+      });
+
+      effectCalled = false; // Resetting for the next check
+      beacon.value = 10;
+
+      // Not changing the beacon value
+      expect(effectCalled, isFalse);
+    });
+
+    test('Effect runs when any of its multiple dependencies change', () {
+      var beacon1 = Beacon.writable<int>(10);
+      var beacon2 = Beacon.writable<int>(20);
+      var effectCalled = false;
+
+      Beacon.createEffect(() {
+        effectCalled = true;
+        beacon1.value;
+        beacon2.value; // Multiple dependencies
+      });
+
+      beacon1.value = 15; // Changing one of the dependencies
+      expect(effectCalled, isTrue);
+
+      effectCalled = false; // Resetting for the next check
+      beacon2.value = 25; // Changing the other dependency
+      expect(effectCalled, isTrue);
+    });
+
+    test('Effect runs immediately upon creation', () {
+      var beacon = Beacon.writable<int>(10);
+      var effectCalled = false;
+
+      Beacon.createEffect(() {
+        effectCalled = true;
+        beacon.value;
+      });
+
+      // Should be true immediately after createEffect
+      expect(effectCalled, isTrue);
+    });
+
+    test('Canceling the effect', () {
+      var beacon = Beacon.writable(10);
+      var effectCalled = false;
+
+      var cancel = Beacon.createEffect(() {
+        effectCalled = true;
+        var _ = beacon.value;
+      });
+
+      cancel();
+      effectCalled = false;
+
+      beacon.value = 20;
+      expect(effectCalled, isFalse);
+    });
+
+    test('should throw when effect mutates its dependency', () {
+      var beacon1 = Beacon.writable<int>(10);
+
+      try {
+        Beacon.createEffect(() => beacon1.value++);
+      } catch (e) {
+        expect(e, isA<CircularDependencyException>());
+      }
+    });
+  });
+
+  group('Derived Tests', () {
+    test('Derived callback is only ran once, on creation', () {
+      final beacon = Beacon.writable(1);
+      var effectCount = 0;
+
+      final _ = Beacon.derived(() {
+        effectCount++;
+        return beacon.peek();
+      });
+
+      expect(effectCount, 1);
+    });
+
+    test('Derived value updates on dependency change', () {
+      var beacon = Beacon.writable<int>(10);
+      var derivedBeacon = Beacon.derived(() => beacon.value * 2);
+
+      beacon.value = 20;
+      expect(derivedBeacon.value, equals(40));
+    });
+
+    test('Derived value is correct upon initialization', () {
+      var beacon = Beacon.writable<int>(10);
+      var derivedBeacon = Beacon.derived(() => beacon.value * 2);
+
+      expect(derivedBeacon.value, equals(20));
+    });
+
+    test('Derived callback run once per update', () {
+      var beacon = Beacon.writable<int>(10);
+      var called = 0;
+      var derivedBeacon = Beacon.derived(() {
+        called++;
+        return beacon.value * 2;
+      });
+
+      beacon.value = 30;
+      expect(derivedBeacon.value, equals(60));
+
+      expect(called, equals(2));
+    });
+
+    test('Derived works with multiple dependencies', () {
+      var beacon1 = Beacon.writable<int>(10);
+      var beacon2 = Beacon.writable<int>(20);
+      var derivedBeacon = Beacon.derived(() => beacon1.value + beacon2.value);
+
+      beacon1.value = 15;
+      expect(derivedBeacon.value, equals(35));
+
+      beacon2.value = 25;
+      expect(derivedBeacon.value, equals(40));
+    });
+
+    test('should throw when derived computation mutates', () {
+      var beacon1 = Beacon.writable<int>(10);
+
+      try {
+        Beacon.derived(() => beacon1.value++);
+      } catch (e) {
+        expect(e, isA<CircularDependencyException>());
+      }
+    });
+  });
+
+  group('Beacon wrapping', () {
+    test('wrap should reflect original beacon value in wrapper beacon', () {
+      var original = Beacon.readable<int>(10);
+      var wrapper = Beacon.writable<int>(0);
+      wrapper.wrap(original);
+
+      expect(wrapper.value, equals(10));
+    });
+
+    test('wrapWithTransform should apply transformation function', () {
+      var original = Beacon.readable<int>(2);
+      var wrapper = Beacon.writable<String>("");
+      wrapper.wrapWithTransform(original, transform: (val) => 'Number $val');
+
+      expect(wrapper.value, equals('Number 2'));
+    });
+
+    test('StreamBeacon wrapped in ThrottledBeacon', () async {
+      final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
+
+      final numsFast = Beacon.stream(stream);
+      final numsSlow = Beacon.throttled<AsyncValue<int>>(AsyncLoading(),
+          duration: Duration(milliseconds: 200));
+
+      const maxCalls = 15;
+
+      numsSlow.wrap(numsFast);
+      var streamCalled = 0;
+      var throttledCalled = 0;
+
+      numsFast.subscribe((value) {
+        if (streamCalled < maxCalls) {
+          if (streamCalled == maxCalls - 1) {
+            numsFast.unsubscribe();
+          }
+
+          streamCalled++;
+        } else {
+          throw Exception('Should not have been called');
+        }
+      });
+
+      numsSlow.subscribe((value) {
+        if (throttledCalled < maxCalls) {
+          throttledCalled++;
+        } else {
+          throw Exception('Should not have been called');
+        }
+      });
+
+      await Future.delayed(Duration(milliseconds: 400));
+
+      expect(streamCalled, equals(15));
+      expect(throttledCalled, equals(1));
+    });
+  });
+}
