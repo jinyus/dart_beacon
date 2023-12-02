@@ -23,7 +23,7 @@ class DerivedBeacon<T> extends LazyBeacon<T> {
 
     return () {
       superUnsub();
-      _unsubscribe();
+      // _unsubscribe(); // this should be called explicitly
     };
   }
 }
