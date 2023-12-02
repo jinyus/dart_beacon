@@ -2,10 +2,11 @@ import 'package:example/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
-final _count = Beacon.writable(0);
+final count = Beacon.writable(0);
 
-final _derivedFutureCounter = Beacon.derivedFuture(() async {
-  return await counterFuture(_count.value);
+// the future will be recomputed whenever the counter changes
+final derivedFutureCounter = Beacon.derivedFuture(() async {
+  return await counterFuture(count.value);
 });
 
 Future<String> counterFuture(int count) async {
@@ -44,13 +45,13 @@ class CounterPage extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.remove),
-              onPressed: () => _count.value--,
+              onPressed: () => count.value--,
               style: btnStyle,
             ),
             k16SizeBox,
             IconButton(
               icon: const Icon(Icons.add),
-              onPressed: () => _count.value++,
+              onPressed: () => count.value++,
               style: btnStyle,
             ),
           ],
@@ -66,8 +67,8 @@ class Counter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      _count.watch(context).toString(),
-      style: Theme.of(context).textTheme.headlineMedium!,
+      count.watch(context).toString(),
+      style: k40Text,
     );
   }
 }
@@ -78,7 +79,7 @@ class FutureCounter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme.headlineSmall;
-    return switch (_derivedFutureCounter.watch(context)) {
+    return switch (derivedFutureCounter.watch(context)) {
       AsyncData<String>(value: final v) => Text(v, style: textTheme),
       AsyncError(error: final e) => Text('$e', style: textTheme),
       AsyncLoading() => const CircularProgressIndicator(),

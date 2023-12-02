@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:example/counter_page.dart';
+import 'package:example/search_page.dart';
 import 'package:example/todo_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Beacon Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -73,7 +74,7 @@ class MyHomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-          title: const Text('TabBar Sample'),
+          title: const Text('Beacon Examples'),
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(
@@ -92,11 +93,18 @@ class MyHomePage extends StatelessWidget {
           children: <Widget>[
             CounterPage(),
             TodoPage(),
-            Center(
-              child: Text("It's sunny here"),
-            ),
+            SearchPage(),
           ],
         ),
+        floatingActionButton: Builder(builder: (context) {
+          final isDark = brightness.watch(context) == Brightness.dark;
+          return IconButton(
+            onPressed: () {
+              brightness.value = isDark ? Brightness.light : Brightness.dark;
+            },
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+          );
+        }),
       ),
     );
   }

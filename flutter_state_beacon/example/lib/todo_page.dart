@@ -4,21 +4,19 @@ import 'package:example/const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
-enum Filter { all, active, completed }
+enum Filter { all, active, done }
 
 final todosBeacon = Beacon.writable(<Todo>[]);
 final inputTextBeacon = Beacon.writable('');
 final filterBeacon = Beacon.writable(Filter.all);
 
 final filteredTodos = Beacon.derived(() {
-  final filter = filterBeacon.value;
-
   final todos = todosBeacon.value;
 
-  return switch (filter) {
+  return switch (filterBeacon.value) {
     Filter.all => todos,
     Filter.active => todos.where((e) => !e.completed).toList(),
-    Filter.completed => todos.where((e) => e.completed).toList()
+    Filter.done => todos.where((e) => e.completed).toList()
   };
 });
 
@@ -49,6 +47,7 @@ class TodoPage extends StatelessWidget {
           child: const Column(
             children: [
               Text('Todo', style: TextStyle(fontSize: 48)),
+              k16SizeBox,
               FilterButtons(),
               k16SizeBox,
               TodoInput(),
@@ -114,12 +113,13 @@ class TodoList extends StatelessWidget {
   Widget build(BuildContext context) {
     final todos = filteredTodos.watch(context);
     return Expanded(
-      child: ListView.builder(
+      child: ListView.separated(
         itemCount: todos.length,
         itemBuilder: (context, index) {
           final todo = todos[index];
           return TodoItem(todo: todo);
         },
+        separatorBuilder: (_, __) => const SizedBox(height: 5),
       ),
     );
   }
@@ -133,6 +133,7 @@ class TodoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      tileColor: Theme.of(context).colorScheme.secondaryContainer,
       title: Text(todo.description, style: k24Text),
       trailing: IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
