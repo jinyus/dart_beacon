@@ -47,7 +47,6 @@ class SearchInput extends StatefulWidget {
 
 class _SearchInputState extends State<SearchInput> {
   final controller = TextEditingController(text: searchTextBeacon.peek());
-  final focus = FocusNode();
 
   @override
   void initState() {
@@ -60,7 +59,6 @@ class _SearchInputState extends State<SearchInput> {
   @override
   void dispose() {
     controller.dispose();
-    focus.dispose();
     super.dispose();
   }
 
@@ -68,7 +66,6 @@ class _SearchInputState extends State<SearchInput> {
   Widget build(BuildContext context) {
     return TextField(
       style: k24Text,
-      focusNode: focus,
       controller: controller,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),

@@ -180,7 +180,7 @@ class FilterButtons extends StatelessWidget {
             },
           );
         },
-      ).toList(),
+      ),
     );
   }
 }
