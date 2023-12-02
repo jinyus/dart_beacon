@@ -15,7 +15,7 @@ var _lastPurge = DateTime.now().subtract(k10seconds);
 final s = Beacon.writable(0);
 
 extension BeaconUtils<T> on BaseBeacon<T> {
-  /// Watches a beacon for changes and triggers a widget
+  /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
   ///
   /// Note: must be called within a widget's build method.
