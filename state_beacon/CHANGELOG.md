@@ -1,3 +1,9 @@
+## 0.2.0
+
+-   Fix bug with DerivedBeacons unregistering
+-   Notify listeners when LazyBeacon is initialized
+-   Add `mapInPlace` for ListBeacon
+
 ## 0.1.2
 
 -   Add `Beacon.scopedWritable`.
