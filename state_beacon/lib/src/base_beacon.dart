@@ -8,6 +8,7 @@ part 'exceptions.dart';
 part 'beacons/debounced.dart';
 part 'beacons/throttled.dart';
 part 'beacons/filtered.dart';
+part 'beacons/buffered.dart';
 part 'beacons/timestamp.dart';
 part 'beacons/lazy.dart';
 part 'beacons/writable.dart';
