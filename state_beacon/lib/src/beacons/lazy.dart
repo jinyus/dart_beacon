@@ -17,8 +17,11 @@ class LazyBeacon<T> extends ReadableBeacon<T> {
       _initialValue = newValue;
       _previousValue = newValue;
       _value = newValue;
+      _notifyListeners();
     } else {
-      _setValue(newValue);
+      _setValue(
+        newValue,
+      );
     }
   }
 
