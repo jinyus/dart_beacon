@@ -15,7 +15,7 @@ class FakeWeatherRepository implements WeatherRepository {
 
     final random = Random();
 
-    if (random.nextInt(10) > 5) {
+    if (random.nextInt(10) > 5 || cityName.isEmpty) {
       throw NetworkException();
     }
 
