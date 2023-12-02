@@ -1,3 +1,7 @@
+## 0.2.1
+
+-   Add BufferedCountBeacon and BufferedTimeBeacon
+
 ## 0.2.0
 
 -   Fix bug with DerivedBeacons unregistering
