@@ -5,23 +5,32 @@ import 'package:state_beacon/state_beacon.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('BaseBeacon Tests', () {
-    test('Initial value is set correctly', () {
-      var beacon = Beacon.writable<int>(10);
+  group('Beacon Tests', () {
+    test('should set initial value', () {
+      var beacon = Beacon.writable(10);
       expect(beacon.peek(), equals(10));
     });
-  });
-
-  group('Beacon Tests', () {
-    test('Value updates notify listeners', () {
-      var beacon = Beacon.writable<int>(10);
+    test('should notify listeners when value changes', () {
+      var beacon = Beacon.writable(10);
       var called = false;
       beacon.subscribe((_) => called = true);
       beacon.value = 20;
       expect(called, isTrue);
     });
 
-    test('Should conditionally stop listening to beacons', () {
+    test('should return a function that can write to the beacon', () {
+      var (count, setCount) = Beacon.scopedWritable(0);
+      var called = 0;
+      count.subscribe((_) => called++);
+      setCount(10);
+      expect(count.value, equals(10));
+      expect(called, equals(1));
+      setCount(20);
+      expect(count.value, equals(20));
+      expect(called, equals(2));
+    });
+
+    test('should conditionally stop listening to beacons', () {
       final name = Beacon.writable("Bob");
       final age = Beacon.writable(20);
       final college = Beacon.writable("MIT");
@@ -52,7 +61,7 @@ void main() {
       expect(called, equals(6));
     });
 
-    test('Subscription should fire immediately', () async {
+    test('should fire subscription immediately', () async {
       final a = Beacon.writable(1);
       final completer = Completer<int>();
 
@@ -63,7 +72,7 @@ void main() {
       expect(result, 1);
     });
 
-    test('Listeners are not notified when the value remains unchanged', () {
+    test('should not notify listeners when the value remains unchanged', () {
       var beacon = Beacon.writable<int>(10);
       var callCount = 0;
       beacon.subscribe((_) => callCount++);
@@ -71,7 +80,7 @@ void main() {
       expect(callCount, equals(0));
     });
 
-    test('Notifications are batched across multiple beacons', () {
+    test('should send 1 notification when doing batch updates', () {
       final age = Beacon.writable<int>(10);
       var callCount = 0;
       age.subscribe((_) => callCount++);
@@ -87,7 +96,7 @@ void main() {
       expect(callCount, equals(1));
     });
 
-    test('Nested batch updates only notify once', () {
+    test('should only notify once for nested batched updates', () {
       final age = Beacon.writable<int>(10);
       var callCount = 0;
       age.subscribe((_) => callCount++);
@@ -114,14 +123,14 @@ void main() {
       expect(age.value, equals(20));
     });
 
-    test('Reset method resets value to initial state', () {
+    test('should reset the value to initial state', () {
       var beacon = Beacon.writable<int>(10);
       beacon.value = 20;
       beacon.reset();
       expect(beacon.value, equals(10));
     });
 
-    test('Subscribing and unsubscribing works correctly', () {
+    test('should subscribe and unsubscribe correctly', () {
       var beacon = Beacon.writable<int>(10);
       var callCount = 0;
 
