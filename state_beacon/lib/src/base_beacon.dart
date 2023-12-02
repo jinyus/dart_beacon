@@ -5,7 +5,6 @@ import 'effect_closure.dart';
 
 part 'effect.dart';
 part 'exceptions.dart';
-part 'extensions.dart';
 part 'beacons/debounced.dart';
 part 'beacons/throttled.dart';
 part 'beacons/filtered.dart';

@@ -1,4 +1,4 @@
-part of 'base_beacon.dart';
+import 'base_beacon.dart';
 
 extension BoolUtils on WritableBeacon<bool> {
   void toggle() {
