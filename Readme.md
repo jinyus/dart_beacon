@@ -27,11 +27,10 @@ A Beacon is a powerful reactive primitive for dart. It provides facilities for e
 
 Include `beacon` in your `pubspec.yaml` dependencies:
 
-```yaml
-dependencies:
-    state_beacon: ^latest_version
-    # or
-    flutter_state_beacon: ^latest_version
+```bash
+dart pub add state_beacon
+# or
+flutter pub add flutter_state_beacon
 ```
 
 ## Usage
