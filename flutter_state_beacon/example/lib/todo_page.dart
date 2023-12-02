@@ -6,7 +6,7 @@ import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
 enum Filter { all, active, done }
 
-final todosBeacon = Beacon.writable(<Todo>[]);
+final todosBeacon = Beacon.list(<Todo>[]);
 final inputTextBeacon = Beacon.writable('');
 final filterBeacon = Beacon.writable(Filter.all);
 
@@ -23,13 +23,12 @@ final filteredTodos = Beacon.derived(() {
 void addTodo() {
   final text = inputTextBeacon.value;
   if (text.isNotEmpty) {
-    todosBeacon.value = [
-      ...todosBeacon.peek(),
+    todosBeacon.add(
       Todo(
         id: DateTime.now().toIso8601String(),
         description: text,
       ),
-    ];
+    );
     inputTextBeacon.value = '';
   }
 }
@@ -138,15 +137,14 @@ class TodoItem extends StatelessWidget {
       trailing: IconButton(
         icon: const Icon(Icons.delete, color: Colors.red),
         onPressed: () {
-          todosBeacon.value =
-              todosBeacon.peek().where((e) => e.id != todo.id).toList();
+          todosBeacon.removeWhere((e) => e.id == todo.id);
         },
       ),
       leading: Checkbox(
         value: todo.completed,
         onChanged: (value) {
           if (value == null) return;
-          todosBeacon.value = todosBeacon.peek().map((e) {
+          todosBeacon.mapInPlace((e) {
             if (e.id == todo.id) {
               return Todo(
                 id: e.id,
@@ -155,7 +153,7 @@ class TodoItem extends StatelessWidget {
               );
             }
             return e;
-          }).toList();
+          });
         },
       ),
     );
