@@ -4,7 +4,7 @@
 
 ## Overview
 
-A Beacon is a powerful reactive primitive for dart. It provides facilities for executing any code when a value is updated.
+A Beacon is a reactive primitive. This means that it provides facilities for executing any code when a it's value is modified.
 
 ## Features
 
