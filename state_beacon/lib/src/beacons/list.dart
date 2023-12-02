@@ -123,7 +123,6 @@ class ListBeacon<E> extends WritableBeacon<List<E>> implements List<E> {
   @override
   void forEach(void Function(E element) action) {
     value.forEach(action);
-    _notifyListeners();
   }
 
   @override
@@ -185,6 +184,13 @@ class ListBeacon<E> extends WritableBeacon<List<E>> implements List<E> {
   @override
   Iterable<T> map<T>(T Function(E e) toElement) {
     return value.map(toElement);
+  }
+
+  void mapInPlace(E Function(E) toElement) {
+    for (var i = 0; i < value.length; i++) {
+      this[i] = toElement(value[i]);
+    }
+    _notifyListeners();
   }
 
   @override
@@ -324,9 +330,11 @@ class ListBeacon<E> extends WritableBeacon<List<E>> implements List<E> {
 
   @override
   int get hashCode {
-    return Object.hashAll([
-      this.hashCode,
-      value.hashCode,
-    ]);
+    return Object.hashAll(
+      [
+        this.hashCode,
+        for (final item in value) item.hashCode,
+      ],
+    );
   }
 }
