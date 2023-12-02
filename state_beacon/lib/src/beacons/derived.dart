@@ -13,6 +13,10 @@ class DerivedBeacon<T> extends LazyBeacon<T> {
     _unsubscribe();
   }
 
+  void forceSetValue(T newValue) {
+    setValue(newValue, force: true);
+  }
+
   @override
   VoidCallback subscribe(
     void Function(T value) callback, {

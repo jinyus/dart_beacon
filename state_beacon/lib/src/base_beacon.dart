@@ -44,8 +44,8 @@ abstract class BaseBeacon<T> {
     return _value;
   }
 
-  void _setValue(T newValue) {
-    if (_value != newValue) {
+  void _setValue(T newValue, {bool force = false}) {
+    if (_value != newValue || force) {
       _previousValue = _value;
       _value = newValue;
 

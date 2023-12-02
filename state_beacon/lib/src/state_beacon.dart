@@ -150,7 +150,7 @@ abstract class Beacon {
     final beacon = DerivedBeacon<T>();
 
     final unsub = effect(() {
-      beacon.value = compute();
+      beacon.forceSetValue(compute());
     });
 
     beacon.$setInternalEffectUnsubscriber(unsub);
@@ -196,9 +196,9 @@ abstract class Beacon {
 
       try {
         final result = await compute();
-        beacon.setValue(exeID, AsyncData(result));
+        beacon.setAsyncValue(exeID, AsyncData(result));
       } catch (e, s) {
-        beacon.setValue(exeID, AsyncError(e, s));
+        beacon.setAsyncValue(exeID, AsyncError(e, s));
       }
     });
 

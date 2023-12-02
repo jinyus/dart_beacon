@@ -6,15 +6,15 @@ class DerivedFutureBeacon<T> extends DerivedBeacon<AsyncValue<T>> {
   var _executionID = 0;
 
   int startLoading() {
-    super.value = AsyncLoading();
+    super.forceSetValue(AsyncLoading());
     return ++_executionID;
   }
 
-  void setValue(int exeID, AsyncValue<T> value) {
+  void setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
     if (exeID != _executionID) return;
-    super.value = value;
+    super.forceSetValue(value);
   }
 }
 

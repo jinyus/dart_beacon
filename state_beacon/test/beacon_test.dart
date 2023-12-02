@@ -222,7 +222,7 @@ void main() {
 
       expect(() => beacon.value, throwsA(isA<UninitializeLazyReadException>()));
 
-      beacon.value = 10;
+      beacon.setValue(10);
 
       expect(beacon.value, equals(10));
     });

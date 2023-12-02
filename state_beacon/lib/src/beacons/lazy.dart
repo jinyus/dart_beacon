@@ -11,7 +11,7 @@ class LazyBeacon<T> extends ReadableBeacon<T> {
     }
   }
 
-  set value(T newValue) {
+  void setValue(T newValue, {bool force = false}) {
     if (_isEmpty) {
       _isEmpty = false;
       _initialValue = newValue;
@@ -19,9 +19,7 @@ class LazyBeacon<T> extends ReadableBeacon<T> {
       _value = newValue;
       _notifyListeners();
     } else {
-      _setValue(
-        newValue,
-      );
+      _setValue(newValue, force: force);
     }
   }
 
