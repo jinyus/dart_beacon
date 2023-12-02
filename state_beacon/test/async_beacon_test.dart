@@ -5,7 +5,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('FutureBeacon Tests', () {
-    test('Updates to AsyncData on successful future resolution', () async {
+    test('should change to AsyncData on successful future resolution',
+        () async {
       var completer = Completer<String>();
       var futureBeacon = Beacon.future(() async => completer.future);
 
@@ -18,7 +19,7 @@ void main() {
       expect(data.value, equals('result'));
     });
 
-    test('Updates to AsyncError on future error', () async {
+    test('should change to AsyncError on future error', () async {
       var futureBeacon =
           Beacon.future<String>(() async => throw Exception('error'));
       await Future.delayed(Duration(milliseconds: 100));
@@ -29,12 +30,12 @@ void main() {
       expect(error.error, isA<Exception>());
     });
 
-    test('Initial state is AsyncLoading', () {
+    test('should set initial state to AsyncLoading', () {
       var futureBeacon = Beacon.future(() async => 'result');
       expect(futureBeacon.value, isA<AsyncLoading>());
     });
 
-    test('Reset re-executes the future', () async {
+    test('should re-executes the future on reset', () async {
       var counter = 0;
 
       var futureBeacon = Beacon.future(() async => ++counter);
@@ -100,7 +101,7 @@ void main() {
   });
 
   group('Stream tests', () {
-    test('StreamBeacon emits values', () async {
+    test('should  emit values', () async {
       var myStream = Stream.periodic(Duration(milliseconds: 100), (i) => i);
       var myBeacon = Beacon.stream(myStream);
       var called = 0;

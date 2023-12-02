@@ -143,7 +143,7 @@ void main() {
       expect(callCount, equals(1)); // No additional call after unsubscribing
     });
 
-    test('Multiple listeners are notified correctly', () {
+    test('should notify multiple listeners', () {
       var beacon = Beacon.writable<int>(10);
       var callCount1 = 0;
       var callCount2 = 0;
@@ -152,8 +152,9 @@ void main() {
       beacon.subscribe((_) => callCount2++);
 
       beacon.value = 20;
-      expect(callCount1, equals(1));
-      expect(callCount2, equals(1));
+      beacon.value = 21;
+      expect(callCount1, equals(2));
+      expect(callCount2, equals(2));
     });
 
     test('should update value only after specified duration', () async {
@@ -163,6 +164,7 @@ void main() {
 
       beacon.subscribe((_) => called++);
 
+      // simulate typing
       beacon.value = 'a';
       beacon.value = 'ap';
       beacon.value = 'app';
@@ -239,7 +241,7 @@ void main() {
       );
     });
 
-    test('ListBeacon should notify listeners when it\'s value is modified', () {
+    test('should notify listeners when list is modified', () {
       var nums = Beacon.list<int>([1, 2, 3]);
 
       nums.add(4);
@@ -275,7 +277,7 @@ void main() {
   });
 
   group('createEffect Tests', () {
-    test('Effect runs when a dependency changes', () {
+    test('should run when a dependency changes', () {
       var beacon = Beacon.writable<int>(10);
       var effectCalled = false;
 
@@ -292,7 +294,7 @@ void main() {
       expect(effectCalled, isTrue);
     });
 
-    test('Effect does not run when dependencies are unchanged', () {
+    test('should not run when dependencies are unchanged', () {
       var beacon = Beacon.writable<int>(10);
       var effectCalled = false;
 
@@ -308,7 +310,7 @@ void main() {
       expect(effectCalled, isFalse);
     });
 
-    test('Effect runs when any of its multiple dependencies change', () {
+    test('should run when any of its multiple dependencies change', () {
       var beacon1 = Beacon.writable<int>(10);
       var beacon2 = Beacon.writable<int>(20);
       var effectCalled = false;
@@ -327,7 +329,7 @@ void main() {
       expect(effectCalled, isTrue);
     });
 
-    test('Effect runs immediately upon creation', () {
+    test('should run immediately upon creation', () {
       var beacon = Beacon.writable<int>(10);
       var effectCalled = false;
 
@@ -340,7 +342,7 @@ void main() {
       expect(effectCalled, isTrue);
     });
 
-    test('Canceling the effect', () {
+    test('should cancel the effect', () {
       var beacon = Beacon.writable(10);
       var effectCalled = false;
 
@@ -368,7 +370,7 @@ void main() {
   });
 
   group('Derived Tests', () {
-    test('Derived callback is only ran once, on creation', () {
+    test('should only run immediately', () {
       final beacon = Beacon.writable(1);
       var effectCount = 0;
 
@@ -380,7 +382,7 @@ void main() {
       expect(effectCount, 1);
     });
 
-    test('Derived value updates on dependency change', () {
+    test('should update derived value when dependency changes', () {
       var beacon = Beacon.writable<int>(10);
       var derivedBeacon = Beacon.derived(() => beacon.value * 2);
 
@@ -388,14 +390,14 @@ void main() {
       expect(derivedBeacon.value, equals(40));
     });
 
-    test('Derived value is correct upon initialization', () {
+    test('should be correct derived value upon initialization', () {
       var beacon = Beacon.writable<int>(10);
       var derivedBeacon = Beacon.derived(() => beacon.value * 2);
 
       expect(derivedBeacon.value, equals(20));
     });
 
-    test('Derived callback run once per update', () {
+    test('should run once per update', () {
       var beacon = Beacon.writable<int>(10);
       var called = 0;
       var derivedBeacon = Beacon.derived(() {
@@ -409,7 +411,7 @@ void main() {
       expect(called, equals(2));
     });
 
-    test('Derived works with multiple dependencies', () {
+    test('should recompute when watching multiple dependencies', () {
       var beacon1 = Beacon.writable<int>(10);
       var beacon2 = Beacon.writable<int>(20);
       var derivedBeacon = Beacon.derived(() => beacon1.value + beacon2.value);
@@ -433,7 +435,7 @@ void main() {
   });
 
   group('Beacon wrapping', () {
-    test('wrap should reflect original beacon value in wrapper beacon', () {
+    test('should reflect original beacon value in wrapper beacon', () {
       var original = Beacon.readable<int>(10);
       var wrapper = Beacon.writable<int>(0);
       wrapper.wrap(original);
@@ -441,7 +443,7 @@ void main() {
       expect(wrapper.value, equals(10));
     });
 
-    test('wrapWithTransform should apply transformation function', () {
+    test('should apply transformation function', () {
       var original = Beacon.readable<int>(2);
       var wrapper = Beacon.writable<String>("");
       wrapper.wrapWithTransform(original, transform: (val) => 'Number $val');
@@ -449,7 +451,7 @@ void main() {
       expect(wrapper.value, equals('Number 2'));
     });
 
-    test('StreamBeacon wrapped in ThrottledBeacon', () async {
+    test('should throttle wrapped StreamBeacon', () async {
       final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
 
       final numsFast = Beacon.stream(stream);
