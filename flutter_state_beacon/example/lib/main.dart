@@ -40,10 +40,6 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         brightness: Brightness.light,
-        useMaterial3: true,
-        textTheme: TextTheme(
-          headlineMedium: TextStyle(fontSize: 48),
-        ),
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -51,23 +47,21 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         brightness: Brightness.dark,
-        useMaterial3: true,
       ),
       themeMode: brightness.watch(context) == Brightness.dark
           ? ThemeMode.dark
           : ThemeMode.light,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = brightness.watch(context) == Brightness.dark;
     return DefaultTabController(
       initialIndex: 1,
       length: 3,
@@ -77,15 +71,9 @@ class MyHomePage extends StatelessWidget {
           title: const Text('Beacon Examples'),
           bottom: const TabBar(
             tabs: <Widget>[
-              Tab(
-                icon: Icon(Icons.onetwothree),
-              ),
-              Tab(
-                icon: Icon(Icons.edit),
-              ),
-              Tab(
-                icon: Icon(Icons.search),
-              ),
+              Tab(icon: Icon(Icons.onetwothree)),
+              Tab(icon: Icon(Icons.edit)),
+              Tab(icon: Icon(Icons.search)),
             ],
           ),
         ),
@@ -96,96 +84,13 @@ class MyHomePage extends StatelessWidget {
             SearchPage(),
           ],
         ),
-        floatingActionButton: Builder(builder: (context) {
-          final isDark = brightness.watch(context) == Brightness.dark;
-          return IconButton(
-            onPressed: () {
-              brightness.value = isDark ? Brightness.light : Brightness.dark;
-            },
-            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
-          );
-        }),
+        floatingActionButton: IconButton(
+          onPressed: () {
+            brightness.value = isDark ? Brightness.light : Brightness.dark;
+          },
+          icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+        ),
       ),
     );
-  }
-}
-// class MyHomePage extends StatelessWidget {
-//   const MyHomePage({super.key, required this.title});
-
-//   final String title;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(title),
-//         actions: [
-//           Builder(builder: (context) {
-//             final isDark = brightness.watch(context) == Brightness.dark;
-//             return IconButton(
-//               onPressed: () {
-//                 brightness.value = isDark ? Brightness.light : Brightness.dark;
-//               },
-//               icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
-//             );
-//           }),
-//         ],
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: <Widget>[
-//             Text(
-//               'You have pushed the button this many times:',
-//               style: Theme.of(context).textTheme.headlineLarge,
-//             ),
-//             counter.watch(context) < 10 ? Counter() : Container(),
-//             FutureCounter(),
-//           ],
-//         ),
-//       ),
-//       floatingActionButton: Row(
-//         mainAxisAlignment: MainAxisAlignment.end,
-//         children: [
-//           FloatingActionButton(
-//             onPressed: () => counter.value--,
-//             tooltip: 'Decrement',
-//             child: const Icon(Icons.remove),
-//           ),
-//           SizedBox(width: 10),
-//           FloatingActionButton(
-//             onPressed: () => counter.value++,
-//             tooltip: 'Increment',
-//             child: const Icon(Icons.add),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-class Counter extends StatelessWidget {
-  const Counter({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      counter.watch(context).toString(),
-      style: Theme.of(context).textTheme.headlineMedium!,
-    );
-  }
-}
-
-class FutureCounter extends StatelessWidget {
-  const FutureCounter({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme.headlineSmall;
-    return switch (derivedFutureCounter.watch(context)) {
-      AsyncData<String>(value: final v) => Text(v, style: textTheme),
-      AsyncError(error: final e) => Text('$e', style: textTheme),
-      AsyncLoading() => const CircularProgressIndicator(),
-    };
   }
 }
