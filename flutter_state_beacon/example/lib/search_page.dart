@@ -34,7 +34,6 @@ class SearchPage extends StatelessWidget {
         ),
       ],
     );
-    ;
   }
 }
 
@@ -92,7 +91,7 @@ class SearchResults extends StatelessWidget {
                 style: k32Text,
                 textAlign: TextAlign.center,
               ),
-            AsyncError(error: final e) => const Text(
+            AsyncError(error: final _) => const Text(
                 'Nextwork Error',
                 style: TextStyle(color: Colors.red, fontSize: 24),
                 textAlign: TextAlign.center,
