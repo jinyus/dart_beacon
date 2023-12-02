@@ -7,22 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
 final brightness = Beacon.writable(Brightness.light);
-final counter = Beacon.writable(0);
-
-// The future will be recomputed whenever the counter changes
-final derivedFutureCounter = Beacon.derivedFuture(() async {
-  final count = counter.value;
-  return await counterFuture(count);
-});
-
-Future<String> counterFuture(int count) async {
-  final count = counter.peek();
-  if (count > 3) {
-    throw Exception('Count($count) cannot be greater than 3');
-  }
-  await Future.delayed(Duration(seconds: count));
-  return '$count second has passed.';
-}
 
 void main() => runApp(const MyApp());
 
