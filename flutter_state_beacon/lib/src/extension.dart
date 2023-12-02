@@ -1,18 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
-typedef ElementUnsub = ({
+typedef _ElementUnsub = ({
   WeakReference<Element> elementRef,
   void Function() unsub
 });
 
-final Map<(int, int), ElementUnsub> _subscribers = {};
+final Map<(int, int), _ElementUnsub> _subscribers = {};
 
-const k10seconds = Duration(seconds: 10);
+const _k10seconds = Duration(seconds: 10);
 
-var _lastPurge = DateTime.now().subtract(k10seconds);
-
-final s = Beacon.writable(0);
+var _lastPurge = DateTime.now().subtract(_k10seconds);
 
 extension BeaconUtils<T> on BaseBeacon<T> {
   /// Watches a beacon and triggers a widget
@@ -71,7 +69,7 @@ void _cleanUp() {
 
   // only clean up if there are more than 10 subscribers
   // and it's been more than 10 seconds
-  if (_subscribers.length < 10 || now.difference(_lastPurge) < k10seconds) {
+  if (_subscribers.length < 10 || now.difference(_lastPurge) < _k10seconds) {
     return;
   }
   _lastPurge = now;
