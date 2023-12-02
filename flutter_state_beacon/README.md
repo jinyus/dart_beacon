@@ -2,7 +2,7 @@
   <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/logo.png?raw=true">
 </p>
 
-### A simple state management library flutter using beacons/signals
+<center><h1>A simple state management library flutter using beacons/signals</h1></center>
 
 ### Usage
 
