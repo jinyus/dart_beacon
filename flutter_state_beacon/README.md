@@ -1,8 +1,19 @@
-# <center>Flutter State Beacon</center>
+<p align="center">
+  <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/logo.png?raw=true">
+</p>
 
 ### A simple state management library flutter using beacons/signals
 
 ### Usage
+
+Flutter web demo: https://flutter-beacon.surge.sh/
+
+<p align="center">
+  <picture>
+    <source srcset="https://github.com/jinyus/dart_beacon/blob/main/assets/flutter-beacon-demo.webp?raw=true" type="image/webp">
+    <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/flutter-beacon-demo.gif?raw=true" alt="demo">
+  </picture>
+</p>
 
 Click [here](https://github.com/jinyus/flutter_state_beacon/blob/main/flutter_beacon/example/lib/main.dart) for the full code.
 
