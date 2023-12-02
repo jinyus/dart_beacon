@@ -14,7 +14,7 @@ abstract class Beacon {
   static WritableBeacon<T> writable<T>(T initialValue) =>
       WritableBeacon<T>(initialValue);
 
-  /// Creates a `ReadableBeacon` with an optional initial value.
+  /// Creates a `ReadableBeacon` with an initial value.
   /// This beacon allows only reading the value.
   ///
   /// Example:
@@ -22,8 +22,22 @@ abstract class Beacon {
   /// var myBeacon = Beacon.readable(15);
   /// print(myBeacon.value); // Outputs: 15
   /// ```
-  static ReadableBeacon<T> readable<T>([T? initialValue]) =>
+  static ReadableBeacon<T> readable<T>(T initialValue) =>
       ReadableBeacon<T>(initialValue);
+
+  /// Returns a `ReadableBeacon` and a function that allows writing to the beacon.
+  /// This is useful for creating a beacon that's readable by the public,
+  /// but writable only by the owner.
+  ///
+  /// Example:
+  /// ```dart
+  /// var (count,setCount) = Beacon.scopedWritable(15);
+  /// ```
+  static (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
+      T initialValue) {
+    final beacon = WritableBeacon<T>(initialValue);
+    return (beacon, (value) => beacon.value = value);
+  }
 
   /// Creates a `LazyBeacon` with an optional initial value.
   /// The value must be initialized before it's first accessed.
