@@ -8,21 +8,21 @@ extension BoolUtils on WritableBeacon<bool> {
 
 extension ListUtils<T> on List<T> {
   /// Converts a list to [ListBeacon].
-  ListBeacon<T> toSignal() {
+  ListBeacon<T> toBeacon() {
     return ListBeacon<T>(this);
   }
 }
 
 extension StreamUtils<T> on Stream<T> {
   /// Converts a stream to [StreamBeacon].
-  StreamBeacon<T> toSignal() {
+  StreamBeacon<T> toBeacon() {
     return StreamBeacon<T>(this);
   }
 }
 
 // extension MapUtils<K, V> on Map<K, V> {
 //   /// Converts a map to [MapBeacon].
-//   MapBeacon<K, V> toSignal() {
+//   MapBeacon<K, V> toBeacon() {
 //     return MapBeacon<K, V>(this);
 //   }
 // }
