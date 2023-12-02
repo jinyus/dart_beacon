@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="200" src="https://github.com/jinyus/dart_beacon/blob/master/logo.png?raw=true">
+  <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/logo.png?raw=true">
 </p>
 
 ## Overview
