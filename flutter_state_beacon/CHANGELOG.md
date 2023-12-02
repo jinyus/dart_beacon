@@ -1,3 +1,7 @@
+## 0.1.2
+
+-   Make internal declarations private.
+
 ## 0.1.1
 
 -   Update state_beacon dependency to 0.2.0.

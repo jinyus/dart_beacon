@@ -1,6 +1,6 @@
 name: flutter_state_beacon
 description: A simple state management library using beacons/signals
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/jinyus/dart_beacon
 
 environment:
