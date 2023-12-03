@@ -93,8 +93,70 @@ abstract class Beacon {
           T initialValue, BeaconFilter<T> filter) =>
       FilteredBeacon<T>(initialValue, filter: filter);
 
+  /// Creates a `BufferedCountBeacon` that collects and buffers a specified number
+  /// of values. Once the count threshold is reached, the beacon's value is updated
+  /// with the list of collected values and the buffer is reset.
+  ///
+  /// This beacon is useful in scenarios where you need to aggregate a certain
+  /// number of values before processing them together.
+  ///
+  /// Example:
+  /// ```dart
+  /// var countBeacon = BufferedCountBeacon<int>(countThreshold: 3);
+  /// countBeacon.subscribe((values) {
+  ///   print(values); // Outputs the list of collected values
+  /// });
+  /// countBeacon.value = 1;
+  /// countBeacon.value = 2;
+  /// countBeacon.value = 3; // Triggers update with [1, 2, 3]
+  /// ```
   static BufferedCountBeacon<T> bufferedCount<T>(int count) =>
       BufferedCountBeacon<T>(countThreshold: count);
+
+  /// Creates a `BufferedTimeBeacon` that collects values over a specified time duration.
+  /// Once the time duration elapses, the beacon's value is updated with the list of
+  /// collected values and the buffer is reset for the next interval.
+  ///
+  /// This beacon is ideal for scenarios where values need to be batched and processed
+  /// periodically over time.
+  ///
+  /// Example:
+  /// ```dart
+  /// var timeBeacon = BufferedTimeBeacon<int>(bufferDuration: Duration(seconds: 5));
+  /// timeBeacon.subscribe((values) {
+  ///   print(values); // Outputs the list of collected values every 5 seconds
+  /// });
+  /// timeBeacon.value = 1;
+  /// timeBeacon.value = 2;
+  /// // After 5 seconds, it will output [1, 2]
+  /// ```
+  static BufferedTimeBeacon<T> bufferedTime<T>({required Duration duration}) =>
+      BufferedTimeBeacon<T>(duration: duration);
+
+  /// Creates an `UndoRedoBeacon` with an initial value and an optional history limit.
+  /// This beacon allows undoing and redoing changes to its value, up to the specified
+  /// number of past states.
+  ///
+  /// This beacon is particularly useful in scenarios where you need to provide
+  /// undo/redo functionality, such as in text editors or form input fields.
+  ///
+  /// Example:
+  /// ```dart
+  /// var undoRedoBeacon = UndoRedoBeacon<int>(0, historyLimit: 10);
+  /// undoRedoBeacon.value = 10;
+  /// undoRedoBeacon.value = 20;
+  /// undoRedoBeacon.undo(); // Reverts to 10
+  /// undoRedoBeacon.redo(); // Goes back to 20
+  /// ```
+  static UndoRedoBeacon<T> undoRedo<T>(
+    T initialValue, {
+    int historyLimit = 10,
+  }) {
+    return UndoRedoBeacon<T>(
+      initialValue,
+      historyLimit: historyLimit,
+    );
+  }
 
   /// Creates a `TimestampBeacon` with an initial value.
   /// This beacon attaches a timestamp to each value update.
