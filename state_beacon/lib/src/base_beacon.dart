@@ -24,11 +24,13 @@ typedef Listerners = Set<EffectClosure>;
 
 abstract class BaseBeacon<T> {
   BaseBeacon([T? initialValue]) {
-    if (initialValue != null) {
-      _initialValue = initialValue;
+    if (initialValue != null || isNullable) {
+      _initialValue = initialValue as T;
       _value = initialValue;
     }
   }
+
+  bool get isNullable => null is T;
 
   late T _value;
   T? _previousValue;
