@@ -15,7 +15,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (newValue == super.value) {
+    if (newValue == super.value && !force) {
       return;
     }
     super.set(newValue, force: force);
