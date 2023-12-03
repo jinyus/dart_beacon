@@ -1,3 +1,7 @@
+## 0.4.1
+
+-   Internal refactor
+
 ## 0.4.0
 
 -   Add WritableBeacon.set that can force update listeners
