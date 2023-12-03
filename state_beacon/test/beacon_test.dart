@@ -615,4 +615,57 @@ void main() {
       expect(buffer, equals([]));
     });
   });
+
+  group('BufferedTimeBeacon', () {
+    test('should buffer values over a time duration', () async {
+      var beacon =
+          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 50));
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(buffer, equals([]));
+
+      await Future.delayed(Duration(milliseconds: 50));
+
+      expect(buffer, equals([1, 2]));
+    });
+
+    test('should reset buffer after time duration', () async {
+      var beacon =
+          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 30));
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+      beacon.add(3);
+      beacon.add(4);
+
+      await Future.delayed(Duration(milliseconds: 40));
+
+      expect(buffer, equals([1, 2, 3, 4]));
+    });
+
+    test('should reset', () async {
+      var beacon =
+          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 30));
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      beacon.reset();
+
+      await Future.delayed(Duration(milliseconds: 40));
+
+      expect(beacon.currentBuffer.value, equals([]));
+      expect(buffer, equals([]));
+    });
+  });
 }
