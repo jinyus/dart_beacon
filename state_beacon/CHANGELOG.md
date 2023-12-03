@@ -1,3 +1,7 @@
+## 0.3.5
+
+-   Add WritableBeacon.set that can force update listeners
+
 ## 0.3.3
 
 -   Expose all Beacons
