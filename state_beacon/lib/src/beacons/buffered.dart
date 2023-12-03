@@ -3,32 +3,43 @@ part of '../base_beacon.dart';
 class BufferedCountBeacon<T> extends WritableBeacon<List<T>> {
   final int countThreshold;
   final List<T> _buffer = [];
+  final _values = WritableBeacon<List<T>>([]);
 
   BufferedCountBeacon({required this.countThreshold}) : super([]);
 
-  int get bufferedCount => _buffer.length;
+  ReadableBeacon<List<T>> get currentBuffer => _values;
 
   void add(T newValue) {
     _buffer.add(newValue);
+    _values.value = List.from(_buffer);
+
     if (_buffer.length == countThreshold) {
       super.value = List.from(_buffer);
       _buffer.clear();
     }
+  }
+
+  @override
+  void reset() {
+    currentBuffer.reset();
+    super.reset();
   }
 }
 
 class BufferedTimeBeacon<T> extends WritableBeacon<List<T>> {
   final Duration duration;
   final List<T> _buffer = [];
+  final _values = WritableBeacon<List<T>>([]);
   Timer? _timer;
 
   BufferedTimeBeacon({required this.duration}) : super([]);
 
-  int get bufferedCount => _buffer.length;
+  ReadableBeacon<List<T>> get currentBuffer => _values;
 
   void add(T newValue) {
     _startTimerIfNeeded();
     _buffer.add(newValue);
+    _values.value = List.from(_buffer);
   }
 
   void _startTimerIfNeeded() {
@@ -39,5 +50,11 @@ class BufferedTimeBeacon<T> extends WritableBeacon<List<T>> {
         _timer = null;
       });
     }
+  }
+
+  @override
+  void reset() {
+    currentBuffer.reset();
+    super.reset();
   }
 }
