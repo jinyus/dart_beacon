@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:example/counter_page.dart';
-import 'package:example/konami.dart';
+import 'package:example/konami_page.dart';
 import 'package:example/search_page.dart';
 import 'package:example/todo_page.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +48,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = brightness.watch(context) == Brightness.dark;
     return DefaultTabController(
-      initialIndex: 1,
+      initialIndex: 0,
       length: 4,
       child: Scaffold(
         appBar: AppBar(

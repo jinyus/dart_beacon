@@ -46,6 +46,7 @@ class _KonamiPageState extends State<KonamiPage> {
     });
 
     _last10.subscribe((codes) {
+      if (codes.isEmpty) return;
       final won = IterableEquality().equals(codes, konamiCodes);
 
       if (won) {
