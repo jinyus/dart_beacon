@@ -25,9 +25,6 @@ class DerivedBeacon<T> extends LazyBeacon<T> {
     final superUnsub =
         super.subscribe(callback, runImmediately: runImmediately);
 
-    return () {
-      superUnsub();
-      // _unsubscribe(); // this should be called explicitly
-    };
+    return superUnsub;
   }
 }
