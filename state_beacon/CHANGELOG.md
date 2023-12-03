@@ -1,3 +1,9 @@
+## 0.3.0
+
+-   Expose currentBuffer for BufferedCountBeacon and BufferedTimeBeacon
+-   Fix bug in BufferedTimeBeacon.reset()
+-   Add UndoRedoBeacon
+
 ## 0.2.1
 
 -   Add BufferedCountBeacon and BufferedTimeBeacon
