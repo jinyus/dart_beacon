@@ -576,7 +576,13 @@ void main() {
 
       beacon.add(1);
       beacon.add(2); // First trigger
+
+      expect(buffer, equals([1, 2]));
+
       beacon.add(3);
+
+      expect(beacon.currentBuffer.value, equals([3]));
+
       beacon.add(4); // Second trigger
 
       expect(buffer, equals([3, 4]));
