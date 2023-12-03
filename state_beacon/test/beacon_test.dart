@@ -556,4 +556,63 @@ void main() {
       expect(beacon.value, 20);
     });
   });
+
+  group('BufferedCountBeacon', () {
+    test('should buffer values until count is reached', () {
+      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+      beacon.add(3); // This should trigger the buffer to be set
+
+      expect(buffer, equals([1, 2, 3]));
+    });
+
+    test('should clear buffer after reaching count threshold', () {
+      var beacon = BufferedCountBeacon<int>(countThreshold: 2);
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2); // First trigger
+      beacon.add(3);
+      beacon.add(4); // Second trigger
+
+      expect(buffer, equals([3, 4]));
+    });
+
+    test('should update currentBuffer', () {
+      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      expect(beacon.currentBuffer.value, equals([1, 2]));
+
+      beacon.add(3); // This should trigger the buffer to be set
+      beacon.add(4);
+
+      expect(beacon.currentBuffer.value, equals([4]));
+
+      expect(buffer, equals([1, 2, 3]));
+    });
+
+    test('should reset', () {
+      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var buffer = [];
+      beacon.subscribe((value) => buffer = value);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      beacon.reset();
+
+      expect(beacon.currentBuffer.value, equals([]));
+      expect(buffer, equals([]));
+    });
+  });
 }
