@@ -19,9 +19,38 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   /// wrapperBeacon.wrap(originalBeacon);
   /// print(wrapperBeacon.value); // Outputs: 10
   /// ```
-  void wrap(ReadableBeacon<T> originalBeacon) {
-    effect(() {
+  VoidCallback wrap(ReadableBeacon<T> originalBeacon) {
+    return effect(() {
       value = originalBeacon.value;
+    });
+  }
+
+  /// Wraps an existing `ReadableBeacon` and allows you to perform a custom transformation
+  /// on its value before updating the value of the current `wrapperBeacon`. The transformation
+  /// is defined by the provided `then` function, which takes the current `wrapperBeacon`
+  /// and the value from the `originalBeacon` as its arguments.
+  ///
+  /// Example:
+  /// ```dart
+  /// var originalBeacon = Beacon.readable(10);
+  /// var wrapperBeacon = Beacon.writable(0);
+  ///
+  /// wrapperBeacon.wrapThen(originalBeacon, then: (wrapper, originalValue) {
+  ///   // Perform a custom transformation, e.g., doubling the value
+  ///   var transformedValue = originalValue * 2;
+  ///
+  ///   // Update the value of the wrapperBeacon with the transformed value
+  ///   wrapper.value = transformedValue;
+  /// });
+  ///
+  /// print(wrapperBeacon.value); // Outputs: 20
+  /// ```
+  VoidCallback wrapThen<U>(
+    ReadableBeacon<U> originalBeacon, {
+    required Function(ReadableBeacon<T>, U) then,
+  }) {
+    return effect(() {
+      then(this, originalBeacon.value);
     });
   }
 
@@ -39,11 +68,11 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   /// );
   /// print(wrapperBeacon.value); // Outputs: "Value is 10"
   /// ```
-  void wrapWithTransform<U>(
+  VoidCallback wrapWithTransform<U>(
     ReadableBeacon<U> originalBeacon, {
     required T Function(U) transform,
   }) {
-    effect(() {
+    return effect(() {
       value = transform(originalBeacon.value);
     });
   }
