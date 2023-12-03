@@ -1,3 +1,7 @@
+## 0.3.2
+
+-   Expose ReadableBeacon and WritableBeacon
+
 ## 0.3.1
 
 -   ThrottledBeacon: add method to change duration
