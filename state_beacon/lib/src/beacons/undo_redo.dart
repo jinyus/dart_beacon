@@ -11,11 +11,14 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  set value(T newValue) {
+  set value(T newValue) => set(newValue);
+
+  @override
+  void set(T newValue, {bool force = false}) {
     if (newValue == super.value) {
       return;
     }
-    super.value = newValue;
+    super.set(newValue, force: force);
     _addValueToHistory(newValue);
     _trimHistoryIfNeeded();
   }

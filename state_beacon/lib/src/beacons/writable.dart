@@ -4,7 +4,11 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   WritableBeacon(T super.initialValue);
 
   set value(T newValue) {
-    _setValue(newValue);
+    set(newValue);
+  }
+
+  void set(T newValue, {bool force = false}) {
+    _setValue(newValue, force: force);
   }
 
   /// Wraps an existing `ReadableBeacon` without transforming its value.

@@ -36,7 +36,7 @@ abstract class Beacon {
   static (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
       T initialValue) {
     final beacon = WritableBeacon<T>(initialValue);
-    return (beacon, (value) => beacon.value = value);
+    return (beacon, beacon.set);
   }
 
   /// Creates a `LazyBeacon` with an optional initial value.

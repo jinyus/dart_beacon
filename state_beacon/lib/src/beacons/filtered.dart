@@ -8,9 +8,12 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
   FilteredBeacon(super.initialValue, {required this.filter});
 
   @override
-  set value(T newValue) {
+  set value(T newValue) => set(newValue);
+
+  @override
+  void set(T newValue, {bool force = false}) {
     if (filter(_previousValue, newValue)) {
-      super.value = newValue;
+      super.set(newValue, force: force);
     }
   }
 }

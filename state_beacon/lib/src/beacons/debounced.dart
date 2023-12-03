@@ -9,9 +9,14 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
 
   @override
   set value(T newValue) {
+    set(newValue);
+  }
+
+  @override
+  void set(T newValue, {bool force = false}) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(debounceDuration, () {
-      super.value = newValue;
+      super.set(newValue, force: force);
     });
   }
 }

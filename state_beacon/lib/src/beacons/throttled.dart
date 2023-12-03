@@ -12,10 +12,13 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  set value(T newValue) {
+  set value(T newValue) => set(newValue);
+
+  @override
+  void set(T newValue, {bool force = false}) {
     if (_blocked) return;
 
-    super.value = newValue;
+    super.set(newValue, force: force);
     _blocked = true;
 
     Timer(_throttleDuration, () {
