@@ -1,11 +1,15 @@
 part of '../base_beacon.dart';
 
 class ThrottledBeacon<T> extends WritableBeacon<T> {
-  final Duration throttleDuration;
+  Duration _throttleDuration;
   bool _blocked = false;
 
   ThrottledBeacon(super.initialValue, {required Duration duration})
-      : throttleDuration = duration;
+      : _throttleDuration = duration;
+
+  void setDuration(Duration newDuration) {
+    _throttleDuration = newDuration;
+  }
 
   @override
   set value(T newValue) {
@@ -14,7 +18,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
     super.value = newValue;
     _blocked = true;
 
-    Timer(throttleDuration, () {
+    Timer(_throttleDuration, () {
       _blocked = false;
     });
   }
