@@ -330,11 +330,6 @@ class ListBeacon<E> extends WritableBeacon<List<E>> implements List<E> {
 
   @override
   int get hashCode {
-    return Object.hashAll(
-      [
-        this.hashCode,
-        for (final item in value) item.hashCode,
-      ],
-    );
+    return this.hashCode ^ value.hashCode;
   }
 }
