@@ -89,8 +89,12 @@ abstract class Beacon {
   /// var myBeacon = Beacon.filtered(10, (value) => value > 5);
   /// myBeacon.value = 4; // Does not update value
   /// ```
-  static FilteredBeacon<T> filtered<T>(T initialValue, BeaconFilter filter) =>
+  static FilteredBeacon<T> filtered<T>(
+          T initialValue, BeaconFilter<T> filter) =>
       FilteredBeacon<T>(initialValue, filter: filter);
+
+  static BufferedCountBeacon<T> bufferedCount<T>(int count) =>
+      BufferedCountBeacon<T>(countThreshold: count);
 
   /// Creates a `TimestampBeacon` with an initial value.
   /// This beacon attaches a timestamp to each value update.
