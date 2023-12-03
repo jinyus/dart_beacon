@@ -1,3 +1,9 @@
+## 0.3.1
+
+-   ThrottledBeacon: add method to change duration
+-   Add Writable.wrapThen
+-   Return dispose function for all `wrap` method
+
 ## 0.3.0
 
 -   Expose currentBuffer for BufferedCountBeacon and BufferedTimeBeacon
