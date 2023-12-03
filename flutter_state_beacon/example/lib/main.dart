@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:example/counter_page.dart';
+import 'package:example/konami.dart';
 import 'package:example/search_page.dart';
 import 'package:example/todo_page.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class MyHomePage extends StatelessWidget {
     final isDark = brightness.watch(context) == Brightness.dark;
     return DefaultTabController(
       initialIndex: 1,
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
@@ -56,6 +57,7 @@ class MyHomePage extends StatelessWidget {
           bottom: const TabBar(
             tabs: <Widget>[
               Tab(icon: Icon(Icons.onetwothree)),
+              Tab(icon: Icon(Icons.abc)),
               Tab(icon: Icon(Icons.edit)),
               Tab(icon: Icon(Icons.search)),
             ],
@@ -64,6 +66,7 @@ class MyHomePage extends StatelessWidget {
         body: const TabBarView(
           children: <Widget>[
             CounterPage(),
+            KonamiPage(),
             TodoPage(),
             SearchPage(),
           ],
