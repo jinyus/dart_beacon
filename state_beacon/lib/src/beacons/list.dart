@@ -322,14 +322,4 @@ class ListBeacon<E> extends WritableBeacon<List<E>> implements List<E> {
   Iterable<T> whereType<T>() {
     return value.whereType<T>();
   }
-
-  @override
-  bool operator ==(Object other) {
-    return other is ListBeacon<E> && value == other.value;
-  }
-
-  @override
-  int get hashCode {
-    return this.hashCode ^ value.hashCode;
-  }
 }
