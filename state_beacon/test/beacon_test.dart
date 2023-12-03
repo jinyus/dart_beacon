@@ -579,6 +579,8 @@ void main() {
 
       expect(buffer, equals([1, 2]));
 
+      expect(beacon.currentBuffer.value, equals([]));
+
       beacon.add(3);
 
       expect(beacon.currentBuffer.value, equals([3]));
@@ -652,6 +654,8 @@ void main() {
       beacon.add(4);
 
       await Future.delayed(Duration(milliseconds: 40));
+
+      expect(beacon.currentBuffer.value, equals([]));
 
       expect(buffer, equals([1, 2, 3, 4]));
     });
