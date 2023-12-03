@@ -6,6 +6,8 @@ class BufferedCountBeacon<T> extends WritableBeacon<List<T>> {
 
   BufferedCountBeacon({required this.countThreshold}) : super([]);
 
+  int get bufferedCount => _buffer.length;
+
   void add(T newValue) {
     _buffer.add(newValue);
     if (_buffer.length == countThreshold) {
@@ -21,6 +23,8 @@ class BufferedTimeBeacon<T> extends WritableBeacon<List<T>> {
   Timer? _timer;
 
   BufferedTimeBeacon({required this.duration}) : super([]);
+
+  int get bufferedCount => _buffer.length;
 
   void add(T newValue) {
     _startTimerIfNeeded();
