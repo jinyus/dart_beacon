@@ -55,6 +55,7 @@ class BufferedTimeBeacon<T> extends WritableBeacon<List<T>> {
   @override
   void reset() {
     currentBuffer.reset();
+    _timer?.cancel();
     super.reset();
   }
 }
