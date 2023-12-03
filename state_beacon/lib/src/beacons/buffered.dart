@@ -1,22 +1,21 @@
 part of '../base_beacon.dart';
 
-class BufferedCountBeacon<T> extends ReadableBeacon<List<T>> {
-  final int countThreshold;
+class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>> {
   final List<T> _buffer = [];
   final _currentBuffer = WritableBeacon<List<T>>([]);
 
-  BufferedCountBeacon({required this.countThreshold}) : super([]);
+  BufferedBaseBeacon() : super([]);
 
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
-  void add(T newValue) {
+  void addToBuffer(T newValue) {
     _buffer.add(newValue);
     _currentBuffer.value = List.from(_buffer);
+  }
 
-    if (_buffer.length == countThreshold) {
-      _setValue(List.from(_buffer));
-      _buffer.clear();
-    }
+  void clearBuffer() {
+    _buffer.clear();
+    _currentBuffer.reset();
   }
 
   @override
@@ -26,27 +25,37 @@ class BufferedCountBeacon<T> extends ReadableBeacon<List<T>> {
   }
 }
 
-class BufferedTimeBeacon<T> extends ReadableBeacon<List<T>> {
-  final Duration duration;
-  final List<T> _buffer = [];
-  final _currentBuffer = WritableBeacon<List<T>>([]);
-  Timer? _timer;
+class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
+  final int countThreshold;
 
-  BufferedTimeBeacon({required this.duration}) : super([]);
-
-  ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
+  BufferedCountBeacon({required this.countThreshold}) : super();
 
   void add(T newValue) {
+    super.addToBuffer(newValue);
+
+    if (_buffer.length == countThreshold) {
+      _setValue(List.from(_buffer));
+      super.clearBuffer();
+    }
+  }
+}
+
+class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
+  final Duration duration;
+  Timer? _timer;
+
+  BufferedTimeBeacon({required this.duration}) : super();
+
+  void add(T newValue) {
+    super.addToBuffer(newValue);
     _startTimerIfNeeded();
-    _buffer.add(newValue);
-    _currentBuffer.value = List.from(_buffer);
   }
 
   void _startTimerIfNeeded() {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer(duration, () {
         _setValue(List.from(_buffer));
-        _buffer.clear();
+        super.clearBuffer();
         _timer = null;
       });
     }
@@ -54,7 +63,7 @@ class BufferedTimeBeacon<T> extends ReadableBeacon<List<T>> {
 
   @override
   void reset() {
-    currentBuffer.reset();
+    super.clearBuffer();
     _timer?.cancel();
     super.reset();
   }
