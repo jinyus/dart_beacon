@@ -18,6 +18,47 @@ void main() {
       expect(called, isTrue);
     });
 
+    test('should notify when same value is set with force option', () async {
+      var beacon = Beacon.writable(10);
+      const time = Duration(milliseconds: 5);
+      var throttleBeacon = Beacon.throttled(10, duration: time);
+      var debounceBeacon = Beacon.debounced(10, duration: time);
+      var filterBeacon = Beacon.filtered(10, (prev, next) => next > 5);
+      var undoRedoBeacon = UndoRedoBeacon(10);
+
+      var called = 0;
+      var tCalled = 0;
+      var dCalled = 0;
+      var fCalled = 0;
+      var uCalled = 0;
+
+      beacon.subscribe((_) => called++);
+      throttleBeacon.subscribe((_) => tCalled++);
+      debounceBeacon.subscribe((_) => dCalled++);
+      filterBeacon.subscribe((_) => fCalled++);
+      undoRedoBeacon.subscribe((_) => uCalled++);
+
+      beacon.value = 20;
+      beacon.set(20, force: true);
+      beacon.set(20, force: true);
+      throttleBeacon.set(10, force: true);
+      debounceBeacon.set(10, force: true);
+      filterBeacon.set(10, force: true);
+      filterBeacon.set(10, force: true);
+      undoRedoBeacon.set(10, force: true);
+      undoRedoBeacon.set(10, force: true);
+
+      await Future.delayed(Duration(milliseconds: 6));
+
+      throttleBeacon.set(10, force: true);
+
+      expect(called, equals(3));
+      expect(tCalled, equals(2));
+      expect(dCalled, equals(1));
+      expect(fCalled, equals(2));
+      expect(uCalled, equals(2));
+    });
+
     test('should return a function that can write to the beacon', () {
       var (count, setCount) = Beacon.scopedWritable(0);
       var called = 0;
