@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
