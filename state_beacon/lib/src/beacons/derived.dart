@@ -16,15 +16,4 @@ class DerivedBeacon<T> extends LazyBeacon<T> {
   void forceSetValue(T newValue) {
     setValue(newValue, force: true);
   }
-
-  @override
-  VoidCallback subscribe(
-    void Function(T value) callback, {
-    bool runImmediately = false,
-  }) {
-    final superUnsub =
-        super.subscribe(callback, runImmediately: runImmediately);
-
-    return superUnsub;
-  }
 }
