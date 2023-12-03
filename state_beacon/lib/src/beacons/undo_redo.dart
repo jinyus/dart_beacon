@@ -26,14 +26,14 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   void undo() {
     if (_currentHistoryIndex > 0) {
       _currentHistoryIndex--;
-      super.value = _history[_currentHistoryIndex];
+      _setValue(_history[_currentHistoryIndex]);
     }
   }
 
   void redo() {
     if (_currentHistoryIndex < _history.length - 1) {
       _currentHistoryIndex++;
-      super.value = _history[_currentHistoryIndex];
+      _setValue(_history[_currentHistoryIndex]);
     }
   }
 
