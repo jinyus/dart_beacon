@@ -1,3 +1,7 @@
+## 0.3.3
+
+-   Expose all Beacons
+
 ## 0.3.2
 
 -   Expose ReadableBeacon and WritableBeacon

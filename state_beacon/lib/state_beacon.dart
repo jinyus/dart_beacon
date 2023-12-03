@@ -1,6 +1,23 @@
 library;
 
 export 'src/state_beacon.dart';
-export 'src/base_beacon.dart' show BaseBeacon, ReadableBeacon, WritableBeacon;
+export 'src/base_beacon.dart'
+    show
+        BaseBeacon,
+        ReadableBeacon,
+        WritableBeacon,
+        ListBeacon,
+        StreamBeacon,
+        BufferedCountBeacon,
+        BufferedTimeBeacon,
+        FutureBeacon,
+        FilteredBeacon,
+        DebouncedBeacon,
+        TimestampBeacon,
+        ThrottledBeacon,
+        UndoRedoBeacon,
+        DerivedBeacon,
+        DerivedFutureBeacon,
+        LazyBeacon;
 export 'src/async_value.dart';
 export 'src/extensions.dart';
