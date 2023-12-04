@@ -24,7 +24,7 @@ void main() {
       var throttleBeacon = Beacon.throttled(10, duration: time);
       var debounceBeacon = Beacon.debounced(10, duration: time);
       var filterBeacon = Beacon.filtered(10, (prev, next) => next > 5);
-      var undoRedoBeacon = UndoRedoBeacon(10);
+      var undoRedoBeacon = UndoRedoBeacon(initialValue: 10);
 
       var called = 0;
       var tCalled = 0;
@@ -258,14 +258,45 @@ void main() {
       expect(beacon.value, equals(6)); // Value should update
     });
 
-    test('should lazily initialize its value', () {
-      final beacon = Beacon.lazy<int>();
+    test('should lazily initialize its value', () async {
+      final wBeacon = Beacon.lazyWritable<int>();
+      expect(
+          () => wBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      wBeacon.set(10);
+      expect(wBeacon.value, equals(10));
 
-      expect(() => beacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      final fBeacon =
+          Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
+      expect(
+          () => fBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      fBeacon.set(10);
+      expect(fBeacon.value, equals(10));
 
-      beacon.setValue(10);
+      const k10ms = Duration(milliseconds: 10);
+      final dBeacon = Beacon.lazyDebounced<int>(duration: k10ms);
+      expect(
+          () => dBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      dBeacon.set(10);
+      await Future.delayed(k10ms * 2);
+      expect(dBeacon.value, equals(10));
 
-      expect(beacon.value, equals(10));
+      final tBeacon = Beacon.lazyThrottled<int>(duration: k10ms);
+      expect(
+          () => tBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      tBeacon.set(10);
+      expect(tBeacon.value, equals(10));
+
+      final tsBeacon = Beacon.lazyTimestamped<int>();
+      expect(
+          () => tsBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      tsBeacon.set(10);
+      expect(tsBeacon.value.value, equals(10));
+
+      final uBeacon = Beacon.lazyUndoRedo<int>();
+      expect(
+          () => uBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+      uBeacon.set(10);
+      expect(uBeacon.value, equals(10));
     });
 
     test('should attach a timestamp to each value', () {
@@ -496,8 +527,10 @@ void main() {
       final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
 
       final numsFast = Beacon.stream(stream);
-      final numsSlow = Beacon.throttled<AsyncValue<int>>(AsyncLoading(),
-          duration: Duration(milliseconds: 200));
+      final numsSlow = Beacon.throttled<AsyncValue<int>>(
+        AsyncLoading(),
+        duration: Duration(milliseconds: 200),
+      );
 
       const maxCalls = 15;
 
@@ -534,7 +567,7 @@ void main() {
 
   group('UndoRedoBeacon', () {
     test('should notify listeners when value changes', () {
-      var beacon = UndoRedoBeacon<int>(0);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
       var called = 0;
 
       beacon.subscribe((_) => called++);
@@ -545,7 +578,7 @@ void main() {
     });
 
     test('undo should revert to the previous value', () {
-      var beacon = UndoRedoBeacon<int>(0);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
       beacon.value = 10; // History: [0, 10]
       beacon.value = 20; // History: [0, 10, 20]
 
@@ -555,7 +588,7 @@ void main() {
     });
 
     test('redo should revert to the next value after undo', () {
-      var beacon = UndoRedoBeacon<int>(0);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
       beacon.value = 10; // History: [0, 10]
       beacon.value = 20; // History: [0, 10, 20]
       beacon.undo(); // History: [0, <10>, 20]
@@ -566,7 +599,7 @@ void main() {
     });
 
     test('should not undo beyond the initial value', () {
-      var beacon = UndoRedoBeacon<int>(0);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
       beacon.value = 10;
       beacon.undo(); // Should stay at initial value
 
@@ -574,7 +607,7 @@ void main() {
     });
 
     test('should not redo beyond the latest value', () {
-      var beacon = UndoRedoBeacon<int>(0);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
       beacon.value = 10; // History: [0, 10]
       beacon.value = 20; // History: [0, 10, 20]
       beacon.undo(); // History: [0, <10>, 20]
@@ -585,7 +618,7 @@ void main() {
     });
 
     test('should respect history limit', () {
-      var beacon = UndoRedoBeacon<int>(0, historyLimit: 2);
+      var beacon = UndoRedoBeacon<int>(initialValue: 0, historyLimit: 2);
       beacon.value = 10; // History: [0, 10]
       beacon.value = 20; // History: [10, 20]
       beacon.value = 30; // History: [20, 30] (0 should be pushed out)
