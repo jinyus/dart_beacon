@@ -6,7 +6,7 @@ enum DerivedFutureStatus {
   restarted,
 }
 
-class DerivedFutureBeacon<T> extends DerivedBeacon<AsyncValue<T>> {
+class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
   DerivedFutureBeacon({bool startNow = true}) {
     if (startNow) {
       _status = WritableBeacon(DerivedFutureStatus.running);
