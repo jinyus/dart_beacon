@@ -78,10 +78,6 @@ abstract class BaseBeacon<T> {
     return () => listeners.remove(effectClosure);
   }
 
-  void reset() {
-    _setValue(_initialValue);
-  }
-
   void _notifyListeners() {
     // We don't want to notify the current effect
     // since that would cause an infinite loop
@@ -97,5 +93,18 @@ abstract class BaseBeacon<T> {
     for (final listener in listeners.toList()) {
       listener.run();
     }
+  }
+
+  /// Set the beacon to its initial value
+  /// and notify all listeners
+  void reset() {
+    _setValue(_initialValue);
+  }
+
+  /// Clears all registered listeners and
+  /// [reset] the beacon to its initial state.
+  void dispose() {
+    listeners.clear();
+    reset();
   }
 }
