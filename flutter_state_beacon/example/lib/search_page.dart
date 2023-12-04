@@ -96,7 +96,7 @@ class SearchResults extends StatelessWidget {
                 style: TextStyle(color: Colors.red, fontSize: 24),
                 textAlign: TextAlign.center,
               ),
-            AsyncLoading() => const CircularProgressIndicator(),
+            _ => const CircularProgressIndicator(),
           },
           const Text(
             "NB: The text input is debounced by 1s so it will"
