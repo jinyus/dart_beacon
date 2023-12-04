@@ -18,7 +18,7 @@ final konamiCodes = [
   "A",
 ];
 
-final _keys = Beacon.timestamped<String?>(null);
+final _keys = Beacon.throttled<String?>(null, duration: k100ms * 2);
 final _last10 = Beacon.bufferedCount<String>(10);
 
 class KonamiPage extends StatefulWidget {
@@ -30,19 +30,15 @@ class KonamiPage extends StatefulWidget {
 
 class _KonamiPageState extends State<KonamiPage> {
   final fNode = FocusNode(onKey: (node, e) {
-    _keys.set(e.data.logicalKey.keyLabel);
+    _keys.set(e.data.logicalKey.keyLabel, force: true);
     return KeyEventResult.handled;
   });
 
   @override
   void initState() {
-    var lastEvent = DateTime.now().subtract(k100ms * 10);
-    _keys.subscribe((x) {
-      if (x.value != null &&
-          DateTime.now().difference(lastEvent) > k100ms * 2) {
-        lastEvent = DateTime.now();
-        _last10.add(x.value!);
-      }
+    print('init state');
+    _keys.subscribe((key) {
+      if (key != null) _last10.add(key);
     });
 
     _last10.subscribe((codes) {
@@ -73,6 +69,8 @@ class _KonamiPageState extends State<KonamiPage> {
   @override
   void dispose() {
     fNode.dispose();
+    _keys.dispose();
+    _last10.dispose();
     super.dispose();
   }
 
