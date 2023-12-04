@@ -1,3 +1,8 @@
+## 0.5.0
+
+-   Add AsyncIdle State and ability to manually trigger futureBeacon execution
+-   Add ability to do lazy starts for wrap methods
+
 ## 0.4.1
 
 -   Internal refactor
