@@ -36,7 +36,6 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   void initState() {
-    print('init state');
     _keys.subscribe((key) {
       if (key != null) _last10.add(key);
     });
