@@ -106,7 +106,7 @@ void main() {
       final a = Beacon.writable(1);
       final completer = Completer<int>();
 
-      a.subscribe(completer.complete, runImmediately: true);
+      a.subscribe(completer.complete, startNow: true);
 
       final result = await completer.future;
 

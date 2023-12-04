@@ -65,13 +65,12 @@ abstract class BaseBeacon<T> {
 
   /// Subscribes to changes in the beacon
   /// returns a function that can be called to unsubscribe
-  VoidCallback subscribe(void Function(T) callback,
-      {bool runImmediately = false}) {
+  VoidCallback subscribe(void Function(T) callback, {bool startNow = false}) {
     listener() => callback(_value);
     final effectClosure = EffectClosure(listener);
     listeners.add(effectClosure);
 
-    if (runImmediately) {
+    if (startNow) {
       listener();
     }
 
