@@ -1,3 +1,7 @@
+## 0.2.0
+
+-   Update state_beacon dependency.
+
 ## 0.1.4
 
 -   Update state_beacon dependency.

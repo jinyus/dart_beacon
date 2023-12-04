@@ -146,11 +146,10 @@ packages:
   state_beacon:
     dependency: transitive
     description:
-      name: state_beacon
-      sha256: fe763fa9c4fa77fd7f74956ea0b0883d19bc9f433096a18f353bdf3273019d1e
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
+      path: "../../state_beacon"
+      relative: true
+    source: path
+    version: "0.6.0"
   stream_channel:
     dependency: transitive
     description:
