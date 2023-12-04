@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:state_beacon/src/interfaces.dart';
+
 import 'async_value.dart';
 import 'effect_closure.dart';
 
