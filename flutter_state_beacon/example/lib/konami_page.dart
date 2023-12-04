@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 import 'package:collection/collection.dart';
 
-final konamiCodes = [
+const konamiCodes = [
   "Arrow Up",
   "Arrow Up",
   "Arrow Down",
