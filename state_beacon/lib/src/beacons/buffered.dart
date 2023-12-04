@@ -1,8 +1,10 @@
 part of '../base_beacon.dart';
 
-class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>> {
+class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
+    implements BeaconConsumer<BufferedBaseBeacon<T>> {
   final List<T> _buffer = [];
   final _currentBuffer = WritableBeacon<List<T>>([]);
+  final _wrapped = <int, VoidCallback>{};
 
   BufferedBaseBeacon() : super([]);
 
@@ -18,10 +20,47 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>> {
     _currentBuffer.reset();
   }
 
+  void add(T newValue) {
+    throw UnimplementedError();
+  }
+
   @override
   void reset() {
     currentBuffer.reset();
     super.reset();
+  }
+
+  @override
+  BufferedBaseBeacon<T> wrap<U>(
+    ReadableBeacon<U> target, {
+    Function(BufferedBaseBeacon<T> p1, U p2)? then,
+    bool startNow = true,
+  }) {
+    if (_wrapped.containsKey(target.hashCode)) return this;
+
+    if (then == null && U != T) {
+      throw WrapTargetWrongTypeException();
+    }
+
+    final fn = then ?? ((b, val) => b.add(val as T));
+
+    final unsub = target.subscribe((val) {
+      fn(this, val);
+    }, startNow: startNow);
+
+    _wrapped[target.hashCode] = unsub;
+
+    return this;
+  }
+
+  @override
+  void dispose() {
+    _wrapped.forEach((_, fn) {
+      fn.call();
+    });
+    _wrapped.clear();
+    currentBuffer.dispose();
+    super.dispose();
   }
 }
 
@@ -30,6 +69,7 @@ class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
 
   BufferedCountBeacon({required this.countThreshold}) : super();
 
+  @override
   void add(T newValue) {
     super.addToBuffer(newValue);
 
@@ -46,6 +86,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
 
   BufferedTimeBeacon({required this.duration}) : super();
 
+  @override
   void add(T newValue) {
     super.addToBuffer(newValue);
     _startTimerIfNeeded();

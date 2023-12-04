@@ -36,3 +36,13 @@ class DerivedBeaconStartedTwiceException implements Exception {
   @override
   String toString() => 'DerivedBeaconStartedTwiceException: $message';
 }
+
+class WrapTargetWrongTypeException implements Exception {
+  final String message =
+      'The type of the target beacon must be the same as the type of the wrapper beacon if no `then` function is provided';
+
+  WrapTargetWrongTypeException();
+
+  @override
+  String toString() => 'WrapTargetWrongTypeException: $message';
+}
