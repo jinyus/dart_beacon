@@ -1,6 +1,6 @@
 part of '../base_beacon.dart';
 
-class DerivedBeacon<T> extends LazyBeacon<T> {
+class DerivedBeacon<T> extends ReadableBeacon<T> {
   late final VoidCallback _unsubscribe;
 
   void $setInternalEffectUnsubscriber(VoidCallback unsubscribe) {
@@ -14,6 +14,12 @@ class DerivedBeacon<T> extends LazyBeacon<T> {
   }
 
   void forceSetValue(T newValue) {
-    setValue(newValue, force: true);
+    _setValue(newValue, force: true);
+  }
+
+  @override
+  void dispose() {
+    unsubscribe();
+    super.dispose();
   }
 }
