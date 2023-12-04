@@ -4,8 +4,9 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   Duration _throttleDuration;
   bool _blocked = false;
 
-  ThrottledBeacon(super.initialValue, {required Duration duration})
-      : _throttleDuration = duration;
+  ThrottledBeacon({T? initialValue, required Duration duration})
+      : _throttleDuration = duration,
+        super(initialValue);
 
   void setDuration(Duration newDuration) {
     _throttleDuration = newDuration;
