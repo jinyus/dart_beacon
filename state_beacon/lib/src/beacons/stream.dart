@@ -32,4 +32,10 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
       _setValue(AsyncError(e, s));
     });
   }
+
+  @override
+  void dispose() {
+    unsubscribe();
+    super.dispose();
+  }
 }
