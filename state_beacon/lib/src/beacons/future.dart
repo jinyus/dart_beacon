@@ -3,8 +3,9 @@ part of '../base_beacon.dart';
 class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   var _executionID = 0;
 
-  FutureBeacon(this._operation) : super(AsyncLoading()) {
-    _init();
+  FutureBeacon(this._operation, {bool startNow = true})
+      : super(startNow ? AsyncLoading() : AsyncIdle()) {
+    if (startNow) _init();
   }
 
   final Future<T> Function() _operation;
@@ -12,7 +13,18 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// Resets the signal by calling the [Future] again
   @override
   void reset() {
-    _executionID++;
+    _executionID++; // ignore any running futures
+    _init();
+  }
+
+  /// Starts executing an idle [Future]
+  ///
+  /// NB: Must only be called once
+  ///
+  /// Use [reset] to restart the [Future]
+  void start() {
+    // can only start once
+    if (peek() is! AsyncIdle) throw FutureStartedTwiceException();
     _init();
   }
 

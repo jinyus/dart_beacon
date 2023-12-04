@@ -19,3 +19,5 @@ class AsyncError<T> extends AsyncValue<T> {
 }
 
 class AsyncLoading<T> extends AsyncValue<T> {}
+
+class AsyncIdle<T> extends AsyncValue<T> {}
