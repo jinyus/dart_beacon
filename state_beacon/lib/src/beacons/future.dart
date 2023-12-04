@@ -10,7 +10,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   final Future<T> Function() _operation;
 
-  /// Resets the signal by calling the [Future] again
+  /// Resets the beacon by calling the [Future] again
   @override
   void reset() {
     _executionID++; // ignore any running futures
