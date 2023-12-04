@@ -23,10 +23,14 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   /// wrapperBeacon.wrap(originalBeacon);
   /// print(wrapperBeacon.value); // Outputs: 10
   /// ```
-  VoidCallback wrap(ReadableBeacon<T> originalBeacon) {
-    return effect(() {
-      value = originalBeacon.value;
-    });
+  VoidCallback wrap(ReadableBeacon<T> originalBeacon,
+      {bool runImmediately = true}) {
+    return originalBeacon.subscribe(
+      (v) {
+        value = v;
+      },
+      runImmediately: runImmediately,
+    );
   }
 
   /// Wraps an existing `ReadableBeacon` and allows you to perform a custom transformation
@@ -52,10 +56,14 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   VoidCallback wrapThen<U>(
     ReadableBeacon<U> originalBeacon, {
     required Function(ReadableBeacon<T>, U) then,
+    bool runImmediately = true,
   }) {
-    return effect(() {
-      then(this, originalBeacon.value);
-    });
+    return originalBeacon.subscribe(
+      (v) {
+        then(this, v);
+      },
+      runImmediately: runImmediately,
+    );
   }
 
   /// Wraps an existing `ReadableBeacon` like [wrap], but allows transformation of its value.
@@ -75,9 +83,13 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   VoidCallback wrapWithTransform<U>(
     ReadableBeacon<U> originalBeacon, {
     required T Function(U) transform,
+    bool runImmediately = true,
   }) {
-    return effect(() {
-      value = transform(originalBeacon.value);
-    });
+    return originalBeacon.subscribe(
+      (v) {
+        value = transform(v);
+      },
+      runImmediately: runImmediately,
+    );
   }
 }
