@@ -185,6 +185,8 @@ abstract class Beacon {
   /// Creates a `FutureBeacon` that initializes its value based on a future.
   /// The beacon can optionally depend on another `ReadableBeacon`.
   ///
+  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  ///
   /// Example:
   /// ```dart
   /// var myBeacon = Beacon.future(() async {
@@ -194,8 +196,11 @@ abstract class Beacon {
   ///   print(value); // Outputs 'Hello' after 1 second
   /// });
   /// ```
-  static FutureBeacon<T> future<T>(Future<T> Function() future) {
-    return FutureBeacon<T>(future);
+  static FutureBeacon<T> future<T>(
+    Future<T> Function() future, {
+    bool startNow = true,
+  }) {
+    return FutureBeacon<T>(future, startNow: startNow);
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
@@ -228,6 +233,8 @@ abstract class Beacon {
   /// This beacon will recompute its value every time one of its dependencies change.
   /// The result is wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
   ///
+  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  ///
   /// Example:
   /// ```dart
   ///   final counter = Beacon.writable(0);
@@ -252,11 +259,16 @@ abstract class Beacon {
   ///   }
   /// }
   /// ```
-  static DerivedBeacon<AsyncValue<T>> derivedFuture<T>(
-      Future<T> Function() compute) {
-    final beacon = DerivedFutureBeacon<T>();
+  static DerivedFutureBeacon<T> derivedFuture<T>(
+    Future<T> Function() compute, {
+    bool startNow = true,
+  }) {
+    final beacon = DerivedFutureBeacon<T>(startNow: startNow);
 
     final unsub = effect(() async {
+      // beacon is manually triggered if in idle state
+      if (beacon.status.value == DerivedFutureStatus.idle) return;
+
       // start loading and get the execution ID
       final exeID = beacon.startLoading();
 
