@@ -18,7 +18,7 @@ final konamiCodes = [
   "A",
 ];
 
-final _keys = Beacon.throttled<String?>(null, duration: k100ms * 2);
+final _keys = Beacon.lazyThrottled<String>(duration: k100ms * 2);
 final _last10 = Beacon.bufferedCount<String>(10);
 
 class KonamiPage extends StatefulWidget {
@@ -36,21 +36,29 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   void initState() {
-    _keys.subscribe((key) {
-      if (key != null) _last10.add(key);
-    });
+    _last10.wrap(_keys, startNow: false);
 
     _last10.subscribe((codes) {
       if (codes.isEmpty) return;
       final won = IterableEquality().equals(codes, konamiCodes);
 
       if (won) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('KONAMI! You won!'),
-            duration: const Duration(seconds: 5),
-            padding: const EdgeInsets.all(20),
-          ),
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Congratulations!'),
+              content: Text('KONAMI! You won!'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
