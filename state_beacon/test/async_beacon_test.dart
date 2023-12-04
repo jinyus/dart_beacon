@@ -65,13 +65,13 @@ void main() {
         return ++ran;
       });
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 10));
 
       expect(ran, equals(1));
 
       count.value = 1; // Changing dependency
 
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 10));
 
       expect(ran, equals(2));
     });
