@@ -261,40 +261,52 @@ void main() {
     test('should lazily initialize its value', () async {
       final wBeacon = Beacon.lazyWritable<int>();
       expect(
-          () => wBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => wBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       wBeacon.set(10);
       expect(wBeacon.value, equals(10));
 
       final fBeacon =
           Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
       expect(
-          () => fBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => fBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       fBeacon.set(10);
       expect(fBeacon.value, equals(10));
 
       const k10ms = Duration(milliseconds: 10);
       final dBeacon = Beacon.lazyDebounced<int>(duration: k10ms);
       expect(
-          () => dBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => dBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       dBeacon.set(10);
       await Future.delayed(k10ms * 2);
       expect(dBeacon.value, equals(10));
 
       final tBeacon = Beacon.lazyThrottled<int>(duration: k10ms);
       expect(
-          () => tBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => tBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       tBeacon.set(10);
       expect(tBeacon.value, equals(10));
 
       final tsBeacon = Beacon.lazyTimestamped<int>();
       expect(
-          () => tsBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => tsBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       tsBeacon.set(10);
       expect(tsBeacon.value.value, equals(10));
 
       final uBeacon = Beacon.lazyUndoRedo<int>();
       expect(
-          () => uBeacon.value, throwsA(isA<UninitializeLazyReadException>()));
+        () => uBeacon.value,
+        throwsA(isA<UninitializeLazyReadException>()),
+      );
       uBeacon.set(10);
       expect(uBeacon.value, equals(10));
     });
