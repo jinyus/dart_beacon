@@ -4,6 +4,10 @@
 -   Expose option to manually trigger futureBeacon execution
 -   Add option to manually trigger and reset derivedFutureBeacon
 -   Add option to manually trigger derivedBeacon
+-   Refactor Writable.wrap and remove redundant methods:
+    Writable.wrapThen
+    Writable.wrapTransform
+-   Add BufferedBeacon.wrap
 
 ## 0.5.0
 
