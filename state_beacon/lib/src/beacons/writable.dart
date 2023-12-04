@@ -55,7 +55,7 @@ class WritableBeacon<T> extends ReadableBeacon<T> {
   /// ```
   VoidCallback wrapThen<U>(
     ReadableBeacon<U> originalBeacon, {
-    required Function(ReadableBeacon<T>, U) then,
+    required Function(WritableBeacon<T>, U) then,
     bool runImmediately = true,
   }) {
     return originalBeacon.subscribe(
