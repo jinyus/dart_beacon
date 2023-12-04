@@ -54,4 +54,10 @@ class DerivedFutureBeacon<T> extends DerivedBeacon<AsyncValue<T>> {
   void reset() {
     _status.value = DerivedFutureStatus.restarted;
   }
+
+  @override
+  void dispose() {
+    _status.dispose();
+    super.dispose();
+  }
 }
