@@ -55,6 +55,29 @@ void main() {
       expect(data.value, equals(2));
     });
 
+    test('should not executes until start() is called', () async {
+      var counter = 0;
+
+      var futureBeacon = Beacon.future(() async => ++counter, startNow: false);
+
+      expect(futureBeacon.value, isA<AsyncIdle>());
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      futureBeacon.start();
+
+      expect(futureBeacon.value, isA<AsyncLoading>());
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(futureBeacon.value, isA<AsyncData<int>>());
+
+      final data = futureBeacon.value as AsyncData<int>;
+
+      expect(data.value, equals(1));
+    });
+  });
+  group('DerivedFutureBeacon Tests', () {
     test('should re-initializes when dependency changes', () async {
       var count = Beacon.writable(0);
 
@@ -97,6 +120,39 @@ void main() {
       await Future.delayed(Duration(milliseconds: 100));
 
       expect(ran, equals(1));
+    });
+
+    test('should not execute until start() is called', () async {
+      var count = Beacon.writable(0);
+
+      var ran = 0;
+
+      var futureBeacon = Beacon.derivedFuture(() async {
+        count.value;
+        return ++ran;
+      }, startNow: false);
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(ran, equals(0));
+
+      futureBeacon.start();
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(ran, equals(1));
+
+      count.value = 1; // Changing dependency
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(ran, equals(2));
+
+      futureBeacon.reset();
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(ran, equals(3));
     });
   });
 
