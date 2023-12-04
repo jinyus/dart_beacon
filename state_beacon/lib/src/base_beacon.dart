@@ -11,7 +11,6 @@ part 'beacons/throttled.dart';
 part 'beacons/filtered.dart';
 part 'beacons/buffered.dart';
 part 'beacons/timestamp.dart';
-part 'beacons/lazy.dart';
 part 'beacons/writable.dart';
 part 'beacons/readable.dart';
 part 'beacons/future.dart';
@@ -28,11 +27,13 @@ abstract class BaseBeacon<T> {
     if (initialValue != null || isNullable) {
       _initialValue = initialValue as T;
       _value = initialValue;
+      _isEmpty = false;
     }
   }
 
   bool get isNullable => null is T;
 
+  var _isEmpty = true;
   late T _value;
   T? _previousValue;
   late final T _initialValue;
@@ -41,6 +42,10 @@ abstract class BaseBeacon<T> {
   T? get previousValue => _previousValue;
 
   T get value {
+    if (_isEmpty) {
+      throw UninitializeLazyReadException();
+    }
+
     final currentEffect = _Effect.current();
     if (currentEffect != null) {
       _subscribe(currentEffect, listeners);
@@ -48,16 +53,26 @@ abstract class BaseBeacon<T> {
     return _value;
   }
 
+  void _notifyOrDeferBatch() {
+    if (_isRunningBatchJob()) {
+      _listenersToPingAfterBatchJob.addAll(listeners);
+    } else {
+      _notifyListeners();
+    }
+  }
+
   void _setValue(T newValue, {bool force = false}) {
-    if (_value != newValue || force) {
+    if (_isEmpty) {
+      _isEmpty = false;
+      _initialValue = newValue;
+      _previousValue = newValue;
+      _value = newValue;
+      _notifyOrDeferBatch();
+    } else if (_value != newValue || force) {
       _previousValue = _value;
       _value = newValue;
 
-      if (_isRunningBatchJob()) {
-        _listenersToPingAfterBatchJob.addAll(listeners);
-      } else {
-        _notifyListeners();
-      }
+      _notifyOrDeferBatch();
     }
   }
 

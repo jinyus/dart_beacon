@@ -5,14 +5,14 @@ typedef BeaconFilter<T> = bool Function(T?, T);
 class FilteredBeacon<T> extends WritableBeacon<T> {
   final BeaconFilter<T> filter;
 
-  FilteredBeacon(super.initialValue, {required this.filter});
+  FilteredBeacon({T? initialValue, required this.filter}) : super(initialValue);
 
   @override
   set value(T newValue) => set(newValue);
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (filter(_previousValue, newValue)) {
+    if (_isEmpty || filter(_previousValue, newValue)) {
       super.set(newValue, force: force);
     }
   }

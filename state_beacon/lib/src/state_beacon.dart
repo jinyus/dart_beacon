@@ -14,6 +14,10 @@ abstract class Beacon {
   static WritableBeacon<T> writable<T>(T initialValue) =>
       WritableBeacon<T>(initialValue);
 
+  /// Like `writable`, but the initial value is lazily initialized.
+  static WritableBeacon<T> lazyWritable<T>([T? initialValue]) =>
+      WritableBeacon<T>(initialValue);
+
   /// Creates a `ReadableBeacon` with an initial value.
   /// This beacon allows only reading the value.
   ///
@@ -39,17 +43,6 @@ abstract class Beacon {
     return (beacon, beacon.set);
   }
 
-  /// Creates a `LazyBeacon` with an optional initial value.
-  /// The value must be initialized before it's first accessed.
-  ///
-  /// Example:
-  /// ```dart
-  /// var myBeacon = Beacon.lazy<int>();
-  /// // Value is initialized when it's first accessed
-  /// ```
-  static LazyBeacon<T> lazy<T>([T? initialValue]) =>
-      LazyBeacon<T>(initialValue);
-
   /// Creates a `DebouncedBeacon` with an initial value and a debounce duration.
   /// This beacon delays updates to its value based on the duration.
   ///
@@ -63,7 +56,14 @@ abstract class Beacon {
   /// ```
   static DebouncedBeacon<T> debounced<T>(T initialValue,
           {required Duration duration}) =>
-      DebouncedBeacon<T>(initialValue, duration: duration);
+      DebouncedBeacon<T>(initialValue: initialValue, duration: duration);
+
+  /// Like `debounced`, but the initial value is lazily initialized.
+  static DebouncedBeacon<T> lazyDebounced<T>({
+    T? initialValue,
+    required Duration duration,
+  }) =>
+      DebouncedBeacon<T>(initialValue: initialValue, duration: duration);
 
   /// Creates a `ThrottledBeacon` with an initial value and a throttle duration.
   /// This beacon limits the rate of updates to its value based on the duration.
@@ -77,9 +77,17 @@ abstract class Beacon {
   /// await Future.delayed(Duration(seconds: 1));
   /// print(age.value); // Outputs: 10 because the update was ignored
   /// ```
-  static ThrottledBeacon<T> throttled<T>(T initialValue,
-          {required Duration duration}) =>
-      ThrottledBeacon<T>(initialValue, duration: duration);
+
+  static ThrottledBeacon<T> throttled<T>(
+    T? initialValue, {
+    required Duration duration,
+  }) =>
+      ThrottledBeacon<T>(initialValue: initialValue, duration: duration);
+
+  /// Like `throttled`, but the initial value is lazily initialized.
+  static ThrottledBeacon<T> lazyThrottled<T>(
+          {T? initialValue, required Duration duration}) =>
+      ThrottledBeacon<T>(initialValue: initialValue, duration: duration);
 
   /// Creates a `FilteredBeacon` with an initial value and a filter function.
   /// This beacon updates its value only if it passes the filter criteria.
@@ -91,7 +99,12 @@ abstract class Beacon {
   /// ```
   static FilteredBeacon<T> filtered<T>(
           T initialValue, BeaconFilter<T> filter) =>
-      FilteredBeacon<T>(initialValue, filter: filter);
+      FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+
+  /// Like `filtered`, but the initial value is lazily initialized.
+  static FilteredBeacon<T> lazyFiltered<T>(
+          {T? initialValue, required BeaconFilter<T> filter}) =>
+      FilteredBeacon<T>(initialValue: initialValue, filter: filter);
 
   /// Creates a `BufferedCountBeacon` that collects and buffers a specified number
   /// of values. Once the count threshold is reached, the beacon's value is updated
@@ -153,7 +166,18 @@ abstract class Beacon {
     int historyLimit = 10,
   }) {
     return UndoRedoBeacon<T>(
-      initialValue,
+      initialValue: initialValue,
+      historyLimit: historyLimit,
+    );
+  }
+
+  /// Like `undoRedo`, but the initial value is lazily initialized.
+  static UndoRedoBeacon<T> lazyUndoRedo<T>({
+    T? initialValue,
+    int historyLimit = 10,
+  }) {
+    return UndoRedoBeacon<T>(
+      initialValue: initialValue,
       historyLimit: historyLimit,
     );
   }
@@ -167,6 +191,10 @@ abstract class Beacon {
   /// print(myBeacon.value); // Outputs: (value: 10, timestamp: DateTime.now())
   /// ```
   static TimestampBeacon<T> timestamped<T>(T initialValue) =>
+      TimestampBeacon<T>(initialValue);
+
+  /// Like `timestamped`, but the initial value is lazily initialized.
+  static TimestampBeacon<T> lazyTimestamped<T>([T? initialValue]) =>
       TimestampBeacon<T>(initialValue);
 
   /// Creates a `StreamBeacon` from a given stream.
@@ -206,6 +234,8 @@ abstract class Beacon {
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value everytime one of it's dependencies change.
   ///
+  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  ///
   /// Example:
   /// ```dart
   /// final age = Beacon.writable<int>(18);
@@ -217,10 +247,16 @@ abstract class Beacon {
   ///
   /// print(canDrink.value); // Outputs: true
   /// ```
-  static DerivedBeacon<T> derived<T>(T Function() compute) {
-    final beacon = DerivedBeacon<T>();
+  static DerivedBeacon<T> derived<T>(
+    T Function() compute, {
+    bool startNow = true,
+  }) {
+    final beacon = DerivedBeacon<T>(startNow: startNow);
 
     final unsub = effect(() {
+      // beacon is manually triggered if in idle state
+      if (beacon.status.value == DerivedStatus.idle) return;
+
       beacon.forceSetValue(compute());
     });
 
