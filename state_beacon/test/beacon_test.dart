@@ -530,9 +530,26 @@ void main() {
     test('should apply transformation function', () {
       var original = Beacon.readable<int>(2);
       var wrapper = Beacon.writable<String>("");
-      wrapper.wrapWithTransform(original, transform: (val) => 'Number $val');
+      var bufWrapper = Beacon.bufferedCount<String>(10);
+
+      wrapper.wrap(original, then: (w, val) => w.value = 'Number $val');
+      bufWrapper.wrap(original, then: (w, val) => w.add('Number $val'));
 
       expect(wrapper.value, equals('Number 2'));
+      expect(bufWrapper.currentBuffer.value, equals(['Number 2']));
+    });
+
+    test('should throw when no then function is supplied', () {
+      var original = Beacon.readable<int>(2);
+      var wrapper = Beacon.writable<String>("");
+      var bufWrapper = Beacon.bufferedCount<String>(10);
+
+      expect(() => wrapper.wrap(original),
+          throwsA(isA<WrapTargetWrongTypeException>()));
+      expect(
+        () => bufWrapper.wrap(original),
+        throwsA(isA<WrapTargetWrongTypeException>()),
+      );
     });
 
     test('should throttle wrapped StreamBeacon', () async {
