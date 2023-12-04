@@ -17,7 +17,6 @@ export 'src/base_beacon.dart'
         ThrottledBeacon,
         UndoRedoBeacon,
         DerivedBeacon,
-        DerivedFutureBeacon,
-        LazyBeacon;
+        DerivedFutureBeacon;
 export 'src/async_value.dart';
 export 'src/extensions.dart';
