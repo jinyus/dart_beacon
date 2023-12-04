@@ -5,9 +5,11 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   List<T> _history = [];
   int _currentHistoryIndex = -1;
 
-  UndoRedoBeacon(T initialValue, {this.historyLimit = 10})
+  UndoRedoBeacon({T? initialValue, this.historyLimit = 10})
       : super(initialValue) {
-    _addValueToHistory(initialValue);
+    if (initialValue != null || isNullable) {
+      _addValueToHistory(initialValue as T);
+    }
   }
 
   @override
@@ -15,7 +17,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (newValue == super.value && !force) {
+    if (!_isEmpty && newValue == super.value && !force) {
       return;
     }
     super.set(newValue, force: force);
