@@ -1,7 +1,7 @@
 part of 'base_beacon.dart';
 
 class UninitializeLazyReadException implements Exception {
-  final String message = 'LazyBeacon read before its value was set';
+  final String message = 'Lazy beacon read before its value was set';
 
   UninitializeLazyReadException();
 
@@ -26,4 +26,13 @@ class FutureStartedTwiceException implements Exception {
 
   @override
   String toString() => 'FutureStartedTwiceException: $message';
+}
+
+class DerivedBeaconStartedTwiceException implements Exception {
+  final String message = 'DerivedBeacon.start() must only be called once';
+
+  DerivedBeaconStartedTwiceException();
+
+  @override
+  String toString() => 'DerivedBeaconStartedTwiceException: $message';
 }
