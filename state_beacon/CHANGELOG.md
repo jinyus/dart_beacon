@@ -1,3 +1,10 @@
+## 0.6.0
+
+-   Give all writable beacons a lazy variant
+-   Expose option to manually trigger futureBeacon execution
+-   Add option to manually trigger and reset derivedFutureBeacon
+-   Add option to manually trigger derivedBeacon
+
 ## 0.5.0
 
 -   Add AsyncIdle State and ability to manually trigger futureBeacon execution
