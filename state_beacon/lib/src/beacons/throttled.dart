@@ -32,12 +32,14 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   @override
   void reset() {
     _timer?.cancel();
+    _blocked = false;
     super.reset();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _blocked = false;
     super.dispose();
   }
 }
