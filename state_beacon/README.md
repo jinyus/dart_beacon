@@ -6,8 +6,6 @@
 
 A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter.
 
-### Usage
-
 Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
 <br>All examples: https://github.com/jinyus/dart_beacon/examples
 
