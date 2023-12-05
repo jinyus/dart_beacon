@@ -1,3 +1,7 @@
+## 0.6.1
+
+-   Expose `cancelOnError` option for StreamBeaon
+
 ## 0.6.0
 
 -   Give all writable beacons a lazy variant
