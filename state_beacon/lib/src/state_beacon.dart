@@ -208,7 +208,15 @@ abstract class Beacon {
   ///   print(value); // Outputs the stream's emitted values
   /// });
   /// ```
-  static StreamBeacon<T> stream<T>(Stream<T> stream) => StreamBeacon<T>(stream);
+  static StreamBeacon<T> stream<T>(
+    Stream<T> stream, {
+    bool cancelOnError = false,
+  }) {
+    return StreamBeacon<T>(
+      stream,
+      cancelOnError: cancelOnError,
+    );
+  }
 
   /// Creates a `FutureBeacon` that initializes its value based on a future.
   /// The beacon can optionally depend on another `ReadableBeacon`.
