@@ -1,3 +1,10 @@
+## 0.9.0
+
+-   Roll flutter_state_beacon package into state_beacon package
+-   Add `watch` extension for use in flutter widgets
+-   Beacons now implement ValueListenable
+-   Add `toValueNotifier()` and `toStream()` extension methods
+
 ## 0.8.0
 
 -   Avoid throwing errors when start is called on a beacon that is already started

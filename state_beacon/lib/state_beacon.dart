@@ -19,4 +19,4 @@ export 'src/base_beacon.dart'
         DerivedBeacon,
         DerivedFutureBeacon;
 export 'src/async_value.dart';
-export 'src/extensions.dart';
+export 'src/extensions/extensions.dart';

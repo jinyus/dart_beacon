@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
-import 'package:test/test.dart';
 
 void main() {
   group('FutureBeacon Tests', () {
