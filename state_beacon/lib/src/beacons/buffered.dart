@@ -26,7 +26,7 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   @override
   void reset() {
-    currentBuffer.reset();
+    clearBuffer();
     super.reset();
   }
 
@@ -60,6 +60,7 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     });
     _wrapped.clear();
     currentBuffer.dispose();
+    clearBuffer();
     super.dispose();
   }
 }
@@ -104,7 +105,6 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
 
   @override
   void reset() {
-    super.clearBuffer();
     _timer?.cancel();
     super.reset();
   }
