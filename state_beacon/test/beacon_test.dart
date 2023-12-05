@@ -466,6 +466,22 @@ void main() {
       expect(effectCount, 1);
     });
 
+    test('should not run immediately', () {
+      final beacon = Beacon.writable(1);
+      var effectCount = 0;
+
+      final derived = Beacon.derived(() {
+        effectCount++;
+        return beacon.peek();
+      }, manualStart: true);
+
+      expect(effectCount, 0);
+
+      derived.start();
+
+      expect(effectCount, 1);
+    });
+
     test('should update derived value when dependency changes', () {
       var beacon = Beacon.writable<int>(10);
       var derivedBeacon = Beacon.derived(() => beacon.value * 2);
