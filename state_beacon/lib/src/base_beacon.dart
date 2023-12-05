@@ -124,7 +124,8 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   /// [reset] the beacon to its initial state.
   void dispose() {
     listeners.clear();
-    reset();
+    _value = _initialValue;
+    _previousValue = null;
   }
 
   @override
