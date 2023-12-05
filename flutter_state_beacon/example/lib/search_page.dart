@@ -12,7 +12,7 @@ final searchTextBeacon = Beacon.lazyDebounced(duration: k100ms * 10);
 final searchResults = Beacon.derivedFuture(() async {
   final query = searchTextBeacon.value;
   return await FakeWeatherRepository().fetchWeather(query);
-}, startNow: false);
+}, manualStart: true);
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});

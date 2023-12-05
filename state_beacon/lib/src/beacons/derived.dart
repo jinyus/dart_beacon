@@ -27,9 +27,9 @@ class DerivedBeaconBase<T> extends ReadableBeacon<T> {
 }
 
 class DerivedBeacon<T> extends DerivedBeaconBase<T> {
-  DerivedBeacon({bool startNow = true}) {
+  DerivedBeacon({bool manualStart = false}) {
     _status = WritableBeacon(
-      startNow ? DerivedStatus.running : DerivedStatus.idle,
+      manualStart ? DerivedStatus.idle : DerivedStatus.running,
     );
   }
 

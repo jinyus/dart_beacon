@@ -7,12 +7,12 @@ enum DerivedFutureStatus {
 }
 
 class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
-  DerivedFutureBeacon({bool startNow = true}) {
-    if (startNow) {
-      _status = WritableBeacon(DerivedFutureStatus.running);
-    } else {
+  DerivedFutureBeacon({bool manualStart = false}) {
+    if (manualStart) {
       _status = WritableBeacon(DerivedFutureStatus.idle);
       super.forceSetValue(AsyncIdle());
+    } else {
+      _status = WritableBeacon(DerivedFutureStatus.running);
     }
   }
 

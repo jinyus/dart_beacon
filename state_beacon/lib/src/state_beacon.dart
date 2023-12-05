@@ -221,7 +221,7 @@ abstract class Beacon {
   /// Creates a `FutureBeacon` that initializes its value based on a future.
   /// The beacon can optionally depend on another `ReadableBeacon`.
   ///
-  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
   /// Example:
   /// ```dart
@@ -234,15 +234,15 @@ abstract class Beacon {
   /// ```
   static FutureBeacon<T> future<T>(
     Future<T> Function() future, {
-    bool startNow = true,
+    bool manualStart = false,
   }) {
-    return FutureBeacon<T>(future, startNow: startNow);
+    return FutureBeacon<T>(future, manualStart: manualStart);
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value everytime one of it's dependencies change.
   ///
-  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
   /// Example:
   /// ```dart
@@ -257,9 +257,9 @@ abstract class Beacon {
   /// ```
   static DerivedBeacon<T> derived<T>(
     T Function() compute, {
-    bool startNow = true,
+    bool manualStart = false,
   }) {
-    final beacon = DerivedBeacon<T>(startNow: startNow);
+    final beacon = DerivedBeacon<T>(manualStart: manualStart);
 
     final unsub = effect(() {
       // beacon is manually triggered if in idle state
@@ -277,7 +277,7 @@ abstract class Beacon {
   /// This beacon will recompute its value every time one of its dependencies change.
   /// The result is wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
   ///
-  /// If [startNow] is [false], the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
   /// Example:
   /// ```dart
@@ -305,9 +305,9 @@ abstract class Beacon {
   /// ```
   static DerivedFutureBeacon<T> derivedFuture<T>(
     Future<T> Function() compute, {
-    bool startNow = true,
+    bool manualStart = false,
   }) {
-    final beacon = DerivedFutureBeacon<T>(startNow: startNow);
+    final beacon = DerivedFutureBeacon<T>(manualStart: manualStart);
 
     final unsub = effect(() async {
       // beacon is manually triggered if in idle state

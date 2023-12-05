@@ -58,7 +58,8 @@ void main() {
     test('should not executes until start() is called', () async {
       var counter = 0;
 
-      var futureBeacon = Beacon.future(() async => ++counter, startNow: false);
+      var futureBeacon =
+          Beacon.future(() async => ++counter, manualStart: true);
 
       expect(futureBeacon.value, isA<AsyncIdle>());
 
@@ -130,7 +131,7 @@ void main() {
       var futureBeacon = Beacon.derivedFuture(() async {
         count.value;
         return ++ran;
-      }, startNow: false);
+      }, manualStart: true);
 
       await Future.delayed(Duration(milliseconds: 10));
 

@@ -3,9 +3,9 @@ part of '../base_beacon.dart';
 class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   var _executionID = 0;
 
-  FutureBeacon(this._operation, {bool startNow = true})
-      : super(startNow ? AsyncLoading() : AsyncIdle()) {
-    if (startNow) _init();
+  FutureBeacon(this._operation, {bool manualStart = false})
+      : super(manualStart ? AsyncIdle() : AsyncLoading()) {
+    if (!manualStart) _init();
   }
 
   final Future<T> Function() _operation;
