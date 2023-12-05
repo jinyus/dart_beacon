@@ -1,3 +1,7 @@
+## 0.7.0
+
+-   Changed `startNow` to `manualStart` for future and derived beacons to avoid ambiguity
+
 ## 0.6.1
 
 -   Expose `cancelOnError` option for StreamBeaon
