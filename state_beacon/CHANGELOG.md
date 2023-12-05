@@ -1,3 +1,9 @@
+## 0.9.1
+
+-   Add initialValue getter
+-   Customize previousValue getter for DerivedFutureBeacon to ignore loading/error states
+-   Fix memory leak in BufferedBeacons
+
 ## 0.9.0
 
 -   Roll flutter_state_beacon package into state_beacon package
