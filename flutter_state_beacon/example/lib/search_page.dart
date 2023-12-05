@@ -1,5 +1,4 @@
 import 'package:example/const.dart';
-import 'package:example/counter_page.dart';
 import 'package:example/data/weather_model.dart';
 import 'package:example/data/weather_repo.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +45,7 @@ class SearchInput extends StatefulWidget {
 }
 
 class _SearchInputState extends State<SearchInput> {
-  final controller = TextEditingController(text: searchTextBeacon.peek());
+  final controller = TextEditingController();
 
   @override
   void initState() {
