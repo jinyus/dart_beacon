@@ -5,6 +5,11 @@ repository: https://github.com/jinyus/dart_beacon
 
 environment:
     sdk: ^3.1.5
+    flutter: ">=1.17.0"
+
+dependencies:
+    flutter:
+        sdk: flutter
 
 dev_dependencies:
     lints: ^3.0.0
