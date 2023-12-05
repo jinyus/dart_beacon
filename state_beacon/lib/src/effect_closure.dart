@@ -7,7 +7,7 @@ class EffectClosure {
   final int id;
   final VoidCallback run;
 
-  EffectClosure(this.run) : id = ++_globalEffectID;
+  EffectClosure(this.run, {int? customID}) : id = customID ?? ++_globalEffectID;
 
   @override
   int get hashCode => id;
