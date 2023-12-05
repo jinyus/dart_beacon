@@ -1,11 +1,15 @@
 part of '../base_beacon.dart';
 
 class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
-  StreamBeacon(this._stream) : super(AsyncLoading()) {
+  StreamBeacon(
+    this._stream, {
+    this.cancelOnError = false,
+  }) : super(AsyncLoading()) {
     _init();
   }
 
   final Stream<T> _stream;
+  final bool cancelOnError;
 
   StreamSubscription<T>? _subscription;
 
@@ -24,13 +28,18 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
       _setValue(AsyncLoading());
     }
 
-    _subscription = _stream.listen((value) {
-      _setValue(AsyncData(value));
-    });
-
-    _subscription!.onError((e, s) {
-      _setValue(AsyncError(e, s));
-    });
+    _subscription = _stream.listen(
+      (value) {
+        _setValue(AsyncData(value));
+      },
+      onError: (e, s) {
+        _setValue(AsyncError(e, s));
+      },
+      onDone: () {
+        dispose();
+      },
+      cancelOnError: cancelOnError,
+    );
   }
 
   @override
