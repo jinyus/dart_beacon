@@ -29,10 +29,12 @@ class KonamiPage extends StatefulWidget {
 }
 
 class _KonamiPageState extends State<KonamiPage> {
-  final fNode = FocusNode(onKey: (node, e) {
-    _keys.set(e.data.logicalKey.keyLabel, force: true);
-    return KeyEventResult.handled;
-  });
+  final fNode = FocusNode(
+    onKey: (node, e) {
+      _keys.set(e.data.logicalKey.keyLabel, force: true);
+      return KeyEventResult.handled;
+    },
+  );
 
   @override
   void initState() {
