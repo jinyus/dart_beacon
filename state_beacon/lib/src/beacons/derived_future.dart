@@ -16,6 +16,10 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
     }
   }
 
+  AsyncValue<T>? _previousAsyncValue;
+  @override
+  AsyncValue<T>? get previousValue => _previousAsyncValue;
+
   late final WritableBeacon<DerivedFutureStatus> _status;
   ReadableBeacon<DerivedFutureStatus> get status => _status;
 
@@ -30,6 +34,11 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
     if (exeID != _executionID) return;
+
+    // the current value would be loading so we need the previous AsyncData
+    if (value is AsyncData && _previousValue is AsyncData) {
+      _previousAsyncValue = _previousValue;
+    }
 
     super.forceSetValue(value);
   }
