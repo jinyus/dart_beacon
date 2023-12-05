@@ -1,4 +1,5 @@
 import 'package:example/const.dart';
+import 'package:example/counter_page.dart';
 import 'package:example/data/weather_model.dart';
 import 'package:example/data/weather_repo.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +7,12 @@ import 'dart:math' as math;
 
 import 'package:flutter_state_beacon/flutter_state_beacon.dart';
 
-final searchTextBeacon = Beacon.debounced('', duration: k100ms * 10);
+final searchTextBeacon = Beacon.lazyDebounced(duration: k100ms * 10);
 
 final searchResults = Beacon.derivedFuture(() async {
   final query = searchTextBeacon.value;
   return await FakeWeatherRepository().fetchWeather(query);
-});
+}, startNow: false);
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -50,8 +51,17 @@ class _SearchInputState extends State<SearchInput> {
   @override
   void initState() {
     controller.addListener(() {
+      if (controller.text.isEmpty) return;
       searchTextBeacon.value = controller.text;
     });
+
+    late VoidCallback unsub;
+
+    unsub = searchTextBeacon.subscribe((val) {
+      searchResults.start();
+      unsub();
+    });
+
     super.initState();
   }
 
@@ -96,7 +106,12 @@ class SearchResults extends StatelessWidget {
                 style: TextStyle(color: Colors.red, fontSize: 24),
                 textAlign: TextAlign.center,
               ),
-            _ => const CircularProgressIndicator(),
+            AsyncLoading() => const CircularProgressIndicator(),
+            AsyncIdle() => const Text(
+                'Enter a city to search for its weather',
+                style: TextStyle(fontSize: 24),
+                textAlign: TextAlign.center,
+              ),
           },
           const Text(
             "NB: The text input is debounced by 1s so it will"
