@@ -41,9 +41,7 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
   /// Use [reset] to restart the [Future]
   void start() {
     // can only start once
-    if (_status.peek() != DerivedFutureStatus.idle) {
-      throw FutureStartedTwiceException();
-    }
+    if (_status.peek() != DerivedFutureStatus.idle) return;
     _status.value = DerivedFutureStatus.running;
   }
 

@@ -19,14 +19,14 @@ class CircularDependencyException implements Exception {
   String toString() => 'CircularDependencyException: $message';
 }
 
-class FutureStartedTwiceException implements Exception {
-  final String message = 'FutureBeacon.start() must only be called once';
+// class FutureStartedTwiceException implements Exception {
+//   final String message = 'FutureBeacon.start() must only be called once';
 
-  FutureStartedTwiceException();
+//   FutureStartedTwiceException();
 
-  @override
-  String toString() => 'FutureStartedTwiceException: $message';
-}
+//   @override
+//   String toString() => 'FutureStartedTwiceException: $message';
+// }
 
 class DerivedBeaconStartedTwiceException implements Exception {
   final String message = 'DerivedBeacon.start() must only be called once';

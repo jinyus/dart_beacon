@@ -24,7 +24,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// Use [reset] to restart the [Future]
   void start() {
     // can only start once
-    if (peek() is! AsyncIdle) throw FutureStartedTwiceException();
+    if (peek() is! AsyncIdle) return;
     _init();
   }
 
