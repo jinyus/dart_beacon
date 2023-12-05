@@ -1,3 +1,7 @@
+## 0.3.1
+
+-   Deprecate package. Use [state_beacon](https://pub.dev/packages/state_beacon) instead
+
 ## 0.3.0
 
 -   Update state_beacon dependency.
