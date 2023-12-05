@@ -44,6 +44,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   final Listerners listeners = {};
 
   T? get previousValue => _previousValue;
+  T get initialValue => _initialValue;
 
   @override
   T get value {
