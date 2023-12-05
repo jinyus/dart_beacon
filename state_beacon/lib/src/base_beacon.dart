@@ -45,6 +45,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
   T? get previousValue => _previousValue;
 
+  @override
   T get value {
     if (_isEmpty) {
       throw UninitializeLazyReadException();
