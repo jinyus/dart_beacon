@@ -8,7 +8,7 @@ A Beacon is a reactive primitive(`signal`) and simple state management solution 
 
 ### Usage
 
-Flutter web demo: https://flutter-beacon.surge.sh/
+Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
 <br>All examples: https://github.com/jinyus/dart_beacon/examples
 
 <p align="center">
@@ -17,8 +17,6 @@ Flutter web demo: https://flutter-beacon.surge.sh/
     <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/flutter-beacon-demo.gif?raw=true" alt="demo">
   </picture>
 </p>
-
-Click [here](https://github.com/jinyus/flutter_state_beacon/blob/main/flutter_beacon/example/lib/main.dart) for the full code.
 
 ## Installation
 
