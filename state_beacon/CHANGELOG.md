@@ -1,3 +1,7 @@
+## 0.8.0
+
+-   Avoid throwing errors when start is called on a beacon that is already started
+
 ## 0.7.0
 
 -   Changed `startNow` to `manualStart` for future and derived beacons to avoid ambiguity
