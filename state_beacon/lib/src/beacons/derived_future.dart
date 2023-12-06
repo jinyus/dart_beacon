@@ -60,7 +60,9 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
   /// NB: This will not reset its dependencies
   @override
   void reset() {
-    _status.value = DerivedFutureStatus.restarted;
+    _status.value = _status.peek() == DerivedFutureStatus.running
+        ? DerivedFutureStatus.restarted
+        : DerivedFutureStatus.running;
   }
 
   @override
