@@ -279,6 +279,9 @@ abstract class Beacon {
   ///
   /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
+  /// If `cancelRunning` is `true`, the results of a current execution will be discarded
+  /// if another execution is triggered before the current one finishes.
+  ///
   /// Example:
   /// ```dart
   ///   final counter = Beacon.writable(0);
@@ -306,8 +309,12 @@ abstract class Beacon {
   static DerivedFutureBeacon<T> derivedFuture<T>(
     Future<T> Function() compute, {
     bool manualStart = false,
+    bool cancelRunning = true,
   }) {
-    final beacon = DerivedFutureBeacon<T>(manualStart: manualStart);
+    final beacon = DerivedFutureBeacon<T>(
+      manualStart: manualStart,
+      cancelRunning: cancelRunning,
+    );
 
     final unsub = effect(() async {
       // beacon is manually triggered if in idle state

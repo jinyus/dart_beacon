@@ -7,7 +7,7 @@ enum DerivedFutureStatus {
 }
 
 class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
-  DerivedFutureBeacon({bool manualStart = false}) {
+  DerivedFutureBeacon({bool manualStart = false, this.cancelRunning = true}) {
     if (manualStart) {
       _status = WritableBeacon(DerivedFutureStatus.idle);
       super.forceSetValue(AsyncIdle());
@@ -16,6 +16,7 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
     }
   }
 
+  final bool cancelRunning;
   AsyncValue<T>? _previousAsyncValue;
   @override
   AsyncValue<T>? get previousValue => _previousAsyncValue;
@@ -33,7 +34,7 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
   void setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
-    if (exeID != _executionID) return;
+    if (cancelRunning && exeID != _executionID) return;
 
     // the current value would be loading so we need the previous AsyncData
     if (value is AsyncData && _previousValue is AsyncData) {
