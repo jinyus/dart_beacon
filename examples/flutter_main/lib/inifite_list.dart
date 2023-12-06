@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:state_beacon/state_beacon.dart';
 import 'dart:math' as math;
 
+class NoMoreItemsException implements Exception {}
+
 sealed class ListItem {}
 
 class ItemData extends ListItem {
@@ -13,12 +15,14 @@ class ItemData extends ListItem {
 class ItemLoading extends ListItem {}
 
 class ItemError extends ListItem {
-  final String error;
+  final Object? error;
   ItemError(this.error);
 }
 
 Future<List<String>> _fetchItems(int pageNum) async {
   await Future.delayed(const Duration(seconds: 1));
+
+  if (pageNum > 5) throw NoMoreItemsException();
 
   // randomly throw an error
   if (pageNum > 2 && math.Random().nextBool()) {
@@ -51,7 +55,7 @@ final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]).wrap(
       AsyncData<List<String>>(value: final lst) => newList
         ..addAll(lst.map(ItemData.new))
         ..add(ItemLoading()),
-      AsyncError(error: final err) => newList..add(ItemError(err.toString())),
+      AsyncError(error: final err) => newList..add(ItemError(err)),
       _ => newList..add(ItemLoading()),
     };
   },
@@ -82,8 +86,7 @@ class InfiniteList extends StatelessWidget {
                       return switch (item) {
                         ItemData(value: final value) => ItemTile(title: value),
                         ItemLoading() => const BottomWidget(),
-                        ItemError(error: final err) =>
-                          BottomWidget(errorMsg: err),
+                        ItemError(error: final err) => BottomWidget(error: err),
                       };
                     },
                     itemCount: count,
@@ -116,10 +119,10 @@ class ItemTile extends StatelessWidget {
 class BottomWidget extends StatefulWidget {
   const BottomWidget({
     super.key,
-    this.errorMsg,
+    this.error,
   });
 
-  final String? errorMsg;
+  final Object? error;
 
   @override
   State<BottomWidget> createState() => _BottomWidgetState();
@@ -131,7 +134,7 @@ class _BottomWidgetState extends State<BottomWidget> {
   @override
   void initState() {
     // load the next page when we reach to the end of the ListView.builder
-    if (widget.errorMsg == null) {
+    if (widget.error == null) {
       pageNum.value++;
     }
     super.initState();
@@ -143,18 +146,29 @@ class _BottomWidgetState extends State<BottomWidget> {
   );
   @override
   Widget build(BuildContext context) {
-    if (widget.errorMsg != null) {
-      return Column(
-        children: [
-          ItemTile(title: widget.errorMsg!),
-          const SizedBox(height: 5),
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: rawItems.reset,
-            child: const Text('retry'),
-          )
-        ],
-      );
+    if (widget.error != null) {
+      const style = TextStyle(fontSize: 20);
+      return widget.error is NoMoreItemsException
+          ? const Text(
+              'No More Items',
+              style: style,
+              textAlign: TextAlign.center,
+            )
+          : Column(
+              children: [
+                Text(
+                  widget.error?.toString() ?? 'Unknown Error',
+                  style: style,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 5),
+                ElevatedButton(
+                  style: btnStyle,
+                  onPressed: rawItems.reset,
+                  child: const Text('retry'),
+                )
+              ],
+            );
     }
 
     return const Center(child: CircularProgressIndicator());
