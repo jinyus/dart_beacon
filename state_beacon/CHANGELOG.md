@@ -1,3 +1,9 @@
+## 0.9.2
+
+-   Fix: refreshing logic for DerivedFutureBeacon
+-   Allow customization of how the old results of a future are handled in when it has be retriggered
+-   Add increment and decrement methods to Writable<num>
+
 ## 0.9.1
 
 -   Add initialValue getter
