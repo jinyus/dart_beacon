@@ -98,6 +98,8 @@ class FutureCounter extends StatelessWidget {
 
 ### Beacon.writable:
 
+Creates a `WritableBeacon` from a value that be read and written to.
+
 ```dart
 final counter = Beacon.writable(0);
 counter.value = 10;
@@ -118,7 +120,7 @@ print(counter.value); // 10
 
 ### Beacon.readable:
 
-Create an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
+Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
 
 ```dart
 final counter = Beacon.readable(10);
