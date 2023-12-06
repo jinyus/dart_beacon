@@ -81,6 +81,8 @@ class FutureCounter extends StatelessWidget {
 
 -   [Beacon.writable](https://github.com/jinyus/dart_beacon#beaconwritable): Read and write values.
 -   [Beacon.readable](https://github.com/jinyus/dart_beacon#beaconreadable): Read-only values.
+-   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacondobatchupdate): Batch multiple updates into a single notification.
 -   [Beacon.debounced](https://github.com/jinyus/dart_beacon#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](https://github.com/jinyus/dart_beacon#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](https://github.com/jinyus/dart_beacon#beaconfiltered): Update values based on filter criteria.
@@ -93,8 +95,6 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.derived](https://github.com/jinyus/dart_beacon#beaconderived): Compute values reactively based on other beacons.
 -   [Beacon.derivedFuture](https://github.com/jinyus/dart_beacon#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](https://github.com/jinyus/dart_beacon#beaconlist): Manage lists reactively.
--   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beaconcreateeffect): React to changes in beacon values.
--   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacondobatchupdate): Batch multiple updates into a single notification.
 
 ### Beacon.writable:
 
@@ -121,6 +121,49 @@ print(counter.value); // 10
 ```dart
 final counter = Beacon.readable(10);
 counter.value = 10; // Compilation error
+```
+
+### Beacon.createEffect:
+
+Creates an effect based on a provided function. The provided function will be called
+whenever one of its dependencies change.
+
+```dart
+final age = Beacon.writable(15);
+
+Beacon.createEffect(() {
+    if (age.value >= 18) {
+      print("You can vote!");
+    } else {
+       print("You can't vote yet");
+    }
+ });
+
+// Outputs: "You can't vote yet"
+
+age.value = 20; // Outputs: "You can vote!"
+```
+
+### Beacon.doBatchUpdate:
+
+Executes a batched update which allows multiple updates to be batched into a single update.
+This can be used to optimize performance by reducing the number of update notifications.
+
+```dart
+final age = Beacon.writable<int>(10);
+
+var callCount = 0;
+
+age.subscribe((_) => callCount++);
+
+Beacon.doBatchUpdate(() {
+  age.value = 15;
+  age.value = 16;
+  age.value = 20;
+  age.value = 23;
+});
+
+expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### Beacon.derived:
@@ -347,49 +390,6 @@ Beacon.createEffect(() {
 nums.add(4); // Outputs: [1, 2, 3, 4]
 
 nums.remove(2); // Outputs: [1, 3, 4]
-```
-
-### Beacon.createEffect:
-
-Creates an effect based on a provided function. The provided function will be called
-whenever one of its dependencies change.
-
-```dart
-final age = Beacon.writable(15);
-
-Beacon.createEffect(() {
-    if (age.value >= 18) {
-      print("You can vote!");
-    } else {
-       print("You can't vote yet");
-    }
- });
-
-// Outputs: "You can't vote yet"
-
-age.value = 20; // Outputs: "You can vote!"
-```
-
-### Beacon.doBatchUpdate:
-
-Executes a batched update which allows multiple updates to be batched into a single update.
-This can be used to optimize performance by reducing the number of update notifications.
-
-```dart
-final age = Beacon.writable<int>(10);
-
-var callCount = 0;
-
-age.subscribe((_) => callCount++);
-
-Beacon.doBatchUpdate(() {
-  age.value = 15;
-  age.value = 16;
-  age.value = 20;
-  age.value = 23;
-});
-
-expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### myWritable.wrap(anyBeacon):
