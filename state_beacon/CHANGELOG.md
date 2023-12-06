@@ -1,3 +1,7 @@
+## 0.10.0
+
+-   FilteredBeacon : Make filter function nullable which allows changing/setting it after initialization
+
 ## 0.9.2
 
 -   Fix: refreshing logic for DerivedFutureBeacon
