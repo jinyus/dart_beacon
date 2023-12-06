@@ -92,20 +92,39 @@ abstract class Beacon {
 
   /// Creates a `FilteredBeacon` with an initial value and a filter function.
   /// This beacon updates its value only if it passes the filter criteria.
+  /// The filter function receives the previous and new values as arguments.
+  /// The filter function can also be changed using the `setFilter` method.
   ///
-  /// Example:
+  /// ### Simple Example:
   /// ```dart
-  /// var myBeacon = Beacon.filtered(10, (value) => value > 5);
-  /// myBeacon.value = 4; // Does not update value
+  /// var pageNum = Beacon.filtered(10, (prev, next) => next > 0); // only positive values are allowed
+  /// pageNum.value = 20; // update is allowed
+  /// pageNum.value = -5; // update is ignored
+  /// ```
+
+  /// ### Example when filter function depends on another beacon:
+  /// ```dart
+  /// var pageNum = Beacon.filtered(1); // we will set the filter function later
+  ///
+  /// final posts = Beacon.derivedFuture(() async {Repository.getPosts(pageNum.value);});
+  ///
+  /// pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
   /// ```
   static FilteredBeacon<T> filtered<T>(
-          T initialValue, BeaconFilter<T> filter) =>
-      FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+    T initialValue, [
+    BeaconFilter<T>? filter,
+  ]) {
+    return FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+  }
 
   /// Like `filtered`, but the initial value is lazily initialized.
-  static FilteredBeacon<T> lazyFiltered<T>(
-          {T? initialValue, required BeaconFilter<T> filter}) =>
-      FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+  /// The first will not be filtered if the `initialValue` is null.
+  static FilteredBeacon<T> lazyFiltered<T>({
+    T? initialValue,
+    BeaconFilter<T>? filter,
+  }) {
+    return FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+  }
 
   /// Creates a `BufferedCountBeacon` that collects and buffers a specified number
   /// of values. Once the count threshold is reached, the beacon's value is updated

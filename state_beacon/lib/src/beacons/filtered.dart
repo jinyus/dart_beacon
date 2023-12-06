@@ -3,16 +3,23 @@ part of '../base_beacon.dart';
 typedef BeaconFilter<T> = bool Function(T?, T);
 
 class FilteredBeacon<T> extends WritableBeacon<T> {
-  final BeaconFilter<T> filter;
+  BeaconFilter<T>? _filter;
 
-  FilteredBeacon({T? initialValue, required this.filter}) : super(initialValue);
+  FilteredBeacon({T? initialValue, BeaconFilter<T>? filter})
+      : _filter = filter,
+        super(initialValue);
 
   @override
   set value(T newValue) => set(newValue);
 
+  // Set the function that will be used to filter subsequent values.
+  void setFilter(BeaconFilter<T> newFilter) {
+    _filter = newFilter;
+  }
+
   @override
   void set(T newValue, {bool force = false}) {
-    if (_isEmpty || filter(_previousValue, newValue)) {
+    if (_isEmpty || (_filter?.call(_previousValue, newValue) ?? true)) {
       super.set(newValue, force: force);
     }
   }
