@@ -259,6 +259,32 @@ void main() {
       expect(beacon.value, equals(6)); // Value should update
     });
 
+    test('should update value if filter function is null', () {
+      var beacon = Beacon.filtered(0);
+      beacon.value = 4;
+      expect(beacon.value, equals(4)); // Value should update
+
+      beacon.setFilter((p0, p1) => p1 > 10);
+
+      beacon.value = 6;
+      expect(beacon.value, equals(4)); // Value should not update
+
+      beacon.value = 11;
+      expect(beacon.value, equals(11)); // Value should update
+    });
+
+    test('should bypass filter function for first value', () {
+      var beacon = Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
+      beacon.value = 4;
+      expect(beacon.value, equals(4)); // Value should update
+
+      beacon.value = 4;
+      expect(beacon.value, equals(4)); // Value should not update
+
+      beacon.value = 6;
+      expect(beacon.value, equals(6)); // Value should update
+    });
+
     test('should lazily initialize its value', () async {
       final wBeacon = Beacon.lazyWritable<int>();
       expect(
