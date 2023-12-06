@@ -85,16 +85,16 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.throttled](https://github.com/jinyus/dart_beacon#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](https://github.com/jinyus/dart_beacon#beaconfiltered): Update values based on filter criteria.
 -   [Beacon.timestamped](https://github.com/jinyus/dart_beacon#beacontimestamped): Attach timestamps to each value update.
--   [Beacon.undoRedo](https://github.com/jinyus/dart_beacon#beaconundoRedo): Undo and redo value changes.
--   [Beacon.bufferedCount](https://github.com/jinyus/dart_beacon#beaconbufferedCount): Create a buffer/list of values based a int limit.
--   [Beacon.bufferedTime](https://github.com/jinyus/dart_beacon#beaconbufferedTime): Create a buffer/list of values based on a time limit.
+-   [Beacon.undoRedo](https://github.com/jinyus/dart_beacon#beaconundoredo): Undo and redo value changes.
+-   [Beacon.bufferedCount](https://github.com/jinyus/dart_beacon#beaconbufferedcount): Create a buffer/list of values based a int limit.
+-   [Beacon.bufferedTime](https://github.com/jinyus/dart_beacon#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.stream](https://github.com/jinyus/dart_beacon#beaconstream): Create beacons from Dart streams.
 -   [Beacon.future](https://github.com/jinyus/dart_beacon#beaconfuture): Initialize beacons from futures.
 -   [Beacon.derived](https://github.com/jinyus/dart_beacon#beaconderived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](https://github.com/jinyus/dart_beacon#beaconderivedFuture): Asynchronously compute values with state tracking.
+-   [Beacon.derivedFuture](https://github.com/jinyus/dart_beacon#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](https://github.com/jinyus/dart_beacon#beaconlist): Manage lists reactively.
--   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beaconcreateEffect): React to changes in beacon values.
--   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacondoBatchUpdate): Batch multiple updates into a single notification.
+-   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacondobatchupdate): Batch multiple updates into a single notification.
 
 ### Beacon.writable:
 
@@ -178,7 +178,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Beacon.debounce:
+### Beacon.debounced:
 
 Creates a `DebouncedBeacon` with an initial value and a debounce duration.
 This beacon delays updates to its value based on the duration.
@@ -191,7 +191,7 @@ await Future.delayed(Duration(seconds: 1));
 print(myBeacon.value); // Outputs: 20
 ```
 
-### Beacon.throttle:
+### Beacon.throttled:
 
 Creates a `ThrottledBeacon` with an initial value and a throttle duration.
 This beacon limits the rate of updates to its value based on the duration.
@@ -213,7 +213,7 @@ beacon.set(30);
 expect(beacon.value, equals(30)); // throttle time passed, update allowed
 ```
 
-### Beacon.filter:
+### Beacon.filterd:
 
 Creates a `FilteredBeacon` with an initial value and a filter function.
 This beacon updates its value only if it passes the filter criteria.
@@ -238,7 +238,7 @@ final posts = Beacon.derivedFuture(() async {Repository.getPosts(pageNum.value);
 pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
 ```
 
-### Beacon.timestamp:
+### Beacon.timestamped:
 
 Creates a `TimestampBeacon` with an initial value.
 This beacon attaches a timestamp to each value update.
