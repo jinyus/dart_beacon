@@ -10,6 +10,7 @@ class WritableBeacon<T> extends ReadableBeacon<T>
     set(newValue);
   }
 
+  // Sets the value of the beacon and allows a force notification
   void set(T newValue, {bool force = false}) {
     _setValue(newValue, force: force);
   }

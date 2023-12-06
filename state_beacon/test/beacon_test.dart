@@ -223,6 +223,21 @@ void main() {
       expect(called, equals(1)); // Only one notification should be sent
     });
 
+    test('should set throttle value updates', () async {
+      var beacon = Beacon.throttled(10, duration: k10ms);
+
+      beacon.set(20);
+      expect(beacon.value, equals(20)); // first update allowed
+
+      beacon.set(30);
+      expect(beacon.value, equals(20)); // too fast, update ignored
+
+      await Future.delayed(k10ms * 1.1);
+
+      beacon.set(30);
+      expect(beacon.value, equals(30)); // throttle time passed, update allowed
+    });
+
     test('should update value at most once in specified duration', () async {
       final beacon = Beacon.throttled(0, duration: Duration(milliseconds: 100));
       var called = 0;
@@ -704,7 +719,7 @@ void main() {
 
   group('BufferedCountBeacon', () {
     test('should buffer values until count is reached', () {
-      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var beacon = Beacon.bufferedCount<int>(3);
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -716,7 +731,7 @@ void main() {
     });
 
     test('should clear buffer after reaching count threshold', () {
-      var beacon = BufferedCountBeacon<int>(countThreshold: 2);
+      var beacon = Beacon.bufferedCount<int>(2);
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -737,7 +752,7 @@ void main() {
     });
 
     test('should update currentBuffer', () {
-      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var beacon = Beacon.bufferedCount<int>(3);
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -755,7 +770,7 @@ void main() {
     });
 
     test('should reset', () {
-      var beacon = BufferedCountBeacon<int>(countThreshold: 3);
+      var beacon = Beacon.bufferedCount<int>(3);
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -772,7 +787,7 @@ void main() {
   group('BufferedTimeBeacon', () {
     test('should buffer values over a time duration', () async {
       var beacon =
-          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 50));
+          Beacon.bufferedTime<int>(duration: Duration(milliseconds: 50));
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -790,7 +805,7 @@ void main() {
 
     test('should reset buffer after time duration', () async {
       var beacon =
-          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 30));
+          Beacon.bufferedTime<int>(duration: Duration(milliseconds: 30));
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
@@ -808,7 +823,7 @@ void main() {
 
     test('should reset', () async {
       var beacon =
-          BufferedTimeBeacon<int>(duration: Duration(milliseconds: 30));
+          Beacon.bufferedTime<int>(duration: Duration(milliseconds: 30));
       var buffer = [];
       beacon.subscribe((value) => buffer = value);
 
