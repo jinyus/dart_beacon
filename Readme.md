@@ -79,22 +79,22 @@ class FutureCounter extends StatelessWidget {
 
 ## Features
 
--   [Beacon.writable](https://github.com/jinyus/dart_beacon#beacon.writable): Read and write values.
--   [Beacon.readable](https://github.com/jinyus/dart_beacon#beacon.readable): Read-only values.
--   [Beacon.debounced](https://github.com/jinyus/dart_beacon#beacon.debounced): Debounce value changes over a specified duration.
--   [Beacon.throttled](https://github.com/jinyus/dart_beacon#beacon.throttled): Throttle value changes based on a duration.
--   [Beacon.filtered](https://github.com/jinyus/dart_beacon#beacon.filtered): Update values based on filter criteria.
--   [Beacon.timestamped](https://github.com/jinyus/dart_beacon#beacon.timestamped): Attach timestamps to each value update.
--   [Beacon.undoRedo](https://github.com/jinyus/dart_beacon#beacon.undoRedo): Undo and redo value changes.
--   [Beacon.bufferedCount](https://github.com/jinyus/dart_beacon#beacon.bufferedCount): Create a buffer/list of values based a int limit.
--   [Beacon.bufferedTime](https://github.com/jinyus/dart_beacon#beacon.bufferedTime): Create a buffer/list of values based on a time limit.
--   [Beacon.stream](https://github.com/jinyus/dart_beacon#beacon.stream): Create beacons from Dart streams.
--   [Beacon.future](https://github.com/jinyus/dart_beacon#beacon.future): Initialize beacons from futures.
--   [Beacon.derived](https://github.com/jinyus/dart_beacon#beacon.derived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](https://github.com/jinyus/dart_beacon#beacon.derivedFuture): Asynchronously compute values with state tracking.
--   [Beacon.list](https://github.com/jinyus/dart_beacon#beacon.list): Manage lists reactively.
--   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beacon.createEffect): React to changes in beacon values.
--   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacon.doBatchUpdate): Batch multiple updates into a single notification.
+-   [Beacon.writable](https://github.com/jinyus/dart_beacon#beaconwritable): Read and write values.
+-   [Beacon.readable](https://github.com/jinyus/dart_beacon#beaconreadable): Read-only values.
+-   [Beacon.debounced](https://github.com/jinyus/dart_beacon#beacondebounced): Debounce value changes over a specified duration.
+-   [Beacon.throttled](https://github.com/jinyus/dart_beacon#beaconthrottled): Throttle value changes based on a duration.
+-   [Beacon.filtered](https://github.com/jinyus/dart_beacon#beaconfiltered): Update values based on filter criteria.
+-   [Beacon.timestamped](https://github.com/jinyus/dart_beacon#beacontimestamped): Attach timestamps to each value update.
+-   [Beacon.undoRedo](https://github.com/jinyus/dart_beacon#beaconundoRedo): Undo and redo value changes.
+-   [Beacon.bufferedCount](https://github.com/jinyus/dart_beacon#beaconbufferedCount): Create a buffer/list of values based a int limit.
+-   [Beacon.bufferedTime](https://github.com/jinyus/dart_beacon#beaconbufferedTime): Create a buffer/list of values based on a time limit.
+-   [Beacon.stream](https://github.com/jinyus/dart_beacon#beaconstream): Create beacons from Dart streams.
+-   [Beacon.future](https://github.com/jinyus/dart_beacon#beaconfuture): Initialize beacons from futures.
+-   [Beacon.derived](https://github.com/jinyus/dart_beacon#beaconderived): Compute values reactively based on other beacons.
+-   [Beacon.derivedFuture](https://github.com/jinyus/dart_beacon#beaconderivedFuture): Asynchronously compute values with state tracking.
+-   [Beacon.list](https://github.com/jinyus/dart_beacon#beaconlist): Manage lists reactively.
+-   [Beacon.createEffect](https://github.com/jinyus/dart_beacon#beaconcreateEffect): React to changes in beacon values.
+-   [Beacon.doBatchUpdate](https://github.com/jinyus/dart_beacon#beacondoBatchUpdate): Batch multiple updates into a single notification.
 
 ### Beacon.writable:
 
