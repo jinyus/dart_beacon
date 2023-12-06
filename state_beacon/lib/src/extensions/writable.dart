@@ -6,6 +6,16 @@ extension BoolUtils on WritableBeacon<bool> {
   }
 }
 
+extension IntUtils<T extends num> on WritableBeacon<T> {
+  void increment() {
+    value = value + 1 as T;
+  }
+
+  void decrement() {
+    value = value - 1 as T;
+  }
+}
+
 extension WritableBeaconUtils<T> on WritableBeacon<T> {
   /// Converts a [WritableBeacon] to [ValueNotifier]
   ValueNotifier<T> toValueNotifier() {
