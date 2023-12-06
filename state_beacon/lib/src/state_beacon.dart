@@ -70,6 +70,9 @@ abstract class Beacon {
   /// This beacon limits the rate of updates to its value based on the duration.
   /// Updates that occur faster than the throttle duration are ignored.
   ///
+  /// If `dropBlocked` is `true`, values will be dropped while the beacon is blocked.
+  /// If `dropBlocked` is `false`, values will be buffered and emitted when the beacon is unblocked.
+  ///
   /// Example:
   /// ```dart
   /// const k10ms = Duration(milliseconds: 10);
@@ -90,13 +93,25 @@ abstract class Beacon {
   static ThrottledBeacon<T> throttled<T>(
     T? initialValue, {
     required Duration duration,
+    bool dropBlocked = true,
   }) =>
-      ThrottledBeacon<T>(initialValue: initialValue, duration: duration);
+      ThrottledBeacon<T>(
+        initialValue: initialValue,
+        duration: duration,
+        dropBlocked: dropBlocked,
+      );
 
   /// Like `throttled`, but the initial value is lazily initialized.
-  static ThrottledBeacon<T> lazyThrottled<T>(
-          {T? initialValue, required Duration duration}) =>
-      ThrottledBeacon<T>(initialValue: initialValue, duration: duration);
+  static ThrottledBeacon<T> lazyThrottled<T>({
+    T? initialValue,
+    required Duration duration,
+    bool dropBlocked = true,
+  }) =>
+      ThrottledBeacon<T>(
+        initialValue: initialValue,
+        duration: duration,
+        dropBlocked: dropBlocked,
+      );
 
   /// Creates a `FilteredBeacon` with an initial value and a filter function.
   /// This beacon updates its value only if it passes the filter criteria.

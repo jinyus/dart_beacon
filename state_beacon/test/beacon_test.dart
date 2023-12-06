@@ -265,6 +265,45 @@ void main() {
       expect(called, equals(2));
     });
 
+    test('should buffer blocked updates', () async {
+      final beacon = Beacon.lazyThrottled(
+        duration: k10ms * 5,
+        dropBlocked: false,
+      );
+
+      final values = <int>[];
+      beacon.subscribe((value) {
+        values.add(value);
+      });
+
+      beacon.set(1);
+      expect(values, equals([1])); // first update is allowed
+
+      beacon.set(2);
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(values, equals([1])); // update blocked
+
+      await Future.delayed(Duration(milliseconds: 55));
+
+      expect(values, equals([1, 2])); // buffered update sent
+
+      beacon.set(3);
+      beacon.set(4);
+      beacon.set(5);
+
+      await Future.delayed(Duration(milliseconds: 10));
+
+      expect(values, equals([1, 2])); // all blocked and buffered
+
+      await Future.delayed(Duration(milliseconds: 100));
+
+      expect(values, equals([1, 2, 3, 4]));
+
+      await Future.delayed(Duration(milliseconds: 40));
+
+      expect(values, equals([1, 2, 3, 4, 5]));
+    });
+
     test('should update value only if it satisfies the filter criteria', () {
       var beacon = Beacon.filtered(0, (prev, next) => next > 5);
       beacon.value = 4;

@@ -5,8 +5,17 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   Timer? _timer;
   bool _blocked = false;
 
-  ThrottledBeacon({T? initialValue, required Duration duration})
-      : _throttleDuration = duration,
+  /// If true, values will be dropped while the beacon is blocked.
+  /// If false, values will be buffered and emitted when the beacon is unblocked.
+  final bool dropBlocked;
+
+  final List<T> _buffer = [];
+
+  ThrottledBeacon({
+    T? initialValue,
+    required Duration duration,
+    this.dropBlocked = true,
+  })  : _throttleDuration = duration,
         super(initialValue);
 
   void setDuration(Duration newDuration) {
@@ -18,14 +27,25 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (_blocked) return;
+    if (_blocked) {
+      if (!dropBlocked) {
+        _buffer.add(newValue);
+      }
+      return;
+    }
 
     super.set(newValue, force: force);
     _blocked = true;
 
     _timer?.cancel();
-    _timer = Timer(_throttleDuration, () {
-      _blocked = false;
+    _timer = Timer.periodic(_throttleDuration, (_) {
+      if (_buffer.isNotEmpty) {
+        T bufferedValue = _buffer.removeAt(0);
+        super.set(bufferedValue, force: force);
+      } else {
+        _timer?.cancel();
+        _blocked = false;
+      }
     });
   }
 
@@ -33,6 +53,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   void reset() {
     _timer?.cancel();
     _blocked = false;
+    _buffer.clear();
     super.reset();
   }
 
@@ -40,6 +61,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   void dispose() {
     _timer?.cancel();
     _blocked = false;
+    _buffer.clear();
     super.dispose();
   }
 }
