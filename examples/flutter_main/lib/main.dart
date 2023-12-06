@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:example/counter_page.dart';
+import 'package:example/inifite_list.dart';
 import 'package:example/konami_page.dart';
 import 'package:example/search_page.dart';
 import 'package:example/todo_page.dart';
@@ -49,7 +50,7 @@ class MyHomePage extends StatelessWidget {
     final isDark = brightness.watch(context) == Brightness.dark;
     return DefaultTabController(
       initialIndex: 0,
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
@@ -60,6 +61,7 @@ class MyHomePage extends StatelessWidget {
               Tab(icon: Icon(Icons.abc)),
               Tab(icon: Icon(Icons.edit)),
               Tab(icon: Icon(Icons.search)),
+              Tab(icon: Icon(Icons.list)),
             ],
           ),
         ),
@@ -69,6 +71,7 @@ class MyHomePage extends StatelessWidget {
             KonamiPage(),
             TodoPage(),
             SearchPage(),
+            InfiniteList(),
           ],
         ),
         floatingActionButton: IconButton(
