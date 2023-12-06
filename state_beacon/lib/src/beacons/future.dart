@@ -3,11 +3,15 @@ part of '../base_beacon.dart';
 class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   var _executionID = 0;
 
-  FutureBeacon(this._operation, {bool manualStart = false})
-      : super(manualStart ? AsyncIdle() : AsyncLoading()) {
+  FutureBeacon(
+    this._operation, {
+    bool manualStart = false,
+    this.cancelRunning = true,
+  }) : super(manualStart ? AsyncIdle() : AsyncLoading()) {
     if (!manualStart) _init();
   }
 
+  final bool cancelRunning;
   final Future<T> Function() _operation;
 
   /// Resets the beacon by calling the [Future] again
@@ -37,9 +41,10 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     void updateOrIgnore(AsyncValue<T> value) {
       // if currentTacker != _tracker, another call to
       // init has been made so we should ignore this result
-      if (currentTracker == _executionID) {
-        _setValue(value);
+      if (cancelRunning && currentTracker != _executionID) {
+        return;
       }
+      _setValue(value);
     }
 
     try {

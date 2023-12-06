@@ -235,8 +235,13 @@ abstract class Beacon {
   static FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
+    bool cancelRunning = true,
   }) {
-    return FutureBeacon<T>(future, manualStart: manualStart);
+    return FutureBeacon<T>(
+      future,
+      manualStart: manualStart,
+      cancelRunning: cancelRunning,
+    );
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
