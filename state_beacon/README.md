@@ -118,6 +118,8 @@ print(counter.value); // 10
 
 ### Beacon.readable:
 
+Create an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
+
 ```dart
 final counter = Beacon.readable(10);
 counter.value = 10; // Compilation error
