@@ -1,6 +1,6 @@
-var _globalEffectID = 0;
+import 'common.dart';
 
-typedef VoidCallback = void Function();
+var _globalEffectID = 0;
 
 // This wrapper makes Set lookups faster
 class EffectClosure {

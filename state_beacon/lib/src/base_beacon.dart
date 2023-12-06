@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:state_beacon/src/common.dart';
 import 'package:state_beacon/src/interfaces.dart';
 
 import 'async_value.dart';
@@ -22,9 +23,6 @@ part 'beacons/list.dart';
 part 'beacons/derived.dart';
 part 'beacons/derived_future.dart';
 part 'beacons/value_notifier.dart';
-
-typedef VoidCallback = void Function();
-typedef Listerners = Set<EffectClosure>;
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
   BaseBeacon([T? initialValue]) {

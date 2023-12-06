@@ -1,5 +1,6 @@
 import 'async_value.dart';
 import 'base_beacon.dart';
+import 'common.dart';
 
 abstract class Beacon {
   /// Creates a `WritableBeacon` with an initial value.
