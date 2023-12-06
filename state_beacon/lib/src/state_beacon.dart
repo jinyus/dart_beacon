@@ -72,11 +72,19 @@ abstract class Beacon {
   ///
   /// Example:
   /// ```dart
-  /// var age = Beacon.throttled(10, duration: Duration(seconds: 1));
-  /// age.value = 20; // Update is throttled
-  /// print(age.value); // Outputs: 10
-  /// await Future.delayed(Duration(seconds: 1));
-  /// print(age.value); // Outputs: 10 because the update was ignored
+  /// const k10ms = Duration(milliseconds: 10);
+  /// var beacon = Beacon.throttled(10, duration: k10ms);
+  ///
+  /// beacon.set(20);
+  /// expect(beacon.value, equals(20)); // first update allowed
+  ///
+  /// beacon.set(30);
+  /// expect(beacon.value, equals(20)); // too fast, update ignored
+  ///
+  /// await Future.delayed(k10ms * 1.1);
+  ///
+  /// beacon.set(30);
+  /// expect(beacon.value, equals(30)); // throttle time passed, update allowed
   /// ```
 
   static ThrottledBeacon<T> throttled<T>(
@@ -135,7 +143,7 @@ abstract class Beacon {
   ///
   /// Example:
   /// ```dart
-  /// var countBeacon = BufferedCountBeacon<int>(countThreshold: 3);
+  /// var countBeacon = Beacon.bufferedCount(3);
   /// countBeacon.subscribe((values) {
   ///   print(values); // Outputs the list of collected values
   /// });
@@ -155,10 +163,12 @@ abstract class Beacon {
   ///
   /// Example:
   /// ```dart
-  /// var timeBeacon = BufferedTimeBeacon<int>(bufferDuration: Duration(seconds: 5));
+  /// var timeBeacon = Beacon.bufferedTime<int>(duration: Duration(seconds: 5));
+  ///
   /// timeBeacon.subscribe((values) {
-  ///   print(values); // Outputs the list of collected values every 5 seconds
+  ///   print(values);
   /// });
+  ///
   /// timeBeacon.value = 1;
   /// timeBeacon.value = 2;
   /// // After 5 seconds, it will output [1, 2]
@@ -397,7 +407,6 @@ abstract class Beacon {
   ///        print("You can't vote yet");
   ///     }
   ///  });
-  /// });
   ///
   /// // Outputs: "You can't vote yet"
   ///
