@@ -1,3 +1,8 @@
+## 0.10.2
+
+-   Add unwrapValue() method to AsyncValue class
+-   Keep track of the last AsyncData so it can be used in loading and error states
+
 ## 0.10.1
 
 -   Expose listenersCount
