@@ -100,29 +100,6 @@ void main() {
       expect(ran, equals(2));
     });
 
-    test('should stop listening after unsubscribing', () async {
-      var count = Beacon.writable(0);
-
-      var ran = 0;
-
-      var futureBeacon = Beacon.derivedFuture(() async {
-        count.value;
-        return ++ran;
-      });
-
-      await Future.delayed(Duration(milliseconds: 100));
-
-      expect(ran, equals(1));
-
-      futureBeacon.unsubscribe();
-
-      count.value = 1; // Changing dependency
-
-      await Future.delayed(Duration(milliseconds: 100));
-
-      expect(ran, equals(1));
-    });
-
     test('should not execute until start() is called', () async {
       var count = Beacon.writable(0);
 

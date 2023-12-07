@@ -2,17 +2,11 @@ part of '../base_beacon.dart';
 
 enum DerivedStatus { idle, running }
 
-class DerivedBeaconBase<T> extends ReadableBeacon<T> {
+mixin DerivedMixin<T> on ReadableBeacon<T> {
   late final VoidCallback _unsubscribe;
 
   void $setInternalEffectUnsubscriber(VoidCallback unsubscribe) {
     _unsubscribe = unsubscribe;
-  }
-
-  DerivedBeaconBase();
-
-  void unsubscribe() {
-    _unsubscribe();
   }
 
   void forceSetValue(T newValue) {
@@ -21,12 +15,12 @@ class DerivedBeaconBase<T> extends ReadableBeacon<T> {
 
   @override
   void dispose() {
-    unsubscribe();
+    _unsubscribe();
     super.dispose();
   }
 }
 
-class DerivedBeacon<T> extends DerivedBeaconBase<T> {
+class DerivedBeacon<T> extends ReadableBeacon<T> with DerivedMixin<T> {
   DerivedBeacon({bool manualStart = false}) {
     _status = WritableBeacon(
       manualStart ? DerivedStatus.idle : DerivedStatus.running,
