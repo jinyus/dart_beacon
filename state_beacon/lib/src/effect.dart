@@ -1,9 +1,9 @@
 part of 'base_beacon.dart';
 
 final _effectStack = <_Effect>[];
-final _batchStack = <Null>[];
+var _batchStack = 0;
 
-bool _isRunningBatchJob() => _batchStack.isNotEmpty;
+bool _isRunningBatchJob() => _batchStack > 0;
 
 final Listerners _listenersToPingAfterBatchJob = {};
 
@@ -47,9 +47,9 @@ VoidCallback effect(Function fn) {
 }
 
 void batch(void Function() compute) {
-  _batchStack.add(null);
+  _batchStack++;
   compute();
-  _batchStack.removeLast();
+  _batchStack--;
 
   if (_isRunningBatchJob()) {
     return;
