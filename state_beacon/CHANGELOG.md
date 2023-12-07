@@ -1,3 +1,12 @@
+## 0.11.1
+
+-   Mark internal methods as @protected
+
+## 0.11.0
+
+-   FutureBeacon is now a base class for DefaultFutureBeacon and DerivedFutureBeacon
+-   Expose DerivedFutureBeacon as a FutureBeacon
+
 ## 0.10.2
 
 -   Add unwrapValue() method to AsyncValue class
