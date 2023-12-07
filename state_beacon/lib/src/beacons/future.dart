@@ -14,6 +14,16 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   final bool cancelRunning;
   final Future<T> Function() _operation;
 
+  AsyncValue<T>? _previousAsyncValue;
+  T? _lastData;
+
+  @override
+  AsyncValue<T>? get previousValue => _previousAsyncValue;
+
+  /// The last data that was successfully loaded
+  /// This is useful when the current state is [AsyncError] or [AsyncLoading]
+  T? get lastData => _lastData;
+
   /// Resets the beacon by calling the [Future] again
   @override
   void reset() {
@@ -44,6 +54,18 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
       if (cancelRunning && currentTracker != _executionID) {
         return;
       }
+
+      if (value is AsyncData) {
+        if (_lastData != null) {
+          // first time we get data, we don't have a previous value
+
+          // ignore: null_check_on_nullable_type_parameter
+          _previousAsyncValue = AsyncData(_lastData!);
+        }
+
+        _lastData = value.unwrapValue();
+      }
+
       _setValue(value);
     }
 
@@ -53,5 +75,12 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     } catch (e, s) {
       return updateOrIgnore(AsyncError(e, s));
     }
+  }
+
+  @override
+  void dispose() {
+    _lastData = null;
+    _previousAsyncValue = null;
+    super.dispose();
   }
 }

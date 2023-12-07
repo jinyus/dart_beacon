@@ -18,8 +18,14 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
 
   final bool cancelRunning;
   AsyncValue<T>? _previousAsyncValue;
+  T? _lastData;
+
   @override
   AsyncValue<T>? get previousValue => _previousAsyncValue;
+
+  /// The last data that was successfully loaded
+  /// This is useful when the current state is [AsyncError] or [AsyncLoading]
+  T? get lastData => _lastData;
 
   late final WritableBeacon<DerivedFutureStatus> _status;
   ReadableBeacon<DerivedFutureStatus> get status => _status;
@@ -36,9 +42,15 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
     // then this is an old execution and we should ignore it
     if (cancelRunning && exeID != _executionID) return;
 
-    // the current value would be loading so we need the previous AsyncData
-    if (value is AsyncData && _previousValue is AsyncData) {
-      _previousAsyncValue = _previousValue;
+    if (value is AsyncData) {
+      if (_lastData != null) {
+        // first time we get data, we don't have a previous value
+
+        // ignore: null_check_on_nullable_type_parameter
+        _previousAsyncValue = AsyncData(_lastData!);
+      }
+
+      _lastData = value.unwrapValue();
     }
 
     super.forceSetValue(value);
@@ -68,6 +80,8 @@ class DerivedFutureBeacon<T> extends DerivedBeaconBase<AsyncValue<T>> {
   @override
   void dispose() {
     _status.dispose();
+    _lastData = null;
+    _previousAsyncValue = null;
     super.dispose();
   }
 }
