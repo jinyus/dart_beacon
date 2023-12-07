@@ -39,10 +39,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   late T _value;
   T? _previousValue;
   late final T _initialValue;
-  final Listerners listeners = {};
+  final Listerners _listeners = {};
 
   T? get previousValue => _previousValue;
   T get initialValue => _initialValue;
+  int get listenersCount => _listeners.length;
 
   @override
   T get value {
@@ -52,14 +53,14 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
     final currentEffect = _Effect.current();
     if (currentEffect != null) {
-      _subscribe(currentEffect, listeners);
+      _subscribe(currentEffect, _listeners);
     }
     return _value;
   }
 
   void _notifyOrDeferBatch() {
     if (_isRunningBatchJob()) {
-      _listenersToPingAfterBatchJob.addAll(listeners);
+      _listenersToPingAfterBatchJob.addAll(_listeners);
     } else {
       _notifyListeners();
     }
@@ -87,13 +88,13 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   VoidCallback subscribe(void Function(T) callback, {bool startNow = false}) {
     listener() => callback(_value);
     final effectClosure = EffectClosure(listener);
-    listeners.add(effectClosure);
+    _listeners.add(effectClosure);
 
     if (startNow) {
       listener();
     }
 
-    return () => listeners.remove(effectClosure);
+    return () => _listeners.remove(effectClosure);
   }
 
   void _notifyListeners() {
@@ -102,13 +103,13 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     final currentEffect = _Effect.current();
 
     if (currentEffect != null) {
-      if (listeners.contains(currentEffect.func)) {
+      if (_listeners.contains(currentEffect.func)) {
         throw CircularDependencyException();
       }
     }
 
     // toList() is used to avoid concurrent modification
-    for (final listener in listeners.toList()) {
+    for (final listener in _listeners.toList()) {
       listener.run();
     }
   }
@@ -122,7 +123,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   /// Clears all registered listeners and
   /// [reset] the beacon to its initial state.
   void dispose() {
-    listeners.clear();
+    _listeners.clear();
     if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
   }
@@ -131,12 +132,12 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   void addListener(VoidCallback listener) {
     final effectClosure = EffectClosure(listener, customID: listener.hashCode);
 
-    listeners.add(effectClosure);
+    _listeners.add(effectClosure);
   }
 
   @override
   void removeListener(VoidCallback listener) {
     final effectClosure = EffectClosure(listener, customID: listener.hashCode);
-    listeners.remove(effectClosure);
+    _listeners.remove(effectClosure);
   }
 }
