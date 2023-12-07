@@ -50,9 +50,9 @@ void main() {
 
       expect(futureBeacon.value, isA<AsyncData<int>>());
 
-      final data = futureBeacon.value as AsyncData<int>;
+      final value = futureBeacon.value.unwrapValue();
 
-      expect(data.value, equals(2));
+      expect(value, equals(2));
     });
 
     test('should not executes until start() is called', () async {
@@ -73,9 +73,9 @@ void main() {
 
       expect(futureBeacon.value, isA<AsyncData<int>>());
 
-      final data = futureBeacon.value as AsyncData<int>;
+      final value = futureBeacon.value.unwrapValue();
 
-      expect(data.value, equals(1));
+      expect(value, equals(1));
     });
   });
   group('DerivedFutureBeacon Tests', () {
@@ -171,7 +171,7 @@ void main() {
           called++;
         } else if (called < 3) {
           expect(myBeacon.previousValue, isA<AsyncData<int>>());
-          expect((value as AsyncData<int>).value, equals(called));
+          expect(value.unwrapValue(), equals(called));
 
           if (called == 2) {
             myBeacon.unsubscribe();
