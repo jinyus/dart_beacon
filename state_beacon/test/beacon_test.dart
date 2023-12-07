@@ -960,13 +960,24 @@ void main() {
     test('should set previous and initial values - derivedFuture', () async {
       var count = Beacon.writable(0);
       var beacon = Beacon.derivedFuture(() async => count.value * 2);
+
       await Future.delayed(k10ms * 10);
       count.set(1);
+
       await Future.delayed(k10ms * 10);
-      expect((beacon.previousValue as AsyncData<int>?)?.value, equals(0));
+      expect(beacon.previousValue?.unwrapValue(), equals(0));
       count.set(5);
+
       await Future.delayed(k10ms * 10);
-      expect((beacon.previousValue as AsyncData<int>?)?.value, equals(2));
+      expect(beacon.previousValue?.unwrapValue(), equals(2));
+
+      count.set(10);
+      expect(beacon.lastData, equals(10));
+
+      await Future.delayed(k10ms * 10);
+      expect(beacon.previousValue?.unwrapValue(), equals(10));
+      expect(beacon.value.unwrapValue(), equals(20));
+
       expect(beacon.initialValue, isA<AsyncLoading<int>>());
     });
 
