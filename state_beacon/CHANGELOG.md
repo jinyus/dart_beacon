@@ -1,3 +1,8 @@
+## 0.10.1
+
+-   Expose listenersCount
+-   Internal improvements
+
 ## 0.10.0
 
 -   FilteredBeacon : Make filter function nullable which allows changing/setting it after initialization
