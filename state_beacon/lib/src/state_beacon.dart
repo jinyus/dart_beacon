@@ -282,7 +282,7 @@ abstract class Beacon {
     bool manualStart = false,
     bool cancelRunning = true,
   }) {
-    return FutureBeacon<T>(
+    return DefaultFutureBeacon<T>(
       future,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
@@ -356,7 +356,7 @@ abstract class Beacon {
   ///   }
   /// }
   /// ```
-  static DerivedFutureBeacon<T> derivedFuture<T>(
+  static FutureBeacon<T> derivedFuture<T>(
     Future<T> Function() compute, {
     bool manualStart = false,
     bool cancelRunning = true,
