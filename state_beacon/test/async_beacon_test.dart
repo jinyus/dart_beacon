@@ -118,8 +118,8 @@ void main() {
       });
 
       var fullName = Beacon.derivedFuture(() async {
-        final fname = await Beacon.asFuture(firstName);
-        final lname = await Beacon.asFuture(lastName);
+        final fname = await firstName.toFuture();
+        final lname = await lastName.toFuture();
 
         final name = '$fname $lname';
 

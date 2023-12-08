@@ -456,20 +456,6 @@ abstract class Beacon {
     batch(callback);
   }
 
-  /// Exposes a [FutureBeacon] as a [Future] that can be awaited inside another [FutureBeacon].
-  /// var count = Beacon.writable(0);
-  /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
-  ///
-  /// var lastName = Beacon.derivedFuture(() async => 'Smith ${count.value}');
-  ///
-  /// var fullName = Beacon.derivedFuture(() async {
-  ///
-  ///    // no need for a manual switch expression
-  ///   final fname = await Beacon.asFuture(firstName);
-  ///   final lname = await Beacon.asFuture(lastName);
-  ///
-  ///   return '$fname $lname';
-  /// });
   static Future<T> asFuture<T>(FutureBeacon<T> beacon) {
     final existing = Awaited.find(beacon);
     if (existing != null) {

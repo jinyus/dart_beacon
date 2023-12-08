@@ -46,6 +46,32 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     _setValue(value, force: true);
   }
 
+  /// Exposes this as a [Future] that can be awaited inside another [FutureBeacon].
+  /// var count = Beacon.writable(0);
+  /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
+  ///
+  /// var lastName = Beacon.derivedFuture(() async => 'Smith ${count.value}');
+  ///
+  /// var fullName = Beacon.derivedFuture(() async {
+  ///
+  ///    // no need for a manual switch expression
+  ///   final fname = await firstName.toFuture();
+  ///   final lname = await lastName.toFuture();
+  ///
+  ///   return '$fname $lname';
+  /// });
+  Future<T> toFuture() {
+    final existing = Awaited.find(this);
+    if (existing != null) {
+      return existing.future;
+    }
+
+    final newAwaited = Awaited(this);
+    Awaited.put(this, newAwaited);
+
+    return newAwaited.future;
+  }
+
   @override
   void dispose() {
     _lastData = null;
