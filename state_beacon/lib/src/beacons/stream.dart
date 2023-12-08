@@ -12,6 +12,21 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   final bool cancelOnError;
 
   StreamSubscription<T>? _subscription;
+  VoidCallback? _cancelAwaitedSubscription;
+
+  Future<T> toFuture() {
+    final existing = Awaited.find<T, StreamBeacon<T>>(this);
+    if (existing != null) {
+      return existing.future;
+    }
+
+    final newAwaited = Awaited<T, StreamBeacon<T>>(this);
+    Awaited.put(this, newAwaited);
+
+    _cancelAwaitedSubscription = newAwaited.cancel;
+
+    return newAwaited.future;
+  }
 
   /// Resets the signal by calling the [Stream] again
   @override
@@ -45,6 +60,7 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   @override
   void dispose() {
     unsubscribe();
+    _cancelAwaitedSubscription?.call();
     super.dispose();
   }
 }
