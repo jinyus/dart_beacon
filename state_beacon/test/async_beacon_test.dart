@@ -244,14 +244,14 @@ void main() {
     });
 
     test('should emit raw values', () async {
-      var myStream = Stream.periodic(k10ms * 10, (i) => i + 1);
+      var myStream = Stream.periodic(k10ms, (i) => i + 1);
       var myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
       var called = 0;
 
       final results = <int?>[];
 
       myBeacon.subscribe((value) {
-        print('called: $called with $value');
+        // print('called: $called with $value');
         if (called == 0) {
           results.add(myBeacon.previousValue);
         }
@@ -264,7 +264,7 @@ void main() {
         called++;
       });
 
-      await Future.delayed(Duration(milliseconds: 400));
+      await Future.delayed(Duration(milliseconds: 50));
 
       expect(results, [0, 1, 2, 3, 4]);
 
