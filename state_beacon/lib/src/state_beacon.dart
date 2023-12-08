@@ -455,16 +455,4 @@ abstract class Beacon {
   static void doBatchUpdate(VoidCallback callback) {
     batch(callback);
   }
-
-  static Future<T> asFuture<T>(FutureBeacon<T> beacon) {
-    final existing = Awaited.find(beacon);
-    if (existing != null) {
-      return existing.future;
-    }
-
-    final newAwaited = Awaited(beacon);
-    Awaited.put(beacon, newAwaited);
-
-    return newAwaited.future;
-  }
 }
