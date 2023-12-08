@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'async_value.dart';
 import 'base_beacon.dart';
 import 'common.dart';
@@ -371,13 +373,12 @@ abstract class Beacon {
       if (beacon.status.value == DerivedFutureStatus.idle) return;
 
       // start loading and get the execution ID
-      final exeID = beacon.startLoading();
-
+      final exeID = beacon.$startLoading();
       try {
         final result = await compute();
-        beacon.setAsyncValue(exeID, AsyncData(result));
+        beacon.$setAsyncValue(exeID, AsyncData(result));
       } catch (e, s) {
-        beacon.setAsyncValue(exeID, AsyncError(e, s));
+        beacon.$setAsyncValue(exeID, AsyncError(e, s));
       }
     });
 
