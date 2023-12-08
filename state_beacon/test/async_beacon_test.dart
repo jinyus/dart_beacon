@@ -173,6 +173,43 @@ void main() {
 
       expect(ran, equals(3));
     });
+    test('should await StreamBeacon exposed a future', () async {
+      Stream<int> idChanges() async* {
+        yield 1;
+        await Future.delayed(k10ms);
+        yield 2;
+        await Future.delayed(k10ms);
+        yield 3;
+      }
+
+      Future<String> fetchUser(int id) async {
+        await Future.delayed(k10ms);
+        return 'User $id';
+      }
+
+      final id = Beacon.stream(idChanges());
+      final user = Beacon.derivedFuture(() async {
+        return fetchUser(await id.toFuture());
+      });
+
+      final results = <AsyncValue>[];
+      final correctResults = [
+        AsyncLoading<String>(),
+        AsyncData('User 1'),
+        AsyncLoading<String>(),
+        AsyncData('User 2'),
+        AsyncLoading<String>(),
+        AsyncData('User 3'),
+      ];
+
+      Beacon.createEffect(() {
+        results.add(user.value);
+      });
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      expect(results, correctResults);
+    });
   });
 
   group('Stream tests', () {
