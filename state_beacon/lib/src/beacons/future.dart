@@ -19,12 +19,30 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   void start() {}
 
-  int startLoading() {
+  /// Internal method to start loading
+  @protected
+  int $startLoading() {
     _setValue(AsyncLoading());
     return ++_executionID;
   }
 
-  void setAsyncValue(int exeID, AsyncValue<T> value) {
+  Future<T> get asFuture {
+    //value; // register dependency
+    if (_value case AsyncData<T>(:final value)) {
+      return Future.value(value);
+    } else if (_value case AsyncError<T>(:final error, :final stackTrace)) {
+      return Future.error(error, stackTrace);
+    }
+
+    _futureCompleter = Completer<T>();
+    return _futureCompleter!.future;
+  }
+
+  Completer<T>? _futureCompleter;
+
+  /// Internal method to set the value
+  @protected
+  void $setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
     if (cancelRunning && exeID != _executionID) return;
@@ -39,8 +57,23 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
       _lastData = value.unwrapValue();
     }
-
+    print('setting value to $value');
     _setValue(value, force: true);
+
+    if (_futureCompleter != null) {
+      switch (value) {
+        case AsyncData<T>(value: final v):
+          _futureCompleter?.complete(v);
+          break;
+        case AsyncError<T>(error: final e, stackTrace: final s):
+          _futureCompleter?.completeError(e, s);
+          break;
+        default:
+          break;
+      }
+
+      _futureCompleter = null;
+    }
   }
 
   @override
@@ -82,13 +115,13 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
   }
 
   Future<void> _init() async {
-    final currentExeID = startLoading();
+    final currentExeID = $startLoading();
 
     try {
       final result = await _operation();
-      return setAsyncValue(currentExeID, AsyncData(result));
+      return $setAsyncValue(currentExeID, AsyncData(result));
     } catch (e, s) {
-      return setAsyncValue(currentExeID, AsyncError(e, s));
+      return $setAsyncValue(currentExeID, AsyncError(e, s));
     }
   }
 }
