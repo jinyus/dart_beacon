@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
+  const k10ms = Duration(milliseconds: 10);
+
   group('FutureBeacon Tests', () {
     test('should change to AsyncData on successful future resolution',
         () async {
@@ -98,6 +100,49 @@ void main() {
       await Future.delayed(Duration(milliseconds: 10));
 
       expect(ran, equals(2));
+    });
+    test('should await derivedFuture asFuture', () async {
+      var count = Beacon.writable(0);
+
+      var firstName = Beacon.derivedFuture(() async {
+        final val = count.value;
+        await Future.delayed(k10ms);
+        return 'Sally $val';
+      });
+
+      var lastName = Beacon.derivedFuture(() async {
+        final val = count.value + 1;
+        await Future.delayed(k10ms);
+        return 'Smith $val';
+      });
+
+      var fullName = Beacon.derivedFuture(() async {
+        count.value; // register dependency
+
+        // final fname = await firstName.asFuture;
+        // final lname = await lastName.asFuture;
+
+        final [String fname, String lname] = await Future.wait([
+          firstName.asFuture,
+          lastName.asFuture,
+        ]);
+
+        return '$fname $lname';
+      });
+
+      expect(fullName.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 3);
+
+      expect(fullName.value.unwrapValue(), 'Sally 0 Smith 1');
+
+      count.increment();
+
+      expect(fullName.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 3);
+
+      expect(fullName.value.unwrapValue(), 'Sally 1 Smith 2');
     });
 
     test('should not execute until start() is called', () async {
