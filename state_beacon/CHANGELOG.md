@@ -1,3 +1,7 @@
+## 0.11.2
+
+-   Add Beacon.asFuture that exposes a FutureBeacon as a Future
+
 ## 0.11.1
 
 -   Mark internal methods as @protected
