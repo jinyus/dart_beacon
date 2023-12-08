@@ -1,3 +1,7 @@
+## 0.12.0
+
+-   Beacon.asFuture is now FutureBeacon.toFuture()
+
 ## 0.11.2
 
 -   Add Beacon.asFuture that exposes a FutureBeacon as a Future
