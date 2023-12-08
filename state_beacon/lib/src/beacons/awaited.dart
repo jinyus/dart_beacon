@@ -1,7 +1,10 @@
 part of '../base_beacon.dart';
 
-class Awaited<T> extends ReadableBeacon<Completer<T>> {
-  late final FutureBeacon<T> _futureBeacon;
+typedef AsyncBeacon<T> = ReadableBeacon<AsyncValue<T>>;
+
+class Awaited<T, S extends AsyncBeacon<T>>
+    extends ReadableBeacon<Completer<T>> {
+  late final S _futureBeacon;
 
   Future<T> get future => value.future;
 
@@ -20,17 +23,18 @@ class Awaited<T> extends ReadableBeacon<Completer<T>> {
     }, startNow: true);
   }
 
-  static Awaited<T>? find<T>(FutureBeacon<T> beacon) {
+  static Awaited<T, S>? find<T, S extends AsyncBeacon<T>>(S beacon) {
     final existing = _awaitedBeacons[beacon];
     if (existing != null) {
-      return existing as Awaited<T>;
+      return existing as Awaited<T, S>;
     }
     return null;
   }
 
-  static void put<T>(FutureBeacon<T> beacon, Awaited<T> awaited) {
+  static void put<T, S extends AsyncBeacon<T>>(
+      S beacon, Awaited<T, S> awaited) {
     _awaitedBeacons[beacon] = awaited;
   }
 }
 
-final _awaitedBeacons = <FutureBeacon, Awaited>{};
+final _awaitedBeacons = <AsyncBeacon, Awaited>{};
