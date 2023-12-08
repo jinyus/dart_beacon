@@ -46,6 +46,8 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     _setValue(value, force: true);
   }
 
+  VoidCallback? _cancelAwaitedSubscription;
+
   /// Exposes this as a [Future] that can be awaited inside another [FutureBeacon].
   /// var count = Beacon.writable(0);
   /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
@@ -69,6 +71,8 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     final newAwaited = Awaited(this);
     Awaited.put(this, newAwaited);
 
+    _cancelAwaitedSubscription = newAwaited.cancel;
+
     return newAwaited.future;
   }
 
@@ -76,6 +80,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   void dispose() {
     _lastData = null;
     _previousAsyncValue = null;
+    _cancelAwaitedSubscription?.call();
     super.dispose();
   }
 }

@@ -5,8 +5,10 @@ class Awaited<T> extends ReadableBeacon<Completer<T>> {
 
   Future<T> get future => value.future;
 
+  VoidCallback? cancel;
+
   Awaited(this._futureBeacon, {String? debugName}) : super(Completer<T>()) {
-    _futureBeacon.subscribe((v) {
+    cancel = _futureBeacon.subscribe((v) {
       if (peek().isCompleted) {
         _setValue(Completer<T>());
       }
