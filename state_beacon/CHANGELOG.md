@@ -1,3 +1,7 @@
+## 0.12.1
+
+-   Internal fixes
+
 ## 0.12.0
 
 -   Beacon.asFuture is now FutureBeacon.toFuture()
