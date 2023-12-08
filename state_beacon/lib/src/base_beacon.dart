@@ -23,6 +23,7 @@ part 'beacons/list.dart';
 part 'beacons/derived.dart';
 part 'beacons/derived_future.dart';
 part 'beacons/value_notifier.dart';
+part 'beacons/awaited.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
   BaseBeacon([T? initialValue]) {
