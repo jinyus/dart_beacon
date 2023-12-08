@@ -118,16 +118,11 @@ void main() {
       });
 
       var fullName = Beacon.derivedFuture(() async {
-        //count.value; // register dependency
-        print('running effect');
-
         final fname = await Beacon.asFuture(firstName);
         final lname = await Beacon.asFuture(lastName);
-        // final lname = await lastName.asFuture;
 
         final name = '$fname $lname';
 
-        print(name);
         return name;
       });
 

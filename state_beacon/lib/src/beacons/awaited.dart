@@ -7,7 +7,6 @@ class Awaited<T> extends ReadableBeacon<Completer<T>> {
 
   Awaited(this._futureBeacon, {String? debugName}) : super(Completer<T>()) {
     _futureBeacon.subscribe((v) {
-      print('got $v from $debugName');
       if (peek().isCompleted) {
         _setValue(Completer<T>());
       }
