@@ -19,12 +19,16 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   void start() {}
 
-  int startLoading() {
+  /// Internal method to start loading
+  @protected
+  int $startLoading() {
     _setValue(AsyncLoading());
     return ++_executionID;
   }
 
-  void setAsyncValue(int exeID, AsyncValue<T> value) {
+  /// Internal method to set the value
+  @protected
+  void $setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
     if (cancelRunning && exeID != _executionID) return;
@@ -39,7 +43,6 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
       _lastData = value.unwrapValue();
     }
-
     _setValue(value, force: true);
   }
 
@@ -82,13 +85,13 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
   }
 
   Future<void> _init() async {
-    final currentExeID = startLoading();
+    final currentExeID = $startLoading();
 
     try {
       final result = await _operation();
-      return setAsyncValue(currentExeID, AsyncData(result));
+      return $setAsyncValue(currentExeID, AsyncData(result));
     } catch (e, s) {
-      return setAsyncValue(currentExeID, AsyncError(e, s));
+      return $setAsyncValue(currentExeID, AsyncError(e, s));
     }
   }
 }

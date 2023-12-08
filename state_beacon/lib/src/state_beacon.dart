@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'async_value.dart';
 import 'base_beacon.dart';
 import 'common.dart';
@@ -371,13 +373,12 @@ abstract class Beacon {
       if (beacon.status.value == DerivedFutureStatus.idle) return;
 
       // start loading and get the execution ID
-      final exeID = beacon.startLoading();
-
+      final exeID = beacon.$startLoading();
       try {
         final result = await compute();
-        beacon.setAsyncValue(exeID, AsyncData(result));
+        beacon.$setAsyncValue(exeID, AsyncData(result));
       } catch (e, s) {
-        beacon.setAsyncValue(exeID, AsyncError(e, s));
+        beacon.$setAsyncValue(exeID, AsyncError(e, s));
       }
     });
 
@@ -453,5 +454,31 @@ abstract class Beacon {
   /// ```
   static void doBatchUpdate(VoidCallback callback) {
     batch(callback);
+  }
+
+  /// Exposes a [FutureBeacon] as a [Future] that can be awaited inside another [FutureBeacon].
+  /// var count = Beacon.writable(0);
+  /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
+  ///
+  /// var lastName = Beacon.derivedFuture(() async => 'Smith ${count.value}');
+  ///
+  /// var fullName = Beacon.derivedFuture(() async {
+  ///
+  ///    // no need for a manual switch expression
+  ///   final fname = await Beacon.asFuture(firstName);
+  ///   final lname = await Beacon.asFuture(lastName);
+  ///
+  ///   return '$fname $lname';
+  /// });
+  static Future<T> asFuture<T>(FutureBeacon<T> beacon) {
+    final existing = Awaited.find(beacon);
+    if (existing != null) {
+      return existing.future;
+    }
+
+    final newAwaited = Awaited(beacon);
+    Awaited.put(beacon, newAwaited);
+
+    return newAwaited.future;
   }
 }
