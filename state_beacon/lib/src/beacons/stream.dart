@@ -61,6 +61,7 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   void dispose() {
     unsubscribe();
     _cancelAwaitedSubscription?.call();
+    Awaited.remove(this);
     super.dispose();
   }
 }
@@ -112,6 +113,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   @override
   void dispose() {
     unsubscribe();
+
     super.dispose();
   }
 }

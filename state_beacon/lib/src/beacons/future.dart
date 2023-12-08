@@ -81,6 +81,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     _lastData = null;
     _previousAsyncValue = null;
     _cancelAwaitedSubscription?.call();
+    Awaited.remove(this);
     super.dispose();
   }
 }

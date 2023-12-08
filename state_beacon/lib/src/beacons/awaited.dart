@@ -35,6 +35,10 @@ class Awaited<T, S extends AsyncBeacon<T>>
       S beacon, Awaited<T, S> awaited) {
     _awaitedBeacons[beacon] = awaited;
   }
+
+  static void remove<T, S extends AsyncBeacon<T>>(S beacon) {
+    _awaitedBeacons.remove(beacon);
+  }
 }
 
 final _awaitedBeacons = <AsyncBeacon, Awaited>{};
