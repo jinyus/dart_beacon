@@ -101,7 +101,8 @@ void main() {
 
       expect(ran, equals(2));
     });
-    test('should await derivedFuture asFuture', () async {
+
+    test('should await FutureBeacon exposed a future', () async {
       var count = Beacon.writable(0);
 
       var firstName = Beacon.derivedFuture(() async {
@@ -117,17 +118,22 @@ void main() {
       });
 
       var fullName = Beacon.derivedFuture(() async {
-        count.value; // register dependency
+        //count.value; // register dependency
+        print('running effect');
 
-        final fname = await firstName.asFuture;
-        final lname = await lastName.asFuture;
+        final fname = await Beacon.asFuture(firstName);
+        final lname = await Beacon.asFuture(lastName);
+        // final lname = await lastName.asFuture;
 
-        return '$fname $lname';
+        final name = '$fname $lname';
+
+        print(name);
+        return name;
       });
 
       expect(fullName.value, isA<AsyncLoading>());
 
-      await Future.delayed(k10ms * 3);
+      await Future.delayed(k10ms * 2);
 
       expect(fullName.value.unwrapValue(), 'Sally 0 Smith 1');
 
