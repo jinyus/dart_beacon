@@ -1,3 +1,7 @@
+## 0.12.3
+
+-   Internal fixes
+
 ## 0.12.2
 
 -   Add myStreamBeacon.toFuture() that exposes a StreamBeacon as a Future
