@@ -57,7 +57,6 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
       _lastData = value.unwrapValue();
     }
-    print('setting value to $value');
     _setValue(value, force: true);
 
     if (_futureCompleter != null) {
