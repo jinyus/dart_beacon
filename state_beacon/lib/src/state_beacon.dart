@@ -246,6 +246,7 @@ abstract class Beacon {
 
   /// Creates a `StreamBeacon` from a given stream.
   /// This beacon updates its value based on the stream's emitted values.
+  /// The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
   ///
   /// Example:
   /// ```dart
@@ -262,6 +263,23 @@ abstract class Beacon {
     return StreamBeacon<T>(
       stream,
       cancelOnError: cancelOnError,
+    );
+  }
+
+  /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
+  static RawStreamBeacon<T> streamRaw<T>(
+    Stream<T> stream, {
+    bool cancelOnError = false,
+    Function? onError,
+    Function? onDone,
+    T? initialValue,
+  }) {
+    return RawStreamBeacon<T>(
+      stream,
+      cancelOnError: cancelOnError,
+      onError: onError,
+      onDone: onDone,
+      initialValue: initialValue,
     );
   }
 

@@ -213,8 +213,8 @@ void main() {
   });
 
   group('Stream tests', () {
-    test('should  emit values', () async {
-      var myStream = Stream.periodic(Duration(milliseconds: 100), (i) => i);
+    test('should emit values', () async {
+      var myStream = Stream.periodic(k10ms * 10, (i) => i);
       var myBeacon = Beacon.stream(myStream);
       var called = 0;
 
@@ -241,6 +241,34 @@ void main() {
       await Future.delayed(Duration(milliseconds: 400));
 
       expect(called, equals(3));
+    });
+
+    test('should emit raw values', () async {
+      var myStream = Stream.periodic(k10ms * 10, (i) => i + 1);
+      var myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
+      var called = 0;
+
+      final results = <int?>[];
+
+      myBeacon.subscribe((value) {
+        print('called: $called with $value');
+        if (called == 0) {
+          results.add(myBeacon.previousValue);
+        }
+
+        results.add(value);
+
+        if (called == 3) {
+          myBeacon.unsubscribe();
+        }
+        called++;
+      });
+
+      await Future.delayed(Duration(milliseconds: 400));
+
+      expect(results, [0, 1, 2, 3, 4]);
+
+      expect(called, equals(4));
     });
   });
 }
