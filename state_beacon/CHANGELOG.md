@@ -1,3 +1,8 @@
+## 0.12.2
+
+-   Add myStreamBeacon.toFuture() that exposes a StreamBeacon as a Future
+-   Add Beacon.streamRaw that emits unwrapped values
+
 ## 0.12.1
 
 -   Internal fixes
