@@ -1,3 +1,7 @@
+## 0.12.5
+
+-   Internal code refactor
+
 ## 0.12.4
 
 -   Internal improvements
