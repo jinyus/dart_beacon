@@ -1,5 +1,5 @@
 name: skeleton
-description: "A new Flutter project."
+description: "Flutter skeleton project with state_beacon"
 
 # Prevent accidental publishing to pub.dev.
 publish_to: "none"
