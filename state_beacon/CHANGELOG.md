@@ -1,3 +1,7 @@
+## 0.12.8
+
+-   Fix null assertion bug in `Beacon.observe`
+
 ## 0.12.7
 
 -   Add beacon.observe(context, callback) for performing side effects in a widget
