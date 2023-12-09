@@ -19,6 +19,28 @@ void main() {
       expect(called, isTrue);
     });
 
+    test('should decrease listenersCount when unsubscribed', () {
+      var beacon = Beacon.writable(10);
+
+      final unsub1 = beacon.subscribe((_) {});
+
+      expect(beacon.listenersCount, 1);
+
+      final unsub2 = Beacon.createEffect(() {
+        beacon.value;
+      });
+
+      expect(beacon.listenersCount, 2);
+
+      unsub1();
+
+      expect(beacon.listenersCount, 1);
+
+      unsub2();
+
+      expect(beacon.listenersCount, 0);
+    });
+
     test('should notify when same value is set with force option', () async {
       var beacon = Beacon.writable(10);
       const time = Duration(milliseconds: 5);
