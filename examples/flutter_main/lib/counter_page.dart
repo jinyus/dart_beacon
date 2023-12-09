@@ -24,6 +24,24 @@ class CounterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    count.observe(context, (prev, next) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      if (next > prev && next > 3) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Count cannot be greater than 3'),
+          ),
+        );
+      } else if (next < prev && next < 0) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Count cannot be negative'),
+          ),
+        );
+      }
+    });
+
     final btnStyle = IconButton.styleFrom(
       minimumSize: const Size(100, 100),
       backgroundColor:

@@ -32,11 +32,13 @@ class App extends StatelessWidget {
   static const String title = 'State Beacon GoRouter Example';
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-        routerConfig: _router,
-        title: App.title,
-        debugShowCheckedModeBanner: false,
-      );
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: App.title,
+      debugShowCheckedModeBanner: false,
+    );
+  }
 
   late final GoRouter _router = GoRouter(
     routes: <GoRoute>[
@@ -81,25 +83,34 @@ class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text(App.title)),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              // context.read<AuthController>().login('test-user');
-              _authController.login((id: 1, name: 'test-user'));
+  Widget build(BuildContext context) {
+    _authController.user.observe(context, (prev, next) {
+      if (next != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('WELCOME BACK ${next.name}')),
+        );
+      }
+    });
+    return Scaffold(
+      appBar: AppBar(title: const Text(App.title)),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            // context.read<AuthController>().login('test-user');
+            _authController.login((id: 1, name: 'test-user'));
 
-              // router will automatically redirect from /login to / using
-              // refreshListenable
-            },
-            style: ElevatedButton.styleFrom(
-              textStyle: Theme.of(context).textTheme.headlineLarge,
-              minimumSize: const Size(200, 100),
-            ),
-            child: const Text('Login'),
+            // router will automatically redirect from /login to / using
+            // refreshListenable
+          },
+          style: ElevatedButton.styleFrom(
+            textStyle: Theme.of(context).textTheme.headlineLarge,
+            minimumSize: const Size(200, 100),
           ),
+          child: const Text('Login'),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class HomeScreen extends StatelessWidget {
@@ -108,6 +119,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = _authController.user.watch(context);
+    if (user == null) return const SizedBox.shrink();
     return Scaffold(
       appBar: AppBar(
         title: const Text(App.title),
