@@ -1,6 +1,6 @@
 ## 0.12.6
 
--   TimestampBeacon mow extend ReadableBeacon
+-   TimestampBeacon now extend ReadableBeacon
 
 ## 0.12.5
 
