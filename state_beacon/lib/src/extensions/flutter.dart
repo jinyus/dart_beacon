@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 
-class _BeaconListener {
-  late VoidCallback unsub;
-}
-
 extension BeaconFlutterX<T> on BaseBeacon<T> {
   /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
@@ -29,9 +25,9 @@ extension BeaconFlutterX<T> on BaseBeacon<T> {
   T watch(BuildContext context) {
     final elementRef = WeakReference(context as Element);
 
-    final listener = _BeaconListener();
+    late VoidCallback unsub;
 
-    listener.unsub = subscribe((_) {
+    unsub = subscribe((_) {
       assert(
           SchedulerBinding.instance.schedulerPhase !=
               SchedulerPhase.persistentCallbacks,
@@ -44,7 +40,7 @@ extension BeaconFlutterX<T> on BaseBeacon<T> {
         elementRef.target!.markNeedsBuild();
       }
       // only subscribe to one change per `build`
-      listener.unsub();
+      unsub();
     });
 
     return peek();
