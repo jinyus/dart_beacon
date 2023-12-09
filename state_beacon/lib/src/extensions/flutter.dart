@@ -1,18 +1,14 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 
-typedef _ElementUnsub = ({
-  WeakReference<Element> elementRef,
-  void Function() unsub
-});
+// Can't refer to listener while it is being declared, so we need this class
+// to add a layer of indirection.
+class _BeaconListener {
+  late VoidCallback unsub;
+}
 
-final Map<(int, int), _ElementUnsub> _subscribers = {};
-
-const _k10seconds = Duration(seconds: 10);
-
-var _lastPurge = DateTime.now().subtract(_k10seconds);
-
-extension BeaconUtils<T> on BaseBeacon<T> {
+extension BeaconFlutterX<T> on BaseBeacon<T> {
   /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
   ///
@@ -33,52 +29,26 @@ extension BeaconUtils<T> on BaseBeacon<T> {
   ///}
   /// ```
   T watch(BuildContext context) {
-    final key = (hashCode, context.hashCode);
+    final elementRef = WeakReference(context as Element);
 
-    void rebuildWidget(T value) {
-      final record = _subscribers[key]!;
+    final listener = _BeaconListener();
 
-      final target = record.elementRef.target;
-      final isMounted = target?.mounted ?? false;
+    listener.unsub = subscribe((_) {
+      assert(
+          SchedulerBinding.instance.schedulerPhase !=
+              SchedulerPhase.persistentCallbacks,
+          '$runtimeType mutated during a `build` method. Please use '
+          '`SchedulerBinding.instance.scheduleTask(updateTask, Priority.idle)`, '
+          '`SchedulerBinding.addPostFrameCallback(updateTask)`, '
+          'or similar. to schedule an update after the current build completes.');
 
-      if (isMounted) {
-        target!.markNeedsBuild();
-      } else {
-        final removedRecord = _subscribers.remove(key);
-        removedRecord?.unsub();
+      if (elementRef.target?.mounted ?? false) {
+        elementRef.target!.markNeedsBuild();
       }
-    }
-
-    if (!_subscribers.containsKey(key)) {
-      final unsub = subscribe(rebuildWidget);
-
-      _subscribers[key] = (
-        elementRef: WeakReference(context as Element),
-        unsub: unsub,
-      );
-    }
-
-    _cleanUp();
+      // only subscribe to one change per `build`
+      listener.unsub();
+    });
 
     return peek();
   }
-}
-
-void _cleanUp() {
-  final now = DateTime.now();
-
-  // only clean up if there are more than 10 subscribers
-  // and it's been more than 10 seconds
-  if (_subscribers.length < 10 || now.difference(_lastPurge) < _k10seconds) {
-    return;
-  }
-  _lastPurge = now;
-
-  _subscribers.removeWhere((key, value) {
-    final shouldRemove = value.elementRef.target == null;
-    if (shouldRemove) {
-      value.unsub();
-    }
-    return shouldRemove;
-  });
 }
