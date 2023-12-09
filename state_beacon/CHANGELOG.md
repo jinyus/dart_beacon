@@ -1,3 +1,7 @@
+## 0.12.4
+
+-   Internal improvements
+
 ## 0.12.3
 
 -   Internal fixes
