@@ -1,3 +1,7 @@
+## 0.12.7
+
+-   Add beacon.observe(context, callback) for performing side effects in a widget
+
 ## 0.12.6
 
 -   TimestampBeacon now extend ReadableBeacon
