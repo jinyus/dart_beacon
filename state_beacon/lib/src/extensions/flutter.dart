@@ -103,7 +103,7 @@ extension BeaconFlutterX<T> on BaseBeacon<T> {
     unsub = subscribe((newValue) {
       Future.delayed(delay, () {
         if (elementRef.target?.mounted ?? false) {
-          callback(previousValue!, newValue);
+          callback(previousValue as T, newValue);
         } else {
           _observers.remove(key);
           // keep subscription alive until widget is unmounted
