@@ -55,9 +55,9 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   @override
   void dispose() {
-    _wrapped.forEach((_, fn) {
-      fn.call();
-    });
+    for (var e in _wrapped.values) {
+      e();
+    }
     _wrapped.clear();
     currentBuffer.dispose();
     clearBuffer();

@@ -40,4 +40,13 @@ class WritableBeacon<T> extends ReadableBeacon<T>
 
     return this;
   }
+
+  @override
+  void dispose() {
+    for (var e in _wrapped.values) {
+      e();
+    }
+    _wrapped.clear();
+    super.dispose();
+  }
 }
