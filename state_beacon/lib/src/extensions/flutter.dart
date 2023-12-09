@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 
-// Can't refer to listener while it is being declared, so we need this class
-// to add a layer of indirection.
 class _BeaconListener {
   late VoidCallback unsub;
 }
