@@ -1,3 +1,7 @@
+## 0.12.6
+
+-   TimestampBeacon mow extend ReadableBeacon
+
 ## 0.12.5
 
 -   Internal code refactor
