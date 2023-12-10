@@ -20,6 +20,23 @@ class Counter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    counter.observe(context, (prev, next) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      if (next > prev && next > 3) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Count cannot be greater than 3'),
+          ),
+        );
+      } else if (next < prev && next < 0) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Count cannot be negative'),
+          ),
+        );
+      }
+    });
     return Text(
       counter.watch(context).toString(),
       style: Theme.of(context).textTheme.headlineMedium!,
@@ -112,5 +129,43 @@ void main() {
       find.text('Exception: Count(${counter.value}) too large'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Counter shows snackbar for exceeding 3',
+      (WidgetTester tester) async {
+    // Build the Counter widget
+    final counter = Beacon.writable(0);
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: Counter(counter: counter),
+      ),
+    ));
+
+    // Increase counter beyond limit
+    counter.value = 4;
+    await tester.pumpAndSettle();
+
+    // Verify snackbar visibility
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.text('Count cannot be greater than 3'), findsOneWidget);
+  });
+
+  testWidgets('Counter shows snackbar for going negative',
+      (WidgetTester tester) async {
+    // Build the Counter widget
+    final counter = Beacon.writable(0);
+    await tester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: Counter(counter: counter),
+      ),
+    ));
+
+    // Decrease counter below limit
+    counter.value = -1;
+    await tester.pumpAndSettle();
+
+    // Verify snackbar visibility
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.text('Count cannot be negative'), findsOneWidget);
   });
 }
