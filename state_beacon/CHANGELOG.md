@@ -1,3 +1,7 @@
+## 0.12.9
+
+-   Internal improvements
+
 ## 0.12.8
 
 -   Fix null assertion bug in `Beacon.observe`
