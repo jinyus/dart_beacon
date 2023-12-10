@@ -9,6 +9,8 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
       : _filter = filter,
         super(initialValue);
 
+  bool get hasFilter => _filter != null;
+
   @override
   set value(T newValue) => set(newValue);
 
