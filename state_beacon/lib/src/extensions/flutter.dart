@@ -1,15 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 
-// NB: The listener stays alive if the beacon is never modified.
-//     This is rear and not a problem in practice, but it is something to be
-//     aware of.
+typedef _ElementUnsub = ({
+  WeakReference<Element> elementRef,
+  void Function() unsub
+});
 
-final Set<(int, int)> _subscribers = {};
-final Set<(int, int)> _observers = {};
+typedef ObserverCallback<T> = void Function(T prev, T next);
 
-extension BeaconFlutterX<T> on BaseBeacon<T> {
+final Map<int, _ElementUnsub> _subscribers = {};
+
+const _k10seconds = Duration(seconds: 10);
+
+var _lastPurge = DateTime.now().subtract(_k10seconds);
+
+extension BeaconUtils<T> on BaseBeacon<T> {
   /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
   ///
@@ -30,35 +36,7 @@ extension BeaconFlutterX<T> on BaseBeacon<T> {
   ///}
   /// ```
   T watch(BuildContext context) {
-    final key = (hashCode, context.hashCode);
-
-    if (_subscribers.contains(key)) {
-      // the widget has an active subscription to this beacon
-      return peek();
-    }
-
-    _subscribers.add(key);
-
-    final elementRef = WeakReference(context as Element);
-
-    late VoidCallback unsub;
-
-    unsub = subscribe((_) {
-      assert(
-          SchedulerBinding.instance.schedulerPhase !=
-              SchedulerPhase.persistentCallbacks,
-          _buildMutationMsg);
-
-      _subscribers.remove(key);
-      // only subscribe to one change per `build`
-      unsub();
-
-      if (elementRef.target?.mounted ?? false) {
-        elementRef.target!.markNeedsBuild();
-      }
-    });
-
-    return peek();
+    return _watch(this, context);
   }
 
   /// Observes the state of a beacon and triggers a callback with the current state.
@@ -82,36 +60,86 @@ extension BeaconFlutterX<T> on BaseBeacon<T> {
   ///   }
   /// }
   /// ```
-  void observe(
-    BuildContext context,
-    void Function(T prev, T next) callback, {
-    Duration delay = Duration.zero,
-  }) {
-    final key = (hashCode, context.hashCode);
-
-    if (_observers.contains(key)) {
-      // the widget has an active subscription to this beacon
-      return;
-    }
-
-    _observers.add(key);
-
-    final elementRef = WeakReference(context as Element);
-
-    late VoidCallback unsub;
-
-    unsub = subscribe((newValue) {
-      Future.delayed(delay, () {
-        if (elementRef.target?.mounted ?? false) {
-          callback(previousValue as T, newValue);
-        } else {
-          _observers.remove(key);
-          // keep subscription alive until widget is unmounted
-          unsub();
-        }
-      });
-    });
+  void observe(BuildContext context, ObserverCallback<T> callback) {
+    _watch(
+      this,
+      context,
+      callback: callback,
+    );
   }
+}
+
+T _watch<T>(
+  BaseBeacon<T> beacon,
+  BuildContext context, {
+  ObserverCallback<T>? callback,
+}) {
+  final isObserving = callback != null;
+
+  final key = Object.hashAll([
+    beacon.hashCode,
+    context.hashCode,
+    if (isObserving) 'isObserving', // 1 widget should only observe once
+  ]);
+
+  void rebuildWidget(T value) {
+    _assertNotBuildMutation();
+
+    final record = _subscribers[key]!;
+
+    final target = record.elementRef.target;
+    final isMounted = target?.mounted ?? false;
+
+    if (isMounted) {
+      if (isObserving) {
+        callback(beacon.previousValue as T, value);
+      } else {
+        target!.markNeedsBuild();
+      }
+    } else {
+      final removedRecord = _subscribers.remove(key);
+      removedRecord?.unsub();
+    }
+  }
+
+  if (!_subscribers.containsKey(key)) {
+    final unsub = beacon.subscribe(rebuildWidget);
+
+    _subscribers[key] = (
+      elementRef: WeakReference(context as Element),
+      unsub: unsub,
+    );
+  }
+
+  _cleanUp();
+
+  return beacon.peek();
+}
+
+_assertNotBuildMutation() {
+  assert(
+      SchedulerBinding.instance.schedulerPhase !=
+          SchedulerPhase.persistentCallbacks,
+      _buildMutationMsg);
+}
+
+void _cleanUp() {
+  final now = DateTime.now();
+
+  // only clean up if last clean was more  than 10 seconds ago
+  if (now.difference(_lastPurge) < _k10seconds) {
+    return;
+  }
+
+  _lastPurge = now;
+
+  _subscribers.removeWhere((key, value) {
+    final shouldRemove = value.elementRef.target == null;
+    if (shouldRemove) {
+      value.unsub();
+    }
+    return shouldRemove;
+  });
 }
 
 const _buildMutationMsg =
