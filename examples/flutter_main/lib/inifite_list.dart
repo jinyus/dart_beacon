@@ -133,10 +133,12 @@ class _BottomWidgetState extends State<BottomWidget> {
 
   @override
   void initState() {
-    // load the next page when we reach to the end of the ListView.builder
-    if (widget.error == null) {
-      pageNum.value++;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // load the next page when we reach to the end of the ListView.builder
+      if (widget.error == null) {
+        pageNum.value++;
+      }
+    });
     super.initState();
   }
 
