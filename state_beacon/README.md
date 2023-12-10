@@ -98,7 +98,7 @@ class FutureCounter extends StatelessWidget {
 
 ### Beacon.writable:
 
-Creates a `WritableBeacon` from a value that be read and written to.
+Creates a `WritableBeacon` from a value that can be read and written to.
 
 ```dart
 final counter = Beacon.writable(0);
@@ -109,6 +109,8 @@ print(counter.value); // 10
 ### Beacon.lazyWritable:
 
 Like `Beacon.writable` but behaves like a `late` variable. It must be set before it's read.
+
+#### NB: All writable beacons have a lazy counterpart.
 
 ```dart
 final counter = Beacon.lazyWritable();
@@ -125,12 +127,18 @@ Creates an immutable `ReadableBeacon` from a value. This is useful for exposing 
 ```dart
 final counter = Beacon.readable(10);
 counter.value = 10; // Compilation error
+
+
+final _internalCounter = Beacon.writable(10);
+
+// Expose the beacon's value without allowing it to be modified
+ReadableBeacon<int> get counter => _internalCounter;
 ```
 
 ### Beacon.createEffect:
 
 Creates an effect based on a provided function. The provided function will be called
-whenever one of its dependencies change.
+whenever one of its dependencies change. An effect runs immediately after creation.
 
 ```dart
 final age = Beacon.writable(15);
@@ -192,9 +200,9 @@ print(canDrink.value); // Outputs: true
 
 Creates a `DerivedBeacon` whose value is derived from an asynchronous computation.
 This beacon will recompute its value every time one of its dependencies change.
-The result is wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
+The result is wrapped in an `AsyncValue`, which can be in one of four states: `idle`, `loading`, `data`, or `error`.
 
-If `manualStart` is `true` (default: false), the future will not execute until [start()] is called.
+If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until [start()] is called.
 
 If `cancelRunning` is `true` (default: true), the results of a current execution will be discarded
 if another execution is triggered before the current one finishes.
@@ -219,10 +227,37 @@ Widget build(BuildContext context) {
   return switch (derivedFutureCounter.watch(context)) {
     AsyncData<String>(value: final v) => Text(v),
     AsyncError(error: final e) => Text('$e'),
-    AsyncLoading() => const CircularProgressIndicator(),
+    AsyncLoading() || AsyncIdle() => const CircularProgressIndicator(),
   };
 }
 }
+```
+
+Can be transformed into a future with `myFutureBeacon.toFuture()`
+This can useful when a DerivedFutureBeacon depends on another DerivedFutureBeacon.
+This functionality is also availabe to regular FutureBeacons and StreamBeacons.
+
+```dart
+var firstName = Beacon.derivedFuture(() async {
+  final val = count.value;
+  await Future.delayed(k10ms);
+  return 'Sally $val';
+});
+
+var lastName = Beacon.derivedFuture(() async {
+  final val = count.value + 1;
+  await Future.delayed(k10ms);
+  return 'Smith $val';
+});
+
+var fullName = Beacon.derivedFuture(() async {
+  // wait for the future to complete
+  // we don't have to manually handle all the states
+  final fname = await firstName.toFuture();
+  final lname = await lastName.toFuture();
+
+  return '$fname $lname';
+});
 ```
 
 ### Beacon.debounced:
@@ -350,7 +385,9 @@ timeBeacon.value = 2;
 
 Creates a `StreamBeacon` from a given stream.
 This beacon updates its value based on the stream's emitted values.
+The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: `loading`, `data`, or `error`.
 This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
+Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
 ```dart
 var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
@@ -358,7 +395,22 @@ var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
 var myBeacon = Beacon.stream(myStream);
 
 myBeacon.subscribe((value) {
-  print(value); // Outputs the stream's emitted values
+  print(value); // Outputs AsyncLoading(),AsyncData(0),AsyncData(1),AsyncData(2),...
+});
+```
+
+### Beacon.streamRaw:
+
+Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
+If you dont supply an initial value, the type has to be nullable.
+
+```dart
+var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
+
+var myBeacon = Beacon.streamRaw(myStream,initialValue: 0);
+
+myBeacon.subscribe((value) {
+  print(value); // Outputs 0,1,2,3,...
 });
 ```
 
@@ -408,10 +460,14 @@ var bufferBeacon = Beacon.bufferedCount<int>(10);
 var count = Beacon.writable(5);
 
 // Wrap the count beacon and provide a custom transformation.
-bufferBeacon.wrap(count, then: (beacon, value) {
-  // Custom transformation: Add the value twice to the buffer.
-  beacon.add(value);
-  beacon.add(value);
+bufferBeacon.wrap(
+  count,
+  then: (thisBeacon, countValue) {
+
+      // Custom transformation: Add the value twice to the buffer.
+      thisBeacon.add(countValue);
+      thisBeacon.add(countValue);
+
 });
 
 print(bufferBeacon.buffer); // Outputs: [5, 5]
