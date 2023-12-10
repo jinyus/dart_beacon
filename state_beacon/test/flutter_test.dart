@@ -131,7 +131,7 @@ void main() {
     );
   });
 
-  testWidgets('Counter shows snackbar for exceeding 3',
+  testWidgets('should show snackbar for exceeding 3',
       (WidgetTester tester) async {
     // Build the Counter widget
     final counter = Beacon.writable(0);
@@ -150,7 +150,7 @@ void main() {
     expect(find.text('Count cannot be greater than 3'), findsOneWidget);
   });
 
-  testWidgets('Counter shows snackbar for going negative',
+  testWidgets('should show snackbar for going negative',
       (WidgetTester tester) async {
     // Build the Counter widget
     final counter = Beacon.writable(0);
