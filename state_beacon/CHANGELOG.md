@@ -1,3 +1,8 @@
+## 0.12.11
+
+-   Add FilteredBeacon.hasFilter getter
+-   Fix previous Value in filteredBeacon filter callback
+
 ## 0.12.10
 
 -   Add Beacon.untracked
