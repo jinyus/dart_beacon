@@ -126,14 +126,14 @@ class HomeScreen extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             onPressed: _authController.logout,
-            tooltip: 'Logout: ${user?.name}',
+            tooltip: 'Logout: ${user.name}',
             icon: const Icon(Icons.logout),
           )
         ],
       ),
       body: Center(
         child: Text(
-          'Welcome back ${user?.name.toUpperCase()}',
+          'Welcome back ${user.name.toUpperCase()}',
           style: Theme.of(context).textTheme.headlineLarge,
         ),
       ),
