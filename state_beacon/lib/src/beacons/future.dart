@@ -35,7 +35,8 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
     if (value is AsyncData) {
       if (_lastData != null) {
-        // first time we get data, we don't have a previous value
+        // if _lastData == null, then it's the first time we are getting data,
+        // so we wouldn't have a previous value.
 
         // ignore: null_check_on_nullable_type_parameter
         _previousAsyncValue = AsyncData(_lastData!);
