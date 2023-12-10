@@ -267,6 +267,7 @@ abstract class Beacon {
   }
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
+  /// If you dont supply an initial value, the type has to be nullable.
   static RawStreamBeacon<T> streamRaw<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
