@@ -21,7 +21,7 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (_isEmpty || (_filter?.call(_previousValue, newValue) ?? true)) {
+    if (_isEmpty || (_filter?.call(peek(), newValue) ?? true)) {
       super.set(newValue, force: force);
     }
   }
