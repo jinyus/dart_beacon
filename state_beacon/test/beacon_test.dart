@@ -160,6 +160,26 @@ void main() {
       expect(callCount, equals(1));
     });
 
+    test('should not send notification when doing untracked access/updates',
+        () {
+      final age = Beacon.writable<int>(10);
+      var callCount = 0;
+      age.subscribe((_) => callCount++);
+
+      Beacon.createEffect(() {
+        age.value;
+        Beacon.untracked(() {
+          age.value = 15;
+        });
+      });
+
+      expect(callCount, equals(0));
+      expect(age.value, 15);
+
+      age.value = 20;
+      expect(callCount, equals(1));
+    });
+
     test('should only notify once for nested batched updates', () {
       final age = Beacon.writable<int>(10);
       var callCount = 0;

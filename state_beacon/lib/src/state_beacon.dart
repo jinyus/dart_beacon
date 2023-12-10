@@ -1,5 +1,7 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:state_beacon/src/untracked.dart';
+
 import 'async_value.dart';
 import 'base_beacon.dart';
 import 'common.dart';
@@ -473,5 +475,28 @@ abstract class Beacon {
   /// ```
   static void doBatchUpdate(VoidCallback callback) {
     batch(callback);
+  }
+
+  /// Runs the function without tracking any changes to the state.
+  /// This is useful when you want to run a function that
+  /// changes the state, but you don't want to notify listeners of those changes.
+  ///
+  /// ```dart
+  /// final age = Beacon.writable<int>(10);
+  /// var callCount = 0;
+  /// age.subscribe((_) => callCount++);
+  ///
+  /// Beacon.createEffect(() {
+  ///      age.value;
+  ///      Beacon.untracked(() {
+  ///        age.value = 15;
+  ///      });
+  /// });
+  ///
+  /// expect(callCount, equals(0));
+  /// expect(age.value, 15);
+  /// ```
+  static void untracked(VoidCallback fn) {
+    doUntracked(fn);
   }
 }

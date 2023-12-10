@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:state_beacon/src/common.dart';
 import 'package:state_beacon/src/interfaces.dart';
+import 'package:state_beacon/src/untracked.dart';
 
 import 'async_value.dart';
 import 'effect_closure.dart';
@@ -51,6 +52,9 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     if (_isEmpty) {
       throw UninitializeLazyReadException();
     }
+    if (isRunningUntracked()) {
+      return _value;
+    }
 
     final currentEffect = _Effect.current();
     if (currentEffect != null) {
@@ -60,7 +64,9 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   }
 
   void _notifyOrDeferBatch() {
-    if (_isRunningBatchJob()) {
+    if (isRunningUntracked()) {
+      return;
+    } else if (_isRunningBatchJob()) {
       _listenersToPingAfterBatchJob.addAll(_listeners);
     } else {
       _notifyListeners();
