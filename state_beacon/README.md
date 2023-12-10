@@ -71,7 +71,7 @@ class FutureCounter extends StatelessWidget {
     return switch (derivedFutureCounter.watch(context)) {
       AsyncData<String>(value: final v) => Text(v),
       AsyncError(error: final e) => Text('$e'),
-      AsyncLoading() => const CircularProgressIndicator(),
+      _ => const CircularProgressIndicator(),
     };
   }
 }
