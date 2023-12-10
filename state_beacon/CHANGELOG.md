@@ -1,3 +1,7 @@
+## 0.12.10
+
+-   Add Beacon.untracked
+
 ## 0.12.9
 
 -   Internal improvements
