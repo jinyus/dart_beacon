@@ -1,7 +1,9 @@
+import 'dart:collection';
+
 import 'effect_closure.dart';
 
 class Listeners {
-  final Set<EffectClosure> _set = {};
+  final HashSet<EffectClosure> _set = HashSet<EffectClosure>();
   late List<EffectClosure> _list;
 
   Listeners() {
