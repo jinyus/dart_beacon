@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:state_beacon/src/common.dart';
 import 'package:state_beacon/src/interfaces.dart';
 import 'package:state_beacon/src/untracked.dart';
 
 import 'async_value.dart';
 import 'effect_closure.dart';
+import 'listeners.dart';
 
 part 'effect.dart';
 part 'exceptions.dart';
@@ -41,7 +43,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   late T _value;
   T? _previousValue;
   late final T _initialValue;
-  final Listerners _listeners = {};
+  final _listeners = Listeners();
 
   T? get previousValue => _previousValue;
   T get initialValue => _initialValue;
@@ -67,7 +69,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     if (isRunningUntracked()) {
       return;
     } else if (_isRunningBatchJob()) {
-      _listenersToPingAfterBatchJob.addAll(_listeners);
+      _listenersToPingAfterBatchJob.addAll(_listeners.items);
     } else {
       _notifyListeners();
     }
@@ -116,7 +118,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     }
 
     // toList() is used to avoid concurrent modification
-    for (final listener in _listeners.toList()) {
+    for (final listener in _listeners.items) {
       listener.run();
     }
   }
@@ -146,5 +148,117 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   void removeListener(VoidCallback listener) {
     final effectClosure = EffectClosure(listener, customID: listener.hashCode);
     _listeners.remove(effectClosure);
+  }
+
+  final _subscribers = <int>{};
+  final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
+
+  /// Watches a beacon and triggers a widget
+  /// rebuild when its value changes.
+  ///
+  /// Note: must be called within a widget's build method.
+  ///
+  /// Usage:
+  /// ```dart
+  /// final counter = Beacon.writable(0);
+  ///
+  /// class Counter extends StatelessWidget {
+  ///  const Counter({super.key});
+
+  ///  @override
+  ///  Widget build(BuildContext context) {
+  ///    final count = counter.watch(context);
+  ///    return Text(count.toString());
+  ///  }
+  ///}
+  /// ```
+  T watch(BuildContext context) {
+    final key = Object.hashAll([
+      hashCode,
+      context.hashCode,
+    ]);
+
+    final elementRef = WeakReference(context as Element);
+
+    void rebuildWidget(T value) {
+      final target = elementRef.target;
+      final isMounted = target?.mounted ?? false;
+
+      if (isMounted) {
+        target!.markNeedsBuild();
+      }
+    }
+
+    if (!_subscribers.contains(key)) {
+      final unsub = subscribe(rebuildWidget);
+
+      _subscribers.add(key);
+
+      _finalizer.attach(
+        context,
+        () {
+          _subscribers.remove(key);
+          unsub();
+        },
+        detach: context,
+      );
+    }
+
+    return _value;
+  }
+
+  /// Observes the state of a beacon and triggers a callback with the current state.
+  ///
+  /// The callback is provided with the current state of the beacon and a BuildContext.
+  /// This can be used to show snackbars or other side effects.
+  ///
+  /// Usage:
+  /// ```dart
+  /// final exampleBeacon = Beacon.writable("Initial State");
+  ///
+  /// class ExampleWidget extends StatelessWidget {
+  ///   @override
+  ///   Widget build(BuildContext context) {
+  ///     context.observe(exampleBeacon, (state, context) {
+  ///       ScaffoldMessenger.of(context).showSnackBar(
+  ///         SnackBar(content: Text(state)),
+  ///       );
+  ///     });
+  ///     return Container();
+  ///   }
+  /// }
+  /// ```
+  void observe(BuildContext context, ObserverCallback<T> callback) {
+    final key = Object.hashAll([
+      hashCode,
+      context.hashCode,
+      'isObserving'.hashCode, // 1 widget should only observe once
+    ]);
+
+    final elementRef = WeakReference(context as Element);
+
+    void notifyWidget(T value) {
+      final target = elementRef.target;
+      final isMounted = target?.mounted ?? false;
+
+      if (isMounted) {
+        callback(previousValue as T, value);
+      }
+    }
+
+    if (!_subscribers.contains(key)) {
+      final unsub = subscribe(notifyWidget);
+
+      _subscribers.add(key);
+
+      _finalizer.attach(
+        context,
+        () {
+          _subscribers.remove(key);
+          unsub();
+        },
+        detach: context,
+      );
+    }
   }
 }
