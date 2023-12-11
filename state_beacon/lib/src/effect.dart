@@ -5,13 +5,13 @@ var _batchStack = 0;
 
 bool _isRunningBatchJob() => _batchStack > 0;
 
-final Listerners _listenersToPingAfterBatchJob = {};
+final Set<EffectClosure> _listenersToPingAfterBatchJob = {};
 
 class _Effect {
-  final Set<Listerners> dependencies;
+  final Set<Listeners> dependencies;
   late final EffectClosure func;
 
-  _Effect() : dependencies = <Listerners>{};
+  _Effect() : dependencies = <Listeners>{};
 
   VoidCallback execute(Function fn) {
     func = EffectClosure(() {
@@ -71,7 +71,7 @@ void batch(void Function() compute) {
   _listenersToPingAfterBatchJob.clear();
 }
 
-void _subscribe(_Effect runningEffect, Listerners subscriptions) {
+void _subscribe(_Effect runningEffect, Listeners subscriptions) {
   subscriptions.add(runningEffect.func);
   runningEffect.dependencies.add(subscriptions);
 }
