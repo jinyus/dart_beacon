@@ -1,3 +1,7 @@
+## 0.13.1
+
+-   Internal improvements
+
 ## 0.13.0
 
 -   `watch` and `observe` are now methods on Beacon instead of extensions
