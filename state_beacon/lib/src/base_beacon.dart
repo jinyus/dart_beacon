@@ -179,18 +179,18 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     ]);
 
     final elementRef = WeakReference(context as Element);
+    late VoidCallback unsub;
 
     void rebuildWidget(T value) {
-      final target = elementRef.target;
-      final isMounted = target?.mounted ?? false;
-
-      if (isMounted) {
-        target!.markNeedsBuild();
+      if (elementRef.target?.mounted ?? false) {
+        elementRef.target!.markNeedsBuild();
+      } else {
+        unsub();
       }
     }
 
     if (!_subscribers.contains(key)) {
-      final unsub = subscribe(rebuildWidget);
+      unsub = subscribe(rebuildWidget);
 
       _subscribers.add(key);
 
@@ -236,18 +236,18 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     ]);
 
     final elementRef = WeakReference(context as Element);
+    late VoidCallback unsub;
 
     void notifyWidget(T value) {
-      final target = elementRef.target;
-      final isMounted = target?.mounted ?? false;
-
-      if (isMounted) {
+      if (elementRef.target?.mounted ?? false) {
         callback(previousValue as T, value);
+      } else {
+        unsub();
       }
     }
 
     if (!_subscribers.contains(key)) {
-      final unsub = subscribe(notifyWidget);
+      unsub = subscribe(notifyWidget);
 
       _subscribers.add(key);
 
