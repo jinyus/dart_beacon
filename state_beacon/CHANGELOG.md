@@ -1,3 +1,7 @@
+## 0.13.0
+
+-   `watch` and `observe` are now methods on Beacon instead of extensions
+
 ## 0.12.11
 
 -   Add FilteredBeacon.hasFilter getter
