@@ -168,4 +168,36 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.text('Count cannot be negative'), findsOneWidget);
   });
+
+  testWidgets('listenersCount decreases on widget dispose',
+      (WidgetTester tester) async {
+    final testCounter = Beacon.writable(0);
+
+    // Check initial listeners count
+    expect(testCounter.listenersCount, 0);
+
+    // Build the 5 Counter widget, each with 2 listeners
+    // 1 for the text and 1 for the observer
+    await tester.pumpWidget(MaterialApp(
+        home: Column(
+      children: [
+        Counter(counter: testCounter),
+        Counter(counter: testCounter),
+        Counter(counter: testCounter),
+        Counter(counter: testCounter),
+        Counter(counter: testCounter),
+      ],
+    )));
+
+    // Check listeners count after widget is built
+    expect(testCounter.listenersCount, 10);
+
+    // Dispose the Counter widget by pumping a different widget
+    await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+
+    testCounter.value = 1;
+
+    // Check listeners count after widget is disposed
+    expect(testCounter.listenersCount, 0);
+  });
 }
