@@ -28,7 +28,6 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     return newAwaited.future;
   }
 
-  /// Resets the signal by calling the [Stream] again
   @override
   void reset() {
     // noop
