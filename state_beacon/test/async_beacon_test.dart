@@ -104,6 +104,7 @@ void main() {
 
     test('should await FutureBeacon exposed a future', () async {
       var count = Beacon.writable(0);
+      var count2 = Beacon.writable(0);
 
       var firstName = Beacon.derivedFuture(() async {
         final val = count.value;
@@ -112,14 +113,25 @@ void main() {
       });
 
       var lastName = Beacon.derivedFuture(() async {
-        final val = count.value + 1;
+        final val = count2.value + 1;
         await Future.delayed(k10ms);
         return 'Smith $val';
       });
 
       var fullName = Beacon.derivedFuture(() async {
-        final fname = await firstName.toFuture();
-        final lname = await lastName.toFuture();
+        // final fname = await firstName.toFuture();
+
+        // a change in this won't trigger a rerun because of the async gap
+        // only values accessed before await will trigger a rerun
+        // so Future.wait must be used to ensure both futures are accessed
+        // final lname = await lastName.toFuture();
+
+        final [fname, lname] = await Future.wait(
+          [
+            firstName.toFuture(),
+            lastName.toFuture(),
+          ],
+        );
 
         final name = '$fname $lname';
 
@@ -133,6 +145,14 @@ void main() {
       expect(fullName.value.unwrapValue(), 'Sally 0 Smith 1');
 
       count.increment();
+
+      expect(fullName.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 3);
+
+      expect(fullName.value.unwrapValue(), 'Sally 1 Smith 1');
+
+      count2.increment();
 
       expect(fullName.value, isA<AsyncLoading>());
 
