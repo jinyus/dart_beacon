@@ -173,11 +173,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   ///}
   /// ```
   T watch(BuildContext context) {
-    final key = Object.hashAll([
-      hashCode,
-      context.hashCode,
-    ]);
-
+    final key = Object.hash(this, context);
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
@@ -229,11 +225,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   /// }
   /// ```
   void observe(BuildContext context, ObserverCallback<T> callback) {
-    final key = Object.hashAll([
-      hashCode,
-      context.hashCode,
-      'isObserving'.hashCode, // 1 widget should only observe once
-    ]);
+    final key = Object.hash(
+      this,
+      context,
+      'isObserving', // 1 widget should only observe once
+    );
 
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
