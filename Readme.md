@@ -239,6 +239,8 @@ This can useful when a DerivedFutureBeacon depends on another DerivedFutureBeaco
 This functionality is also availabe to regular FutureBeacons and StreamBeacons.
 
 ```dart
+var count = Beacon.writable(0);
+
 var firstName = Beacon.derivedFuture(() async {
   final val = count.value;
   await Future.delayed(k10ms);
@@ -254,8 +256,12 @@ var lastName = Beacon.derivedFuture(() async {
 var fullName = Beacon.derivedFuture(() async {
   // wait for the future to complete
   // we don't have to manually handle all the states
-  final fname = await firstName.toFuture();
-  final lname = await lastName.toFuture();
+  final [fname, lname] = await Future.wait(
+    [
+      firstName.toFuture(),
+      lastName.toFuture(),
+    ],
+  );
 
   return '$fname $lname';
 });
