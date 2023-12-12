@@ -32,17 +32,17 @@ import 'package:state_beacon/state_beacon.dart';
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_beacon/flutter_beacon.dart';
+import 'package:state_beacon/state_beacon.dart';
 
 final counter = Beacon.writable(0);
 
 // The future will be recomputed whenever the counter changes
 final derivedFutureCounter = Beacon.derivedFuture(() async {
   final count = counter.value;
-  return await counterFuture(count);
+  return await fetchData(count);
 });
 
-Future<String> counterFuture(int count) async {
+Future<String> fetchData(int count) async {
   await Future.delayed(Duration(seconds: count));
   return '$count second has passed.';
 }
@@ -91,6 +91,7 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.bufferedCount](#beaconbufferedcount): Create a buffer/list of values based a int limit.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
+-   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
 -   [Beacon.future](#beaconfuture): Initialize beacons from futures.
 -   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
 -   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
@@ -402,7 +403,7 @@ myBeacon.subscribe((value) {
 ### Beacon.streamRaw:
 
 Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
-If you dont supply an initial value, the type has to be nullable.
+If you don't supply an initial value, the type has to be nullable.
 
 ```dart
 var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
