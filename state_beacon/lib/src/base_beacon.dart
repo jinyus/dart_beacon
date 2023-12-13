@@ -164,7 +164,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   ///
   /// class Counter extends StatelessWidget {
   ///  const Counter({super.key});
-
+  ///
   ///  @override
   ///  Widget build(BuildContext context) {
   ///    final count = counter.watch(context);
@@ -174,6 +174,13 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   /// ```
   T watch(BuildContext context) {
     final key = context.hashCode;
+
+    if (_subscribers.contains(key)) {
+      return _value;
+    }
+
+    _subscribers.add(key);
+
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
@@ -182,23 +189,22 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
         elementRef.target!.markNeedsBuild();
       } else {
         unsub();
+        _subscribers.remove(key);
       }
     }
 
-    if (!_subscribers.contains(key)) {
-      unsub = subscribe(rebuildWidget);
+    unsub = subscribe(rebuildWidget);
 
-      _subscribers.add(key);
-
-      _finalizer.attach(
-        context,
-        () {
-          _subscribers.remove(key);
-          unsub();
-        },
-        detach: context,
-      );
-    }
+    // clean up if the widget is disposed
+    // and value is never modified again
+    _finalizer.attach(
+      context,
+      () {
+        _subscribers.remove(key);
+        unsub();
+      },
+      detach: context,
+    );
 
     return _value;
   }
@@ -230,6 +236,10 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       'isObserving', // 1 widget should only observe once
     );
 
+    if (_subscribers.contains(key)) {
+      return;
+    }
+
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
@@ -238,22 +248,21 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
         callback(previousValue as T, value);
       } else {
         unsub();
+        _subscribers.remove(key);
       }
     }
 
-    if (!_subscribers.contains(key)) {
-      unsub = subscribe(notifyWidget);
+    unsub = subscribe(notifyWidget);
 
-      _subscribers.add(key);
+    _subscribers.add(key);
 
-      _finalizer.attach(
-        context,
-        () {
-          _subscribers.remove(key);
-          unsub();
-        },
-        detach: context,
-      );
-    }
+    _finalizer.attach(
+      context,
+      () {
+        _subscribers.remove(key);
+        unsub();
+      },
+      detach: context,
+    );
   }
 }
