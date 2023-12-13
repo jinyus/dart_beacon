@@ -1,3 +1,7 @@
+## 0.13.7
+
+-   Expose the internal completer on FutureBeacon. ie: `myFutureBeacon.completer`
+
 ## 0.13.6
 
 -   Minor internal refactor
