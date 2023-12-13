@@ -1,3 +1,7 @@
+## 0.13.6
+
+-   Minor internal refactor
+
 ## 0.13.5
 
 -   Minor internal improvements
