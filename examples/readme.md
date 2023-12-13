@@ -15,3 +15,7 @@ flutter web demo: https://flutter-beacon.surge.sh/
 ## skeleton:
 
 This is the standard flutter skeleton project migrated to use state_beacon.
+
+## vgv_best_practices:
+
+This is the starter template from Very Good Ventures with their ascribed best practices.
