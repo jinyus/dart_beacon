@@ -1,3 +1,7 @@
+## 0.13.8
+
+-   Revert change in 0.13.7
+
 ## 0.13.7
 
 -   Expose the internal completer on FutureBeacon. ie: `myFutureBeacon.completer`

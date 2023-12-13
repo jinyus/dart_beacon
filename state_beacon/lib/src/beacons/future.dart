@@ -64,13 +64,9 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   ///   return '$fname $lname';
   /// });
   Future<T> toFuture() {
-    return completer.future;
-  }
-
-  Completer<T> get completer {
     final existing = Awaited.find<T, FutureBeacon<T>>(this);
     if (existing != null) {
-      return existing.value;
+      return existing.future;
     }
 
     final newAwaited = Awaited<T, FutureBeacon<T>>(this);
@@ -78,7 +74,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
     _cancelAwaitedSubscription = newAwaited.cancel;
 
-    return newAwaited.value;
+    return newAwaited.future;
   }
 
   @override
