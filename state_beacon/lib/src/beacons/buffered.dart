@@ -64,6 +64,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   void dispose() {
     clearWrapped();
     clearBuffer();
+    _currentBuffer.dispose();
     super.dispose();
   }
 }
