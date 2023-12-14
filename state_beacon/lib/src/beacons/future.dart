@@ -1,6 +1,6 @@
 part of '../base_beacon.dart';
 
-class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
+abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   var _executionID = 0;
 
   final bool cancelRunning;
@@ -17,7 +17,7 @@ class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   FutureBeacon({this.cancelRunning = true, AsyncValue<T>? initialValue})
       : super(initialValue);
 
-  void start() {}
+  void start();
 
   /// Internal method to start loading
   @protected
