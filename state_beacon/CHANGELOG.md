@@ -1,3 +1,7 @@
+## 0.13.9
+
+-   add `WritableBeacon.clearWrapped()`` method to dispose all currently wrapped beacons
+
 ## 0.13.8
 
 -   Revert change in 0.13.7
