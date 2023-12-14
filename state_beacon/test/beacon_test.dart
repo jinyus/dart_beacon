@@ -736,13 +736,13 @@ void main() {
       expect(count.listenersCount, 1);
     });
 
-    test('should remove subscription for all wrapped beacons on dispose', () {
+    test('should remove subscription for all wrapped beacons', () {
       var count = Beacon.readable<int>(10);
       var doubledCount = Beacon.derived<int>(() => count.value * 2);
 
       var wrapper = Beacon.bufferedCount<int>(5);
 
-      wrapper.wrap(count);
+      wrapper.wrap(count, then: (b, c) => b.add(c));
       wrapper.wrap(doubledCount);
 
       expect(wrapper.value, equals([]));
@@ -755,6 +755,20 @@ void main() {
 
       expect(doubledCount.listenersCount, 0);
       expect(count.listenersCount, 1);
+    });
+
+    test('should dispose internal currentBuffer on dispose', () {
+      var beacon = Beacon.bufferedCount<int>(5);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      expect(beacon.currentBuffer.value, [1, 2]);
+
+      beacon.dispose();
+
+      expect(beacon.currentBuffer.value, []);
+      expect(beacon.currentBuffer.isDisposed, true);
     });
 
     test('should apply transformation function', () {
