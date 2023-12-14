@@ -381,6 +381,27 @@ void main() {
       expect(beacon.value, equals(6)); // Value should update
     });
 
+    test('should set hasFilter to false if not is provided', () {
+      var beacon = Beacon.filtered(0);
+      beacon.value = 4;
+      expect(beacon.value, equals(4)); // Value should update
+
+      expect(beacon.hasFilter, false);
+
+      beacon.value = 5;
+      expect(beacon.value, equals(5));
+
+      beacon.setFilter((p0, p1) => p1 > 10);
+
+      expect(beacon.hasFilter, true);
+
+      beacon.value = 6;
+      expect(beacon.value, equals(5)); // Value should not update
+
+      beacon.value = 11;
+      expect(beacon.value, equals(11)); // Value should update
+    });
+
     test('should lazily initialize its value', () async {
       final wBeacon = Beacon.lazyWritable<int>();
       expect(
@@ -812,6 +833,25 @@ void main() {
       beacon.redo(); // Should stay at latest value
 
       expect(beacon.value, 20);
+    });
+
+    test('should truncate future history if value is set after undo', () {
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
+      // Set initial values
+      beacon.set(1);
+      beacon.set(2);
+      beacon.set(3); // History: [0, 1, 2, 3]
+
+      // Undo twice, moving back in history
+      beacon.undo(); // Current value is 2
+      beacon.undo(); // Current value is 1
+
+      // Set a new value after undo
+      beacon.set(4); // New history should be [0, 1, 4]
+
+      // Check the length of history and current value
+      expect(beacon.value, equals(4));
+      expect(beacon.history, equals([0, 1, 4]));
     });
 
     test('should respect history limit', () {
