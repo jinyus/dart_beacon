@@ -144,69 +144,6 @@ void main() {
       expect(callCount, equals(0));
     });
 
-    test('should send 1 notification when doing batch updates', () {
-      final age = Beacon.writable<int>(10);
-      var callCount = 0;
-      age.subscribe((_) => callCount++);
-
-      Beacon.doBatchUpdate(() {
-        age.value = 15;
-        age.value = 16;
-        age.value = 20;
-        age.value = 23;
-      });
-
-      // There were 4 updates, but only 1 notification
-      expect(callCount, equals(1));
-    });
-
-    test('should not send notification when doing untracked access/updates',
-        () {
-      final age = Beacon.writable<int>(10);
-      var callCount = 0;
-      age.subscribe((_) => callCount++);
-
-      Beacon.createEffect(() {
-        age.value;
-        Beacon.untracked(() {
-          age.value = 15;
-        });
-      });
-
-      expect(callCount, equals(0));
-      expect(age.value, 15);
-
-      age.value = 20;
-      expect(callCount, equals(1));
-    });
-
-    test('should only notify once for nested batched updates', () {
-      final age = Beacon.writable<int>(10);
-      var callCount = 0;
-      age.subscribe((_) => callCount++);
-
-      Beacon.doBatchUpdate(() {
-        age.value = 15;
-        age.value = 16;
-        Beacon.doBatchUpdate(() {
-          age.value = 50;
-          age.value = 51;
-          Beacon.doBatchUpdate(() {
-            age.value = 100;
-            age.value = 200;
-          });
-          age.value = 52;
-        });
-        age.value = 20;
-      });
-
-      // There were 6 updates, but only 1 notification
-      expect(callCount, equals(1));
-
-      // The last value should be the one that was set last
-      expect(age.value, equals(20));
-    });
-
     test('should reset the value to initial state', () {
       var beacon = Beacon.writable<int>(10);
       beacon.value = 20;
@@ -273,11 +210,50 @@ void main() {
 
       beacon.set(30);
       expect(beacon.value, equals(20)); // too fast, update ignored
+      expect(beacon.isBlocked, true);
 
       await Future.delayed(k10ms * 1.1);
 
       beacon.set(30);
       expect(beacon.value, equals(30)); // throttle time passed, update allowed
+    });
+
+    test('should respect newly set throttle duration', () async {
+      var beacon = Beacon.throttled(10, duration: k10ms);
+
+      beacon.set(20);
+      expect(beacon.value, equals(20)); // first update allowed
+
+      beacon.set(30);
+      expect(beacon.value, equals(20)); // too fast, update ignored
+
+      beacon.setDuration(Duration.zero);
+
+      beacon.set(30);
+      expect(beacon.value, equals(30));
+    });
+
+    test('should not be blocked on reset and dispose', () async {
+      var beacon = Beacon.throttled(10, duration: k10ms);
+
+      beacon.set(20);
+      expect(beacon.value, equals(20)); // first update allowed
+
+      beacon.set(30);
+      expect(beacon.value, equals(20)); // too fast, update ignored
+
+      beacon.reset();
+
+      beacon.set(30);
+      expect(beacon.value, equals(30));
+
+      beacon.set(40);
+      expect(beacon.value, equals(30)); // too fast, update ignored
+
+      beacon.dispose();
+
+      beacon.set(40);
+      expect(beacon.value, equals(40));
     });
 
     test('should update value at most once in specified duration', () async {
@@ -381,6 +357,27 @@ void main() {
       expect(beacon.value, equals(6)); // Value should update
     });
 
+    test('should set hasFilter to false if not is provided', () {
+      var beacon = Beacon.filtered(0);
+      beacon.value = 4;
+      expect(beacon.value, equals(4)); // Value should update
+
+      expect(beacon.hasFilter, false);
+
+      beacon.value = 5;
+      expect(beacon.value, equals(5));
+
+      beacon.setFilter((p0, p1) => p1 > 10);
+
+      expect(beacon.hasFilter, true);
+
+      beacon.value = 6;
+      expect(beacon.value, equals(5)); // Value should not update
+
+      beacon.value = 11;
+      expect(beacon.value, equals(11)); // Value should update
+    });
+
     test('should lazily initialize its value', () async {
       final wBeacon = Beacon.lazyWritable<int>();
       expect(
@@ -446,40 +443,6 @@ void main() {
             beacon.value.timestamp.isBefore(timestampAfter),
         isTrue,
       );
-    });
-
-    test('should notify listeners when list is modified', () {
-      var nums = Beacon.list<int>([1, 2, 3]);
-
-      nums.add(4);
-
-      expect(nums.value, equals([1, 2, 3, 4]));
-
-      nums.remove(2);
-
-      expect(nums.value, equals([1, 3, 4]));
-
-      nums[0] = 10;
-
-      expect(nums.value, equals([10, 3, 4]));
-
-      nums.addAll([5, 6, 7]);
-
-      expect(nums.value, equals([10, 3, 4, 5, 6, 7]));
-
-      nums.length = 2;
-
-      expect(nums.value, equals([10, 3]));
-
-      nums.clear();
-
-      expect(nums.value, equals([]));
-
-      try {
-        nums.first;
-      } catch (e) {
-        expect(e, isA<StateError>());
-      }
     });
   });
 
@@ -569,7 +532,11 @@ void main() {
       var beacon1 = Beacon.writable<int>(10);
 
       try {
-        Beacon.createEffect(() => beacon1.value++);
+        Beacon.createEffect(() {
+          Beacon.doBatchUpdate(() {
+            beacon1.value++;
+          });
+        });
       } catch (e) {
         expect(e, isA<CircularDependencyException>());
       }
@@ -695,6 +662,61 @@ void main() {
       expect(wrapper.value, equals(10));
     });
 
+    test('should remove subscription for all wrapped beacons on dispose', () {
+      var count = Beacon.readable<int>(10);
+      var doubledCount = Beacon.derived<int>(() => count.value * 2);
+
+      var wrapper = Beacon.writable<int>(0);
+
+      wrapper.wrap(count);
+      wrapper.wrap(doubledCount);
+
+      expect(wrapper.value, equals(20));
+
+      expect(doubledCount.listenersCount, 1);
+      expect(count.listenersCount, 2);
+
+      wrapper.clearWrapped();
+
+      expect(doubledCount.listenersCount, 0);
+      expect(count.listenersCount, 1);
+    });
+
+    test('should remove subscription for all wrapped beacons', () {
+      var count = Beacon.readable<int>(10);
+      var doubledCount = Beacon.derived<int>(() => count.value * 2);
+
+      var wrapper = Beacon.bufferedCount<int>(5);
+
+      wrapper.wrap(count, then: (b, c) => b.add(c));
+      wrapper.wrap(doubledCount);
+
+      expect(wrapper.value, equals([]));
+      expect(wrapper.currentBuffer.value, [10, 20]);
+
+      expect(doubledCount.listenersCount, 1);
+      expect(count.listenersCount, 2);
+
+      wrapper.clearWrapped();
+
+      expect(doubledCount.listenersCount, 0);
+      expect(count.listenersCount, 1);
+    });
+
+    test('should dispose internal currentBuffer on dispose', () {
+      var beacon = Beacon.bufferedCount<int>(5);
+
+      beacon.add(1);
+      beacon.add(2);
+
+      expect(beacon.currentBuffer.value, [1, 2]);
+
+      beacon.dispose();
+
+      expect(beacon.currentBuffer.value, []);
+      expect(beacon.currentBuffer.isDisposed, true);
+    });
+
     test('should apply transformation function', () {
       var original = Beacon.readable<int>(2);
       var wrapper = Beacon.writable<String>("");
@@ -718,6 +740,28 @@ void main() {
         () => bufWrapper.wrap(original),
         throwsA(isA<WrapTargetWrongTypeException>()),
       );
+    });
+
+    test('should throw when derived is started twice', () {
+      var count = Beacon.readable<int>(2);
+      var asText = Beacon.derived<String>(() => count.value.toString());
+
+      expect(
+        () => asText.start(),
+        throwsA(isA<DerivedBeaconStartedTwiceException>()),
+      );
+    });
+
+    test('should dispose internal status when disposed', () {
+      var count = Beacon.readable<int>(2);
+      var asText = Beacon.derived<String>(() => count.value.toString());
+
+      expect(asText.value, count.value.toString());
+
+      asText.dispose();
+
+      expect(asText.isDisposed, true);
+      expect(asText.status.isDisposed, true);
     });
 
     test('should throttle wrapped StreamBeacon', () async {
@@ -812,6 +856,25 @@ void main() {
       beacon.redo(); // Should stay at latest value
 
       expect(beacon.value, 20);
+    });
+
+    test('should truncate future history if value is set after undo', () {
+      var beacon = UndoRedoBeacon<int>(initialValue: 0);
+      // Set initial values
+      beacon.set(1);
+      beacon.set(2);
+      beacon.set(3); // History: [0, 1, 2, 3]
+
+      // Undo twice, moving back in history
+      beacon.undo(); // Current value is 2
+      beacon.undo(); // Current value is 1
+
+      // Set a new value after undo
+      beacon.set(4); // New history should be [0, 1, 4]
+
+      // Check the length of history and current value
+      expect(beacon.value, equals(4));
+      expect(beacon.history, equals([0, 1, 4]));
     });
 
     test('should respect history limit', () {
@@ -994,15 +1057,6 @@ void main() {
       beacon.set(30);
       expect(beacon.previousValue, equals(20));
       expect(beacon.initialValue, 10);
-    });
-
-    test('should set previous and initial values - list', () {
-      var beacon = Beacon.list([]);
-      beacon.value = [1, 2, 3];
-      expect(beacon.previousValue, equals([]));
-      beacon.value = [4, 5, 6];
-      expect(beacon.previousValue, equals([1, 2, 3]));
-      expect(beacon.initialValue, []);
     });
 
     test('should set previous and initial values - filtered', () {

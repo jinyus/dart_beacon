@@ -1,6 +1,6 @@
 part of '../base_beacon.dart';
 
-class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
+abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     implements BeaconConsumer<BufferedBaseBeacon<T>> {
   final List<T> _buffer = [];
   final _currentBuffer = WritableBeacon<List<T>>([]);
@@ -20,13 +20,14 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     _currentBuffer.reset();
   }
 
-  void add(T newValue) {
-    throw UnimplementedError();
-  }
+  void add(T newValue);
 
+  /// Clears the buffer, unsubscribes from wrapped beacons
+  /// and resets the beacon to its initial state
   @override
   void reset() {
     clearBuffer();
+    clearWrapped();
     super.reset();
   }
 
@@ -64,12 +65,9 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   @override
   void dispose() {
-    for (var e in _wrapped.values) {
-      e();
-    }
-    _wrapped.clear();
-    currentBuffer.dispose();
+    clearWrapped();
     clearBuffer();
+    _currentBuffer.dispose();
     super.dispose();
   }
 }

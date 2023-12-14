@@ -13,6 +13,28 @@ Future<String> counterFuture(int count) async {
   return '$count second has passed.';
 }
 
+class CounterColmn extends StatelessWidget {
+  const CounterColmn({super.key, required this.counter, required this.show});
+
+  final WritableBeacon<int> counter;
+  final WritableBeacon<bool> show;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: show.watch(context)
+          ? [
+              Counter(counter: counter),
+              Counter(counter: counter),
+              Counter(counter: counter),
+              Counter(counter: counter),
+              Counter(counter: counter),
+            ]
+          : [Container()],
+    );
+  }
+}
+
 class Counter extends StatelessWidget {
   const Counter({super.key, required this.counter});
 

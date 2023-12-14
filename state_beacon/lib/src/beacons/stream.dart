@@ -38,10 +38,6 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   }
 
   void _init() {
-    if (peek() is! AsyncLoading) {
-      _setValue(AsyncLoading());
-    }
-
     _subscription = _stream.listen(
       (value) {
         _setValue(AsyncData(value));

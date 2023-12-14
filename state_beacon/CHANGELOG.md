@@ -1,3 +1,13 @@
+## 0.14.0
+
+-   undeRedo: expose canUndo,canRedo and history
+-   Add isDisposed property to all beacons
+-   Add ThrottleBeacon.setDuration to change the throttle duration
+
+### Breaking Changes
+
+-   Beacon.list no longer implements List. It only has mutating methods
+
 ## 0.13.9
 
 -   add `WritableBeacon.clearWrapped()`` method to dispose all currently wrapped beacons

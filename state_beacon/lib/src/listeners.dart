@@ -37,6 +37,7 @@ class Listeners {
   }
 
   List<EffectClosure> get items => _list;
+  HashSet<EffectClosure> get itemsSet => _set;
 
   void clear() {
     _set.clear();

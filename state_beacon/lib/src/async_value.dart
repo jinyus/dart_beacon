@@ -1,5 +1,3 @@
-// ignore_for_file: hash_and_equals
-
 sealed class AsyncValue<T> {
   /// Casts this [AsyncValue] to [AsyncData] and return it's value
   /// or throws [CastError] if this is not [AsyncData].
@@ -22,7 +20,7 @@ class AsyncData<T> extends AsyncValue<T> {
   operator ==(other) => other is AsyncData<T> && other.value == value;
 
   @override
-  int get hashCode => super.hashCode ^ value.hashCode;
+  int get hashCode => toString().hashCode ^ value.hashCode;
 }
 
 class AsyncError<T> extends AsyncValue<T> {
@@ -38,15 +36,22 @@ class AsyncError<T> extends AsyncValue<T> {
       other.stackTrace == stackTrace;
 
   @override
-  int get hashCode => error.hashCode ^ stackTrace.hashCode;
+  int get hashCode =>
+      toString().hashCode ^ error.hashCode ^ stackTrace.hashCode;
 }
 
 class AsyncLoading<T> extends AsyncValue<T> {
   @override
   operator ==(other) => other is AsyncLoading<T>;
+
+  @override
+  int get hashCode => toString().hashCode;
 }
 
 class AsyncIdle<T> extends AsyncValue<T> {
   @override
   operator ==(other) => other is AsyncIdle<T>;
+
+  @override
+  int get hashCode => toString().hashCode;
 }

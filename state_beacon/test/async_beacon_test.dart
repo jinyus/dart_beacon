@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
@@ -102,6 +103,30 @@ void main() {
       expect(ran, equals(2));
     });
 
+    test('should clean up internal status beacon when disposed', () async {
+      var count = Beacon.writable(0);
+
+      var plus1 = Beacon.derivedFuture(() async {
+        return count.value + 1;
+      }, manualStart: true);
+
+      final plus1Status = (plus1 as DerivedFutureBeacon).status;
+
+      expect(plus1Status.value, DerivedFutureStatus.idle);
+
+      plus1.start();
+
+      await Future.delayed(k10ms);
+
+      expect(plus1.value.unwrapValue(), equals(1));
+
+      expect(plus1Status.value, DerivedFutureStatus.running);
+
+      plus1.dispose();
+
+      expect(plus1Status.value, DerivedFutureStatus.idle);
+    });
+
     test('should await FutureBeacon exposed a future', () async {
       var count = Beacon.writable(0);
       var count2 = Beacon.writable(0);
@@ -159,6 +184,39 @@ void main() {
       await Future.delayed(k10ms * 3);
 
       expect(fullName.value.unwrapValue(), 'Sally 1 Smith 2');
+    });
+
+    test('should return error when dependency throws error', () async {
+      var count = Beacon.writable(0);
+
+      var firstName = Beacon.derivedFuture(() async {
+        final val = count.value;
+        await Future.delayed(k10ms);
+        if (val > 0) {
+          throw Exception('error');
+        }
+        return 'Sally $val';
+      });
+
+      var greeting = Beacon.derivedFuture(() async {
+        final fname = await firstName.toFuture();
+
+        return 'Hello $fname';
+      });
+
+      expect(greeting.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 1.1);
+
+      expect(greeting.value.unwrapValue(), 'Hello Sally 0');
+
+      count.increment();
+
+      expect(greeting.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 3);
+
+      expect(greeting.value, isA<AsyncError>());
     });
 
     test('should not execute until start() is called', () async {
@@ -263,6 +321,34 @@ void main() {
       expect(called, equals(3));
     });
 
+    test('should be AsyncError when error is added to stream', () async {
+      Stream<int> errorStream() async* {
+        yield 1;
+        await Future.delayed(k10ms);
+        yield 2;
+        await Future.delayed(k10ms);
+        yield* Stream.error('error');
+      }
+
+      var myBeacon = Beacon.stream(errorStream());
+
+      var called = 1;
+      myBeacon.subscribe((value) {
+        if (called == 1) {
+          expect(value, isA<AsyncLoading>());
+        } else if (called == 2) {
+          expect(value, isA<AsyncData<int>>());
+        } else if (called == 3) {
+          expect(value, isA<AsyncData<int>>());
+        } else if (called == 4) {
+          expect(value, isA<AsyncError>());
+        } else {
+          throw Exception('Should not have been called');
+        }
+        called++;
+      }, startNow: true);
+    });
+
     test('should emit raw values', () async {
       var myStream = Stream.periodic(k10ms, (i) => i + 1);
       var myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
@@ -289,6 +375,61 @@ void main() {
       expect(results, [0, 1, 2, 3, 4]);
 
       expect(called, equals(4));
+    });
+
+    test('should throw is initial value is empty and type is non-nullable',
+        () async {
+      var myStream = Stream.periodic(k10ms, (i) => i + 1);
+      expect(() => Beacon.streamRaw(myStream), throwsAssertionError);
+    });
+
+    test('should execute onDone callback', () async {
+      var myStream = Stream.periodic(k10ms * 0.1, (i) => i + 1).take(3);
+      var called = 0;
+      var myBeacon = Beacon.streamRaw(myStream, initialValue: 0, onDone: () {
+        called++;
+      });
+
+      myBeacon.subscribe((value) {
+        called++;
+      });
+
+      await Future.delayed(k10ms);
+
+      expect(called, equals(4));
+    });
+
+    test('should do nothing on stream beacon is reset', () {
+      final controller = StreamController<int>();
+      var listeners = 0;
+      var myStream = controller.stream.asBroadcastStream(
+        onListen: (_) => listeners++,
+        onCancel: (_) => listeners--,
+      );
+      var called = 0;
+      var myRawBeacon = Beacon.streamRaw(myStream, initialValue: 0);
+      var myBeacon = Beacon.stream(myStream);
+
+      myBeacon.subscribe((value) {
+        called++;
+      });
+
+      myRawBeacon.subscribe((value) {
+        called++;
+      });
+
+      myBeacon.reset();
+      myRawBeacon.reset();
+
+      expect(called, equals(0));
+      expect(listeners, 1);
+
+      myRawBeacon.dispose();
+      myBeacon.dispose();
+
+      expect(listeners, 0);
+
+      controller.close();
     });
   });
 }
