@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
@@ -102,6 +103,30 @@ void main() {
       expect(ran, equals(2));
     });
 
+    test('should clean up internal status beacon when disposed', () async {
+      var count = Beacon.writable(0);
+
+      var plus1 = Beacon.derivedFuture(() async {
+        return count.value + 1;
+      }, manualStart: true);
+
+      final plus1Status = (plus1 as DerivedFutureBeacon).status;
+
+      expect(plus1Status.value, DerivedFutureStatus.idle);
+
+      plus1.start();
+
+      await Future.delayed(k10ms);
+
+      expect(plus1.value.unwrapValue(), equals(1));
+
+      expect(plus1Status.value, DerivedFutureStatus.running);
+
+      plus1.dispose();
+
+      expect(plus1Status.value, DerivedFutureStatus.idle);
+    });
+
     test('should await FutureBeacon exposed a future', () async {
       var count = Beacon.writable(0);
       var count2 = Beacon.writable(0);
@@ -159,6 +184,39 @@ void main() {
       await Future.delayed(k10ms * 3);
 
       expect(fullName.value.unwrapValue(), 'Sally 1 Smith 2');
+    });
+
+    test('should return error when dependency throws error', () async {
+      var count = Beacon.writable(0);
+
+      var firstName = Beacon.derivedFuture(() async {
+        final val = count.value;
+        await Future.delayed(k10ms);
+        if (val > 0) {
+          throw Exception('error');
+        }
+        return 'Sally $val';
+      });
+
+      var greeting = Beacon.derivedFuture(() async {
+        final fname = await firstName.toFuture();
+
+        return 'Hello $fname';
+      });
+
+      expect(greeting.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 1.1);
+
+      expect(greeting.value.unwrapValue(), 'Hello Sally 0');
+
+      count.increment();
+
+      expect(greeting.value, isA<AsyncLoading>());
+
+      await Future.delayed(k10ms * 3);
+
+      expect(greeting.value, isA<AsyncError>());
     });
 
     test('should not execute until start() is called', () async {
