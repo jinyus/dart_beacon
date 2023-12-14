@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:state_beacon/state_beacon.dart';
 import 'package:vgv_best_practices/counter/counter.dart';
 import 'package:vgv_best_practices/l10n/l10n.dart';
 
@@ -31,7 +32,14 @@ class CounterView extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.counterAppBarTitle)),
-      body: const Center(child: CounterText()),
+      body: const Center(
+          child: Column(
+        children: [
+          CounterText(),
+          DoubledText(),
+          TripledText(),
+        ],
+      )),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -65,5 +73,45 @@ class CounterText extends StatelessWidget {
     final count = controller.count.watch(context);
 
     return Text('$count', style: theme.textTheme.displayLarge);
+  }
+}
+
+class DoubledText extends StatelessWidget {
+  const DoubledText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // not need to watch the controller, because it is a singleton
+    final controller = context.read<CounterController>();
+
+    // watch the beacon for changes
+    final doubleCount = controller.doubleCount.watch(context);
+
+    return Text('$doubleCount', style: theme.textTheme.displayLarge);
+  }
+}
+
+class TripledText extends StatelessWidget {
+  const TripledText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // not need to watch the controller, because it is a singleton
+    final controller = context.read<CounterController>();
+
+    // watch the beacon for changes
+    final tripleCount = controller.tripleCount.watch(context);
+
+    final text = switch (tripleCount) {
+      AsyncData(:final value) => value,
+      AsyncError(:final error) => error.toString(),
+      _ => 'fetching triple count...',
+    };
+
+    return Text('$text', style: theme.textTheme.displayLarge);
   }
 }
