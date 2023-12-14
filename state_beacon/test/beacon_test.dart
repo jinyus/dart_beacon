@@ -716,6 +716,47 @@ void main() {
       expect(wrapper.value, equals(10));
     });
 
+    test('should remove subscription for all wrapped beacons on dispose', () {
+      var count = Beacon.readable<int>(10);
+      var doubledCount = Beacon.derived<int>(() => count.value * 2);
+
+      var wrapper = Beacon.writable<int>(0);
+
+      wrapper.wrap(count);
+      wrapper.wrap(doubledCount);
+
+      expect(wrapper.value, equals(20));
+
+      expect(doubledCount.listenersCount, 1);
+      expect(count.listenersCount, 2);
+
+      wrapper.clearWrapped();
+
+      expect(doubledCount.listenersCount, 0);
+      expect(count.listenersCount, 1);
+    });
+
+    test('should remove subscription for all wrapped beacons on dispose', () {
+      var count = Beacon.readable<int>(10);
+      var doubledCount = Beacon.derived<int>(() => count.value * 2);
+
+      var wrapper = Beacon.bufferedCount<int>(5);
+
+      wrapper.wrap(count);
+      wrapper.wrap(doubledCount);
+
+      expect(wrapper.value, equals([]));
+      expect(wrapper.currentBuffer.value, [10, 20]);
+
+      expect(doubledCount.listenersCount, 1);
+      expect(count.listenersCount, 2);
+
+      wrapper.clearWrapped();
+
+      expect(doubledCount.listenersCount, 0);
+      expect(count.listenersCount, 1);
+    });
+
     test('should apply transformation function', () {
       var original = Beacon.readable<int>(2);
       var wrapper = Beacon.writable<String>("");
