@@ -18,8 +18,16 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   })  : _throttleDuration = duration,
         super(initialValue);
 
-  void setDuration(Duration newDuration) {
+  bool get isBlocked => _blocked;
+
+  /// Sets the duration of the throttle.
+  /// If [unblock] is true, the beacon will be unblocked if
+  /// it is currently blocked.
+  void setDuration(Duration newDuration, {bool unblock = true}) {
     _throttleDuration = newDuration;
+    if (unblock) {
+      _blocked = false;
+    }
   }
 
   @override
@@ -49,19 +57,21 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
     });
   }
 
-  @override
-  void reset() {
+  void _cleanUp() {
     _timer?.cancel();
     _blocked = false;
     _buffer.clear();
+  }
+
+  @override
+  void reset() {
+    _cleanUp();
     super.reset();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _blocked = false;
-    _buffer.clear();
+    _cleanUp();
     super.dispose();
   }
 }
