@@ -53,6 +53,15 @@ class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     return this;
   }
 
+  /// Disposes all currently wrapped beacons
+  @override
+  void clearWrapped() {
+    for (var e in _wrapped.values) {
+      e();
+    }
+    _wrapped.clear();
+  }
+
   @override
   void dispose() {
     for (var e in _wrapped.values) {

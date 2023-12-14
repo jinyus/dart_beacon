@@ -32,6 +32,8 @@ abstract class BeaconConsumer<S> {
     Function(S, U)? then,
     bool startNow = true,
   });
+
+  void clearWrapped();
 }
 
 // abstract class StreamConsumer<T> {
