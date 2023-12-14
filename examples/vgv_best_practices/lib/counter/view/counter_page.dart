@@ -33,13 +33,14 @@ class CounterView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.counterAppBarTitle)),
       body: const Center(
-          child: Column(
-        children: [
-          CounterText(),
-          DoubledText(),
-          TripledText(),
-        ],
-      )),
+        child: Column(
+          children: [
+            CounterText(),
+            DoubledText(),
+            TripledText(),
+          ],
+        ),
+      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
