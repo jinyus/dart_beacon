@@ -1,3 +1,7 @@
+## 0.14.1
+
+-   internal improvements
+
 ## 0.14.0
 
 -   undeRedo: expose canUndo,canRedo and history
