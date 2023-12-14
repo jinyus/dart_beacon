@@ -273,11 +273,50 @@ void main() {
 
       beacon.set(30);
       expect(beacon.value, equals(20)); // too fast, update ignored
+      expect(beacon.isBlocked, true);
 
       await Future.delayed(k10ms * 1.1);
 
       beacon.set(30);
       expect(beacon.value, equals(30)); // throttle time passed, update allowed
+    });
+
+    test('should respect newly set throttle duration', () async {
+      var beacon = Beacon.throttled(10, duration: k10ms);
+
+      beacon.set(20);
+      expect(beacon.value, equals(20)); // first update allowed
+
+      beacon.set(30);
+      expect(beacon.value, equals(20)); // too fast, update ignored
+
+      beacon.setDuration(Duration.zero);
+
+      beacon.set(30);
+      expect(beacon.value, equals(30));
+    });
+
+    test('should not be blocked on reset and dispose', () async {
+      var beacon = Beacon.throttled(10, duration: k10ms);
+
+      beacon.set(20);
+      expect(beacon.value, equals(20)); // first update allowed
+
+      beacon.set(30);
+      expect(beacon.value, equals(20)); // too fast, update ignored
+
+      beacon.reset();
+
+      beacon.set(30);
+      expect(beacon.value, equals(30));
+
+      beacon.set(40);
+      expect(beacon.value, equals(30)); // too fast, update ignored
+
+      beacon.dispose();
+
+      beacon.set(40);
+      expect(beacon.value, equals(40));
     });
 
     test('should update value at most once in specified duration', () async {
@@ -467,40 +506,6 @@ void main() {
             beacon.value.timestamp.isBefore(timestampAfter),
         isTrue,
       );
-    });
-
-    test('should notify listeners when list is modified', () {
-      var nums = Beacon.list<int>([1, 2, 3]);
-
-      nums.add(4);
-
-      expect(nums.value, equals([1, 2, 3, 4]));
-
-      nums.remove(2);
-
-      expect(nums.value, equals([1, 3, 4]));
-
-      nums[0] = 10;
-
-      expect(nums.value, equals([10, 3, 4]));
-
-      nums.addAll([5, 6, 7]);
-
-      expect(nums.value, equals([10, 3, 4, 5, 6, 7]));
-
-      nums.length = 2;
-
-      expect(nums.value, equals([10, 3]));
-
-      nums.clear();
-
-      expect(nums.value, equals([]));
-
-      try {
-        nums.first;
-      } catch (e) {
-        expect(e, isA<StateError>());
-      }
     });
   });
 
@@ -796,6 +801,28 @@ void main() {
       );
     });
 
+    test('should throw when derived is started twice', () {
+      var count = Beacon.readable<int>(2);
+      var asText = Beacon.derived<String>(() => count.value.toString());
+
+      expect(
+        () => asText.start(),
+        throwsA(isA<DerivedBeaconStartedTwiceException>()),
+      );
+    });
+
+    test('should dispose internal status when disposed', () {
+      var count = Beacon.readable<int>(2);
+      var asText = Beacon.derived<String>(() => count.value.toString());
+
+      expect(asText.value, count.value.toString());
+
+      asText.dispose();
+
+      expect(asText.isDisposed, true);
+      expect(asText.status.isDisposed, true);
+    });
+
     test('should throttle wrapped StreamBeacon', () async {
       final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
 
@@ -1089,15 +1116,6 @@ void main() {
       beacon.set(30);
       expect(beacon.previousValue, equals(20));
       expect(beacon.initialValue, 10);
-    });
-
-    test('should set previous and initial values - list', () {
-      var beacon = Beacon.list([]);
-      beacon.value = [1, 2, 3];
-      expect(beacon.previousValue, equals([]));
-      beacon.value = [4, 5, 6];
-      expect(beacon.previousValue, equals([1, 2, 3]));
-      expect(beacon.initialValue, []);
     });
 
     test('should set previous and initial values - filtered', () {
