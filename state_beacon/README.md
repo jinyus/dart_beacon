@@ -2,6 +2,12 @@
   <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/logo.png?raw=true">
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-purple"> 
+  <img src="https://img.shields.io/codecov/c/github/jinyus/dart_beacon">
+  <img src="https://img.shields.io/pub/points/state_beacon?color=blue">
+</p>
+
 ## Overview
 
 A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter.
