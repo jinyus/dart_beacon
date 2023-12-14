@@ -12,6 +12,10 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
     }
   }
 
+  bool get canUndo => _currentHistoryIndex > 0;
+  bool get canRedo => _currentHistoryIndex < _history.length - 1;
+  List<T> get history => List.unmodifiable(_history);
+
   @override
   set value(T newValue) => set(newValue);
 
@@ -26,14 +30,14 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   }
 
   void undo() {
-    if (_currentHistoryIndex > 0) {
+    if (canUndo) {
       _currentHistoryIndex--;
       _setValue(_history[_currentHistoryIndex]);
     }
   }
 
   void redo() {
-    if (_currentHistoryIndex < _history.length - 1) {
+    if (canRedo) {
       _currentHistoryIndex++;
       _setValue(_history[_currentHistoryIndex]);
     }
@@ -42,6 +46,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   void _addValueToHistory(T newValue) {
     _currentHistoryIndex++;
     if (_currentHistoryIndex < _history.length) {
+      // truncate the history if value is set after undo
       _history = _history.sublist(0, _currentHistoryIndex);
     }
     _history.add(newValue);
