@@ -103,6 +103,8 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
 
+[Pitfalls](#pitfalls)
+
 ### Beacon.writable:
 
 Creates a `WritableBeacon` from a value that can be read and written to.
@@ -488,4 +490,55 @@ print(bufferBeacon.buffer); // Outputs: [5, 5]
 count.value = 10;
 
 print(bufferBeacon.buffer); // Outputs: [5, 5, 10, 10]
+```
+
+## Pitfalls
+
+When using `Beacon.derivedFuture`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
+
+```dart
+final counter = Beacon.writable(0);
+final doubledCounter = Beacon.derived(() => counter.value * 2);
+
+final derivedFutureCounter = Beacon.derivedFuture(() async {
+  // This will be tracked as a dependency because it's accessed before the async gap
+  final count = counter.value;
+
+  await Future.delayed(Duration(seconds: count));
+
+  // This will NOT be tracked as a dependency because it's accessed after `await`
+  final doubled = doubledCounter.value;
+
+  return '$count x 2 =  $doubled';
+});
+```
+
+When a derivedFuture depends on multiple future/stream beacons
+
+-   DONT:
+
+```dart
+final derivedFutureCounter = Beacon.derivedFuture(() async {
+  // in this instance lastNameStreamBeacon will not be tracked as a dependency
+  // because it's accessed after the async gap
+  final firstName = await firstNameFutureBeacon.toFuture();
+  final lastName = await lastNameStreamBeacon.toFuture();
+
+  return 'Fullname is $firstName $lastName';
+});
+```
+
+-   DO:
+
+```dart
+final derivedFutureCounter = Beacon.derivedFuture(() async {
+  // acquire the futures before the async gap ie: don't use await
+  final firstNameFuture = firstNameFutureBeacon.toFuture();
+  final lastNameFuture = lastNameStreamBeacon.toFuture();
+
+  // wait for the futures to complete
+  final (String firstName, String lastName) = await (firstNameFuture, lastNameFuture).wait;
+
+  return 'Fullname is $firstName $lastName';
+});
 ```
