@@ -9,7 +9,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
 
     final unsub = subscribe((v) => controller.add(v));
 
-    controller.onCancel = unsub;
+    controller.onCancel = () {
+      unsub();
+      controller.close();
+    };
 
     return controller.stream;
   }
