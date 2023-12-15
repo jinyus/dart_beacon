@@ -30,8 +30,8 @@ void main() {
 
   test('should convert a beacon to a stream', () async {
     var beacon = Beacon.writable(0);
-
-    var stream = beacon.toStream();
+    var cancelled = false;
+    var stream = beacon.toStream(onCancel: () => cancelled = true);
 
     expect(stream, isA<Stream<int>>());
 
@@ -50,6 +50,12 @@ void main() {
     await Future.delayed(k10ms);
 
     expect(called, 3);
+
+    beacon.dispose();
+
+    await Future.delayed(k10ms);
+
+    expect(cancelled, true);
   });
 
   test('should toggle bool beacon', () {
