@@ -140,6 +140,10 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
     _isDisposed = true;
+    for (final callback in _disposeCallbacks) {
+      callback();
+    }
+    _disposeCallbacks.clear();
   }
 
   @override
@@ -269,5 +273,16 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       },
       detach: context,
     );
+  }
+
+  final List<VoidCallback> _disposeCallbacks = [];
+
+  /// Registers a callback to be called when the beacon is disposed.
+  void onDispose(VoidCallback callback) {
+    if (isDisposed) {
+      callback();
+    } else {
+      _disposeCallbacks.add(callback);
+    }
   }
 }
