@@ -4,8 +4,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-purple"> 
-  <img src="https://img.shields.io/codecov/c/github/jinyus/dart_beacon">
-  <img src="https://img.shields.io/pub/points/state_beacon?color=blue">
+  <a href="https://app.codecov.io/github/jinyus/dart_beacon"><img src="https://img.shields.io/codecov/c/github/jinyus/dart_beacon"></a>
+  <a href="https://pub.dev/packages/state_beacon"><img src="https://img.shields.io/pub/points/state_beacon?color=blue"></a>
 </p>
 
 ## Overview
