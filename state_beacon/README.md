@@ -102,6 +102,7 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
 -   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
+-   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 
 [Pitfalls](#pitfalls)
 
@@ -490,6 +491,36 @@ print(bufferBeacon.buffer); // Outputs: [5, 5]
 count.value = 10;
 
 print(bufferBeacon.buffer); // Outputs: [5, 5, 10, 10]
+```
+
+### Beacon.family:
+
+Creates and manages a family of related `Beacon`s based on a single creation function.
+
+This class provides a convenient way to handle related
+beacons that share the same creation logic but have different arguments.
+
+### Type Parameters:
+
+-   `T`: The type of the value emitted by the signals in the family.
+-   `Arg`: The type of the argument used to identify individual beacons within the family.
+-   `BeaconType`: The type of the beacon in the family.
+
+If `cache` is `true`, created signals are cached. Default is `false`.
+
+A common use-case is dependency injection.
+
+Example:
+
+```dart
+final apiClientFamily = Beacon.family(
+ (String baseUrl) {
+   return Beacon.readable(ApiClient(baseUrl));
+ },
+);
+
+final githubApiClient = apiClientFamily('https://api.github.com');
+final twitterApiClient = apiClientFamily('https://api.twitter.com');
 ```
 
 ## Pitfalls

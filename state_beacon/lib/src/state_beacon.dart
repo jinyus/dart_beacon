@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:state_beacon/src/beacons/family.dart';
 import 'package:state_beacon/src/untracked.dart';
 
 import 'async_value.dart';
@@ -498,5 +499,37 @@ abstract class Beacon {
   /// ```
   static void untracked(VoidCallback fn) {
     doUntracked(fn);
+  }
+
+  /// Creates and manages a family of related `Beacon`s based on a single creation function.
+  ///
+  /// This class provides a convenient way to handle related
+  /// beacons that share the same creation logic but have different arguments.
+  ///
+  /// ### Type Parameters:
+  ///
+  /// * `T`: The type of the value emitted by the signals in the family.
+  /// * `Arg`: The type of the argument used to identify individual beacons within the family.
+  /// * `BeaconType`: The type of the beacon in the family.
+  ///
+  /// If `cache` is `true`, created signals are cached. Default is `false`.
+  ///
+  /// Example:
+  /// ```dart
+  ///final apiClientFamily = Beacon.family(
+  ///  (String baseUrl) {
+  ///    return Beacon.readable(ApiClient(baseUrl));
+  ///  },
+  ///);
+  ///
+  /// final githubApiClient = apiClientFamily('https://api.github.com');
+  /// final twitterApiClient = apiClientFamily('https://api.twitter.com');
+  /// ```
+  static BeaconFamily<Arg, BeaconType>
+      family<T, Arg, BeaconType extends BaseBeacon<T>>(
+    BeaconType Function(Arg) create, {
+    bool cache = false,
+  }) {
+    return BeaconFamily<Arg, BeaconType>(create, shouldCache: cache);
   }
 }

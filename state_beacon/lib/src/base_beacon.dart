@@ -140,6 +140,10 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
     _isDisposed = true;
+    for (final callback in _disposeCallbacks) {
+      callback();
+    }
+    _disposeCallbacks.clear();
   }
 
   @override
@@ -180,38 +184,10 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   T watch(BuildContext context) {
     final key = context.hashCode;
 
-    if (_subscribers.contains(key)) {
-      return _value;
-    }
-
-    _subscribers.add(key);
-
-    final elementRef = WeakReference(context as Element);
-    late VoidCallback unsub;
-
-    void rebuildWidget(T value) {
-      if (elementRef.target?.mounted ?? false) {
-        elementRef.target!.markNeedsBuild();
-      } else {
-        unsub();
-        _subscribers.remove(key);
-      }
-    }
-
-    unsub = subscribe(rebuildWidget);
-
-    // clean up if the widget is disposed
-    // and value is never modified again
-    _finalizer.attach(
+    return _watchOrObserve(
+      key,
       context,
-      () {
-        _subscribers.remove(key);
-        unsub();
-      },
-      detach: context,
     );
-
-    return _value;
   }
 
   /// Observes the state of a beacon and triggers a callback with the current state.
@@ -241,26 +217,46 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       'isObserving', // 1 widget should only observe once
     );
 
+    _watchOrObserve(
+      key,
+      context,
+      callback: callback,
+    );
+  }
+
+  T _watchOrObserve(
+    int key,
+    BuildContext context, {
+    ObserverCallback<T>? callback,
+  }) {
+    final isObserving = callback != null;
+
     if (_subscribers.contains(key)) {
-      return;
+      return _value;
     }
+
+    _subscribers.add(key);
 
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
-    void notifyWidget(T value) {
+    void rebuildWidget(T value) {
       if (elementRef.target?.mounted ?? false) {
-        callback(previousValue as T, value);
+        if (isObserving) {
+          callback(previousValue as T, value);
+        } else {
+          elementRef.target!.markNeedsBuild();
+        }
       } else {
         unsub();
         _subscribers.remove(key);
       }
     }
 
-    unsub = subscribe(notifyWidget);
+    unsub = subscribe(rebuildWidget);
 
-    _subscribers.add(key);
-
+    // clean up if the widget is disposed
+    // and value is never modified again
     _finalizer.attach(
       context,
       () {
@@ -269,5 +265,16 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       },
       detach: context,
     );
+
+    return _value;
+  }
+
+  final List<VoidCallback> _disposeCallbacks = [];
+
+  /// Registers a callback to be called when the beacon is disposed.
+  void onDispose(VoidCallback callback) {
+    if (isDisposed) return;
+
+    _disposeCallbacks.add(callback);
   }
 }

@@ -1,3 +1,9 @@
+## 0.14.2
+
+-   Add Beacon.family
+-   Add myBeacon.onDispose to listen to when a beacon is disposed
+-   Add `onCancel` to `toSteam()` extension method
+
 ## 0.14.1
 
 -   internal improvements
