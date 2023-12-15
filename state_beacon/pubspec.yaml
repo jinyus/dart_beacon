@@ -1,6 +1,6 @@
 name: state_beacon
 description: A reactive primitive and simple state managerment solution for dart and flutter
-version: 0.14.1
+version: 0.14.2
 repository: https://github.com/jinyus/dart_beacon
 
 environment:
