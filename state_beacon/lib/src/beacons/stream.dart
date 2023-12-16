@@ -28,6 +28,7 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     return newAwaited.future;
   }
 
+  /// this is a no-op for streams
   @override
   void reset() {
     // noop
@@ -81,7 +82,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
 
   StreamSubscription<T>? _subscription;
 
-  /// Resets the signal by calling the [Stream] again
+  /// this is a no-op for streams
   @override
   void reset() {
     // noop

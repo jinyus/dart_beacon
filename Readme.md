@@ -502,11 +502,11 @@ beacons that share the same creation logic but have different arguments.
 
 ### Type Parameters:
 
--   `T`: The type of the value emitted by the signals in the family.
+-   `T`: The type of the value emitted by the beacons in the family.
 -   `Arg`: The type of the argument used to identify individual beacons within the family.
 -   `BeaconType`: The type of the beacon in the family.
 
-If `cache` is `true`, created signals are cached. Default is `false`.
+If `cache` is `true`, created beacons are cached. Default is `false`.
 
 A common use-case is dependency injection.
 
