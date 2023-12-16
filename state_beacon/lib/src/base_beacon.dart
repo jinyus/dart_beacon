@@ -220,17 +220,15 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     _watchOrObserve(
       key,
       context,
-      callback: callback,
+      callback: () => callback(previousValue as T, _value),
     );
   }
 
   T _watchOrObserve(
     int key,
     BuildContext context, {
-    ObserverCallback<T>? callback,
+    VoidCallback? callback,
   }) {
-    final isObserving = callback != null;
-
     if (_subscribers.contains(key)) {
       return _value;
     }
@@ -240,20 +238,22 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
-    void rebuildWidget(T value) {
-      if (elementRef.target?.mounted ?? false) {
-        if (isObserving) {
-          callback(previousValue as T, value);
-        } else {
-          elementRef.target!.markNeedsBuild();
-        }
+    rebuildWidget() {
+      elementRef.target!.markNeedsBuild();
+    }
+
+    final run = callback ?? rebuildWidget;
+
+    void handleNewValue(T value) {
+      if (elementRef.target?.mounted == true) {
+        run();
       } else {
         unsub();
         _subscribers.remove(key);
       }
     }
 
-    unsub = subscribe(rebuildWidget);
+    unsub = subscribe(handleNewValue);
 
     // clean up if the widget is disposed
     // and value is never modified again
