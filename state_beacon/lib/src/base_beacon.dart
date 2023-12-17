@@ -49,6 +49,15 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   T get initialValue => _initialValue;
   int get listenersCount => _listeners.length;
 
+  final List<VoidCallback> _disposeCallbacks = [];
+  var _isDisposed = false;
+  bool get isDisposed => _isDisposed;
+
+  final _widgetSubscribers = <int>{};
+  final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
+
+  T peek() => _value;
+
   @override
   T get value {
     if (_isEmpty) {
@@ -90,8 +99,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     }
   }
 
-  T peek() => _value;
-
   /// Subscribes to changes in the beacon
   /// returns a function that can be called to unsubscribe
   VoidCallback subscribe(void Function(T) callback, {bool startNow = false}) {
@@ -123,30 +130,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     }
   }
 
-  /// Set the beacon to its initial value
-  /// and notify all listeners
-  void reset() {
-    _setValue(_initialValue);
-  }
-
-  var _isDisposed = false;
-  bool get isDisposed => _isDisposed;
-
-  /// Clears all registered listeners and
-  /// [reset] the beacon to its initial state.
-  @mustCallSuper
-  void dispose() {
-    _listeners.clear();
-    _subscribers.clear();
-    if (!_isEmpty) _value = _initialValue;
-    _previousValue = null;
-    _isDisposed = true;
-    for (final callback in _disposeCallbacks) {
-      callback();
-    }
-    _disposeCallbacks.clear();
-  }
-
   @override
   void addListener(VoidCallback listener) {
     final effectClosure = EffectClosure(listener, customID: listener.hashCode);
@@ -159,9 +142,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     final effectClosure = EffectClosure(listener, customID: listener.hashCode);
     _listeners.remove(effectClosure);
   }
-
-  final _subscribers = <int>{};
-  final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
 
   /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
@@ -230,11 +210,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     BuildContext context, {
     VoidCallback? callback,
   }) {
-    if (_subscribers.contains(key)) {
+    if (_widgetSubscribers.contains(key)) {
       return _value;
     }
 
-    _subscribers.add(key);
+    _widgetSubscribers.add(key);
 
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
@@ -250,7 +230,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
         run();
       } else {
         unsub();
-        _subscribers.remove(key);
+        _widgetSubscribers.remove(key);
       }
     }
 
@@ -261,7 +241,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     _finalizer.attach(
       context,
       () {
-        _subscribers.remove(key);
+        _widgetSubscribers.remove(key);
         unsub();
       },
       detach: context,
@@ -270,12 +250,31 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     return _value;
   }
 
-  final List<VoidCallback> _disposeCallbacks = [];
+  /// Set the beacon to its initial value
+  /// and notify all listeners
+  void reset() {
+    _setValue(_initialValue);
+  }
 
   /// Registers a callback to be called when the beacon is disposed.
   void onDispose(VoidCallback callback) {
     if (isDisposed) return;
 
     _disposeCallbacks.add(callback);
+  }
+
+  /// Clears all registered listeners and
+  /// [reset] the beacon to its initial state.
+  @mustCallSuper
+  void dispose() {
+    _listeners.clear();
+    _widgetSubscribers.clear();
+    if (!_isEmpty) _value = _initialValue;
+    _previousValue = null;
+    _isDisposed = true;
+    for (final callback in _disposeCallbacks) {
+      callback();
+    }
+    _disposeCallbacks.clear();
   }
 }
