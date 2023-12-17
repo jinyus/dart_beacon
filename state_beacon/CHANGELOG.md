@@ -1,3 +1,7 @@
+## 0.14.3
+
+-   Internal refactor
+
 ## 0.14.2
 
 -   Add Beacon.family
