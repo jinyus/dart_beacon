@@ -137,6 +137,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   @mustCallSuper
   void dispose() {
     _listeners.clear();
+    _subscribers.clear();
     if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
     _isDisposed = true;
