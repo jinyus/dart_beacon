@@ -11,6 +11,13 @@ void main() {
       var beacon = Beacon.writable(10);
       expect(beacon.peek(), equals(10));
     });
+
+    test('should return immutable beacon', () {
+      var beacon = Beacon.writable(10);
+      var immutableBeacon = beacon.freeze();
+      expect(immutableBeacon, isA<ReadableBeacon<int>>());
+    });
+
     test('should notify listeners when value changes', () {
       var beacon = Beacon.writable(10);
       var called = false;

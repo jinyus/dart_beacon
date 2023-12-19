@@ -29,4 +29,6 @@ extension WritableBeaconUtils<T> on WritableBeacon<T> {
 
     return notifier;
   }
+
+  ReadableBeacon<T> freeze() => this;
 }

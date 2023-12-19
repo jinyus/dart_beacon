@@ -1,3 +1,7 @@
+## 0.14.4
+
+-   Add `WriteableBeacon.freeze()` that converts it to a `ReadableBeacon`
+
 ## 0.14.3
 
 -   Internal refactor
