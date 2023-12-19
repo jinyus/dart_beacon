@@ -23,6 +23,8 @@ class BeaconFamily<Arg, BeaconType extends BaseBeacon> {
   /// Clears the cache of beacon if caching is enabled.
   /// Beacons are disposed before thy are removed
   void clear() {
+    if (!shouldCache) return;
+
     for (final beacon in _cache.values) {
       beacon.dispose();
     }
