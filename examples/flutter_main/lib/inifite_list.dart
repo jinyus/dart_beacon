@@ -34,40 +34,56 @@ Future<List<String>> _fetchItems(int pageNum) async {
   return List.generate(10, (index) => 'Item ${start + index}');
 }
 
-final pageNum = Beacon.debounced(1, duration: k100ms);
+class Controller {
+  Controller() {
+    // prevent the pageNum from changing when the list is loading
+    pageNum.setFilter((_, __) => rawItems.value is! AsyncLoading);
+  }
 
-// this re-executes the future when the pageNum changes
-final rawItems = Beacon.derivedFuture(
-  () => _fetchItems(pageNum.value),
-  cancelRunning: false,
-);
+  final pageNum = Beacon.filtered(1);
 
-final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]).wrap(
-  rawItems,
-  then: (beacon, newAsyncValue) {
-    final newList = beacon.peek().toList();
+  // this re-executes the future when the pageNum changes
+  late final rawItems = Beacon.derivedFuture(
+    () => _fetchItems(pageNum.value),
+  );
 
-    if (newList.last is! ItemData) {
-      newList.removeLast();
-    }
+  late final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]).wrap(
+    rawItems,
+    then: (beacon, newAsyncValue) {
+      // get the current list
+      final newList = beacon.peek().toList();
 
-    beacon.value = switch (newAsyncValue) {
-      AsyncData<List<String>>(value: final lst) => newList
-        ..addAll(lst.map(ItemData.new))
-        ..add(ItemLoading()),
-      AsyncError(error: final err) => newList..add(ItemError(err)),
-      _ => newList..add(ItemLoading()),
-    };
-  },
-  startNow: false,
-);
+      // remove the last item if it's an ItemLoading or ItemError
+      if (newList.last is! ItemData) {
+        newList.removeLast();
+      }
+
+      beacon.value = switch (newAsyncValue) {
+        // if the new value is AsyncData<List<String>>, add the items to the list
+        AsyncData<List<String>>(value: final lst) => newList
+          ..addAll(lst.map(ItemData.new))
+          ..add(ItemLoading()),
+
+        // if the new value is AsyncError, add the error to the list
+        AsyncError(error: final err) => newList..add(ItemError(err)),
+
+        // if the new value is AsyncLoading, add the loading indicator to the list
+        _ => newList..add(ItemLoading()),
+      };
+    },
+    startNow: false,
+  );
+}
+
+// you could use Provider or GetIt to provide the controller to the widget tree
+final controller = Controller();
 
 class InfiniteList extends StatelessWidget {
   const InfiniteList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final count = parsedItems.watch(context).length;
+    final count = controller.parsedItems.watch(context).length;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -81,7 +97,7 @@ class InfiniteList extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     itemBuilder: (context, index) {
-                      final item = parsedItems.value[index];
+                      final item = controller.parsedItems.value[index];
 
                       return switch (item) {
                         ItemData(value: final value) => ItemTile(title: value),
@@ -136,7 +152,7 @@ class _BottomWidgetState extends State<BottomWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // load the next page when we reach to the end of the ListView.builder
       if (widget.error == null) {
-        pageNum.value++;
+        controller.pageNum.value++;
       }
     });
     super.initState();
@@ -166,7 +182,7 @@ class _BottomWidgetState extends State<BottomWidget> {
                 const SizedBox(height: 5),
                 ElevatedButton(
                   style: btnStyle,
-                  onPressed: rawItems.reset,
+                  onPressed: controller.rawItems.reset,
                   child: const Text('retry'),
                 )
               ],
