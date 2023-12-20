@@ -142,8 +142,8 @@ class KeyText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: const EdgeInsets.all(3),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 4),
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).colorScheme.onSurface),
         borderRadius: BorderRadius.circular(8),
