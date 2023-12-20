@@ -9,6 +9,8 @@ import 'package:shopping_cart/src/catalog/service.dart';
 import 'src/app.dart';
 
 void main() async {
+  // you could use Provider or GetIt to provide the controllers to widgets
+  // instead of passing them through the contructor
   final cartServer = CartService();
   final cartController = CartController(cartServer);
 
