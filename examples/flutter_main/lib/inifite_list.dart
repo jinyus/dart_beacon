@@ -145,14 +145,13 @@ class BottomWidget extends StatefulWidget {
 }
 
 class _BottomWidgetState extends State<BottomWidget> {
-  var isLoading = false;
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // this widgets gets built when we reach the end of the list and we want to
       // load the next page when we reach to the end of the ListView.builder
       if (widget.error == null) {
-        controller.pageNum.value++;
+        controller.pageNum.increment();
       }
     });
     super.initState();
