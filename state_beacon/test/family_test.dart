@@ -76,6 +76,8 @@ void main() {
 
     // Beacons should not be the same instance
     expect(identical(beacon1, beacon2), isFalse);
+
+    family.clear();
   });
 
   test('should clear the cache', () {
