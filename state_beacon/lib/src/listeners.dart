@@ -4,17 +4,9 @@ import 'effect_closure.dart';
 
 class Listeners {
   final HashSet<EffectClosure> _set = HashSet<EffectClosure>();
-  late List<EffectClosure> _list;
-
-  Listeners() {
-    _updateList();
-  }
+  List<EffectClosure> _list = [];
 
   int get length => _set.length;
-
-  void _updateList() {
-    _list = _set.toList();
-  }
 
   bool add(EffectClosure item) {
     bool added = _set.add(item);
@@ -27,7 +19,8 @@ class Listeners {
   bool remove(EffectClosure item) {
     bool removed = _set.remove(item);
     if (removed) {
-      _updateList();
+      // prevent concurrent modification
+      _list = _list.toList()..remove(item);
     }
     return removed;
   }
