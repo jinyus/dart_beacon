@@ -16,10 +16,7 @@ Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/exampl
 <br>All examples: https://github.com/jinyus/dart_beacon/tree/main/examples
 
 <p align="center">
-  <picture>
-    <source srcset="https://github.com/jinyus/dart_beacon/blob/main/assets/flutter-beacon-demo.webp?raw=true" type="image/webp">
-    <img width="200" src="https://github.com/jinyus/dart_beacon/blob/main/assets/flutter-beacon-demo.gif?raw=true" alt="demo">
-  </picture>
+  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
 </p>
 
 ## Installation
