@@ -11,17 +11,18 @@ class CatalogController {
 
   final CatalogService _catalogService;
 
-  final _catalog = Beacon.writable<AsyncValue<Catalog>>(AsyncLoading());
-  ReadableBeacon<AsyncValue<Catalog>> get catalog => _catalog;
+  late final catalog = Beacon.future(
+    () async {
+      final catalog = await _catalogService.load();
+      return Catalog(catalog);
+    },
+    manualStart: true,
+  );
 
   Future<void> dispatch(CatalogEvent event) async {
     switch (event) {
       case CatalogEvent.started:
-        _catalog.value = AsyncLoading();
-        _catalogService
-            .load()
-            .then((catalog) => _catalog.value = AsyncData(Catalog(catalog)))
-            .catchError((e, s) => _catalog.value = AsyncError(e, s));
+        catalog.start();
     }
   }
 }
