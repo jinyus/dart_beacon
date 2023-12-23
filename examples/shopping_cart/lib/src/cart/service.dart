@@ -7,7 +7,7 @@ class CartService {
   Future<List<Product>> loadProducts() =>
       Future.delayed(k100ms * 10, () => _items);
 
-  void add(Product item) => _items.add(item);
+  Future<void> add(Product item) async => _items.add(item);
 
-  void remove(Product item) => _items.remove(item);
+  Future<void> remove(Product item) async => _items.remove(item);
 }
