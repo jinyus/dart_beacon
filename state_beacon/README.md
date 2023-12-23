@@ -308,7 +308,7 @@ beacon.set(30);
 expect(beacon.value, equals(30)); // throttle time passed, update allowed
 ```
 
-### Beacon.filterd:
+### Beacon.filtered:
 
 Creates a `FilteredBeacon` with an initial value and a filter function.
 This beacon updates its value only if it passes the filter criteria.
@@ -504,8 +504,6 @@ beacons that share the same creation logic but have different arguments.
 -   `BeaconType`: The type of the beacon in the family.
 
 If `cache` is `true`, created beacons are cached. Default is `false`.
-
-A common use-case is dependency injection.
 
 Example:
 
