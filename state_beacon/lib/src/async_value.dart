@@ -4,6 +4,16 @@ sealed class AsyncValue<T> {
   T unwrapValue() {
     return (this as AsyncData<T>).value;
   }
+
+  /// Executes the future provided and returns `AsyncData` with the result if successful
+  /// or `AsyncError` if the future throws.
+  static Future<AsyncValue<T>> tryCatch<T>(Future<T> Function() future) async {
+    try {
+      return AsyncData(await future());
+    } catch (e, s) {
+      return AsyncError(e, s);
+    }
+  }
 }
 
 class AsyncData<T> extends AsyncValue<T> {
