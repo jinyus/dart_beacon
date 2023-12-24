@@ -26,7 +26,6 @@ sealed class AsyncValue<T> {
   ///   } catch (err,stacktrace) {
   ///     beacon.value = AsyncError(err, stacktrace);
   ///   }
-  /// }
   /// ```
   static Future<AsyncValue<T>> tryCatch<T>(Future<T> Function() future) async {
     try {
