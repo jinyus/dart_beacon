@@ -6,7 +6,28 @@ sealed class AsyncValue<T> {
   }
 
   /// Executes the future provided and returns `AsyncData` with the result if successful
-  /// or `AsyncError` if the future throws.
+  /// or `AsyncError` if the future throws an exception.
+  /// /// Example:
+  /// ```dart
+  /// Future<String> fetchUserData() {
+  ///   // Imagine this is a network request that might throw an error
+  ///   return Future.delayed(Duration(seconds: 1), () => 'User data');
+  /// }
+  ///
+  ///   beacon.value = AsyncLoading();
+  ///   beacon.value = await AsyncValue.tryCatch(fetchUserData);
+  /// ```
+  ///
+  /// Without `tryCatch`, handling the potential error requires more boilerplate code:
+  /// ```dart
+  ///   beacon.value = AsyncLoading();
+  ///   try {
+  ///     beacon.value = AsyncData(await fetchUserData());
+  ///   } catch (err,stacktrace) {
+  ///     beacon.value = AsyncError(err, stacktrace);
+  ///   }
+  /// }
+  /// ```
   static Future<AsyncValue<T>> tryCatch<T>(Future<T> Function() future) async {
     try {
       return AsyncData(await future());
