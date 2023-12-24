@@ -18,10 +18,9 @@ class CartController {
     switch (event) {
       case CartStarted():
         _cart.value = AsyncLoading();
-        _cartService
-            .loadProducts()
-            .then((items) => _cart.value = AsyncData(Cart(items: [...items])))
-            .catchError((e, s) => _cart.set(AsyncError(e, s)));
+        _cart.value = await AsyncValue.tryCatch(
+          () async => Cart(items: await _cartService.loadProducts()),
+        );
 
       case CartItemAdded(:final item):
         if (_cart.value case AsyncData<Cart>(:final value)) {
