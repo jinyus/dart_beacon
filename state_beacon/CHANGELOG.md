@@ -1,3 +1,7 @@
+## 0.14.6
+
+-   Add `tryCatch` method to AsyncValue class that executes a future and returns an AsyncData or AsyncError
+
 ## 0.14.5
 
 -   Internal improvements
