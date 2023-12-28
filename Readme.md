@@ -28,15 +28,25 @@ dart pub add state_beacon
 ## Usage
 
 ```dart
-import 'package:state_beacon/state_beacon.dart';
-```
-
-#### Create a beacon
-
-```dart
 import 'package:flutter/material.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+final name = Beacon.writable("Bob");
+
+class ProfileCard extends StatelessWidget {
+  const ProfileCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // rebuilds whenever the name changes
+    return Text(name.watch(context));
+  }
+}
+```
+
+#### Using an asynchronous function
+
+```dart
 final counter = Beacon.writable(0);
 
 // The future will be recomputed whenever the counter changes
@@ -48,22 +58,6 @@ final derivedFutureCounter = Beacon.derivedFuture(() async {
 Future<String> fetchData(int count) async {
   await Future.delayed(Duration(seconds: count));
   return '$count second has passed.';
-}
-```
-
-#### Watch it in a widget
-
-```dart
-class Counter extends StatelessWidget {
-  const Counter({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      counter.watch(context).toString(),
-      style: Theme.of(context).textTheme.headlineMedium!,
-    );
-  }
 }
 
 class FutureCounter extends StatelessWidget {
@@ -144,8 +138,8 @@ ReadableBeacon<int> get counter => _internalCounter;
 
 ### Beacon.createEffect:
 
-Creates an effect based on a provided function. The provided function will be called
-whenever one of its dependencies change. An effect runs immediately after creation.
+An effect is just a function that will re-run whenever one of its
+dependencies change. An effect runs immediately after creation.
 
 ```dart
 final age = Beacon.writable(15);
