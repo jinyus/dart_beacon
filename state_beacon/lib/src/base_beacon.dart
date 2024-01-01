@@ -63,7 +63,9 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     if (_isEmpty) {
       throw UninitializeLazyReadException();
     }
+
     if (isRunningUntracked()) {
+      // if we are running untracked, we don't want to add the current effect to the listeners
       return _value;
     }
 
@@ -76,8 +78,17 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
   void _notifyOrDeferBatch() {
     if (isRunningUntracked()) {
-      return;
-    } else if (_isRunningBatchJob()) {
+      final currentEffects = <EffectClosure>[];
+      for (final effect in _effectStack) {
+        _listeners.remove(effect.func);
+        currentEffects.add(effect.func);
+      }
+      reAddListeners = () {
+        _listeners.addAll(currentEffects);
+      };
+    }
+
+    if (_isRunningBatchJob()) {
       _listenersToPingAfterBatchJob.addAll(_listeners.items);
     } else {
       _notifyListeners();
