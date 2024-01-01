@@ -1,3 +1,7 @@
+## 0.15.0
+
+-   Beacon.untracked() now only hide the update/access from encompassing effects.
+
 ## 0.14.6
 
 -   Add `tryCatch` method to AsyncValue class that executes a future and returns an AsyncData or AsyncError

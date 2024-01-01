@@ -16,6 +16,11 @@ class Listeners {
     return added;
   }
 
+  void addAll(Iterable<EffectClosure> items) {
+    _set.addAll(items);
+    _list.addAll(items);
+  }
+
   bool remove(EffectClosure item) {
     bool removed = _set.remove(item);
     if (removed) {
