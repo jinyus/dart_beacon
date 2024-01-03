@@ -28,7 +28,12 @@ void main() {
 
   test('should convert a beacon to a stream', () async {
     var beacon = Beacon.writable(0);
-    var stream = beacon.toStream();
+    var onCanceledCalled = false;
+    var stream = beacon.toStream(
+      onCancel: () {
+        onCanceledCalled = true;
+      },
+    );
 
     expect(stream, isA<Stream<int>>());
 
@@ -44,6 +49,8 @@ void main() {
     beacon.value = 1;
     beacon.value = 2;
     beacon.dispose();
+
+    expect(onCanceledCalled, true);
   });
 
   test('should toggle bool beacon', () {

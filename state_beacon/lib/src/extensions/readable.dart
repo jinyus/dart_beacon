@@ -2,6 +2,7 @@ part of 'extensions.dart';
 
 extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// Converts a [ReadableBeacon] to [Stream]
+  /// The stream can only be canceled by calling [dispose]
   Stream<T> toStream({
     FutureOr<void> Function()? onCancel,
   }) {
@@ -16,8 +17,6 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       controller.close();
       onCancel?.call();
     }
-
-    controller.onCancel = cancel;
 
     onDispose(cancel);
 
