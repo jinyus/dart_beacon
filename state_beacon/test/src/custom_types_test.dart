@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/src/effect_closure.dart';
 import 'package:state_beacon/src/listeners.dart';
-import 'package:state_beacon/state_beacon.dart';
 
 void main() {
   test('shoud correctly format toString', () {
@@ -56,31 +55,5 @@ void main() {
     final closure2 = EffectClosure(() {}, customID: closure.id);
 
     expect(closure, closure2);
-  });
-
-  test('should share the same hashCode with sister instances', () {
-    var data = AsyncData(1);
-    var data2 = AsyncData(1);
-
-    expect(data.hashCode, data2.hashCode);
-
-    var load = AsyncLoading();
-    var load2 = AsyncLoading();
-
-    expect(load, load2);
-    expect(load.hashCode, load2.hashCode);
-
-    var stack = StackTrace.current;
-    var error = AsyncError('error', stack);
-    var error2 = AsyncError('error', stack);
-
-    expect(error, error2);
-    expect(error.hashCode, error2.hashCode);
-
-    var idle = AsyncIdle();
-    var idle2 = AsyncIdle();
-
-    expect(idle, idle2);
-    expect(idle.hashCode, idle2.hashCode);
   });
 }

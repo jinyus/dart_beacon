@@ -54,7 +54,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   bool get isDisposed => _isDisposed;
 
   final _widgetSubscribers = <int>{};
+
+  // coverage:ignore-start
+  // requires a manual GC trigger to test
   final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
+  // coverage:ignore-end
 
   T peek() => _value;
 
@@ -247,6 +251,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
     unsub = subscribe(handleNewValue);
 
+    // coverage:ignore-start
     // clean up if the widget is disposed
     // and value is never modified again
     _finalizer.attach(
@@ -257,6 +262,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       },
       detach: context,
     );
+    // coverage:ignore-end
 
     return _value;
   }

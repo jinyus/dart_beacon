@@ -1,3 +1,10 @@
+## 0.16.0
+
+-   beacon.toStream() now returns a broadcast stream
+-   Add lastData. isLoading and valueOrNull getters to AsyncValue
+-   Add optional beacon parameter to tryCatch
+-   Add WritableBeacon<AsyncValue>.tryCatch extension for handling asynchronous values
+
 ## 0.15.0
 
 -   Beacon.untracked() now only hide the update/access from encompassing effects.
