@@ -4,6 +4,11 @@ import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
+  test('should return immutable beacon', () {
+    var beacon = Beacon.writable(10);
+    var immutableBeacon = beacon.freeze();
+    expect(immutableBeacon, isA<ReadableBeacon<int>>());
+  });
   test('should create relevant beacons', () {
     var listBeacon = [].toBeacon();
 

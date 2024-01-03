@@ -211,4 +211,33 @@ void main() {
 
     expect(results, correctResults);
   });
+
+  test('should trigger rerun when accessed before async gap', () async {
+    var count = Beacon.writable<int>(3);
+
+    late var nums = Beacon.derived(() {
+      return List.generate(count.value, (i) => i);
+    });
+
+    expect(nums.value, equals([0, 1, 2]));
+
+    var numsDoubled = Beacon.derivedFuture(() async {
+      // This will trigger a rerun because it is accessed before await
+      var currentNums = nums.value;
+      await Future.delayed(k10ms);
+      return currentNums.map((e) => e * 2).toList();
+    });
+
+    await Future.delayed(k10ms * 2);
+
+    expect(numsDoubled.value.unwrapValue(), equals([0, 2, 4]));
+
+    count.value = 5;
+
+    expect(nums.value, equals([0, 1, 2, 3, 4]));
+
+    await Future.delayed(k10ms * 2);
+
+    expect(numsDoubled.value.unwrapValue(), equals([0, 2, 4, 6, 8]));
+  });
 }
