@@ -1,3 +1,11 @@
+## 0.17.0
+
+-   Mdd debugLabel to beacons
+-   Add BeaconObserver and LoggingObserver classes
+-   [Breaking] Make initialValue named argument for lazy beacons
+-   [Breaking] Make `filter` a named argument for FilteredBeacon
+-   [Breaking] Make `initialValue` required for ListBeacon
+
 ## 0.16.0
 
 -   beacon.toStream() now returns a broadcast stream
