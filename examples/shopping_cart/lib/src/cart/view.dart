@@ -65,13 +65,12 @@ class CartList extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              color: isRemoving ? Colors.grey.shade700 : Colors.white,
               clipBehavior: Clip.hardEdge,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
-                  tileColor: isRemoving
-                      ? item.color.withOpacity(0)
-                      : item.color.withAlpha(50),
+                  tileColor: item.color.withAlpha(50),
                   leading: const Icon(Icons.directions_car_sharp),
                   title: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -79,9 +78,11 @@ class CartList extends StatelessWidget {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      controller.dispatch(CartItemRemoved(item));
-                    },
+                    onPressed: isRemoving
+                        ? null
+                        : () {
+                            controller.dispatch(CartItemRemoved(item));
+                          },
                   ),
                 ),
               ),
