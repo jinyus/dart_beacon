@@ -7,7 +7,7 @@ import '../../common.dart';
 
 void main() {
   test('should emit values', () async {
-    var myStream = Stream.periodic(k1ms, (i) => i);
+    var myStream = Stream.periodic(k10ms, (i) => i);
     var myBeacon = Beacon.stream(myStream);
     var called = 0;
 
@@ -31,7 +31,7 @@ void main() {
       }
     });
 
-    await Future.delayed(k1ms * 10);
+    await Future.delayed(k10ms * 5);
 
     expect(called, equals(3));
   });
@@ -99,19 +99,21 @@ void main() {
   });
 
   test('should execute onDone callback', () async {
-    var myStream = Stream.periodic(k1ms * 0.1, (i) => i + 1).take(3);
+    var myStream = Stream.periodic(k10ms, (i) => i + 1).take(3);
     var called = 0;
+    var done = false;
     var myBeacon = Beacon.streamRaw(myStream, initialValue: 0, onDone: () {
-      called++;
+      done = true;
     });
 
     myBeacon.subscribe((value) {
       called++;
     });
 
-    await Future.delayed(k1ms);
+    await Future.delayed(k10ms * 4);
 
-    expect(called, equals(4));
+    expect(called, equals(3));
+    expect(done, true);
   });
 
   test('should do nothing on stream beacon is reset', () {

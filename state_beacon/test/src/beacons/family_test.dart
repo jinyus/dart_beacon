@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-import 'common.dart';
+import '../../common.dart';
 
 void main() {
   test('should create a new beacon', () {
