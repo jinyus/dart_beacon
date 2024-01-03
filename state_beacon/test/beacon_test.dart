@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+import 'common.dart';
+
 void main() {
-  const k10ms = Duration(milliseconds: 10);
   group('Beacon Tests', () {
     test('should set initial value', () {
       var beacon = Beacon.writable(10);

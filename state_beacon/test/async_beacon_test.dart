@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-void main() {
-  const k10ms = Duration(milliseconds: 10);
+import 'common.dart';
 
+void main() {
   group('FutureBeacon Tests', () {
     test('should change to AsyncData on successful future resolution',
         () async {

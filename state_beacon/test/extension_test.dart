@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+import 'common.dart';
 import 'flutter_test.dart';
 
 void main() {
