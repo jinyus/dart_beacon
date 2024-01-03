@@ -17,12 +17,20 @@ abstract class Beacon {
   /// print(myBeacon.value); // Outputs: 10
   /// myBeacon.value = 20;
   /// ```
-  static WritableBeacon<T> writable<T>(T initialValue) =>
-      WritableBeacon<T>(initialValue);
+  static WritableBeacon<T> writable<T>(
+    T initialValue, {
+    String? debugLabel,
+  }) =>
+      WritableBeacon<T>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'Writable<$T>');
 
   /// Like `writable`, but the initial value is lazily initialized.
-  static WritableBeacon<T> lazyWritable<T>([T? initialValue]) =>
-      WritableBeacon<T>(initialValue);
+  static WritableBeacon<T> lazyWritable<T>([
+    T? initialValue,
+    String? debugLabel,
+  ]) =>
+      WritableBeacon<T>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'LazyWritable<$T>');
 
   /// Creates a `ReadableBeacon` with an initial value.
   /// This beacon allows only reading the value.
@@ -32,8 +40,12 @@ abstract class Beacon {
   /// var myBeacon = Beacon.readable(15);
   /// print(myBeacon.value); // Outputs: 15
   /// ```
-  static ReadableBeacon<T> readable<T>(T initialValue) =>
-      ReadableBeacon<T>(initialValue);
+  static ReadableBeacon<T> readable<T>(
+    T initialValue, {
+    String? debugLabel,
+  }) =>
+      ReadableBeacon<T>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'Readable<$T>');
 
   /// Returns a `ReadableBeacon` and a function that allows writing to the beacon.
   /// This is useful for creating a beacon that's readable by the public,
@@ -44,8 +56,11 @@ abstract class Beacon {
   /// var (count,setCount) = Beacon.scopedWritable(15);
   /// ```
   static (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
-      T initialValue) {
-    final beacon = WritableBeacon<T>(initialValue);
+    T initialValue, {
+    String? debugLabel,
+  }) {
+    final beacon = WritableBeacon<T>(initialValue)
+      ..setDebugLabel(debugLabel ?? 'ScopedWritable<$T>');
     return (beacon, beacon.set);
   }
 
@@ -60,16 +75,22 @@ abstract class Beacon {
   /// await Future.delayed(Duration(seconds: 1));
   /// print(myBeacon.value); // Outputs: 20
   /// ```
-  static DebouncedBeacon<T> debounced<T>(T initialValue,
-          {required Duration duration}) =>
-      DebouncedBeacon<T>(initialValue: initialValue, duration: duration);
+  static DebouncedBeacon<T> debounced<T>(
+    T initialValue, {
+    required Duration duration,
+    String? debugLabel,
+  }) =>
+      DebouncedBeacon<T>(initialValue: initialValue, duration: duration)
+        ..setDebugLabel(debugLabel ?? 'DebouncedBeacon<$T>');
 
   /// Like `debounced`, but the initial value is lazily initialized.
   static DebouncedBeacon<T> lazyDebounced<T>({
     T? initialValue,
     required Duration duration,
+    String? debugLabel,
   }) =>
-      DebouncedBeacon<T>(initialValue: initialValue, duration: duration);
+      DebouncedBeacon<T>(initialValue: initialValue, duration: duration)
+        ..setDebugLabel(debugLabel ?? 'LazyDebouncedBeacon<$T>');
 
   /// Creates a `ThrottledBeacon` with an initial value and a throttle duration.
   /// This beacon limits the rate of updates to its value based on the duration.
@@ -99,24 +120,26 @@ abstract class Beacon {
     T? initialValue, {
     required Duration duration,
     bool dropBlocked = true,
+    String? debugLabel,
   }) =>
       ThrottledBeacon<T>(
         initialValue: initialValue,
         duration: duration,
         dropBlocked: dropBlocked,
-      );
+      )..setDebugLabel(debugLabel ?? 'ThrottledBeacon<$T>');
 
   /// Like `throttled`, but the initial value is lazily initialized.
   static ThrottledBeacon<T> lazyThrottled<T>({
     T? initialValue,
     required Duration duration,
     bool dropBlocked = true,
+    String? debugLabel,
   }) =>
       ThrottledBeacon<T>(
         initialValue: initialValue,
         duration: duration,
         dropBlocked: dropBlocked,
-      );
+      )..setDebugLabel(debugLabel ?? 'LazyThrottledBeacon<$T>');
 
   /// Creates a `FilteredBeacon` with an initial value and a filter function.
   /// This beacon updates its value only if it passes the filter criteria.
@@ -141,8 +164,10 @@ abstract class Beacon {
   static FilteredBeacon<T> filtered<T>(
     T initialValue, [
     BeaconFilter<T>? filter,
+    String? debugLabel,
   ]) {
-    return FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+    return FilteredBeacon<T>(initialValue: initialValue, filter: filter)
+      ..setDebugLabel(debugLabel ?? 'FilteredBeacon<$T>');
   }
 
   /// Like `filtered`, but the initial value is lazily initialized.
@@ -150,8 +175,10 @@ abstract class Beacon {
   static FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
+    String? debugLabel,
   }) {
-    return FilteredBeacon<T>(initialValue: initialValue, filter: filter);
+    return FilteredBeacon<T>(initialValue: initialValue, filter: filter)
+      ..setDebugLabel(debugLabel ?? 'LazyFilteredBeacon<$T>');
   }
 
   /// Creates a `BufferedCountBeacon` that collects and buffers a specified number
@@ -171,8 +198,10 @@ abstract class Beacon {
   /// countBeacon.value = 2;
   /// countBeacon.value = 3; // Triggers update with [1, 2, 3]
   /// ```
-  static BufferedCountBeacon<T> bufferedCount<T>(int count) =>
-      BufferedCountBeacon<T>(countThreshold: count);
+  static BufferedCountBeacon<T> bufferedCount<T>(int count,
+          {String? debugLabel}) =>
+      BufferedCountBeacon<T>(countThreshold: count)
+        ..setDebugLabel(debugLabel ?? 'BufferedCountBeacon<$T>');
 
   /// Creates a `BufferedTimeBeacon` that collects values over a specified time duration.
   /// Once the time duration elapses, the beacon's value is updated with the list of
@@ -193,8 +222,12 @@ abstract class Beacon {
   /// timeBeacon.value = 2;
   /// // After 5 seconds, it will output [1, 2]
   /// ```
-  static BufferedTimeBeacon<T> bufferedTime<T>({required Duration duration}) =>
-      BufferedTimeBeacon<T>(duration: duration);
+  static BufferedTimeBeacon<T> bufferedTime<T>({
+    required Duration duration,
+    String? debugLabel,
+  }) =>
+      BufferedTimeBeacon<T>(duration: duration)
+        ..setDebugLabel(debugLabel ?? 'BufferedTimeBeacon<$T>');
 
   /// Creates an `UndoRedoBeacon` with an initial value and an optional history limit.
   /// This beacon allows undoing and redoing changes to its value, up to the specified
@@ -214,22 +247,24 @@ abstract class Beacon {
   static UndoRedoBeacon<T> undoRedo<T>(
     T initialValue, {
     int historyLimit = 10,
+    String? debugLabel,
   }) {
     return UndoRedoBeacon<T>(
       initialValue: initialValue,
       historyLimit: historyLimit,
-    );
+    )..setDebugLabel(debugLabel ?? 'UndoRedoBeacon<$T>');
   }
 
   /// Like `undoRedo`, but the initial value is lazily initialized.
   static UndoRedoBeacon<T> lazyUndoRedo<T>({
     T? initialValue,
     int historyLimit = 10,
+    String? debugLabel,
   }) {
     return UndoRedoBeacon<T>(
       initialValue: initialValue,
       historyLimit: historyLimit,
-    );
+    )..setDebugLabel(debugLabel ?? 'LazyUndoRedoBeacon<$T>');
   }
 
   /// Creates a `TimestampBeacon` with an initial value.
@@ -240,12 +275,18 @@ abstract class Beacon {
   /// var myBeacon = Beacon.timestamped(10);
   /// print(myBeacon.value); // Outputs: (value: 10, timestamp: DateTime.now())
   /// ```
-  static TimestampBeacon<T> timestamped<T>(T initialValue) =>
-      TimestampBeacon<T>(initialValue);
+  static TimestampBeacon<T> timestamped<T>(T initialValue,
+          {String? debugLabel}) =>
+      TimestampBeacon<T>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'TimestampBeacon<$T>');
 
   /// Like `timestamped`, but the initial value is lazily initialized.
-  static TimestampBeacon<T> lazyTimestamped<T>([T? initialValue]) =>
-      TimestampBeacon<T>(initialValue);
+  static TimestampBeacon<T> lazyTimestamped<T>([
+    T? initialValue,
+    String? debugLabel,
+  ]) =>
+      TimestampBeacon<T>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'LazyTimestampBeacon<$T>');
 
   /// Creates a `StreamBeacon` from a given stream.
   /// This beacon updates its value based on the stream's emitted values.
@@ -262,11 +303,12 @@ abstract class Beacon {
   static StreamBeacon<T> stream<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
+    String? debugLabel,
   }) {
     return StreamBeacon<T>(
       stream,
       cancelOnError: cancelOnError,
-    );
+    )..setDebugLabel(debugLabel ?? 'StreamBeacon<$T>');
   }
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
@@ -277,6 +319,7 @@ abstract class Beacon {
     Function? onError,
     Function? onDone,
     T? initialValue,
+    String? debugLabel,
   }) {
     return RawStreamBeacon<T>(
       stream,
@@ -284,7 +327,7 @@ abstract class Beacon {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
-    );
+    )..setDebugLabel(debugLabel ?? 'RawStreamBeacon<$T>');
   }
 
   /// Creates a `FutureBeacon` that initializes its value based on a future.
@@ -305,12 +348,13 @@ abstract class Beacon {
     Future<T> Function() future, {
     bool manualStart = false,
     bool cancelRunning = true,
+    String? debugLabel,
   }) {
     return DefaultFutureBeacon<T>(
       future,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
-    );
+    )..setDebugLabel(debugLabel ?? 'FutureBeacon<$T>');
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
@@ -332,8 +376,10 @@ abstract class Beacon {
   static DerivedBeacon<T> derived<T>(
     T Function() compute, {
     bool manualStart = false,
+    String? debugLabel,
   }) {
-    final beacon = DerivedBeacon<T>(manualStart: manualStart);
+    final beacon = DerivedBeacon<T>(manualStart: manualStart)
+      ..setDebugLabel(debugLabel ?? 'DerivedBeacon<$T>');
 
     final unsub = effect(() {
       // beacon is manually triggered if in idle state
@@ -384,11 +430,12 @@ abstract class Beacon {
     Future<T> Function() compute, {
     bool manualStart = false,
     bool cancelRunning = true,
+    String? debugLabel,
   }) {
     final beacon = DerivedFutureBeacon<T>(
       manualStart: manualStart,
       cancelRunning: cancelRunning,
-    );
+    )..setDebugLabel(debugLabel ?? 'DerivedFutureBeacon<$T>');
 
     final unsub = effect(() async {
       // beacon is manually triggered if in idle state
@@ -428,8 +475,9 @@ abstract class Beacon {
   ///
   /// nums.remove(2); // Outputs: [1, 3, 4]
   /// ```
-  static ListBeacon<T> list<T>([List<T>? initialValue]) =>
-      ListBeacon<T>(initialValue ?? []);
+  static ListBeacon<T> list<T>([List<T>? initialValue, String? debugLabel]) =>
+      ListBeacon<T>(initialValue ?? [])
+        ..setDebugLabel(debugLabel ?? 'ListBeacon<$T>');
 
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.

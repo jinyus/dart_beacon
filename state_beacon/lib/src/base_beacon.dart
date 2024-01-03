@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:state_beacon/src/common.dart';
 import 'package:state_beacon/src/interfaces.dart';
+import 'package:state_beacon/src/observer.dart';
 import 'package:state_beacon/src/untracked.dart';
 
 import 'async_value.dart';
@@ -38,6 +39,13 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   }
 
   bool get isNullable => null is T;
+
+  String? _debugLabel;
+  String get debugLabel => _debugLabel ?? runtimeType.toString();
+
+  void setDebugLabel(String? value) {
+    _debugLabel = value;
+  }
 
   var _isEmpty = true;
   late T _value;
@@ -105,11 +113,13 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       _initialValue = newValue;
       _previousValue = newValue;
       _value = newValue;
+      BeaconObserver.instance?.onUpdate(this);
       _notifyOrDeferBatch();
     } else if (_value != newValue || force) {
       _previousValue = _value;
       _value = newValue;
 
+      BeaconObserver.instance?.onUpdate(this);
       _notifyOrDeferBatch();
     }
   }
@@ -293,5 +303,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       callback();
     }
     _disposeCallbacks.clear();
+    BeaconObserver.instance?.onDispose(this);
   }
 }
