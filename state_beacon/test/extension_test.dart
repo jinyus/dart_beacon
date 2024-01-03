@@ -3,9 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-import 'common.dart';
-import 'flutter_test.dart';
-
 void main() {
   test('should create relevant beacons', () {
     var listBeacon = [].toBeacon();
@@ -31,32 +28,22 @@ void main() {
 
   test('should convert a beacon to a stream', () async {
     var beacon = Beacon.writable(0);
-    var cancelled = false;
-    var stream = beacon.toStream(onCancel: () => cancelled = true);
+    var stream = beacon.toStream();
 
     expect(stream, isA<Stream<int>>());
 
-    var called = 0;
-
-    stream.listen((_) => called++);
+    expect(
+        stream,
+        emitsInOrder([
+          0,
+          1,
+          2,
+          emitsDone,
+        ]));
 
     beacon.value = 1;
-
-    await Future.delayed(k10ms);
-
-    expect(called, 2);
-
     beacon.value = 2;
-
-    await Future.delayed(k10ms);
-
-    expect(called, 3);
-
     beacon.dispose();
-
-    await Future.delayed(k10ms);
-
-    expect(cancelled, true);
   });
 
   test('should toggle bool beacon', () {
