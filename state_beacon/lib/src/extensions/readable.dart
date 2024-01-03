@@ -21,6 +21,6 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
 
     onDispose(cancel);
 
-    return controller.stream;
+    return controller.stream.asBroadcastStream();
   }
 }
