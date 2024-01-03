@@ -138,7 +138,6 @@ class CartTotal extends StatelessWidget {
               },
               child: const Text('BUY'),
             ),
-            // IconsData.byName(name: 'add'),
           ],
         ),
       ),
