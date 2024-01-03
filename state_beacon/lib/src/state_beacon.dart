@@ -25,10 +25,10 @@ abstract class Beacon {
         ..setDebugLabel(debugLabel ?? 'Writable<$T>');
 
   /// Like `writable`, but the initial value is lazily initialized.
-  static WritableBeacon<T> lazyWritable<T>([
+  static WritableBeacon<T> lazyWritable<T>({
     T? initialValue,
     String? debugLabel,
-  ]) =>
+  }) =>
       WritableBeacon<T>(initialValue)
         ..setDebugLabel(debugLabel ?? 'LazyWritable<$T>');
 
@@ -281,10 +281,10 @@ abstract class Beacon {
         ..setDebugLabel(debugLabel ?? 'TimestampBeacon<$T>');
 
   /// Like `timestamped`, but the initial value is lazily initialized.
-  static TimestampBeacon<T> lazyTimestamped<T>([
+  static TimestampBeacon<T> lazyTimestamped<T>({
     T? initialValue,
     String? debugLabel,
-  ]) =>
+  }) =>
       TimestampBeacon<T>(initialValue)
         ..setDebugLabel(debugLabel ?? 'LazyTimestampBeacon<$T>');
 
