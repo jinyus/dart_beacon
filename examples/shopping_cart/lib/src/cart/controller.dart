@@ -1,6 +1,7 @@
 // ignore_for_file: invalid_return_type_for_catch_error
 
 import 'package:shopping_cart/src/models/models.dart';
+import 'package:shopping_cart/src/models/product.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 import 'events.dart';
@@ -11,40 +12,35 @@ class CartController {
 
   final CartService _cartService;
 
+  final _removingItem = Beacon.list<Product>([]);
+  ReadableBeacon<List<Product>> get removingIndex => _removingItem;
+
+  final _addingItem = Beacon.list<Product>([]);
+  ReadableBeacon<List<Product>> get addingItem => _addingItem;
+
   late final _cart = Beacon.writable<AsyncValue<Cart>>(AsyncIdle());
   ReadableBeacon<AsyncValue<Cart>> get cart => _cart;
 
   Future<void> dispatch(CartEvent event) async {
     switch (event) {
       case CartStarted():
-        _cart.value = AsyncLoading();
-        _cart.value = await AsyncValue.tryCatch(
+        await _cart.tryCatch(
           () async => Cart(items: await _cartService.loadProducts()),
         );
 
       case CartItemAdded(:final item):
-        if (_cart.value case AsyncData<Cart>(:final value)) {
-          try {
-            await _cartService.add(item);
-            _cart.value = AsyncData(Cart(items: [...value.items, item]));
-          } catch (e, s) {
-            _cart.value = AsyncError(e, s);
-          }
-        }
+        _addingItem.add(item);
+        await _cart.tryCatch(
+          () async => Cart(items: await _cartService.add(item)),
+        );
+        _addingItem.remove(item);
 
       case CartItemRemoved(:final item):
-        if (_cart.value case AsyncData<Cart>(:final value)) {
-          try {
-            await _cartService.remove(item);
-            _cart.value = AsyncData(
-              Cart(
-                items: [...value.items]..remove(event.item),
-              ),
-            );
-          } catch (e, s) {
-            _cart.value = AsyncError(e, s);
-          }
-        }
+        _removingItem.add(item);
+        await _cart.tryCatch(
+          () async => Cart(items: await _cartService.remove(item)),
+        );
+        _removingItem.remove(item);
     }
   }
 }

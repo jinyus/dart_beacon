@@ -4,6 +4,8 @@ import 'package:state_beacon/state_beacon.dart';
 import 'controller.dart';
 import 'events.dart';
 
+const loadingIndicator = Center(child: CircularProgressIndicator());
+
 class CartView extends StatelessWidget {
   const CartView({super.key, required this.controller});
 
@@ -47,11 +49,18 @@ class CartList extends StatelessWidget {
     final state = controller.cart.watch(context);
 
     return switch (state) {
-      AsyncData(value: final cart) => ListView.separated(
-          itemCount: cart.items.length,
+      AsyncData() ||
+      AsyncLoading() when state.lastData != null =>
+        ListView.separated(
+          itemCount: state.lastData!.items.length,
           separatorBuilder: (_, __) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
-            final item = cart.items[index];
+            final item = state.lastData!.items.elementAtOrNull(index);
+            if (item == null) {
+              return const SizedBox.shrink();
+            }
+            final isRemoving =
+                controller.removingIndex.watch(context).contains(item);
             return Material(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -60,7 +69,9 @@ class CartList extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListTile(
-                  tileColor: item.color.withAlpha(50),
+                  tileColor: isRemoving
+                      ? item.color.withOpacity(0)
+                      : item.color.withAlpha(50),
                   leading: const Icon(Icons.directions_car_sharp),
                   title: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -78,7 +89,7 @@ class CartList extends StatelessWidget {
           },
         ),
       AsyncError() => const Text('Something went wrong!'),
-      _ => const CircularProgressIndicator(),
+      _ => loadingIndicator,
     };
   }
 }
@@ -105,15 +116,17 @@ class CartTotal extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             switch (state) {
-              AsyncData(value: final cart) => Padding(
+              AsyncData() ||
+              AsyncLoading() when state.lastData != null =>
+                Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    '\$${cart.totalPrice}',
+                    '\$${state.lastData!.totalPrice}',
                     style: hugeStyle,
                   ),
                 ),
               AsyncError() => const Text('Something went wrong!'),
-              _ => const CircularProgressIndicator(),
+              _ => loadingIndicator,
             },
             const SizedBox(width: 24),
             ElevatedButton(

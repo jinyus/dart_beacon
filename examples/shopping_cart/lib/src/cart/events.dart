@@ -25,7 +25,6 @@ final class CartItemRemoved extends CartEvent {
   const CartItemRemoved(this.item);
 
   final Product item;
-
   @override
   List<Object> get props => [item];
 }

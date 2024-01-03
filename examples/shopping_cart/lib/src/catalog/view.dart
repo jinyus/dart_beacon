@@ -102,9 +102,16 @@ class AddButton extends StatelessWidget {
 
     return switch (state) {
       AsyncError() => const Text('Something went wrong!'),
-      AsyncData(value: final cart) => Builder(
+      AsyncData() || AsyncLoading() when state.lastData != null => Builder(
           builder: (context) {
+            final cart = state.lastData!;
             final isInCart = cart.items.contains(item);
+            final isAdding =
+                cartController.addingItem.watch(context).contains(item);
+            final btnChild = isAdding
+                ? const CircularProgressIndicator()
+                : const Text('ADD');
+
             return TextButton(
               style: TextButton.styleFrom(
                   disabledForegroundColor: theme.primaryColor,
@@ -112,12 +119,12 @@ class AddButton extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                   minimumSize: const Size(100, 50)),
-              onPressed: isInCart
+              onPressed: isInCart || isAdding
                   ? null
                   : () => cartController.dispatch(CartItemAdded(item)),
               child: isInCart
                   ? const Icon(Icons.check, semanticLabel: 'ADDED')
-                  : const Text('ADD'),
+                  : btnChild,
             );
           },
         ),
@@ -134,11 +141,7 @@ class CatalogAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = cartController.cart.watch(context);
-    int count = 0;
-
-    if (cart is AsyncData<Cart>) {
-      count = cart.value.items.length;
-    }
+    final count = cart.lastData?.items.length ?? 0;
 
     return SliverAppBar(
       title: const Text('Catalog'),
