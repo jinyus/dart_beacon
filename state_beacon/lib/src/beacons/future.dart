@@ -5,11 +5,9 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   final bool cancelRunning;
   AsyncValue<T>? _previousAsyncValue;
-  T? _lastData;
 
-  /// The last data that was successfully loaded
-  /// This is useful when the current state is [AsyncError] or [AsyncLoading]
-  T? get lastData => _lastData;
+  /// Alias for peek().lastData. Returns the last data that was successfully loaded
+  T? get lastData => _value.lastData;
 
   @override
   AsyncValue<T>? get previousValue => _previousAsyncValue;
@@ -22,7 +20,9 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// Internal method to start loading
   @protected
   int $startLoading() {
-    _setValue(AsyncLoading());
+    _setValue(
+      AsyncLoading()..setLastData(lastData),
+    );
     return ++_executionID;
   }
 
@@ -34,15 +34,15 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     if (cancelRunning && exeID != _executionID) return;
 
     if (value is AsyncData) {
-      if (_lastData != null) {
+      if (lastData != null) {
         // if _lastData == null, then it's the first time we are getting data,
         // so we wouldn't have a previous value.
 
         // ignore: null_check_on_nullable_type_parameter
-        _previousAsyncValue = AsyncData(_lastData!);
+        _previousAsyncValue = AsyncData(lastData!);
       }
-
-      _lastData = value.unwrapValue();
+    } else if (value is AsyncError) {
+      value.setLastData(lastData);
     }
     _setValue(value, force: true);
   }
@@ -79,7 +79,6 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   @override
   void dispose() {
-    _lastData = null;
     _previousAsyncValue = null;
     _cancelAwaitedSubscription?.call();
     Awaited.remove(this);
