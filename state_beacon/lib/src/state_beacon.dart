@@ -162,10 +162,10 @@ abstract class Beacon {
   /// pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
   /// ```
   static FilteredBeacon<T> filtered<T>(
-    T initialValue, [
+    T initialValue, {
     BeaconFilter<T>? filter,
     String? debugLabel,
-  ]) {
+  }) {
     return FilteredBeacon<T>(initialValue: initialValue, filter: filter)
       ..setDebugLabel(debugLabel ?? 'FilteredBeacon<$T>');
   }
@@ -475,8 +475,8 @@ abstract class Beacon {
   ///
   /// nums.remove(2); // Outputs: [1, 3, 4]
   /// ```
-  static ListBeacon<T> list<T>([List<T>? initialValue, String? debugLabel]) =>
-      ListBeacon<T>(initialValue ?? [])
+  static ListBeacon<T> list<T>(List<T> initialValue, {String? debugLabel}) =>
+      ListBeacon<T>(initialValue)
         ..setDebugLabel(debugLabel ?? 'ListBeacon<$T>');
 
   /// Creates an effect based on a provided function. The provided function will be called

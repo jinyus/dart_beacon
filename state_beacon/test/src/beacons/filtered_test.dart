@@ -3,7 +3,7 @@ import 'package:state_beacon/state_beacon.dart';
 
 void main() {
   test('should update value only if it satisfies the filter criteria', () {
-    var beacon = Beacon.filtered(0, (prev, next) => next > 5);
+    var beacon = Beacon.filtered(0, filter: (prev, next) => next > 5);
     beacon.value = 4;
     expect(beacon.value, equals(0)); // Value should not update
 
