@@ -2,9 +2,11 @@
 
 -   Mdd debugLabel to beacons
 -   Add BeaconObserver and LoggingObserver classes
+-   Add FutureBeacon.overrideWith() to replace the internal callback
 -   [Breaking] Make initialValue named argument for lazy beacons
 -   [Breaking] Make `filter` a named argument for FilteredBeacon
 -   [Breaking] Make `initialValue` required for ListBeacon
+-   [Breaking] `FutureBeacon.previousValue` is no longer customized to return the previous AsyncData, use `FutureBeacon.lastData` instead
 
 ## 0.16.0
 
