@@ -66,6 +66,8 @@ void main() {
 
     await Future.delayed(Duration(milliseconds: 10));
 
+    expect(counter, 0);
+
     futureBeacon.start();
 
     expect(futureBeacon.value, isA<AsyncLoading>());
