@@ -24,22 +24,16 @@ class CartController {
   Future<void> dispatch(CartEvent event) async {
     switch (event) {
       case CartStarted():
-        await _cart.tryCatch(
-          () async => Cart(items: await _cartService.loadProducts()),
-        );
+        await _cart.tryCatch(() => _cartService.loadProducts());
 
       case CartItemAdded(:final item):
         _addingItem.add(item);
-        await _cart.tryCatch(
-          () async => Cart(items: await _cartService.add(item)),
-        );
+        await _cart.tryCatch(() => _cartService.add(item));
         _addingItem.remove(item);
 
       case CartItemRemoved(:final item):
         _removingItem.add(item);
-        await _cart.tryCatch(
-          () async => Cart(items: await _cartService.remove(item)),
-        );
+        await _cart.tryCatch(() => _cartService.remove(item));
         _removingItem.remove(item);
     }
   }
