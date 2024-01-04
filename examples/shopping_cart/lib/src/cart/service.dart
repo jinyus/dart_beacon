@@ -9,15 +9,13 @@ class CartService {
 
   Future<List<Product>> add(Product item) async {
     await Future.delayed(k100ms * 10);
-    return _items
-      ..add(item)
-      ..toList();
+    _items.add(item);
+    return _items.toList();
   }
 
   Future<List<Product>> remove(Product item) async {
     await Future.delayed(k100ms * 10);
-    return _items
-      ..remove(item)
-      ..toList();
+    _items.remove(item);
+    return _items.toList();
   }
 }

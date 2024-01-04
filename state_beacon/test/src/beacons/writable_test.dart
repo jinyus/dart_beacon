@@ -121,7 +121,7 @@ void main() {
     const time = Duration(milliseconds: 5);
     var throttleBeacon = Beacon.throttled(10, duration: time);
     var debounceBeacon = Beacon.debounced(10, duration: time);
-    var filterBeacon = Beacon.filtered(10, (prev, next) => next > 5);
+    var filterBeacon = Beacon.filtered(10, filter: (prev, next) => next > 5);
     var undoRedoBeacon = UndoRedoBeacon(initialValue: 10);
 
     var called = 0;
