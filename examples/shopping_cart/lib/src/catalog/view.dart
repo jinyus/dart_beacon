@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_cart/src/cart/controller.dart';
 import 'package:shopping_cart/src/cart/events.dart';
-import 'package:shopping_cart/src/models/models.dart';
 import 'package:shopping_cart/src/models/product.dart';
 import 'package:state_beacon/state_beacon.dart';
 import 'controller.dart';
