@@ -33,7 +33,7 @@ void main() {
     expect(called, 3);
     expect(data.value, equals({'a': 1, 'c': 3}));
 
-    data.update('a', (value) => value! + 2);
+    data.update('a', (value) => value + 2);
 
     expect(called, 4);
     expect(data.value, equals({'a': 3, 'c': 3}));
