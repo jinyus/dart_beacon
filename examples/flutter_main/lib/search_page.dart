@@ -23,8 +23,8 @@ class SearchPage extends StatelessWidget {
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
-          child: const Column(
-            children: [
+          child: ListView(
+            children: const [
               Text('Weather Search', style: TextStyle(fontSize: 48)),
               k16SizeBox,
               SearchInput(),
@@ -57,7 +57,10 @@ class _SearchInputState extends State<SearchInput> {
     late VoidCallback unsub;
 
     unsub = searchTextBeacon.subscribe((val) {
-      searchResults.start();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // prevents concurrent modification exception
+        searchResults.start();
+      });
       unsub();
     });
 
