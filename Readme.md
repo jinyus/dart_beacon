@@ -90,9 +90,13 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
 -   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
 -   [Beacon.future](#beaconfuture): Initialize beacons from futures.
+    -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
 -   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
 -   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
+-   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
+    -   [unwrapValue](#asyncvalueunwrapvalue): Casts this [AsyncValue] to [AsyncData] and return it's value.
+    -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 
 [Pitfalls](#pitfalls)
@@ -434,14 +438,35 @@ var myBeacon = Beacon.future(() async {
 });
 
 myBeacon.subscribe((value) {
-  print(value); // Outputs 'Hello' after 1 second
+  print(value); // Outputs AsyncLoading immediately then AsyncData('Hello') after 1 second
 });
 ```
+
+#### FutureBeacon.overrideWith:
+
+Replaces the current callback and resets the beacon by running the new callback.
+This can also be done with [DerivedFutureBeacons](#beaconderivedfuture).
+
+````dart
+var futureBeacon = Beacon.future(() async => 1);
+
+await Future.delayed(k1ms);
+
+expect(futureBeacon.value.unwrapValue(), 1);
+
+futureBeacon.overrideWith(() async => throw Exception('error'));
+
+await Future.delayed(k1ms);
+
+expect(futureBeacon.value, isA<AsyncError>());
+``
 
 ### Beacon.list:
 
 Creates a `ListBeacon` with an initial list value.
-This beacon manages a list of items, allowing for reactive updates and manipulations of the list.
+The `ListBeacon` provides methods to add, remove, and update items in the list and notifies listeners without having to make a copy.
+
+_NB_: The `previousValue` and current value will always be the same because the same list is being mutated. If you need access to the previousValue, use Beacon.writable<List>([]) instead.
 
 ```dart
 var nums = Beacon.list<int>([1, 2, 3]);
@@ -453,7 +478,7 @@ Beacon.createEffect(() {
 nums.add(4); // Outputs: [1, 2, 3, 4]
 
 nums.remove(2); // Outputs: [1, 3, 4]
-```
+````
 
 ### myWritable.wrap(anyBeacon):
 
@@ -482,6 +507,59 @@ print(bufferBeacon.buffer); // Outputs: [5, 5]
 count.value = 10;
 
 print(bufferBeacon.buffer); // Outputs: [5, 5, 10, 10]
+```
+
+### AsyncValue:
+
+An `AsyncValue` is a wrapper around a value that can be in one of four states:`idle`, `loading`, `data`, or `error`.
+This is the value type of [FutureBeacons](#beaconfuture),[DerivedFutureBeacons](#beaconderivedfuture) and [StreamBeacons](#beaconstream).
+
+```dart
+var myBeacon = Beacon.future(() async {
+  return await Future.delayed(Duration(seconds: 1), () => 'Hello');
+});
+
+print(myBeacon.value); // Outputs AsyncLoading immediately
+
+await Future.delayed(Duration(seconds: 1));
+
+print(myBeacon.value); // Outputs AsyncData('Hello')
+```
+
+#### AsyncValue.unwrapValue():
+
+Casts this [AsyncValue] to [AsyncData] and return it's value. This will throw an error if the value is not an [AsyncData].
+
+```dart
+var name = AsyncData('Bob');
+print(name.unwrapValue()); // Outputs: Bob
+
+name = AsyncLoading();
+print(name.unwrapValue()); // Throws error
+```
+
+#### AsyncValue.lastData:
+
+Returns the latest valid data value or null. This is useful when you want to display the last valid value while loading new data.
+
+```dart
+var myBeacon = Beacon.future(() async {
+  return await Future.delayed(Duration(seconds: 1), () => 'Hello');
+});
+
+print(myBeacon.value); // Outputs AsyncLoading immediately
+
+print(myBeacon.value.lastData); // Outputs null as there is no valid data yet
+
+await Future.delayed(Duration(seconds: 1));
+
+print(myBeacon.value.lastData); // Outputs 'Hello'
+
+myBeacon.reset();
+
+print(myBeacon.value); // Outputs AsyncLoading
+
+print(myBeacon.value.lastData); // Outputs 'Hello' as the last valid data when in loading state
 ```
 
 ### Beacon.family:
