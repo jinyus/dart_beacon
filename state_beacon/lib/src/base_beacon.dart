@@ -36,6 +36,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       _value = initialValue;
       _isEmpty = false;
     }
+    BeaconObserver.instance?.onCreate(this, _isEmpty);
   }
 
   bool get isNullable => null is T;
