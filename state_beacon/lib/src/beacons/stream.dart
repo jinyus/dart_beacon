@@ -1,6 +1,6 @@
 part of '../base_beacon.dart';
 
-class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
+class StreamBeacon<T> extends AsyncBeacon<T> {
   StreamBeacon(
     this._stream, {
     this.cancelOnError = false,
@@ -14,6 +14,7 @@ class StreamBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   StreamSubscription<T>? _subscription;
   VoidCallback? _cancelAwaitedSubscription;
 
+  @override
   Future<T> toFuture() {
     final existing = Awaited.find<T, StreamBeacon<T>>(this);
     if (existing != null) {

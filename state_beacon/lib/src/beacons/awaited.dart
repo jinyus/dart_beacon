@@ -1,7 +1,5 @@
 part of '../base_beacon.dart';
 
-typedef AsyncBeacon<T> = ReadableBeacon<AsyncValue<T>>;
-
 class Awaited<T, S extends AsyncBeacon<T>>
     extends ReadableBeacon<Completer<T>> {
   late final S _futureBeacon;

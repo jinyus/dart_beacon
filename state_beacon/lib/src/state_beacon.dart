@@ -3,7 +3,6 @@
 import 'package:state_beacon/src/beacons/family.dart';
 import 'package:state_beacon/src/untracked.dart';
 
-import 'async_value.dart';
 import 'base_beacon.dart';
 import 'common.dart';
 
@@ -427,12 +426,13 @@ abstract class Beacon {
   /// }
   /// ```
   static FutureBeacon<T> derivedFuture<T>(
-    Future<T> Function() compute, {
+    FutureCallback<T> compute, {
     bool manualStart = false,
     bool cancelRunning = true,
     String? debugLabel,
   }) {
     final beacon = DerivedFutureBeacon<T>(
+      compute,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
     )..setDebugLabel(debugLabel ?? 'DerivedFutureBeacon<$T>');
@@ -441,14 +441,7 @@ abstract class Beacon {
       // beacon is manually triggered if in idle state
       if (beacon.status.value == DerivedFutureStatus.idle) return;
 
-      // start loading and get the execution ID
-      final exeID = beacon.$startLoading();
-      try {
-        final result = await compute();
-        beacon.$setAsyncValue(exeID, AsyncData(result));
-      } catch (e, s) {
-        beacon.$setAsyncValue(exeID, AsyncError(e, s));
-      }
+      await beacon.run();
     });
 
     beacon.$setInternalEffectUnsubscriber(unsub);

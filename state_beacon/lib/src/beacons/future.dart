@@ -1,9 +1,11 @@
 part of '../base_beacon.dart';
 
-abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
+typedef FutureCallback<T> = Future<T> Function();
+
+abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   var _executionID = 0;
 
-  final bool cancelRunning;
+  final bool _cancelRunning;
   AsyncValue<T>? _previousAsyncValue;
 
   /// Alias for peek().lastData. Returns the last data that was successfully loaded
@@ -12,26 +14,34 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   @override
   AsyncValue<T>? get previousValue => _previousAsyncValue;
 
-  FutureBeacon({this.cancelRunning = true, AsyncValue<T>? initialValue})
-      : super(initialValue);
+  FutureCallback<T> _operation;
 
+  FutureBeacon(
+    this._operation, {
+    bool cancelRunning = true,
+    AsyncValue<T>? initialValue,
+  })  : _cancelRunning = cancelRunning,
+        super(initialValue);
+
+  /// Starts executing an idle [Future]
+  ///
+  /// NB: Must only be called once
+  ///
+  /// Use [reset] to restart the [Future]
   void start();
 
-  /// Internal method to start loading
-  @protected
-  int $startLoading() {
+  int _startLoading() {
     _setValue(
       AsyncLoading()..setLastData(lastData),
     );
     return ++_executionID;
   }
 
-  /// Internal method to set the value
-  @protected
-  void $setAsyncValue(int exeID, AsyncValue<T> value) {
+  void _setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
-    if (cancelRunning && exeID != _executionID) return;
+    // if cancelRunning is true
+    if (_cancelRunning && exeID != _executionID) return;
 
     if (value is AsyncData) {
       if (lastData != null) {
@@ -49,7 +59,7 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   VoidCallback? _cancelAwaitedSubscription;
 
-  /// Exposes this as a [Future] that can be awaited inside another [FutureBeacon].
+  /// Exposes this as a [Future] that can be awaited inside another [BaseFutureBeacon].
   /// var count = Beacon.writable(0);
   /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
   ///
@@ -63,6 +73,7 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   ///
   ///   return '$fname $lname';
   /// });
+  @override
   Future<T> toFuture() {
     final existing = Awaited.find<T, FutureBeacon<T>>(this);
     if (existing != null) {
@@ -77,6 +88,22 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     return newAwaited.future;
   }
 
+  Future<void> _run() async {
+    final currentExeID = _startLoading();
+
+    try {
+      final result = await _operation();
+      return _setAsyncValue(currentExeID, AsyncData(result));
+    } catch (e, s) {
+      return _setAsyncValue(currentExeID, AsyncError(e, s));
+    }
+  }
+
+  void overrideWith(FutureCallback<T> compute) {
+    _operation = compute;
+    reset();
+  }
+
   @override
   void dispose() {
     _previousAsyncValue = null;
@@ -88,42 +115,24 @@ abstract class FutureBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
 class DefaultFutureBeacon<T> extends FutureBeacon<T> {
   DefaultFutureBeacon(
-    this._operation, {
+    super.operation, {
     bool manualStart = false,
     super.cancelRunning = true,
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
-    if (!manualStart) _init();
+    if (!manualStart) _run();
   }
-
-  final Future<T> Function() _operation;
 
   /// Resets the beacon by calling the [Future] again
   @override
   void reset() {
     _executionID++; // ignore any running futures
-    _init();
+    _run();
   }
 
-  /// Starts executing an idle [Future]
-  ///
-  /// NB: Must only be called once
-  ///
-  /// Use [reset] to restart the [Future]
   @override
   void start() {
     // can only start once
     if (peek() is! AsyncIdle) return;
-    _init();
-  }
-
-  Future<void> _init() async {
-    final currentExeID = $startLoading();
-
-    try {
-      final result = await _operation();
-      return $setAsyncValue(currentExeID, AsyncData(result));
-    } catch (e, s) {
-      return $setAsyncValue(currentExeID, AsyncError(e, s));
-    }
+    _run();
   }
 }
