@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+import '../../common.dart';
+import '../async_value_test.dart';
+
 void main() {
   test('should change to AsyncData on successful future resolution', () async {
     var completer = Completer<String>();
@@ -18,8 +21,9 @@ void main() {
   });
 
   test('should change to AsyncError on future error', () async {
-    var futureBeacon =
-        Beacon.future<String>(() async => throw Exception('error'));
+    var futureBeacon = Beacon.future<String>(
+      () async => throw Exception('error'),
+    );
     await Future.delayed(Duration(milliseconds: 100));
     expect(futureBeacon.value, isA<AsyncError>());
 
@@ -73,5 +77,23 @@ void main() {
     final value = futureBeacon.value.unwrapValue();
 
     expect(value, equals(1));
+  });
+
+  test('should override internal function', () async {
+    var futureBeacon = Beacon.future(() async => testFuture(false));
+
+    expect(futureBeacon.value.isLoading, isTrue);
+
+    await Future.delayed(k1ms);
+
+    expect(futureBeacon.value.unwrapValue(), 1);
+
+    futureBeacon.overrideWith(() async => testFuture(true));
+
+    expect(futureBeacon.value.isLoading, isTrue);
+
+    await Future.delayed(k1ms);
+
+    expect(futureBeacon.value, isA<AsyncError>());
   });
 }

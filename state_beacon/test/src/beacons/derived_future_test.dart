@@ -240,4 +240,28 @@ void main() {
 
     expect(numsDoubled.value.unwrapValue(), equals([0, 2, 4, 6, 8]));
   });
+
+  test('should override internal function', () async {
+    var count = Beacon.writable(1);
+
+    var futureBeacon = Beacon.derivedFuture(() async {
+      return count.value;
+    });
+
+    expect(futureBeacon.value.isLoading, isTrue);
+
+    await Future.delayed(k1ms);
+
+    expect(futureBeacon.value.unwrapValue(), 1);
+
+    futureBeacon.overrideWith(() async {
+      return count.value * 2;
+    });
+
+    expect(futureBeacon.value.isLoading, isTrue);
+
+    await Future.delayed(k1ms);
+
+    expect(futureBeacon.value.unwrapValue(), 2);
+  });
 }
