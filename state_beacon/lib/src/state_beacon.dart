@@ -452,9 +452,9 @@ abstract class Beacon {
   /// Creates a `ListBeacon` with an initial list value.
   /// This beacon manages a list of items, allowing for reactive updates and manipulations of the list.
   ///
-  /// The `ListBeacon` provides methods to add, remove, and update items in the list in a way that can be
-  /// observed by listeners. This is useful for managing collections of data that need to be dynamically
-  /// updated and tracked in an application.
+  /// The `ListBeacon` provides methods to add, remove, and update items in the list and notifies listeners without having to make a copy.
+  ///
+  /// NB: The `previousValue` and current value will always be the same because the same list is being mutated. If you need access to the previousValue, use Beacon.writable<List>([]) instead.
   ///
   /// Example:
   /// ```dart
