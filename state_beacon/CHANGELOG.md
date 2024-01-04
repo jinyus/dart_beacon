@@ -3,6 +3,9 @@
 -   Mdd debugLabel to beacons
 -   Add BeaconObserver and LoggingObserver classes
 -   Add FutureBeacon.overrideWith() to replace the internal callback
+-   Add `AsyncValue.isData` and `AsyncValue.isError` getters
+-   Add shortcuts: `FutureBeacon.isData` and `FutureBeacon.isError` and `FutureBeacon.unwrapValue()`
+-   [Breaking] `AsyncValue.unwrapValue()` is now `AsyncValue.unwrap()`
 -   [Breaking] Make initialValue named argument for lazy beacons
 -   [Breaking] Make `filter` a named argument for FilteredBeacon
 -   [Breaking] Make `initialValue` required for ListBeacon
