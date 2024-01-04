@@ -6,13 +6,9 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   var _executionID = 0;
 
   final bool _cancelRunning;
-  AsyncValue<T>? _previousAsyncValue;
 
   /// Alias for peek().lastData. Returns the last data that was successfully loaded
   T? get lastData => _value.lastData;
-
-  @override
-  AsyncValue<T>? get previousValue => _previousAsyncValue;
 
   FutureCallback<T> _operation;
 
@@ -43,17 +39,11 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     // if cancelRunning is true
     if (_cancelRunning && exeID != _executionID) return;
 
-    if (value is AsyncData) {
-      if (lastData != null) {
-        // if _lastData == null, then it's the first time we are getting data,
-        // so we wouldn't have a previous value.
-
-        // ignore: null_check_on_nullable_type_parameter
-        _previousAsyncValue = AsyncData(lastData!);
-      }
-    } else if (value is AsyncError) {
+    if (value is AsyncError) {
+      // If the value is an error, we want to keep the last data
       value.setLastData(lastData);
     }
+
     _setValue(value, force: true);
   }
 
@@ -99,6 +89,7 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
   }
 
+  /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
     _operation = compute;
     reset();
@@ -106,7 +97,6 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
 
   @override
   void dispose() {
-    _previousAsyncValue = null;
     _cancelAwaitedSubscription?.call();
     Awaited.remove(this);
     super.dispose();
