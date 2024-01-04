@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_cart/src/const.dart';
+import 'package:shopping_cart/src/models/models.dart';
 import 'package:shopping_cart/src/models/product.dart';
 
 class CatalogService {
-  Future<List<Product>> load() => Future.delayed(
+  Future<Catalog> load() => Future.delayed(
       k100ms * 8,
-      () => [
+      () => Catalog([
             Product(price: 42, id: 0, color: Colors.red, name: 'Red Car'),
             Product(price: 53, id: 1, color: Colors.green, name: 'Green Car'),
             Product(price: 58, id: 2, color: Colors.blue, name: 'Blue Car'),
@@ -23,5 +24,5 @@ class CatalogService {
             Product(price: 104, id: 12, color: Colors.brown, name: 'Brown Car'),
             Product(price: 30, id: 13, color: Colors.grey, name: 'Grey Car'),
             Product(price: 62, id: 15, color: Colors.black, name: 'Black Car'),
-          ]);
+          ]));
 }

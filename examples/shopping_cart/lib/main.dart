@@ -10,6 +10,7 @@ import 'src/app.dart';
 
 void main() async {
   // BeaconObserver.instance = LoggingObserver(includeLabels: ['cart']);
+
   // you could use Provider or GetIt to provide the controllers to widgets
   // instead of passing them through the contructor
   final cartService = CartService();

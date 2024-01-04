@@ -12,10 +12,7 @@ class CatalogController {
   final CatalogService _catalogService;
 
   late final catalog = Beacon.future(
-    () async {
-      final catalog = await _catalogService.load();
-      return Catalog(catalog);
-    },
+    _catalogService.load,
     manualStart: true,
   );
 
@@ -23,6 +20,8 @@ class CatalogController {
     switch (event) {
       case CatalogEvent.started:
         catalog.start();
+      case CatalogEvent.refresh:
+        catalog.reset();
     }
   }
 }
