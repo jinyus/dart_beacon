@@ -12,8 +12,8 @@ void main() async {
   // BeaconObserver.instance = LoggingObserver(includeLabels: ['cart']);
   // you could use Provider or GetIt to provide the controllers to widgets
   // instead of passing them through the contructor
-  final cartServer = CartService();
-  final cartController = CartController(cartServer);
+  final cartService = CartService();
+  final cartController = CartController(cartService);
 
   final catalogService = CatalogService();
   final catalogController = CatalogController(catalogService);
