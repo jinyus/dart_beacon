@@ -1,3 +1,4 @@
 enum CatalogEvent {
   started,
+  refresh,
 }

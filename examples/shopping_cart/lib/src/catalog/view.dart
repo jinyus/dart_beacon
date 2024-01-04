@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shopping_cart/src/cart/controller.dart';
 import 'package:shopping_cart/src/cart/events.dart';
+import 'package:shopping_cart/src/catalog/events.dart';
 import 'package:shopping_cart/src/models/product.dart';
 import 'package:state_beacon/state_beacon.dart';
 import 'controller.dart';
@@ -20,34 +23,47 @@ class CatalogView extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final cols = _getCrossAxisCount(screenWidth);
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          CatalogAppBar(cartController: cartController),
-          const SliverToBoxAdapter(child: SizedBox(height: 12)),
-          switch (state) {
-            AsyncError() => const SliverFillRemaining(
-                child: Text('Something went wrong!'),
-              ),
-            AsyncData(value: final catalog) => SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: cols,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 1.0,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => CatalogGridItem(
-                    catalog.getByPosition(index),
-                    cartController: cartController,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          controller.dispatch(CatalogEvent.refresh);
+        },
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },
+          ),
+          child: CustomScrollView(
+            slivers: [
+              CatalogAppBar(cartController: cartController),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              switch (state) {
+                AsyncError() => const SliverFillRemaining(
+                    child: Text('Something went wrong!'),
                   ),
-                  childCount: catalog.products.length,
-                ),
-              ),
-            _ => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-          },
-        ],
+                AsyncData(value: final catalog) => SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: cols,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 1.0,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => CatalogGridItem(
+                        catalog.getByPosition(index),
+                        cartController: cartController,
+                      ),
+                      childCount: catalog.products.length,
+                    ),
+                  ),
+                _ => const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+              },
+            ],
+          ),
+        ),
       ),
     );
   }
