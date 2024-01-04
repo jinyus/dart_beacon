@@ -1,6 +1,5 @@
 // ignore_for_file: invalid_return_type_for_catch_error
 
-import 'package:shopping_cart/src/models/models.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 import 'events.dart';
