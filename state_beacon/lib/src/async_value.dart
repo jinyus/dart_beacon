@@ -26,12 +26,18 @@ sealed class AsyncValue<T> {
 
   /// Casts this [AsyncValue] to [AsyncData] and return it's value
   /// or throws [CastError] if this is not [AsyncData].
-  T unwrapValue() {
+  T unwrap() {
     return (this as AsyncData<T>).value;
   }
 
   /// Returns `true` if this is [AsyncLoading] or [AsyncIdle].
   bool get isLoading => this is AsyncLoading || this is AsyncIdle;
+
+  /// Returns `true` if this is [AsyncData].
+  bool get isData => this is AsyncData;
+
+  /// Returns `true` if this is [AsyncError].
+  bool get isError => this is AsyncError;
 
   /// Executes the future provided and returns [AsyncData] with the result if successful
   /// or [AsyncError] if an exception is thrown.

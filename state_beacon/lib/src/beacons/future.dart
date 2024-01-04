@@ -19,6 +19,18 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   })  : _cancelRunning = cancelRunning,
         super(initialValue);
 
+  /// Casts its value to [AsyncData] and return it's value or throws [CastError] if this is not [AsyncData].
+  T unwrapValue() => _value.unwrap();
+
+  /// Returns `true` if this is [AsyncLoading] or [AsyncIdle].
+  bool get isLoading => _value.isLoading;
+
+  /// Returns `true` if this is [AsyncData].
+  bool get isData => _value.isData;
+
+  /// Returns `true` if this is [AsyncError].
+  bool get isError => _value.isError;
+
   /// Starts executing an idle [Future]
   ///
   /// NB: Must only be called once
@@ -39,7 +51,7 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     // if cancelRunning is true
     if (_cancelRunning && exeID != _executionID) return;
 
-    if (value is AsyncError) {
+    if (value.isError) {
       // If the value is an error, we want to keep the last data
       value.setLastData(lastData);
     }

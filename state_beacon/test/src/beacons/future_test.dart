@@ -52,7 +52,7 @@ void main() {
 
     expect(futureBeacon.value, isA<AsyncData<int>>());
 
-    final value = futureBeacon.value.unwrapValue();
+    final value = futureBeacon.value.unwrap();
 
     expect(value, equals(2));
   });
@@ -74,28 +74,26 @@ void main() {
 
     await Future.delayed(Duration(milliseconds: 10));
 
-    expect(futureBeacon.value, isA<AsyncData<int>>());
+    expect(futureBeacon.isData, isTrue);
 
-    final value = futureBeacon.value.unwrapValue();
-
-    expect(value, equals(1));
+    expect(futureBeacon.unwrapValue(), equals(1));
   });
 
   test('should override internal function', () async {
     var futureBeacon = Beacon.future(() async => testFuture(false));
 
-    expect(futureBeacon.value.isLoading, isTrue);
+    expect(futureBeacon.isLoading, isTrue);
 
     await Future.delayed(k1ms);
 
-    expect(futureBeacon.value.unwrapValue(), 1);
+    expect(futureBeacon.unwrapValue(), 1);
 
     futureBeacon.overrideWith(() async => testFuture(true));
 
-    expect(futureBeacon.value.isLoading, isTrue);
+    expect(futureBeacon.isLoading, isTrue);
 
     await Future.delayed(k1ms);
 
-    expect(futureBeacon.value, isA<AsyncError>());
+    expect(futureBeacon.isError, isTrue);
   });
 }

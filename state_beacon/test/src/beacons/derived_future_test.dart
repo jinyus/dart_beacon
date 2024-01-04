@@ -41,7 +41,7 @@ void main() {
 
     await Future.delayed(k10ms);
 
-    expect(plus1.value.unwrapValue(), equals(1));
+    expect(plus1.value.unwrap(), equals(1));
 
     expect(plus1Status.value, DerivedFutureStatus.running);
 
@@ -90,7 +90,7 @@ void main() {
 
     await Future.delayed(k10ms * 2);
 
-    expect(fullName.value.unwrapValue(), 'Sally 0 Smith 1');
+    expect(fullName.value.unwrap(), 'Sally 0 Smith 1');
 
     count.increment();
 
@@ -98,7 +98,7 @@ void main() {
 
     await Future.delayed(k10ms * 3);
 
-    expect(fullName.value.unwrapValue(), 'Sally 1 Smith 1');
+    expect(fullName.value.unwrap(), 'Sally 1 Smith 1');
 
     count2.increment();
 
@@ -106,7 +106,7 @@ void main() {
 
     await Future.delayed(k10ms * 3);
 
-    expect(fullName.value.unwrapValue(), 'Sally 1 Smith 2');
+    expect(fullName.value.unwrap(), 'Sally 1 Smith 2');
   });
 
   test('should return error when dependency throws error', () async {
@@ -131,7 +131,7 @@ void main() {
 
     await Future.delayed(k10ms * 1.1);
 
-    expect(greeting.value.unwrapValue(), 'Hello Sally 0');
+    expect(greeting.value.unwrap(), 'Hello Sally 0');
 
     count.increment();
 
@@ -230,7 +230,7 @@ void main() {
 
     await Future.delayed(k10ms * 2);
 
-    expect(numsDoubled.value.unwrapValue(), equals([0, 2, 4]));
+    expect(numsDoubled.value.unwrap(), equals([0, 2, 4]));
 
     count.value = 5;
 
@@ -238,7 +238,7 @@ void main() {
 
     await Future.delayed(k10ms * 2);
 
-    expect(numsDoubled.value.unwrapValue(), equals([0, 2, 4, 6, 8]));
+    expect(numsDoubled.value.unwrap(), equals([0, 2, 4, 6, 8]));
   });
 
   test('should override internal function', () async {
@@ -252,7 +252,7 @@ void main() {
 
     await Future.delayed(k1ms);
 
-    expect(futureBeacon.value.unwrapValue(), 1);
+    expect(futureBeacon.value.unwrap(), 1);
 
     futureBeacon.overrideWith(() async {
       return count.value * 2;
@@ -262,6 +262,6 @@ void main() {
 
     await Future.delayed(k1ms);
 
-    expect(futureBeacon.value.unwrapValue(), 2);
+    expect(futureBeacon.value.unwrap(), 2);
   });
 }

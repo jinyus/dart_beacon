@@ -19,7 +19,7 @@ void main() {
         called++;
       } else if (called < 3) {
         expect(myBeacon.previousValue, isA<AsyncData<int>>());
-        expect(value.unwrapValue(), equals(called));
+        expect(value.unwrap(), equals(called));
 
         if (called == 2) {
           myBeacon.unsubscribe();

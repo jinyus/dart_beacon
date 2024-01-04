@@ -32,7 +32,7 @@ void main() {
 
     await Future.delayed(k10ms * 2.1);
 
-    expect(doubled.value.unwrapValue(), '20');
+    expect(doubled.value.unwrap(), '20');
 
     var tripled = family(3);
 
@@ -40,7 +40,7 @@ void main() {
 
     await Future.delayed(k10ms * 2.1);
 
-    expect(tripled.value.unwrapValue(), '30');
+    expect(tripled.value.unwrap(), '30');
 
     counter.increment();
 
@@ -49,8 +49,8 @@ void main() {
 
     await Future.delayed(k10ms * 4);
 
-    expect(doubled.value.unwrapValue(), '22');
-    expect(tripled.value.unwrapValue(), '33');
+    expect(doubled.value.unwrap(), '22');
+    expect(tripled.value.unwrap(), '33');
   });
 
   // Test for caching behavior

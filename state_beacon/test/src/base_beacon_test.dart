@@ -80,7 +80,7 @@ void main() {
 
       expect(beacon.value, isA<AsyncLoading>());
       await Future.delayed(k1ms);
-      expect(beacon.value.unwrapValue(), equals(0));
+      expect(beacon.value.unwrap(), equals(0));
 
       count.set(1);
 
@@ -89,7 +89,7 @@ void main() {
 
       await Future.delayed(k1ms);
 
-      expect(beacon.value.unwrapValue(), equals(2));
+      expect(beacon.value.unwrap(), equals(2));
 
       count.set(5);
 
@@ -98,7 +98,7 @@ void main() {
 
       await Future.delayed(k1ms);
 
-      expect(beacon.value.unwrapValue(), equals(10));
+      expect(beacon.value.unwrap(), equals(10));
     });
 
     test('should set previous and initial values - debounced', () async {
