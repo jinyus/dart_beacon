@@ -35,11 +35,6 @@ Future<List<String>> _fetchItems(int pageNum) async {
 }
 
 class Controller {
-  Controller() {
-    // prevent the pageNum from changing when the list is loading
-    pageNum.setFilter((_, __) => rawItems.value is! AsyncLoading);
-  }
-
   final pageNum = Beacon.filtered(1);
 
   // this re-executes the future when the pageNum changes
@@ -47,32 +42,40 @@ class Controller {
     () => _fetchItems(pageNum.value),
   );
 
-  late final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]).wrap(
-    rawItems,
-    then: (beacon, newAsyncValue) {
-      // get the current list
-      final newList = beacon.peek().toList();
+  late final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]);
 
-      // remove the last item if it's an ItemLoading or ItemError
-      if (newList.last is! ItemData) {
-        newList.removeLast();
-      }
+  Controller() {
+    // prevent the pageNum from changing when the list is loading
+    pageNum.setFilter((_, __) => rawItems.value is! AsyncLoading);
 
-      beacon.value = switch (newAsyncValue) {
-        // if the new value is AsyncData<List<String>>, add the items to the list
-        AsyncData<List<String>>(value: final lst) => newList
-          ..addAll(lst.map(ItemData.new))
-          ..add(ItemLoading()),
+    // transform raw items into ListItems
+    parsedItems.wrap(
+      rawItems,
+      then: (beacon, newAsyncValue) {
+        // get the current list
+        final newList = beacon.peek().toList();
 
-        // if the new value is AsyncError, add the error to the list
-        AsyncError(error: final err) => newList..add(ItemError(err)),
+        // remove the last item if it's an ItemLoading or ItemError
+        if (newList.last is! ItemData) {
+          newList.removeLast();
+        }
 
-        // if the new value is AsyncLoading, add the loading indicator to the list
-        _ => newList..add(ItemLoading()),
-      };
-    },
-    startNow: false,
-  );
+        beacon.value = switch (newAsyncValue) {
+          // if the new value is AsyncData<List<String>>, add the items to the list
+          AsyncData<List<String>>(value: final lst) => newList
+            ..addAll(lst.map(ItemData.new))
+            ..add(ItemLoading()),
+
+          // if the new value is AsyncError, add the error to the list
+          AsyncError(error: final err) => newList..add(ItemError(err)),
+
+          // if the new value is AsyncLoading, add the loading indicator to the list
+          _ => newList..add(ItemLoading()),
+        };
+      },
+      startNow: false,
+    );
+  }
 }
 
 // you could use Provider or GetIt to provide the controller to the widget tree
@@ -163,31 +166,31 @@ class _BottomWidgetState extends State<BottomWidget> {
   );
   @override
   Widget build(BuildContext context) {
-    if (widget.error != null) {
-      const style = TextStyle(fontSize: 20);
-      return widget.error is NoMoreItemsException
-          ? const Text(
-              'No More Items',
-              style: style,
-              textAlign: TextAlign.center,
-            )
-          : Column(
-              children: [
-                Text(
-                  widget.error?.toString() ?? 'Unknown Error',
-                  style: style,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 5),
-                ElevatedButton(
-                  style: btnStyle,
-                  onPressed: controller.rawItems.reset,
-                  child: const Text('retry'),
-                )
-              ],
-            );
+    if (widget.error == null) {
+      return const Center(child: CircularProgressIndicator());
     }
 
-    return const Center(child: CircularProgressIndicator());
+    const style = TextStyle(fontSize: 20);
+    return widget.error is NoMoreItemsException
+        ? const Text(
+            'No More Items',
+            style: style,
+            textAlign: TextAlign.center,
+          )
+        : Column(
+            children: [
+              Text(
+                widget.error?.toString() ?? 'Unknown Error',
+                style: style,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 5),
+              ElevatedButton(
+                style: btnStyle,
+                onPressed: controller.rawItems.reset,
+                child: const Text('retry'),
+              )
+            ],
+          );
   }
 }

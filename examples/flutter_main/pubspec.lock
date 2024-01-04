@@ -142,7 +142,7 @@ packages:
       path: "../../state_beacon"
       relative: true
     source: path
-    version: "0.13.5"
+    version: "0.17.0"
   stream_channel:
     dependency: transitive
     description:
