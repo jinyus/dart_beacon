@@ -472,6 +472,24 @@ abstract class Beacon {
       ListBeacon<T>(initialValue)
         ..setDebugLabel(debugLabel ?? 'ListBeacon<$T>');
 
+  /// Creates a `SetBeacon` with an initial set value.
+  /// This beacon manages a set of items, allowing for reactive updates and manipulations of the set.
+  ///
+  /// The `SetBeacon` provides methods to add, remove, and update items in the set and notifies listeners without having to make a copy.
+  static SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? debugLabel}) =>
+      SetBeacon<T>(initialValue)..setDebugLabel(debugLabel ?? 'SetBeacon<$T>');
+
+  /// Creates a `MapBeacon` with an initial map value.
+  /// This beacon manages a map of items, allowing for reactive updates and manipulations of the map.
+  ///
+  /// The `MapBeacon` provides methods to add, remove, and update items in the map and notifies listeners without having to make a copy.
+  static MapBeacon<K, V> hashMap<K, V>(
+    Map<K, V> initialValue, {
+    String? debugLabel,
+  }) =>
+      MapBeacon<K, V>(initialValue)
+        ..setDebugLabel(debugLabel ?? 'MapBeacon<$K,$V>');
+
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///

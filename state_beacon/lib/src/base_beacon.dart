@@ -24,6 +24,8 @@ part 'beacons/readable.dart';
 part 'beacons/future.dart';
 part 'beacons/stream.dart';
 part 'beacons/list.dart';
+part 'beacons/set.dart';
+part 'beacons/map.dart';
 part 'beacons/derived.dart';
 part 'beacons/derived_future.dart';
 part 'beacons/value_notifier.dart';
