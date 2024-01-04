@@ -94,6 +94,8 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
 -   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
+    -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
+    -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
     -   [unwrapValue](#asyncvalueunwrapvalue): Casts this [AsyncValue] to [AsyncData] and return it's value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
@@ -447,7 +449,7 @@ myBeacon.subscribe((value) {
 Replaces the current callback and resets the beacon by running the new callback.
 This can also be done with [DerivedFutureBeacons](#beaconderivedfuture).
 
-````dart
+```dart
 var futureBeacon = Beacon.future(() async => 1);
 
 await Future.delayed(k1ms);
@@ -459,14 +461,21 @@ futureBeacon.overrideWith(() async => throw Exception('error'));
 await Future.delayed(k1ms);
 
 expect(futureBeacon.value, isA<AsyncError>());
-``
+```
 
 ### Beacon.list:
 
-Creates a `ListBeacon` with an initial list value.
 The `ListBeacon` provides methods to add, remove, and update items in the list and notifies listeners without having to make a copy.
 
 _NB_: The `previousValue` and current value will always be the same because the same list is being mutated. If you need access to the previousValue, use Beacon.writable<List>([]) instead.
+
+#### Beacon.hashSet:
+
+Similar to Beacon.list(), but for Sets and Maps.
+
+#### Beacon.hashMap:
+
+Similar to Beacon.list(), but for Sets and Maps.
 
 ```dart
 var nums = Beacon.list<int>([1, 2, 3]);
@@ -478,7 +487,7 @@ Beacon.createEffect(() {
 nums.add(4); // Outputs: [1, 2, 3, 4]
 
 nums.remove(2); // Outputs: [1, 3, 4]
-````
+```
 
 ### myWritable.wrap(anyBeacon):
 
