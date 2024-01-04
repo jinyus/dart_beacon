@@ -16,9 +16,13 @@ class LoggingObserver implements BeaconObserver {
 
   LoggingObserver({this.includeLabels});
 
+  // this is tested with mocks
+  // dont want to print to console in tests
+  // coverage:ignore-start
+
   @override
   void onUpdate(BaseBeacon beacon) {
-    if (!_shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.debugLabel)) return;
 
     debugPrint(
       '''
@@ -31,20 +35,21 @@ Beacon updated:
 
   @override
   void onDispose(BaseBeacon beacon) {
-    if (!_shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.debugLabel)) return;
 
     debugPrint('Beacon disposed: ${beacon.debugLabel}\n');
   }
 
   @override
   void onCreate(BaseBeacon beacon, bool lazy) {
-    if (!_shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.debugLabel)) return;
 
     final lazyLabel = lazy ? 'Lazy' : '';
     debugPrint('${lazyLabel}Beacon created: ${beacon.debugLabel}\n');
   }
+  // coverage:ignore-end
 
-  bool _shouldContinue(String label) {
+  bool shouldContinue(String label) {
     if (includeLabels == null) return true;
     return includeLabels?.contains(label) ?? false;
   }
