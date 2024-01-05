@@ -12,11 +12,11 @@ class CartController {
 
   final CartService _cartService;
 
-  final _removingItem = Beacon.list<Product>([]);
-  ReadableBeacon<List<Product>> get removingIndex => _removingItem;
+  final _removingItem = Beacon.hashSet<Product>({});
+  ReadableBeacon<Set<Product>> get removingIndex => _removingItem;
 
-  final _addingItem = Beacon.list<Product>([]);
-  ReadableBeacon<List<Product>> get addingItem => _addingItem;
+  final _addingItem = Beacon.hashSet<Product>({});
+  ReadableBeacon<Set<Product>> get addingItem => _addingItem;
 
   late final _cart = Beacon.writable<AsyncValue<Cart>>(AsyncIdle());
   ReadableBeacon<AsyncValue<Cart>> get cart => _cart;

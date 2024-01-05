@@ -61,6 +61,7 @@ class CartList extends StatelessWidget {
             }
             final isRemoving =
                 controller.removingIndex.watch(context).contains(item);
+
             return Material(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
