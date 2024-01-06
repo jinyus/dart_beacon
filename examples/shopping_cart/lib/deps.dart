@@ -8,15 +8,15 @@ import 'package:shopping_cart/src/catalog/service.dart';
 
 // You can use your preferred dependency injection library to
 // provide instrances to your widgets.
-final cartService = LiteRef(create: () => CartService());
+final cartService = Ref.singleton(create: () => CartService());
 
-final cartController = LiteRef(
+final cartController = Ref.singleton(
   create: () => CartController(cartService())..dispatch(CartStarted()),
 );
 
-final catalogService = LiteRef(create: () => CatalogService());
+final catalogService = Ref.singleton(create: () => CatalogService());
 
-final catalogController = LiteRef(
+final catalogController = Ref.singleton(
   create: () {
     return CatalogController(catalogService())..dispatch(CatalogEvent.started);
   },

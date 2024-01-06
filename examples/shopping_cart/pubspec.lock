@@ -100,10 +100,10 @@ packages:
     dependency: "direct main"
     description:
       name: lite_ref
-      sha256: df20544e11e3e92ddcbbb289718642fbc4e600b49d6ade4cd62f1d33ad731df8
+      sha256: f2cec03f3c6fb06397fbfa3187470f8e07e8190db2b7407f40b8ce73b4a79858
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.2"
+    version: "0.2.0"
   matcher:
     dependency: transitive
     description:
