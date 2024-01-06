@@ -1,24 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:shopping_cart/src/cart/controller.dart';
+import 'package:shopping_cart/deps.dart';
 import 'package:shopping_cart/src/cart/events.dart';
 import 'package:shopping_cart/src/catalog/events.dart';
 import 'package:shopping_cart/src/models/product.dart';
 import 'package:state_beacon/state_beacon.dart';
-import 'controller.dart';
 
 class CatalogView extends StatelessWidget {
-  const CatalogView(
-      {super.key, required this.controller, required this.cartController});
+  const CatalogView({super.key});
 
   static const routeName = '/';
 
-  final CatalogController controller;
-  final CartController cartController;
-
   @override
   Widget build(BuildContext context) {
+    final controller = catalogController.instance;
     final state = controller.catalog.watch(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final cols = _getCrossAxisCount(screenWidth);
@@ -36,7 +32,7 @@ class CatalogView extends StatelessWidget {
           ),
           child: CustomScrollView(
             slivers: [
-              CatalogAppBar(cartController: cartController),
+              const CatalogAppBar(),
               const SliverToBoxAdapter(child: SizedBox(height: 12)),
               switch (state) {
                 AsyncError() => const SliverFillRemaining(
@@ -52,7 +48,6 @@ class CatalogView extends StatelessWidget {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => CatalogGridItem(
                         catalog.getByPosition(index),
-                        cartController: cartController,
                       ),
                       childCount: catalog.products.length,
                     ),
@@ -70,10 +65,9 @@ class CatalogView extends StatelessWidget {
 }
 
 class CatalogGridItem extends StatelessWidget {
-  const CatalogGridItem(this.item, {super.key, required this.cartController});
+  const CatalogGridItem(this.item, {super.key});
 
   final Product item;
-  final CartController cartController;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +89,7 @@ class CatalogGridItem extends StatelessWidget {
               Icons.directions_car_sharp, // Replace with actual item icon
               color: item.color,
             ),
-            AddButton(item: item, cartController: cartController),
+            AddButton(item: item),
           ],
         ),
       ),
@@ -104,16 +98,14 @@ class CatalogGridItem extends StatelessWidget {
 }
 
 class AddButton extends StatelessWidget {
-  const AddButton(
-      {required this.item, super.key, required this.cartController});
+  const AddButton({required this.item, super.key});
 
   final Product item;
-  final CartController cartController;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final state = cartController.cart.watch(context);
+    final state = cartController().cart.watch(context);
 
     return switch (state) {
       AsyncError() => const Text('Something went wrong!'),
@@ -121,8 +113,9 @@ class AddButton extends StatelessWidget {
           builder: (context) {
             final cart = state.lastData!;
             final isInCart = cart.items.contains(item);
-            final isAdding =
-                cartController.addingItem.watch(context).contains(item);
+            final isAdding = cartController.instance.addingItem
+                .watch(context)
+                .contains(item);
             final btnChild = isAdding
                 ? const CircularProgressIndicator()
                 : const Text('ADD');
@@ -136,7 +129,7 @@ class AddButton extends StatelessWidget {
                   minimumSize: const Size(100, 50)),
               onPressed: isInCart || isAdding
                   ? null
-                  : () => cartController.dispatch(CartItemAdded(item)),
+                  : () => cartController.instance.dispatch(CartItemAdded(item)),
               child: isInCart
                   ? const Icon(Icons.check, semanticLabel: 'ADDED')
                   : btnChild,
@@ -149,13 +142,11 @@ class AddButton extends StatelessWidget {
 }
 
 class CatalogAppBar extends StatelessWidget {
-  const CatalogAppBar({super.key, required this.cartController});
-
-  final CartController cartController;
+  const CatalogAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cart = cartController.cart.watch(context);
+    final cart = cartController().cart.watch(context);
     final count = cart.lastData?.items.length ?? 0;
 
     return SliverAppBar(

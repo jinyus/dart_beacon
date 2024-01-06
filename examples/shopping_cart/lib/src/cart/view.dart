@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_cart/deps.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-import 'controller.dart';
 import 'events.dart';
 
 const loadingIndicator = Center(child: CircularProgressIndicator());
 
 class CartView extends StatelessWidget {
-  const CartView({super.key, required this.controller});
+  const CartView({super.key});
 
   static const routeName = '/cart';
-
-  final CartController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -20,16 +18,16 @@ class CartView extends StatelessWidget {
       appBar: AppBar(title: const Text('Cart')),
       body: ColoredBox(
         color: Colors.grey.shade800,
-        child: Column(
+        child: const Column(
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: CartList(controller),
+                padding: EdgeInsets.all(32),
+                child: CartList(),
               ),
             ),
-            const Divider(height: 4, color: Colors.black),
-            CartTotal(controller),
+            Divider(height: 4, color: Colors.black),
+            CartTotal(),
           ],
         ),
       ),
@@ -38,15 +36,13 @@ class CartView extends StatelessWidget {
 }
 
 class CartList extends StatelessWidget {
-  const CartList(this.controller, {super.key});
-
-  final CartController controller;
+  const CartList({super.key});
 
   @override
   Widget build(BuildContext context) {
     final itemNameStyle = Theme.of(context).textTheme.titleLarge;
 
-    final state = controller.cart.watch(context);
+    final state = cartController().cart.watch(context);
 
     return switch (state) {
       AsyncData() ||
@@ -60,7 +56,7 @@ class CartList extends StatelessWidget {
               return const SizedBox.shrink();
             }
             final isRemoving =
-                controller.removingIndex.watch(context).contains(item);
+                cartController().removingIndex.watch(context).contains(item);
 
             return Material(
               shape: RoundedRectangleBorder(
@@ -82,7 +78,7 @@ class CartList extends StatelessWidget {
                     onPressed: isRemoving
                         ? null
                         : () {
-                            controller.dispatch(CartItemRemoved(item));
+                            cartController().dispatch(CartItemRemoved(item));
                           },
                   ),
                 ),
@@ -97,9 +93,7 @@ class CartList extends StatelessWidget {
 }
 
 class CartTotal extends StatelessWidget {
-  const CartTotal(this.controller, {super.key});
-
-  final CartController controller;
+  const CartTotal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +103,7 @@ class CartTotal extends StatelessWidget {
         ?.copyWith(fontSize: 48)
         .copyWith(color: Colors.white);
 
-    final state = controller.cart.watch(context);
+    final state = cartController().cart.watch(context);
 
     return SizedBox(
       height: 200,
