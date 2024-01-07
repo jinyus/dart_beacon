@@ -1,3 +1,7 @@
+## 0.18.0
+
+-   [Breaking] remove forceSetValue from DerivedBeacon public api
+
 ## 0.17.1
 
 -   Make conditional listening configurable for `Beacon.createEffect` ,`Beacon.derived` and `Beacon.derivedFuture`
