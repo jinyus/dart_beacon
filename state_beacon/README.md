@@ -77,6 +77,7 @@ class FutureCounter extends StatelessWidget {
 ## Features
 
 -   [Beacon.writable](#beaconwritable): Read and write values.
+    -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
 -   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
 -   [Beacon.doBatchUpdate](#beacondobatchupdate): Batch multiple updates into a single notification.
@@ -116,6 +117,16 @@ print(counter.value); // 10
 ### Beacon.lazyWritable:
 
 Like `Beacon.writable` but behaves like a `late` variable. It must be set before it's read.
+
+### Beacon.scopedWritable:
+
+Returns a `ReadableBeacon` and a function for setting its value.
+This is useful for creating a beacon that's readable by the public,
+but writable only by the owner.
+
+```dart
+var (count,setCount) = Beacon.scopedWritable(15);
+```
 
 #### NB: All writable beacons have a lazy counterpart.
 
@@ -535,16 +546,16 @@ await Future.delayed(Duration(seconds: 1));
 print(myBeacon.value); // Outputs AsyncData('Hello')
 ```
 
-#### AsyncValue.unwrapValue():
+#### AsyncValue.unwrap():
 
 Casts this [AsyncValue] to [AsyncData] and return it's value. This will throw an error if the value is not an [AsyncData].
 
 ```dart
 var name = AsyncData('Bob');
-print(name.unwrapValue()); // Outputs: Bob
+print(name.unwrap()); // Outputs: Bob
 
 name = AsyncLoading();
-print(name.unwrapValue()); // Throws error
+print(name.unwrap()); // Throws error
 ```
 
 #### AsyncValue.lastData:

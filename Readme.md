@@ -546,16 +546,16 @@ await Future.delayed(Duration(seconds: 1));
 print(myBeacon.value); // Outputs AsyncData('Hello')
 ```
 
-#### AsyncValue.unwrapValue():
+#### AsyncValue.unwrap():
 
 Casts this [AsyncValue] to [AsyncData] and return it's value. This will throw an error if the value is not an [AsyncData].
 
 ```dart
 var name = AsyncData('Bob');
-print(name.unwrapValue()); // Outputs: Bob
+print(name.unwrap()); // Outputs: Bob
 
 name = AsyncLoading();
-print(name.unwrapValue()); // Throws error
+print(name.unwrap()); // Throws error
 ```
 
 #### AsyncValue.lastData:
