@@ -46,7 +46,7 @@ abstract class Beacon {
       ReadableBeacon<T>(initialValue)
         ..setDebugLabel(debugLabel ?? 'Readable<$T>');
 
-  /// Returns a `ReadableBeacon` and a function that allows writing to the beacon.
+  /// Returns a `ReadableBeacon` and a function for setting its value.
   /// This is useful for creating a beacon that's readable by the public,
   /// but writable only by the owner.
   ///
