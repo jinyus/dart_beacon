@@ -34,6 +34,40 @@ void main() {
     expect(called, equals(6));
   });
 
+  test('should continue listening to unused beacons', () {
+    final name = Beacon.writable("Bob");
+    final age = Beacon.writable(20);
+    final college = Beacon.writable("MIT");
+
+    var called = 0;
+    Beacon.createEffect(
+      () {
+        called++;
+        // ignore: unused_local_variable
+        var msg = '${name.value} is ${age.value} years old';
+
+        if (age.value > 21) {
+          msg += ' and can go to ${college.value}';
+        }
+
+        // print(msg);
+      },
+      supportConditional: false,
+    );
+
+    name.value = "Alice";
+    age.value = 21;
+    college.value = "Stanford";
+    age.value = 22;
+    college.value = "Harvard";
+    age.value = 18;
+
+    // Should still listen to college beacon even if age is less than 21
+    college.value = "Yale";
+
+    expect(called, equals(7));
+  });
+
   test('should run when a dependency changes', () {
     var beacon = Beacon.writable<int>(10);
     var effectCalled = false;
