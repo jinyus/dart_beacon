@@ -382,7 +382,7 @@ abstract class Beacon {
     String? debugLabel,
     bool supportConditional = true,
   }) {
-    final beacon = DerivedBeacon<T>(manualStart: manualStart)
+    final beacon = WritableDerivedBeacon<T>(manualStart: manualStart)
       ..setDebugLabel(debugLabel ?? 'DerivedBeacon<$T>');
 
     final unsub = effect(
@@ -390,7 +390,7 @@ abstract class Beacon {
         // beacon is manually triggered if in idle state
         if (beacon.status.value == DerivedStatus.idle) return;
 
-        beacon.forceSetValue(compute());
+        beacon.$forceSet(compute());
       },
       supportConditional: supportConditional,
     );

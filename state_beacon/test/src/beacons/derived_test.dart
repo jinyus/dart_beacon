@@ -9,10 +9,14 @@ void main() {
 
     final _ = Beacon.derived(() {
       effectCount++;
-      return beacon.peek();
+      return beacon.value;
     });
 
     expect(effectCount, 1);
+
+    beacon.increment();
+
+    expect(effectCount, 2);
   });
 
   test('should not run immediately', () {
@@ -23,6 +27,10 @@ void main() {
       effectCount++;
       return beacon.peek();
     }, manualStart: true);
+
+    expect(effectCount, 0);
+
+    beacon.increment();
 
     expect(effectCount, 0);
 
