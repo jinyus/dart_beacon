@@ -9,10 +9,6 @@ mixin DerivedMixin<T> on ReadableBeacon<T> {
     _unsubscribe = unsubscribe;
   }
 
-  void forceSetValue(T newValue) {
-    _setValue(newValue, force: true);
-  }
-
   @override
   void dispose() {
     _unsubscribe();
@@ -20,16 +16,21 @@ mixin DerivedMixin<T> on ReadableBeacon<T> {
   }
 }
 
-class DerivedBeacon<T> extends ReadableBeacon<T> with DerivedMixin<T> {
-  DerivedBeacon({bool manualStart = false}) {
+// this is only used internally
+class WritableDerivedBeacon<T> extends ReadableBeacon<T>
+    with DerivedMixin<T>
+    implements DerivedBeacon<T> {
+  WritableDerivedBeacon({bool manualStart = false}) {
     _status = WritableBeacon(
       manualStart ? DerivedStatus.idle : DerivedStatus.running,
     );
   }
 
   late final WritableBeacon<DerivedStatus> _status;
+  @override
   ReadableBeacon<DerivedStatus> get status => _status;
 
+  @override
   void start() {
     if (_status.peek() != DerivedStatus.idle) {
       throw DerivedBeaconStartedTwiceException();
@@ -37,9 +38,21 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with DerivedMixin<T> {
     _status.value = DerivedStatus.running;
   }
 
+  void $forceSet(T newValue) {
+    _setValue(newValue, force: true);
+  }
+
   @override
   void dispose() {
     _status.dispose();
     super.dispose();
   }
+}
+
+abstract class DerivedBeacon<T> extends ReadableBeacon<T> {
+  /// Starts the derived beacon if `manualStart` was set to `true`.
+  void start();
+
+  /// Returns the status (`idle` or `running`) of the derived beacon.
+  ReadableBeacon<DerivedStatus> get status;
 }
