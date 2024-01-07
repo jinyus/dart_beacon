@@ -79,6 +79,9 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   /// Returns the current value without subscribing to the beacon.
   T peek() => _value;
 
+  /// Equivalent to calling [value] getter.
+  T call() => value;
+
   /// Returns the current value and subscribes to changes in the beacon
   /// when used within a [Beacon.createEffect] or [Beacon.derived].
   @override
