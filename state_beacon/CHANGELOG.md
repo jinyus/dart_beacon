@@ -1,3 +1,7 @@
+## 0.18.1
+
+-   [Feature] Make beacons callable(`beacon()`) as an alternative to `beacon.value`
+
 ## 0.18.0
 
 -   [Breaking] remove forceSetValue from DerivedBeacon public api
