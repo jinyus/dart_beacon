@@ -9,7 +9,7 @@ void main() {
 
     final _ = Beacon.derived(() {
       effectCount++;
-      return beacon.value;
+      return beacon();
     });
 
     expect(effectCount, 1);
@@ -25,7 +25,7 @@ void main() {
 
     final derived = Beacon.derived(() {
       effectCount++;
-      return beacon.peek();
+      return beacon.call();
     }, manualStart: true);
 
     expect(effectCount, 0);

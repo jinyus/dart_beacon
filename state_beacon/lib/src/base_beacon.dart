@@ -56,11 +56,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   T? _previousValue;
   late final T _initialValue;
   final _listeners = Listeners();
-
-  T? get previousValue => _previousValue;
-  T get initialValue => _initialValue;
-  int get listenersCount => _listeners.length;
-
   final List<VoidCallback> _disposeCallbacks = [];
   var _isDisposed = false;
   bool get isDisposed => _isDisposed;
@@ -72,8 +67,23 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
   // coverage:ignore-end
 
+  /// Returns the previous value without subscribing to the beacon.
+  T? get previousValue => _previousValue;
+
+  /// Returns the initial value without subscribing to the beacon.
+  T get initialValue => _initialValue;
+
+  /// Returns true if the beacon has been initialized.
+  int get listenersCount => _listeners.length;
+
+  /// Returns the current value without subscribing to the beacon.
   T peek() => _value;
 
+  /// Equivalent to calling [value] getter.
+  T call() => value;
+
+  /// Returns the current value and subscribes to changes in the beacon
+  /// when used within a [Beacon.createEffect] or [Beacon.derived].
   @override
   T get value {
     if (_isEmpty) {
