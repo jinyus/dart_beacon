@@ -98,7 +98,7 @@ class FutureCounter extends StatelessWidget {
     -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
     -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
-    -   [unwrapValue](#asyncvalueunwrapvalue): Casts this [AsyncValue] to [AsyncData] and return it's value.
+    -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return it's value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 
@@ -465,7 +465,7 @@ var futureBeacon = Beacon.future(() async => 1);
 
 await Future.delayed(k1ms);
 
-expect(futureBeacon.value.unwrapValue(), 1);
+expect(futureBeacon.value.unwrap(), 1);
 
 futureBeacon.overrideWith(() async => throw Exception('error'));
 
@@ -482,11 +482,11 @@ _NB_: The `previousValue` and current value will always be the same because the 
 
 #### Beacon.hashSet:
 
-Similar to Beacon.list(), but for Sets and Maps.
+Similar to Beacon.list(), but for Sets.
 
 #### Beacon.hashMap:
 
-Similar to Beacon.list(), but for Sets and Maps.
+Similar to Beacon.list(), but for Maps.
 
 ```dart
 var nums = Beacon.list<int>([1, 2, 3]);
