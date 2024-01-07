@@ -1,3 +1,7 @@
+## 0.17.1
+
+-   Make conditional listening configurable for `Beacon.createEffect` ,`Beacon.derived` and `Beacon.derivedFuture`
+
 ## 0.17.0
 
 -   Mdd debugLabel to beacons

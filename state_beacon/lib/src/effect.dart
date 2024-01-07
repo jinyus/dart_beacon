@@ -10,12 +10,13 @@ final Set<EffectClosure> _listenersToPingAfterBatchJob = {};
 class _Effect {
   final Set<Listeners> dependencies;
   late final EffectClosure func;
+  final bool _supportConditional;
 
-  _Effect() : dependencies = <Listeners>{};
+  _Effect(this._supportConditional) : dependencies = <Listeners>{};
 
   VoidCallback execute(Function fn) {
     func = EffectClosure(() {
-      _cleanup(this);
+      if (_supportConditional) _cleanup(this);
       _effectStack.add(this);
       try {
         fn();
@@ -41,8 +42,8 @@ class _Effect {
   }
 }
 
-VoidCallback effect(Function fn) {
-  final effect = _Effect();
+VoidCallback effect(Function fn, {bool supportConditional = true}) {
+  final effect = _Effect(supportConditional);
   return effect.execute(fn);
 }
 

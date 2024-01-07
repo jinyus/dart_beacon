@@ -361,6 +361,10 @@ abstract class Beacon {
   ///
   /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
+  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// Defaults to `true`.
+  ///
   /// Example:
   /// ```dart
   /// final age = Beacon.writable<int>(18);
@@ -376,16 +380,20 @@ abstract class Beacon {
     T Function() compute, {
     bool manualStart = false,
     String? debugLabel,
+    bool supportConditional = true,
   }) {
     final beacon = DerivedBeacon<T>(manualStart: manualStart)
       ..setDebugLabel(debugLabel ?? 'DerivedBeacon<$T>');
 
-    final unsub = effect(() {
-      // beacon is manually triggered if in idle state
-      if (beacon.status.value == DerivedStatus.idle) return;
+    final unsub = effect(
+      () {
+        // beacon is manually triggered if in idle state
+        if (beacon.status.value == DerivedStatus.idle) return;
 
-      beacon.forceSetValue(compute());
-    });
+        beacon.forceSetValue(compute());
+      },
+      supportConditional: supportConditional,
+    );
 
     beacon.$setInternalEffectUnsubscriber(unsub);
 
@@ -400,6 +408,10 @@ abstract class Beacon {
   ///
   /// If `cancelRunning` is `true`, the results of a current execution will be discarded
   /// if another execution is triggered before the current one finishes.
+  ///
+  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// Defaults to `true`.
   ///
   /// Example:
   /// ```dart
@@ -430,6 +442,7 @@ abstract class Beacon {
     bool manualStart = false,
     bool cancelRunning = true,
     String? debugLabel,
+    bool supportConditional = true,
   }) {
     final beacon = DerivedFutureBeacon<T>(
       compute,
@@ -437,12 +450,15 @@ abstract class Beacon {
       cancelRunning: cancelRunning,
     )..setDebugLabel(debugLabel ?? 'DerivedFutureBeacon<$T>');
 
-    final unsub = effect(() async {
-      // beacon is manually triggered if in idle state
-      if (beacon.status.value == DerivedFutureStatus.idle) return;
+    final unsub = effect(
+      () async {
+        // beacon is manually triggered if in idle state
+        if (beacon.status.value == DerivedFutureStatus.idle) return;
 
-      await beacon.run();
-    });
+        await beacon.run();
+      },
+      supportConditional: supportConditional,
+    );
 
     beacon.$setInternalEffectUnsubscriber(unsub);
 
@@ -493,6 +509,10 @@ abstract class Beacon {
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///
+  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// Defaults to `true`.
+  ///
   /// Example:
   /// ```dart
   /// final age = Beacon.writable(15);
@@ -509,8 +529,11 @@ abstract class Beacon {
   ///
   /// age.value = 20; // Outputs: "You can vote!"
   /// ```
-  static VoidCallback createEffect(Function fn) {
-    return effect(fn);
+  static VoidCallback createEffect(
+    Function fn, {
+    bool supportConditional = true,
+  }) {
+    return effect(fn, supportConditional: supportConditional);
   }
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.
