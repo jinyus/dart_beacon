@@ -12,7 +12,7 @@ void main() {
     Beacon.createEffect(() {
       called++;
       // ignore: unused_local_variable
-      var msg = '${name.value} is ${age.value} years old';
+      var msg = '${name()} is ${age()} years old';
 
       if (age.value > 21) {
         msg += ' and can go to ${college.value}';
@@ -74,7 +74,7 @@ void main() {
 
     Beacon.createEffect(() {
       effectCalled = true;
-      beacon.value; // Dependency
+      beacon(); // Dependency
     });
 
     // Should be true immediately after createEffect
@@ -109,7 +109,7 @@ void main() {
     Beacon.createEffect(() {
       effectCalled = true;
       beacon1.value;
-      beacon2.value; // Multiple dependencies
+      beacon2(); // Multiple dependencies
     });
 
     beacon1.value = 15; // Changing one of the dependencies
