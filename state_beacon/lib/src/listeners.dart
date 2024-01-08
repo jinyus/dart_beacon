@@ -42,8 +42,10 @@ class Listeners {
     _list.clear();
   }
 
+  // coverage:ignore-start
   @override
   String toString() {
     return _list.toString();
   }
+  // coverage:ignore-end
 }

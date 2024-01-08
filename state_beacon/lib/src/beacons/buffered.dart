@@ -40,7 +40,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     if (_wrapped.containsKey(target.hashCode)) return this;
 
     if (then == null && U != T) {
-      throw WrapTargetWrongTypeException();
+      throw WrapTargetWrongTypeException(debugLabel, target.debugLabel);
     }
 
     final fn = then ?? ((b, val) => b.add(val as T));

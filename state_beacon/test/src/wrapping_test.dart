@@ -85,19 +85,17 @@ void main() {
 
     expect(() => wrapper.wrap(original),
         throwsA(isA<WrapTargetWrongTypeException>()));
+
+    try {
+      bufWrapper.wrap(original);
+    } catch (e) {
+      expect(e, isA<WrapTargetWrongTypeException>());
+      expect(e.toString(), contains(bufWrapper.debugLabel));
+    }
+
     expect(
       () => bufWrapper.wrap(original),
       throwsA(isA<WrapTargetWrongTypeException>()),
-    );
-  });
-
-  test('should throw when derived is started twice', () {
-    var count = Beacon.readable<int>(2);
-    var asText = Beacon.derived<String>(() => count.value.toString());
-
-    expect(
-      () => asText.start(),
-      throwsA(isA<DerivedBeaconStartedTwiceException>()),
     );
   });
 

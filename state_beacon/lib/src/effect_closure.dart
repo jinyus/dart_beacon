@@ -17,8 +17,10 @@ class EffectClosure {
     return other is EffectClosure && other.id == id;
   }
 
+  // coverage:ignore-start
   @override
   String toString() => 'EffectClosure(id: $id)';
+  // coverage:ignore-end
 }
 
 // Callback add: 277ms

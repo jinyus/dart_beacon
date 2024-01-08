@@ -1,47 +1,34 @@
 part of 'base_beacon.dart';
 
 class UninitializeLazyReadException implements Exception {
-  final String message = 'Lazy beacon read before its value was set';
+  late final String message;
 
-  UninitializeLazyReadException();
+  UninitializeLazyReadException(String label)
+      : message = '$label was read before being initialized. '
+            'You must either provide an initial value or set the value before reading it.';
 
   @override
   String toString() => 'UninitializeLazyReadException: $message';
 }
 
 class CircularDependencyException implements Exception {
-  final String message =
-      'Cycle Detected: Effects/DerivedBeacons cannot mutate values they depend on';
+  late final String message;
 
-  CircularDependencyException();
+  CircularDependencyException(String label)
+      : message = 'Circular dependency detected in $label. '
+            'Effects/DerivedBeacons cannot mutate values they depend on. '
+            'You might want to wrap the mutation in a `Beacon.untracked()`';
 
   @override
   String toString() => 'CircularDependencyException: $message';
 }
 
-// class FutureStartedTwiceException implements Exception {
-//   final String message = 'FutureBeacon.start() must only be called once';
-
-//   FutureStartedTwiceException();
-
-//   @override
-//   String toString() => 'FutureStartedTwiceException: $message';
-// }
-
-class DerivedBeaconStartedTwiceException implements Exception {
-  final String message = 'DerivedBeacon.start() must only be called once';
-
-  DerivedBeaconStartedTwiceException();
-
-  @override
-  String toString() => 'DerivedBeaconStartedTwiceException: $message';
-}
-
 class WrapTargetWrongTypeException implements Exception {
-  final String message =
-      'The type of the target beacon must be the same as the type of the wrapper beacon if no `then` function is provided';
-
-  WrapTargetWrongTypeException();
+  late final String message;
+  WrapTargetWrongTypeException(String consumerLabel, String targetLabel)
+      : message =
+            '$consumerLabel cannot wrap $targetLabel as they are not of the same type. '
+                'If you want to wrap a beacon of a different type, you must provide a `then` function';
 
   @override
   String toString() => 'WrapTargetWrongTypeException: $message';

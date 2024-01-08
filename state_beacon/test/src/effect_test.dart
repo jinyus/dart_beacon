@@ -160,6 +160,7 @@ void main() {
       });
     } catch (e) {
       expect(e, isA<CircularDependencyException>());
+      expect(e.toString(), contains('batch'));
     }
   });
 }

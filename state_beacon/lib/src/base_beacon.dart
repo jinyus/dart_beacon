@@ -12,6 +12,7 @@ import 'effect_closure.dart';
 import 'listeners.dart';
 
 part 'effect.dart';
+part 'batch.dart';
 part 'exceptions.dart';
 part 'beacons/debounced.dart';
 part 'beacons/undo_redo.dart';
@@ -87,7 +88,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   @override
   T get value {
     if (_isEmpty) {
-      throw UninitializeLazyReadException();
+      throw UninitializeLazyReadException(debugLabel);
     }
 
     if (isRunningUntracked()) {
@@ -159,7 +160,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
     if (currentEffect != null) {
       if (_listeners.contains(currentEffect.func)) {
-        throw CircularDependencyException();
+        throw CircularDependencyException(debugLabel);
       }
     }
 
