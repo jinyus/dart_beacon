@@ -18,6 +18,30 @@ void main() {
     expect(callCount, equals(1));
   });
 
+  test('should not break beacon state when exception is thrown', () {
+    final age = Beacon.writable<int>(10);
+    var callCount = 0;
+    age.subscribe((_) => callCount++);
+
+    expect(
+      () => Beacon.doBatchUpdate(() {
+        age.value = 15;
+        age.value = 16;
+        age.value = 20;
+        age.value = 23;
+        throw Exception('Something went wrong');
+      }),
+      throwsException,
+    );
+
+    expect(callCount, equals(0));
+
+    // this should still work
+    age.increment();
+
+    expect(callCount, equals(1));
+  });
+
   test('should only notify once for nested batched updates', () {
     final age = Beacon.writable<int>(10);
     var callCount = 0;
