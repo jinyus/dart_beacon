@@ -32,9 +32,7 @@ class WritableDerivedBeacon<T> extends ReadableBeacon<T>
 
   @override
   void start() {
-    if (_status.peek() != DerivedStatus.idle) {
-      throw DerivedBeaconStartedTwiceException();
-    }
+    if (_status.peek() != DerivedStatus.idle) return;
     _status.value = DerivedStatus.running;
   }
 

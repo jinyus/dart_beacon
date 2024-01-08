@@ -91,16 +91,6 @@ void main() {
     );
   });
 
-  test('should throw when derived is started twice', () {
-    var count = Beacon.readable<int>(2);
-    var asText = Beacon.derived<String>(() => count.value.toString());
-
-    expect(
-      () => asText.start(),
-      throwsA(isA<DerivedBeaconStartedTwiceException>()),
-    );
-  });
-
   test('should dispose internal status when disposed', () {
     var count = Beacon.readable<int>(2);
     var asText = Beacon.derived<String>(() => count.value.toString());
