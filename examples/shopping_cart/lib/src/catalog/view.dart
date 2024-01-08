@@ -113,9 +113,11 @@ class AddButton extends StatelessWidget {
           builder: (context) {
             final cart = state.lastData!;
             final isInCart = cart.items.contains(item);
+
             final isAdding = cartController.instance.addingItem
                 .watch(context)
                 .contains(item);
+
             final btnChild = isAdding
                 ? const CircularProgressIndicator()
                 : const Text('ADD');
@@ -157,6 +159,7 @@ class CatalogAppBar extends StatelessWidget {
         Stack(
           children: [
             IconButton(
+              key: const Key('cart_button'),
               icon: const Icon(Icons.shopping_cart),
               onPressed: () => Navigator.of(context).pushNamed('/cart'),
             ),
