@@ -45,45 +45,51 @@ void main() {
     when(() => cartC.cart).thenReturn(_mockCart);
     when(() => cartC.addingItem).thenReturn(_addingItem);
     when(() => cartC.removingIndex).thenReturn(_removingItem);
-
     when(() => catalogC.catalog).thenReturn(_mockCatalog);
 
     await tester.pumpWidget(const MyApp());
 
-    await tester.pump();
-
+    // catalog loading
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
+    // simulate catalog error
     _mockCatalog.value = AsyncError('error', StackTrace.empty);
 
     await tester.pump();
 
     expect(find.text('Something went wrong!'), findsOneWidget);
 
+    // simulate catalog data
     _mockCatalog.value = AsyncData(_sampleCatalog);
 
     await tester.pump();
 
     expect(find.byType(CatalogGridItem), findsExactly(2));
 
+    // simulate cart error
     _mockCart.value = AsyncError('error', StackTrace.empty);
 
     await tester.pump();
 
+    // add to cart buttons should display error
     expect(find.text('Something went wrong!'), findsExactly(2));
 
+    // simulate cart loading
     _mockCart.value = AsyncIdle();
 
     await tester.pump();
 
+    // add to cart buttons should display loading
     expect(find.byType(CircularProgressIndicator), findsExactly(2));
 
     _mockCart.value = AsyncData(_sampleCart);
 
     await tester.pumpAndSettle();
 
+    // add to cart buttons should display add
     expect(find.text('ADD'), findsExactly(2));
 
+    // simulate adding item to cart
     _sampleCart.items.add(products[0]);
 
     _mockCart.value = AsyncLoading();
@@ -96,6 +102,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
+    // one button should have ADD and the other should have a check
     expect(find.text('ADD'), findsOneWidget);
 
     // added item
@@ -138,7 +145,7 @@ void main() {
 
     expect(find.byType(ListTile), findsNWidgets(2));
 
-    //total
+    // total
     expect(find.text('\$${_sampleCart.totalPrice}'), findsOneWidget);
 
     _mockCart.value = AsyncError('error', StackTrace.empty);
