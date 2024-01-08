@@ -41,7 +41,7 @@ void main() {
   catalogController.overrideWith(() => catalogC);
   cartController.overrideWith(() => cartC);
 
-  testWidgets('should display a string of text', (WidgetTester tester) async {
+  testWidgets('Full app test', (WidgetTester tester) async {
     when(() => cartC.cart).thenReturn(_mockCart);
     when(() => cartC.addingItem).thenReturn(_addingItem);
     when(() => cartC.removingIndex).thenReturn(_removingItem);
