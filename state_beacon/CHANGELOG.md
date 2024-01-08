@@ -1,3 +1,8 @@
+## 0.18.2
+
+-   [Fix] batch opperations that threw errors would leave the beacon in an inconsistent state.
+-   [Breaking] start requests to derived beacons that were already started will now be ignored instead of throwing an error
+
 ## 0.18.1
 
 -   [Feature] Make beacons callable(`beacon()`) as an alternative to `beacon.value`
