@@ -15,15 +15,15 @@ dependencies:
         sdk: flutter
     flutter_localizations:
         sdk: flutter
+    lite_ref: 0.3.0
     state_beacon:
         path: ../../state_beacon
-    lite_ref:
 
 dev_dependencies:
+    flutter_lints: ^2.0.0
     flutter_test:
         sdk: flutter
-
-    flutter_lints: ^2.0.0
+    mocktail: ^1.0.2
 
 flutter:
     uses-material-design: true
