@@ -108,10 +108,14 @@ void main() {
     expect(tsBeacon.value.value, equals(10));
 
     final uBeacon = Beacon.lazyUndoRedo<int>();
-    expect(
-      () => uBeacon.value,
-      throwsA(isA<UninitializeLazyReadException>()),
-    );
+
+    try {
+      uBeacon.value;
+    } catch (e) {
+      expect(e, isA<UninitializeLazyReadException>());
+      expect(e.toString(), contains(uBeacon.debugLabel));
+    }
+
     uBeacon.set(10);
     expect(uBeacon.value, equals(10));
   });

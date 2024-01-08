@@ -24,7 +24,7 @@ class WritableBeacon<T> extends ReadableBeacon<T>
     if (_wrapped.containsKey(target.hashCode)) return this;
 
     if (then == null && U != T) {
-      throw WrapTargetWrongTypeException();
+      throw WrapTargetWrongTypeException(debugLabel, target.debugLabel);
     }
 
     final fn = then ?? ((wb, val) => wb.set(val as T));

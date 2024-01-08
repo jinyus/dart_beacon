@@ -1,11 +1,6 @@
 part of 'base_beacon.dart';
 
 final _effectStack = <_Effect>[];
-var _batchStack = 0;
-
-bool _isRunningBatchJob() => _batchStack > 0;
-
-final Set<EffectClosure> _listenersToPingAfterBatchJob = {};
 
 class _Effect {
   final Set<Listeners> dependencies;
@@ -45,31 +40,6 @@ class _Effect {
 VoidCallback effect(Function fn, {bool supportConditional = true}) {
   final effect = _Effect(supportConditional);
   return effect.execute(fn);
-}
-
-void batch(void Function() compute) {
-  _batchStack++;
-  compute();
-  _batchStack--;
-
-  if (_isRunningBatchJob()) {
-    return;
-  }
-
-  // We don't want to notify the current effect
-  // since that would cause an infinite loop
-  final currentEffect = _Effect.current();
-
-  if (currentEffect != null) {
-    if (_listenersToPingAfterBatchJob.contains(currentEffect.func)) {
-      throw CircularDependencyException();
-    }
-  }
-
-  for (final listener in _listenersToPingAfterBatchJob) {
-    listener.run();
-  }
-  _listenersToPingAfterBatchJob.clear();
 }
 
 void _subscribe(_Effect runningEffect, Listeners subscriptions) {

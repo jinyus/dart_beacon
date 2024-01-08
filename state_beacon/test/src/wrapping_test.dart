@@ -85,6 +85,14 @@ void main() {
 
     expect(() => wrapper.wrap(original),
         throwsA(isA<WrapTargetWrongTypeException>()));
+
+    try {
+      bufWrapper.wrap(original);
+    } catch (e) {
+      expect(e, isA<WrapTargetWrongTypeException>());
+      expect(e.toString(), contains(bufWrapper.debugLabel));
+    }
+
     expect(
       () => bufWrapper.wrap(original),
       throwsA(isA<WrapTargetWrongTypeException>()),
