@@ -11,20 +11,13 @@
 # (the recommended set includes the core lints).
 # The core lints are also what is used by pub.dev for scoring packages.
 
-include: package:lints/recommended.yaml
-
-# Uncomment the following section to specify additional rules.
+# include: package:lints/recommended.yaml
+include: package:austerity/analysis_options.yaml
 
 # linter:
-#   rules:
-#     - camel_case_types
-
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
-
-# For more information about the core and recommended set of lints, see
-# https://dart.dev/go/core-lints
-
-# For additional information about configuring this file, see
-# https://dart.dev/guides/language/analysis-options
+#     rules:
+analyzer:
+    # exclude:
+    #     - path/to/excluded/files/**
+    errors:
+        - always_use_package_imports: ignore
