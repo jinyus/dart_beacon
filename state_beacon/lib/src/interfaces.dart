@@ -29,7 +29,7 @@ abstract class BeaconConsumer<S> {
   /// ```
   S wrap<U>(
     ReadableBeacon<U> target, {
-    Function(S, U)? then,
+    void Function(S, U)? then,
     bool startNow = true,
   });
 
