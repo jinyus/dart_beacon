@@ -89,6 +89,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// resubscribes to the internal stream
   @override
   void reset() {
+    _setValue(initialValue);
     _init();
   }
 
