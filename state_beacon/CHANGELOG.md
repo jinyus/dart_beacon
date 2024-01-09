@@ -1,3 +1,7 @@
+## 0.18.5
+
+-   [Breaking] FamilyBeacon are not cached by default
+
 ## 0.18.4
 
 -   [Fix] Cached family beacons are removed from cache when they are disposed
