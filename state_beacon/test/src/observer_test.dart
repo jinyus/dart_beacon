@@ -11,20 +11,20 @@ class MockLogginObserver extends LoggingObserver {
   MockLogginObserver({super.includeLabels});
 
   @override
-  void onCreate(BaseBeacon beacon, bool lazy) {
+  void onCreate(BaseBeacon<dynamic> beacon, bool lazy) {
     if (!shouldContinue(beacon.debugLabel)) return;
     _lazyOnCreate = lazy;
     _onCreateCalled++;
   }
 
   @override
-  void onDispose(BaseBeacon beacon) {
+  void onDispose(BaseBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.debugLabel)) return;
     _onDisposeCalled++;
   }
 
   @override
-  void onUpdate(BaseBeacon beacon) {
+  void onUpdate(BaseBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.debugLabel)) return;
     _onUpdateCalled++;
   }

@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 
 abstract class BeaconObserver {
-  void onCreate(BaseBeacon beacon, bool lazy);
+  void onCreate(BaseBeacon<dynamic> beacon, bool lazy);
 
-  void onUpdate(BaseBeacon beacon);
+  void onUpdate(BaseBeacon<dynamic> beacon);
 
-  void onDispose(BaseBeacon beacon);
+  void onDispose(BaseBeacon<dynamic> beacon);
 
   static BeaconObserver? instance;
 }
@@ -21,7 +21,7 @@ class LoggingObserver implements BeaconObserver {
   // coverage:ignore-start
 
   @override
-  void onUpdate(BaseBeacon beacon) {
+  void onUpdate(BaseBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.debugLabel)) return;
 
     debugPrint(
@@ -34,14 +34,14 @@ Beacon updated:
   }
 
   @override
-  void onDispose(BaseBeacon beacon) {
+  void onDispose(BaseBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.debugLabel)) return;
 
     debugPrint('Beacon disposed: ${beacon.debugLabel}\n');
   }
 
   @override
-  void onCreate(BaseBeacon beacon, bool lazy) {
+  void onCreate(BaseBeacon<dynamic> beacon, bool lazy) {
     if (!shouldContinue(beacon.debugLabel)) return;
 
     final lazyLabel = lazy ? 'Lazy' : '';

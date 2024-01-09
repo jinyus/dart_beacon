@@ -1,3 +1,5 @@
+// ignore_for_file: strict_raw_type
+
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -8,47 +10,47 @@ import '../async_value_test.dart';
 
 void main() {
   test('should change to AsyncData on successful future resolution', () async {
-    var completer = Completer<String>();
-    var futureBeacon = Beacon.future(() async => completer.future);
+    final completer = Completer<String>();
+    final futureBeacon = Beacon.future(() async => completer.future);
 
     completer.complete('result');
     await completer.future; // Wait for the future to complete
 
     expect(futureBeacon.value, isA<AsyncData<String>>());
 
-    var data = futureBeacon.value as AsyncData<String>;
+    final data = futureBeacon.value as AsyncData<String>;
     expect(data.value, equals('result'));
   });
 
   test('should change to AsyncError on future error', () async {
-    var futureBeacon = Beacon.future<String>(
+    final futureBeacon = Beacon.future<String>(
       () async => throw Exception('error'),
     );
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(k10ms);
     expect(futureBeacon.value, isA<AsyncError>());
 
-    var error = futureBeacon.value as AsyncError;
+    final error = futureBeacon.value as AsyncError;
 
     expect(error.error, isA<Exception>());
   });
 
   test('should set initial state to AsyncLoading', () {
-    var futureBeacon = Beacon.future(() async => 'result');
+    final futureBeacon = Beacon.future(() async => 'result');
     expect(futureBeacon.value, isA<AsyncLoading>());
   });
 
   test('should re-executes the future on reset', () async {
     var counter = 0;
 
-    var futureBeacon = Beacon.future(() async => ++counter);
+    final futureBeacon = Beacon.future(() async => ++counter);
 
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(k10ms);
 
     futureBeacon.reset();
 
     expect(futureBeacon.value, isA<AsyncLoading>());
 
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(k10ms);
 
     expect(futureBeacon.value, isA<AsyncData<int>>());
 
@@ -60,11 +62,12 @@ void main() {
   test('should not executes until start() is called', () async {
     var counter = 0;
 
-    var futureBeacon = Beacon.future(() async => ++counter, manualStart: true);
+    final futureBeacon =
+        Beacon.future(() async => ++counter, manualStart: true);
 
     expect(futureBeacon.value, isA<AsyncIdle>());
 
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(counter, 0);
 
@@ -72,7 +75,7 @@ void main() {
 
     expect(futureBeacon.value, isA<AsyncLoading>());
 
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(futureBeacon.isData, isTrue);
 
@@ -80,11 +83,11 @@ void main() {
   });
 
   test('should override internal function', () async {
-    var futureBeacon = Beacon.future(() async => testFuture(false));
+    final futureBeacon = Beacon.future(() async => testFuture(false));
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(futureBeacon.unwrapValue(), 1);
 
@@ -92,7 +95,7 @@ void main() {
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(futureBeacon.isError, isTrue);
   });

@@ -1,3 +1,5 @@
+// ignore_for_file: strict_raw_type
+
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -7,8 +9,8 @@ import '../../common.dart';
 
 void main() {
   test('should emit values', () async {
-    var myStream = Stream.periodic(k10ms, (i) => i);
-    var myBeacon = Beacon.stream(myStream);
+    final myStream = Stream.periodic(k10ms, (i) => i);
+    final myBeacon = Beacon.stream(myStream);
     var called = 0;
 
     myBeacon.subscribe((value) {
@@ -31,7 +33,7 @@ void main() {
       }
     });
 
-    await Future.delayed(k10ms * 5);
+    await Future<void>.delayed(k10ms * 5);
 
     expect(called, equals(3));
   });
@@ -39,34 +41,37 @@ void main() {
   test('should be AsyncError when error is added to stream', () async {
     Stream<int> errorStream() async* {
       yield 1;
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
       yield 2;
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
       yield* Stream.error('error');
     }
 
-    var myBeacon = Beacon.stream(errorStream());
+    final myBeacon = Beacon.stream(errorStream());
 
     var called = 1;
-    myBeacon.subscribe((value) {
-      if (called == 1) {
-        expect(value, isA<AsyncLoading>());
-      } else if (called == 2) {
-        expect(value, isA<AsyncData<int>>());
-      } else if (called == 3) {
-        expect(value, isA<AsyncData<int>>());
-      } else if (called == 4) {
-        expect(value, isA<AsyncError>());
-      } else {
-        throw Exception('Should not have been called');
-      }
-      called++;
-    }, startNow: true);
+    myBeacon.subscribe(
+      (value) {
+        if (called == 1) {
+          expect(value, isA<AsyncLoading>());
+        } else if (called == 2) {
+          expect(value, isA<AsyncData<int>>());
+        } else if (called == 3) {
+          expect(value, isA<AsyncData<int>>());
+        } else if (called == 4) {
+          expect(value, isA<AsyncError>());
+        } else {
+          throw Exception('Should not have been called');
+        }
+        called++;
+      },
+      startNow: true,
+    );
   });
 
   test('should emit raw values', () async {
-    var myStream = Stream.periodic(k1ms, (i) => i + 1);
-    var myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
+    final myStream = Stream.periodic(k1ms, (i) => i + 1);
+    final myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
     var called = 0;
 
     final results = <int?>[];
@@ -85,7 +90,7 @@ void main() {
       called++;
     });
 
-    await Future.delayed(Duration(milliseconds: 50));
+    await Future<void>.delayed(k10ms * 5);
 
     expect(results, [0, 1, 2, 3, 4]);
 
@@ -94,23 +99,28 @@ void main() {
 
   test('should throw is initial value is empty and type is non-nullable',
       () async {
-    var myStream = Stream.periodic(k1ms, (i) => i + 1);
+    final myStream = Stream.periodic(k1ms, (i) => i + 1);
     expect(() => Beacon.streamRaw(myStream), throwsAssertionError);
   });
 
   test('should execute onDone callback', () async {
-    var myStream = Stream.periodic(k10ms, (i) => i + 1).take(3);
+    final myStream = Stream.periodic(k10ms, (i) => i + 1).take(3);
     var called = 0;
     var done = false;
-    var myBeacon = Beacon.streamRaw(myStream, initialValue: 0, onDone: () {
-      done = true;
-    });
+    final myBeacon = Beacon.streamRaw(
+      myStream,
+      initialValue: 0,
+      onDone: () {
+        done = true;
+      },
+    );
 
+    // ignore: cascade_invocations
     myBeacon.subscribe((value) {
       called++;
     });
 
-    await Future.delayed(k10ms * 4);
+    await Future<void>.delayed(k10ms * 4);
 
     expect(called, equals(3));
     expect(done, true);
@@ -120,13 +130,15 @@ void main() {
     final controller = StreamController<int>();
     var listeners = 0;
 
-    var myStream = controller.stream.asBroadcastStream(
+    final myStream = controller.stream.asBroadcastStream(
       onListen: (_) => listeners++,
       onCancel: (_) => listeners--,
     );
 
-    var myRawBeacon = Beacon.streamRaw(myStream, initialValue: 0);
-    var myBeacon = Beacon.stream(myStream);
+    final myRawBeacon = Beacon.streamRaw(myStream, initialValue: 0);
+    final myBeacon = Beacon.stream(myStream);
+
+    await Future<void>.delayed(k1ms);
 
     expect(listeners, 1);
 
@@ -135,7 +147,7 @@ void main() {
 
     controller.add(1);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(myRawBeacon.value, 1);
     expect(myBeacon.value.lastData, 1);
@@ -151,6 +163,6 @@ void main() {
 
     expect(listeners, 0);
 
-    controller.close();
+    await controller.close();
   });
 }

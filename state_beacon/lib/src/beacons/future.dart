@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_function_invocation
+
 part of '../base_beacon.dart';
 
 typedef FutureCallback<T> = Future<T> Function();

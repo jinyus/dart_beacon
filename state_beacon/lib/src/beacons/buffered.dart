@@ -34,7 +34,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   @override
   BufferedBaseBeacon<T> wrap<U>(
     ReadableBeacon<U> target, {
-    Function(BufferedBaseBeacon<T> p1, U p2)? then,
+    void Function(BufferedBaseBeacon<T> p1, U p2)? then,
     bool startNow = true,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return this;

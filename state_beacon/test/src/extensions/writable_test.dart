@@ -77,21 +77,21 @@ void main() {
       emitsInOrder(
         [
           AsyncData(0),
-          AsyncLoading(),
+          AsyncLoading<int>(),
           AsyncData(1),
           // start errorResult
-          AsyncLoading(),
-          isA<AsyncError>(),
+          AsyncLoading<int>(),
+          isA<AsyncError<int>>(),
         ],
       ),
     );
 
     await beacon.tryCatch(() => testFuture(false));
 
-    expect(beacon.value, isA<AsyncData>());
+    expect(beacon.value, isA<AsyncData<int>>());
 
     await beacon.tryCatch(() => testFuture(true));
 
-    expect(beacon.value, isA<AsyncError>());
+    expect(beacon.value, isA<AsyncError<int>>());
   });
 }

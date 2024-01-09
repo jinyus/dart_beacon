@@ -15,7 +15,7 @@ Future<String> counterFuture(int count) async {
   } else if (count < 0) {
     throw Exception('Count($count) cannot be negative');
   }
-  await Future.delayed(Duration(seconds: count));
+  await Future<void>.delayed(Duration(seconds: count));
   return '$count second has passed.';
 }
 

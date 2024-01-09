@@ -45,7 +45,7 @@ void main() {
       var beacon = Beacon.throttled(10, duration: k10ms);
       beacon.set(20);
       expect(beacon.previousValue, equals(10));
-      await Future.delayed(k10ms * 1.1);
+      await Future<void>.delayed(k10ms * 1.1);
       beacon.set(30);
       expect(beacon.previousValue, equals(20));
       expect(beacon.initialValue, 10);
@@ -78,25 +78,25 @@ void main() {
       var count = Beacon.writable(0);
       var beacon = Beacon.derivedFuture(() async => count.value * 2);
 
-      expect(beacon.value, isA<AsyncLoading>());
-      await Future.delayed(k1ms);
+      expect(beacon.value, isA<AsyncLoading<int>>());
+      await Future<void>.delayed(k1ms);
       expect(beacon.value.unwrap(), equals(0));
 
       count.set(1);
 
-      expect(beacon.value, isA<AsyncLoading>());
+      expect(beacon.value, isA<AsyncLoading<int>>());
       expect(beacon.lastData, 0);
 
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
 
       expect(beacon.value.unwrap(), equals(2));
 
       count.set(5);
 
-      expect(beacon.value, isA<AsyncLoading>());
+      expect(beacon.value, isA<AsyncLoading<int>>());
       expect(beacon.lastData, 2);
 
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
 
       expect(beacon.value.unwrap(), equals(10));
     });
@@ -105,11 +105,11 @@ void main() {
       var beacon = Beacon.debounced<int>(5, duration: k10ms);
 
       beacon.set(10);
-      await Future.delayed(k10ms * 1.1);
+      await Future<void>.delayed(k10ms * 1.1);
       expect(beacon.previousValue, equals(5));
 
       beacon.set(15);
-      await Future.delayed(k10ms * 1.1);
+      await Future<void>.delayed(k10ms * 1.1);
       expect(beacon.previousValue, equals(10));
 
       expect(beacon.initialValue, equals(5));

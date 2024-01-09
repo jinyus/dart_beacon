@@ -1,6 +1,6 @@
 import 'package:state_beacon/src/base_beacon.dart';
 
-class BeaconFamily<Arg, BeaconType extends BaseBeacon> {
+class BeaconFamily<Arg, BeaconType extends BaseBeacon<dynamic>> {
   final bool shouldCache;
   late final Map<Arg, BeaconType> _cache;
   final BeaconType Function(Arg) _create;

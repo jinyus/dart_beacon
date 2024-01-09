@@ -39,4 +39,4 @@ class Awaited<T, S extends AsyncBeacon<T>>
   }
 }
 
-final _awaitedBeacons = <AsyncBeacon, Awaited>{};
+final _awaitedBeacons = <AsyncBeacon<dynamic>, Awaited<dynamic, dynamic>>{};

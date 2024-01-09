@@ -3,22 +3,24 @@ import 'package:state_beacon/state_beacon.dart';
 
 void main() {
   test('should set previous and initial values', () {
-    var beacon = Beacon.list([]);
+    final beacon = Beacon.list<int>([]);
+
+    // ignore: cascade_invocations
     beacon.value = [1, 2, 3];
     expect(beacon.previousValue, equals([]));
     beacon.value = [4, 5, 6];
     expect(beacon.previousValue, equals([1, 2, 3]));
-    expect(beacon.initialValue, []);
+    expect(beacon.initialValue, <int>[]);
   });
 
   test('should notify listeners when list is modified', () {
-    var nums = Beacon.list<int>([1, 2, 3]);
+    final nums = Beacon.list<int>([1, 2, 3]);
 
     var called = 0;
 
-    nums.subscribe((_) => called++);
-
-    nums.add(4);
+    nums
+      ..subscribe((_) => called++)
+      ..add(4);
 
     expect(called, 1);
 
@@ -98,7 +100,7 @@ void main() {
 
     expect(nums.value, equals([1, 4, 5]));
 
-    nums.removeWhere((e) => e % 2 == 0);
+    nums.removeWhere((e) => e.isEven);
 
     expect(nums.value, equals([1, 5]));
 
@@ -114,9 +116,9 @@ void main() {
 
     expect(nums.value, equals([1]));
 
-    nums.value = [1, 2, 3, 4];
-
-    nums.setRange(0, 2, [3, 4]);
+    nums
+      ..value = [1, 2, 3, 4]
+      ..setRange(0, 2, [3, 4]);
 
     expect(nums.value, equals([3, 4, 3, 4]));
 

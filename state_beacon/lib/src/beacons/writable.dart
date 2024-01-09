@@ -18,7 +18,7 @@ class WritableBeacon<T> extends ReadableBeacon<T>
   @override
   WritableBeacon<T> wrap<U>(
     ReadableBeacon<U> target, {
-    Function(WritableBeacon<T> beacon, U newValue)? then,
+    void Function(WritableBeacon<T> beacon, U newValue)? then,
     bool startNow = true,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return this;
