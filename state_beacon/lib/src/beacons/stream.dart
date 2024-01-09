@@ -29,17 +29,20 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
     return newAwaited.future;
   }
 
-  /// this is a no-op for streams
+  /// resubscribes to the internal stream
   @override
   void reset() {
-    // noop
+    _setValue(AsyncLoading());
+    _init();
   }
 
+  /// unsubscribes from the internal stream
   void unsubscribe() {
     _subscription?.cancel();
   }
 
   void _init() {
+    _subscription?.cancel();
     _subscription = _stream.listen(
       (value) {
         _setValue(AsyncData(value));
@@ -83,17 +86,20 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
 
   StreamSubscription<T>? _subscription;
 
-  /// this is a no-op for streams
+  /// resubscribes to the internal stream
   @override
   void reset() {
-    // noop
+    _setValue(initialValue);
+    _init();
   }
 
+  /// unsubscribes from the internal stream
   void unsubscribe() {
     _subscription?.cancel();
   }
 
   void _init() {
+    _subscription?.cancel();
     _subscription = _stream.listen(
       (value) {
         _setValue(value);

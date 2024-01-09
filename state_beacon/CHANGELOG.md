@@ -1,3 +1,7 @@
+## 0.18.3
+
+-   StreamBeacon.reset() now sets loading state and resubscribes to the stream
+
 ## 0.18.2
 
 -   [Fix] batch opperations that threw errors would leave the beacon in an inconsistent state.
