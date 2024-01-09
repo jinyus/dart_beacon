@@ -16,13 +16,13 @@ void main() {
 
     var counterMirror = Beacon.derivedFuture(() async {
       var count = counter.value;
-      await Future.delayed(k10ms);
+      await Future<void>.delayed(k10ms);
       return count;
     });
 
     var family = Beacon.family((int arg) => Beacon.derivedFuture(() async {
           var count = await counterMirror.toFuture();
-          await Future.delayed(k10ms);
+          await Future<void>.delayed(k10ms);
           return (count * arg).toString();
         }));
 
@@ -30,7 +30,7 @@ void main() {
 
     expect(doubled.value, AsyncLoading());
 
-    await Future.delayed(k10ms * 2.1);
+    await Future<void>.delayed(k10ms * 2.1);
 
     expect(doubled.value.unwrap(), '20');
 
@@ -38,7 +38,7 @@ void main() {
 
     expect(tripled.value, AsyncLoading());
 
-    await Future.delayed(k10ms * 2.1);
+    await Future<void>.delayed(k10ms * 2.1);
 
     expect(tripled.value.unwrap(), '30');
 
@@ -47,7 +47,7 @@ void main() {
     expect(doubled.value, AsyncLoading());
     expect(tripled.value, AsyncLoading());
 
-    await Future.delayed(k10ms * 4);
+    await Future<void>.delayed(k10ms * 4);
 
     expect(doubled.value.unwrap(), '22');
     expect(tripled.value.unwrap(), '33');

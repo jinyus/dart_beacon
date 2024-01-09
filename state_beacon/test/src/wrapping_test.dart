@@ -146,7 +146,7 @@ void main() {
       }
     });
 
-    await Future.delayed(Duration(milliseconds: 400));
+    await Future<void>.delayed(Duration(milliseconds: 400));
 
     expect(streamCalled, equals(15));
     expect(throttledCalled, equals(1));

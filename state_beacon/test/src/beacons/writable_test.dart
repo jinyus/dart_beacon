@@ -88,7 +88,7 @@ void main() {
       throwsA(isA<UninitializeLazyReadException>()),
     );
     dBeacon.set(10);
-    await Future.delayed(k10ms * 2);
+    await Future<void>.delayed(k10ms * 2);
     expect(dBeacon.value, equals(10));
 
     final tBeacon = Beacon.lazyThrottled<int>(duration: k10ms);
@@ -150,7 +150,7 @@ void main() {
     undoRedoBeacon.set(10, force: true);
     undoRedoBeacon.set(10, force: true);
 
-    await Future.delayed(Duration(milliseconds: 6));
+    await Future<void>.delayed(Duration(milliseconds: 6));
 
     throttleBeacon.set(10, force: true);
 

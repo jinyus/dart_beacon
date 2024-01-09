@@ -24,7 +24,7 @@ void main() {
     var futureBeacon = Beacon.future<String>(
       () async => throw Exception('error'),
     );
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(Duration(milliseconds: 100));
     expect(futureBeacon.value, isA<AsyncError>());
 
     var error = futureBeacon.value as AsyncError;
@@ -42,13 +42,13 @@ void main() {
 
     var futureBeacon = Beacon.future(() async => ++counter);
 
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(Duration(milliseconds: 100));
 
     futureBeacon.reset();
 
     expect(futureBeacon.value, isA<AsyncLoading>());
 
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(Duration(milliseconds: 100));
 
     expect(futureBeacon.value, isA<AsyncData<int>>());
 
@@ -64,7 +64,7 @@ void main() {
 
     expect(futureBeacon.value, isA<AsyncIdle>());
 
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(Duration(milliseconds: 10));
 
     expect(counter, 0);
 
@@ -72,7 +72,7 @@ void main() {
 
     expect(futureBeacon.value, isA<AsyncLoading>());
 
-    await Future.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(Duration(milliseconds: 10));
 
     expect(futureBeacon.isData, isTrue);
 
@@ -84,7 +84,7 @@ void main() {
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(futureBeacon.unwrapValue(), 1);
 
@@ -92,7 +92,7 @@ void main() {
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(futureBeacon.isError, isTrue);
   });

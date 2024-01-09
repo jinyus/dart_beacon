@@ -79,11 +79,11 @@ void main() {
       beacon.add(1);
       beacon.add(2);
 
-      await Future.delayed(Duration(milliseconds: 10));
+      await Future<void>.delayed(Duration(milliseconds: 10));
 
       expect(buffer, equals([]));
 
-      await Future.delayed(Duration(milliseconds: 50));
+      await Future<void>.delayed(Duration(milliseconds: 50));
 
       expect(buffer, equals([1, 2]));
     });
@@ -99,7 +99,7 @@ void main() {
       beacon.add(3);
       beacon.add(4);
 
-      await Future.delayed(Duration(milliseconds: 40));
+      await Future<void>.delayed(Duration(milliseconds: 40));
 
       expect(beacon.currentBuffer.value, equals([]));
 
@@ -117,7 +117,7 @@ void main() {
 
       beacon.reset();
 
-      await Future.delayed(Duration(milliseconds: 40));
+      await Future<void>.delayed(Duration(milliseconds: 40));
 
       expect(beacon.currentBuffer.value, equals([]));
       expect(buffer, equals([]));

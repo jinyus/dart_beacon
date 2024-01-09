@@ -9,7 +9,7 @@ Future<String> counterFuture(int count) async {
     throw Exception('Count($count) too large');
   }
 
-  await Future.delayed(Duration(milliseconds: count * 10));
+  await Future<void>.delayed(Duration(milliseconds: count * 10));
   return '$count second has passed.';
 }
 

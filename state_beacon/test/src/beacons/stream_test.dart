@@ -31,7 +31,7 @@ void main() {
       }
     });
 
-    await Future.delayed(k10ms * 5);
+    await Future<void>.delayed(k10ms * 5);
 
     expect(called, equals(3));
   });
@@ -39,9 +39,9 @@ void main() {
   test('should be AsyncError when error is added to stream', () async {
     Stream<int> errorStream() async* {
       yield 1;
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
       yield 2;
-      await Future.delayed(k1ms);
+      await Future<void>.delayed(k1ms);
       yield* Stream.error('error');
     }
 
@@ -85,7 +85,7 @@ void main() {
       called++;
     });
 
-    await Future.delayed(Duration(milliseconds: 50));
+    await Future<void>.delayed(Duration(milliseconds: 50));
 
     expect(results, [0, 1, 2, 3, 4]);
 
@@ -110,7 +110,7 @@ void main() {
       called++;
     });
 
-    await Future.delayed(k10ms * 4);
+    await Future<void>.delayed(k10ms * 4);
 
     expect(called, equals(3));
     expect(done, true);
@@ -135,7 +135,7 @@ void main() {
 
     controller.add(1);
 
-    await Future.delayed(k1ms);
+    await Future<void>.delayed(k1ms);
 
     expect(myRawBeacon.value, 1);
     expect(myBeacon.value.lastData, 1);
