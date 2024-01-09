@@ -4,7 +4,7 @@ import 'package:shopping_cart/src/models/models.dart';
 import 'package:shopping_cart/src/models/product.dart';
 
 class CatalogService {
-  Future<Catalog> load() => Future.delayed(
+  Future<Catalog> load() => Future<void>.delayed(
       k100ms * 8,
       () => Catalog([
             Product(price: 42, id: 0, color: Colors.red, name: 'Red Car'),

@@ -20,7 +20,7 @@ class ItemError extends ListItem {
 }
 
 Future<List<String>> _fetchItems(int pageNum) async {
-  await Future.delayed(const Duration(seconds: 1));
+  await Future<void>.delayed(const Duration(seconds: 1));
 
   if (pageNum > 5) throw NoMoreItemsException();
 

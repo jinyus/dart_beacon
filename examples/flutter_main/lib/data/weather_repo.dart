@@ -11,7 +11,7 @@ abstract class WeatherRepository {
 class FakeWeatherRepository implements WeatherRepository {
   @override
   Future<Weather> fetchWeather(String cityName) async {
-    await Future.delayed(k100ms * 10);
+    await Future<void>.delayed(k100ms * 10);
 
     final random = Random();
 

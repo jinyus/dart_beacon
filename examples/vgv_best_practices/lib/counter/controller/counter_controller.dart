@@ -26,7 +26,7 @@ class CounterController {
 
 class Repository {
   static Future<int> fetchTripleCount(int count) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future<void>.delayed(const Duration(seconds: 1));
     return count * 3;
   }
 }
