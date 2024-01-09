@@ -17,7 +17,10 @@ class BeaconFamily<Arg, BeaconType extends BaseBeacon<dynamic>> {
   BeaconType call(Arg arg) {
     if (!shouldCache) return _create(arg);
 
-    return _cache[arg] ??= _create(arg);
+    return _cache[arg] ??= _create(arg)
+      ..onDispose(() {
+        _cache.remove(arg);
+      });
   }
 
   /// Clears the cache of beacon if caching is enabled.
@@ -25,9 +28,10 @@ class BeaconFamily<Arg, BeaconType extends BaseBeacon<dynamic>> {
   void clear() {
     if (!shouldCache) return;
 
-    for (final beacon in _cache.values) {
+    for (final beacon in _cache.values.toList()) {
       beacon.dispose();
     }
+
     _cache.clear();
   }
 }

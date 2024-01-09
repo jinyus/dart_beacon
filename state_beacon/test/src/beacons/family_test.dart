@@ -70,6 +70,20 @@ void main() {
     expect(identical(beacon1, beacon2), isTrue);
   });
 
+  test('should remove from cache when disposed', () {
+    final family = Beacon.family(
+      (int arg) => Beacon.writable(arg.toString()),
+      cache: true,
+    );
+    final beacon1 = family(1);
+
+    beacon1.dispose();
+
+    final beacon2 = family(1);
+
+    expect(identical(beacon1, beacon2), isFalse);
+  });
+
   test('should not cache Beacons if cache is false', () {
     final family = Beacon.family(
       (int arg) => Beacon.writable(arg.toString()),
