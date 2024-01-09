@@ -1,3 +1,7 @@
+## 0.18.4
+
+-   [Fix] Cached family beacons are removed from cache when they are disposed
+
 ## 0.18.3
 
 -   StreamBeacon.reset() now sets loading state and resubscribes to the stream
