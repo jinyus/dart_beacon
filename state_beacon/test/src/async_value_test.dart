@@ -1,3 +1,5 @@
+// ignore_for_file: strict_raw_type, inference_failure_on_instance_creation
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
 
@@ -29,10 +31,10 @@ void main() {
       emitsInOrder(
         [
           AsyncData(0),
-          AsyncLoading(),
+          AsyncLoading<int>(),
           AsyncData(1),
           // start errorResult
-          AsyncLoading(),
+          AsyncLoading<int>(),
           isA<AsyncError>(),
         ],
       ),
@@ -59,21 +61,21 @@ void main() {
 
     expect(data.hashCode, data2.hashCode);
 
-    var load = AsyncLoading();
-    var load2 = AsyncLoading();
+    var load = AsyncLoading<int>();
+    var load2 = AsyncLoading<int>();
 
     expect(load, load2);
     expect(load.hashCode, load2.hashCode);
 
     var stack = StackTrace.current;
-    var error = AsyncError('error', stack);
-    var error2 = AsyncError('error', stack);
+    var error = AsyncError<int>('error', stack);
+    var error2 = AsyncError<int>('error', stack);
 
     expect(error, error2);
     expect(error.hashCode, error2.hashCode);
 
-    var idle = AsyncIdle();
-    var idle2 = AsyncIdle();
+    var idle = AsyncIdle<int>();
+    var idle2 = AsyncIdle<int>();
 
     expect(idle, idle2);
     expect(idle.hashCode, idle2.hashCode);

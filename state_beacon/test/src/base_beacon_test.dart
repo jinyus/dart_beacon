@@ -78,13 +78,13 @@ void main() {
       var count = Beacon.writable(0);
       var beacon = Beacon.derivedFuture(() async => count.value * 2);
 
-      expect(beacon.value, isA<AsyncLoading>());
+      expect(beacon.value, isA<AsyncLoading<int>>());
       await Future<void>.delayed(k1ms);
       expect(beacon.value.unwrap(), equals(0));
 
       count.set(1);
 
-      expect(beacon.value, isA<AsyncLoading>());
+      expect(beacon.value, isA<AsyncLoading<int>>());
       expect(beacon.lastData, 0);
 
       await Future<void>.delayed(k1ms);
@@ -93,7 +93,7 @@ void main() {
 
       count.set(5);
 
-      expect(beacon.value, isA<AsyncLoading>());
+      expect(beacon.value, isA<AsyncLoading<int>>());
       expect(beacon.lastData, 2);
 
       await Future<void>.delayed(k1ms);

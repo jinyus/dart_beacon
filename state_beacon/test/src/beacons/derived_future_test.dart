@@ -1,3 +1,5 @@
+// ignore_for_file: strict_raw_type
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
@@ -6,32 +8,33 @@ import '../../common.dart';
 
 void main() {
   test('should re-initializes when dependency changes', () async {
-    var count = Beacon.writable(0);
+    final count = Beacon.writable(0);
 
     var ran = 0;
 
-    var _ = Beacon.derivedFuture(() async {
+    final _ = Beacon.derivedFuture(() async {
       count.value;
       return ++ran;
     });
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(1));
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(2));
   });
 
   test('should clean up internal status beacon when disposed', () async {
-    var count = Beacon.writable(0);
+    final count = Beacon.writable(0);
 
-    var plus1 = Beacon.derivedFuture(() async {
-      return count.value + 1;
-    }, manualStart: true);
+    final plus1 = Beacon.derivedFuture(
+      () async => count.value + 1,
+      manualStart: true,
+    );
 
     final plus1Status = (plus1 as DerivedFutureBeacon).status;
 
@@ -51,22 +54,22 @@ void main() {
   });
 
   test('should await FutureBeacon exposed a future', () async {
-    var count = Beacon.writable(0);
-    var count2 = Beacon.writable(0);
+    final count = Beacon.writable(0);
+    final count2 = Beacon.writable(0);
 
-    var firstName = Beacon.derivedFuture(() async {
+    final firstName = Beacon.derivedFuture(() async {
       final val = count.value;
       await Future<void>.delayed(k10ms);
       return 'Sally $val';
     });
 
-    var lastName = Beacon.derivedFuture(() async {
+    final lastName = Beacon.derivedFuture(() async {
       final val = count2.value + 1;
       await Future<void>.delayed(k10ms);
       return 'Smith $val';
     });
 
-    var fullName = Beacon.derivedFuture(() async {
+    final fullName = Beacon.derivedFuture(() async {
       // final fname = await firstName.toFuture();
 
       // a change in this won't trigger a rerun because of the async gap
@@ -110,9 +113,9 @@ void main() {
   });
 
   test('should return error when dependency throws error', () async {
-    var count = Beacon.writable(0);
+    final count = Beacon.writable(0);
 
-    var firstName = Beacon.derivedFuture(() async {
+    final firstName = Beacon.derivedFuture(() async {
       final val = count.value;
       await Future<void>.delayed(k10ms);
       if (val > 0) {
@@ -121,7 +124,7 @@ void main() {
       return 'Sally $val';
     });
 
-    var greeting = Beacon.derivedFuture(() async {
+    final greeting = Beacon.derivedFuture(() async {
       final fname = await firstName.toFuture();
 
       return 'Hello $fname';
@@ -143,34 +146,34 @@ void main() {
   });
 
   test('should not execute until start() is called', () async {
-    var count = Beacon.writable(0);
+    final count = Beacon.writable(0);
 
     var ran = 0;
 
-    var futureBeacon = Beacon.derivedFuture(() async {
+    final futureBeacon = Beacon.derivedFuture(() async {
       count.value;
       return ++ran;
     }, manualStart: true);
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(0));
 
     futureBeacon.start();
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(1));
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(2));
 
     futureBeacon.reset();
 
-    await Future<void>.delayed(Duration(milliseconds: 10));
+    await Future<void>.delayed(k10ms);
 
     expect(ran, equals(3));
   });
@@ -189,11 +192,11 @@ void main() {
     }
 
     final id = Beacon.stream(idChanges());
-    final user = Beacon.derivedFuture(() async {
-      return fetchUser(await id.toFuture());
-    });
+    final user = Beacon.derivedFuture(
+      () async => fetchUser(await id.toFuture()),
+    );
 
-    final results = <AsyncValue>[];
+    final results = <AsyncValue<String>>[];
     final correctResults = [
       AsyncLoading<String>(),
       AsyncData('User 1'),
@@ -213,17 +216,17 @@ void main() {
   });
 
   test('should trigger rerun when accessed before async gap', () async {
-    var count = Beacon.writable<int>(3);
+    final count = Beacon.writable<int>(3);
 
-    late var nums = Beacon.derived(() {
-      return List.generate(count.value, (i) => i);
-    });
+    late final nums = Beacon.derived(
+      () => List.generate(count.value, (i) => i),
+    );
 
     expect(nums.value, equals([0, 1, 2]));
 
-    var numsDoubled = Beacon.derivedFuture(() async {
+    final numsDoubled = Beacon.derivedFuture(() async {
       // This will trigger a rerun because it is accessed before await
-      var currentNums = nums.value;
+      final currentNums = nums.value;
       await Future<void>.delayed(k10ms);
       return currentNums.map((e) => e * 2).toList();
     });
@@ -242,11 +245,9 @@ void main() {
   });
 
   test('should override internal function', () async {
-    var count = Beacon.writable(1);
+    final count = Beacon.writable(1);
 
-    var futureBeacon = Beacon.derivedFuture(() async {
-      return count.value;
-    });
+    final futureBeacon = Beacon.derivedFuture(() async => count.value);
 
     expect(futureBeacon.value.isLoading, isTrue);
 
@@ -254,9 +255,7 @@ void main() {
 
     expect(futureBeacon.value.unwrap(), 1);
 
-    futureBeacon.overrideWith(() async {
-      return count.value * 2;
-    });
+    futureBeacon.overrideWith(() async => count.value * 2);
 
     expect(futureBeacon.value.isLoading, isTrue);
 

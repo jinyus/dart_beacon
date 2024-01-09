@@ -62,7 +62,7 @@ void main() {
 
     beacon.dispose();
 
-    expect(beacon.currentBuffer.value, []);
+    expect(beacon.currentBuffer.value, <int>[]);
     expect(beacon.currentBuffer.isDisposed, true);
   });
 
