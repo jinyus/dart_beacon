@@ -610,7 +610,7 @@ abstract class Beacon {
   static BeaconFamily<Arg, BeaconType>
       family<T, Arg, BeaconType extends BaseBeacon<T>>(
     BeaconType Function(Arg) create, {
-    bool cache = false,
+    bool cache = true,
   }) {
     return BeaconFamily<Arg, BeaconType>(create, shouldCache: cache);
   }

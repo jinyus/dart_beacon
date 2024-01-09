@@ -5,7 +5,7 @@ class BeaconFamily<Arg, BeaconType extends BaseBeacon<dynamic>> {
   late final Map<Arg, BeaconType> _cache;
   final BeaconType Function(Arg) _create;
 
-  BeaconFamily(this._create, {this.shouldCache = false}) {
+  BeaconFamily(this._create, {this.shouldCache = true}) {
     if (shouldCache) {
       _cache = {};
     }
