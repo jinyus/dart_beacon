@@ -116,33 +116,38 @@ void main() {
     expect(done, true);
   });
 
-  test('should do nothing on stream beacon is reset', () {
+  test('should set loading state and resub to stream when resetted', () async {
     final controller = StreamController<int>();
     var listeners = 0;
+
     var myStream = controller.stream.asBroadcastStream(
       onListen: (_) => listeners++,
       onCancel: (_) => listeners--,
     );
-    var called = 0;
+
     var myRawBeacon = Beacon.streamRaw(myStream, initialValue: 0);
     var myBeacon = Beacon.stream(myStream);
 
-    myBeacon.subscribe((value) {
-      called++;
-    });
+    expect(listeners, 1);
 
-    myRawBeacon.subscribe((value) {
-      called++;
-    });
+    expect(myRawBeacon.value, 0);
+    expect(myBeacon.value, isA<AsyncLoading>());
+
+    controller.add(1);
+
+    await Future.delayed(k1ms);
+
+    expect(myRawBeacon.value, 1);
+    expect(myBeacon.value.lastData, 1);
 
     myBeacon.reset();
     myRawBeacon.reset();
 
-    expect(called, equals(0));
-    expect(listeners, 1);
+    expect(myRawBeacon.value, 0);
+    expect(myBeacon.value, isA<AsyncLoading>());
 
-    myRawBeacon.dispose();
     myBeacon.dispose();
+    myRawBeacon.dispose();
 
     expect(listeners, 0);
 
