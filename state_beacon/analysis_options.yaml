@@ -14,8 +14,10 @@
 # include: package:lints/recommended.yaml
 include: package:austerity/analysis_options.yaml
 
-# linter:
-#     rules:
+linter:
+    rules:
+        avoid_positional_boolean_parameters: false
+
 analyzer:
     # exclude:
     #     - path/to/excluded/files/**
