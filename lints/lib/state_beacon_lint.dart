@@ -51,7 +51,7 @@ class AvoidValueAccessAfterAwait extends DartLintRule {
       var visitor = BeaconValueVisitor();
       node.body.visitChildren(visitor);
 
-      print(visitor);
+      // print(visitor);
       var seenAwait = false;
 
       for (final rec in visitor.nodes) {

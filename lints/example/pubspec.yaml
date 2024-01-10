@@ -10,4 +10,4 @@ dependencies:
 dev_dependencies:
     custom_lint:
     state_beacon_lint:
-        path: ../../state_beacon_lint
+        path: ../../lints
