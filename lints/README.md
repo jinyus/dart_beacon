@@ -12,7 +12,28 @@
 
 This is the liniting package for [state_beacon](https://pub.dev/packages/state_beacon). It provides a set of lints rules to help you write better code and avoid some of its [pitfalls](https://pub.dev/packages/state_beacon#pitfalls).
 
-## Pitfalls
+## Installation
+
+```bash
+dart pub add custom_lint
+dart pub add state_beacon_lint
+
+# or add these lines to your pubspec.yaml
+dev_dependencies:
+  custom_lint:
+  state_beacon_lint:
+```
+
+Enable the `custom_lint` plugin in your `analysis_options.yaml` file.
+Create the file if it doesn't exist and add the following:
+
+```yaml
+analyzer:
+    plugins:
+        - custom_lint
+```
+
+## Pitfalls of state_beacon
 
 When using `Beacon.derivedFuture`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
 
