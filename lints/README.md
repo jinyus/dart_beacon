@@ -15,8 +15,7 @@ This is the liniting package for [state_beacon](https://pub.dev/packages/state_b
 ## Installation
 
 ```bash
-dart pub add custom_lint
-dart pub add state_beacon_lint
+dart pub add custom_lint state_beacon_lint --dev
 
 # or add these lines to your pubspec.yaml
 dev_dependencies:
