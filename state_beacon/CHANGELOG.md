@@ -1,3 +1,11 @@
+## 0.19.1
+
+-   [Feat] Add `.next()` to all beacons that exposes the next value as a future
+-   [Feat] Add `.buffer()` that returns a [BufferedCountBeacon] that wraps this Beacon.
+-   [Feat] Add `.bufferTime()` that returns a [BufferedTimeBeacon] that wraps this Beacon.
+-   [Feat] Add `.throttle()` that returns a [ThrottledBeacon] that wraps this Beacon.
+-   [Feat] Add `.filter()` that returns a [FilteredBeacon] that wraps this Beacon.
+
 ## 0.19.0
 
 -   [Breaking] FamilyBeacon are not cached by default
