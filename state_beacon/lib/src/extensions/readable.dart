@@ -34,8 +34,7 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// the method completes with the first value received.
   ///
   /// If a value is not emitted within the specified [timeout] duration (default
-  /// is 10 seconds), the method times out and returns the result of calling
-  /// [peek] on the Observable.
+  /// is 10 seconds), the method times out and returns the current value of the beacon.
   ///
   /// Example:
   ///

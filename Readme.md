@@ -79,6 +79,7 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
+    -   [next](#readblebeaconnext): Allows awaiting the next value as a future.
 -   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
 -   [Beacon.doBatchUpdate](#beacondobatchupdate): Batch multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
@@ -151,6 +152,27 @@ final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
 ReadableBeacon<int> get counter => _internalCounter;
+```
+
+#### ReadableBeacon.next():
+
+Listens for the next value emitted by this Beacon and returns it as a Future.
+
+This method subscribes to this Beacon and waits for the next value
+that matches the optional [filter] function. If [filter] is provided and
+returns `false` for a emitted value, the method continues waiting for the
+next value that matches the filter. If no [filter] is provided,
+the method completes with the first value received.
+
+If a value is not emitted within the specified [timeout] duration (default
+is 10 seconds), the method times out and returns the current value of the beacon.
+
+```dart
+final age = Beacon.writable(20);
+
+Timer(Duration(seconds: 1), () => age.value = 21;);
+
+final nextAge = await age.next(); // returns 21 after 1 second
 ```
 
 ### Beacon.createEffect:
