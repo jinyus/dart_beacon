@@ -1,0 +1,27 @@
+name: state_beacon_lint
+description: Linting for state_beacon users, designed to prevent common mistakes and provide a better experience.
+version: 0.1.0
+repository: https://github.com/jinyus/dart_beacon
+
+environment:
+    sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+    analyzer: ">=5.12.0 <7.0.0"
+    analyzer_plugin: ^0.11.2
+    custom_lint_builder: ^0.5.8
+
+platforms:
+    android:
+    ios:
+    linux:
+    macos:
+    web:
+    windows:
+
+topics:
+    - state
+    - signal
+    - reactive
+    - beacon
+    - lint
