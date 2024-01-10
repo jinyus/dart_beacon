@@ -1,4 +1,4 @@
-## 0.18.5
+## 0.19.0
 
 -   [Breaking] FamilyBeacon are not cached by default
 
