@@ -51,6 +51,7 @@ void main() {
     plus1.dispose();
 
     expect(plus1Status.value, DerivedFutureStatus.idle);
+    expect(plus1Status.isDisposed, isTrue);
   });
 
   test('should await FutureBeacon exposed a future', () async {
@@ -244,23 +245,55 @@ void main() {
     expect(numsDoubled.value.unwrap(), equals([0, 2, 4, 6, 8]));
   });
 
-  test('should override internal function', () async {
-    final count = Beacon.writable(1);
+  test('should work with multiple futurebeacon dependencies', () async {
+    final nameBeacon = Beacon.writable('Bob');
+    final ageBeacon = Beacon.writable(20);
+    final speedBeacon = Beacon.writable(10);
 
-    final futureBeacon = Beacon.derivedFuture(() async => count.value);
+    final nameFB = Beacon.derivedFuture(() async => nameBeacon());
+    final ageFB = Beacon.derivedFuture(() async => ageBeacon());
+    final speedFB = Beacon.derivedFuture(() async {
+      final val = speedBeacon();
+      await Future<void>.delayed(k10ms);
+      return val;
+    });
 
-    expect(futureBeacon.value.isLoading, isTrue);
+    final stats = Beacon.derivedFuture(() async {
+      final nameFt = nameFB.toFuture();
+      final ageFt = ageFB.toFuture();
+      final speedFt = speedFB.toFuture();
 
-    await Future<void>.delayed(k1ms);
+      final (name, age, speed) = await (nameFt, ageFt, speedFt).wait;
 
-    expect(futureBeacon.value.unwrap(), 1);
+      return '$name is $age years old and runs at $speed mph';
+    });
 
-    futureBeacon.overrideWith(() async => count.value * 2);
+    expect(stats.isLoading, isTrue);
 
-    expect(futureBeacon.value.isLoading, isTrue);
+    await Future<void>.delayed(k10ms * 2);
 
-    await Future<void>.delayed(k1ms);
+    expect(stats.unwrapValue(), 'Bob is 20 years old and runs at 10 mph');
 
-    expect(futureBeacon.value.unwrap(), 2);
+    Beacon.doBatchUpdate(() {
+      nameBeacon.value = 'Sally';
+      ageBeacon.value = 21;
+      speedBeacon.value = 11;
+    });
+
+    expect(stats.isLoading, isTrue);
+
+    await Future<void>.delayed(k10ms * 2);
+
+    expect(stats.unwrapValue(), 'Sally is 21 years old and runs at 11 mph');
+
+    // override nameFB with error
+
+    nameFB.overrideWith(() => throw Exception('error'));
+
+    expect(stats.isLoading, isTrue);
+
+    await Future<void>.delayed(k10ms * 2);
+
+    expect(stats.isError, isTrue);
   });
 }
