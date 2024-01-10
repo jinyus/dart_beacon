@@ -10,7 +10,7 @@
 
 ## Overview
 
-This is the liniting package for [state_beacon](https://pub.dev/packages/state_beacon). It provides a set of lints rules to help you write better code and avoid some of its [pitfalls](https://pub.dev/packages/state_beacon#pitfalls).
+This is the liniting package for [state_beacon](https://pub.dev/packages/state_beacon). It provides a set of lint rules to help you write better code and avoid some of its [pitfalls](https://pub.dev/packages/state_beacon#pitfalls).
 
 ## Installation
 
