@@ -8,6 +8,7 @@ class _Effect {
   late final Set<BaseBeacon<dynamic>> _currentDeps;
   late final String _debugLabel;
   final bool _supportConditional;
+  dynamic _childDispose;
 
   _Effect(this._supportConditional,
       {required Function fn, String? debugLabel}) {
@@ -20,7 +21,9 @@ class _Effect {
         ? () {
             _effectStack.add(this);
             try {
-              fn();
+              _disposeChildren();
+              final cleanup = fn();
+              if (cleanup is Function) _childDispose = cleanup;
             } finally {
               _effectStack.removeLast();
               final toRemove = _watchedBeacons.difference(_currentDeps);
@@ -28,7 +31,11 @@ class _Effect {
               _currentDeps.clear();
             }
           }
-        : fn);
+        : () {
+            _disposeChildren();
+            final cleanup = fn();
+            if (cleanup is Function) _childDispose = cleanup;
+          });
 
     _debugLabel = debugLabel ?? 'Effect(${func.id})';
   }
@@ -37,12 +44,20 @@ class _Effect {
     // first run to discover dependencies
     _effectStack.add(this);
     try {
-      fn();
+      final cleanup = fn();
+      if (cleanup is Function) _childDispose = cleanup;
     } finally {
       _effectStack.removeLast();
     }
 
-    return () => _remove(_watchedBeacons, disposing: true);
+    return () {
+      _remove(_watchedBeacons, disposing: true);
+      _disposeChildren();
+    };
+  }
+
+  void _disposeChildren() {
+    if (_childDispose is Function) _childDispose();
   }
 
   void _remove(
