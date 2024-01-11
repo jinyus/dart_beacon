@@ -35,7 +35,7 @@ part 'beacons/async.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
   BaseBeacon([T? initialValue]) {
-    if (initialValue != null || isNullable) {
+    if (initialValue != null || _isNullable) {
       _initialValue = initialValue as T;
       _value = initialValue;
       _isEmpty = false;
@@ -43,7 +43,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     BeaconObserver.instance?.onCreate(this, _isEmpty);
   }
 
-  bool get isNullable => null is T;
+  bool get _isNullable => null is T;
 
   String? _debugLabel;
   String get debugLabel => _debugLabel ?? runtimeType.toString();

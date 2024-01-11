@@ -7,7 +7,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
 
   UndoRedoBeacon({T? initialValue, this.historyLimit = 10})
       : super(initialValue) {
-    if (initialValue != null || isNullable) {
+    if (initialValue != null || _isNullable) {
       _addValueToHistory(initialValue as T);
     }
   }
