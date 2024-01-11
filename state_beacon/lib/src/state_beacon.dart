@@ -446,35 +446,19 @@ abstract class Beacon {
       cancelRunning: cancelRunning,
     )..setDebugLabel(debugLabel ?? 'DerivedFutureBeacon<$T>');
 
-    late final VoidCallback statusUnsub;
-    VoidCallback? effectUnsub;
+    final dispose = effect(() {
+      // beacon is manually triggered if in idle state
+      if (beacon.status() == DerivedFutureStatus.idle) return null;
 
-    statusUnsub = beacon.status.subscribe(
-      (newStatus) {
-        if (newStatus == DerivedFutureStatus.idle) return;
+      return effect(
+        () async {
+          await beacon.run();
+        },
+        supportConditional: supportConditional,
+      );
+    });
 
-        // when the beacon is reset, dsipose current effect and create a new one
-        effectUnsub?.call();
-
-        effectUnsub = effect(
-          () async {
-            // beacon is manually triggered if in idle state
-
-            await beacon.run();
-          },
-          supportConditional: supportConditional,
-        );
-
-        beacon.$setInternalEffectUnsubscriber(() {
-          effectUnsub?.call();
-          statusUnsub();
-        });
-      },
-      startNow: true,
-    );
-
-    // incase the beacon is disposed without being started
-    beacon.$setInternalEffectUnsubscriber(statusUnsub);
+    beacon.$setInternalEffectUnsubscriber(dispose);
 
     return beacon;
   }
