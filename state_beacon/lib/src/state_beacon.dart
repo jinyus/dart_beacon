@@ -376,20 +376,16 @@ abstract class Beacon {
   ///
   /// print(canDrink.value); // Outputs: true
   /// ```
-  static DerivedBeacon<T> derived<T>(
+  static ReadableBeacon<T> derived<T>(
     T Function() compute, {
-    bool manualStart = false,
     String? debugLabel,
     bool supportConditional = true,
   }) {
-    final beacon = WritableDerivedBeacon<T>(manualStart: manualStart)
+    final beacon = WritableDerivedBeacon<T>()
       ..setDebugLabel(debugLabel ?? 'DerivedBeacon<$T>');
 
     final unsub = effect(
       () {
-        // beacon is manually triggered if in idle state
-        if (beacon.status.value == DerivedStatus.idle) return;
-
         beacon.$forceSet(compute());
       },
       supportConditional: supportConditional,

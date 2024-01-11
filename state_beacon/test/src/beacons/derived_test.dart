@@ -19,26 +19,6 @@ void main() {
     expect(effectCount, 2);
   });
 
-  test('should not run immediately', () {
-    final beacon = Beacon.writable(1);
-    var effectCount = 0;
-
-    final derived = Beacon.derived(() {
-      effectCount++;
-      return beacon.call();
-    }, manualStart: true);
-
-    expect(effectCount, 0);
-
-    beacon.increment();
-
-    expect(effectCount, 0);
-
-    derived.start();
-
-    expect(effectCount, 1);
-  });
-
   test('should be correct derived value upon initialization', () {
     var beacon = Beacon.writable<int>(10);
     var derivedBeacon = Beacon.derived(() => beacon.value * 2);
@@ -88,5 +68,25 @@ void main() {
     } catch (e) {
       expect(e, isA<CircularDependencyException>());
     }
+  });
+
+  test('should not watch new beacon conditionally', () {
+    var num1 = Beacon.writable<int>(10);
+    var num2 = Beacon.writable<int>(20);
+    // var cond = Beacon.writable<bool>(false);
+    var derivedBeacon = Beacon.derived(
+      () {
+        if (num2().isEven) return num2();
+        return num1.value + num2.value;
+      },
+      supportConditional: false,
+    );
+
+    expect(derivedBeacon(), 20);
+
+    // should not trigger recompute as it wasn't accessed on first run
+    num1.value = 15;
+
+    expect(derivedBeacon.value, 20);
   });
 }

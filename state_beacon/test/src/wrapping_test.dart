@@ -99,18 +99,6 @@ void main() {
     );
   });
 
-  test('should dispose internal status when disposed', () {
-    var count = Beacon.readable<int>(2);
-    var asText = Beacon.derived<String>(() => count.value.toString());
-
-    expect(asText.value, count.value.toString());
-
-    asText.dispose();
-
-    expect(asText.isDisposed, true);
-    expect(asText.status.isDisposed, true);
-  });
-
   test('should throttle wrapped StreamBeacon', () async {
     final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
 
