@@ -21,7 +21,7 @@ class LoggingObserver implements BeaconObserver {
   LoggingObserver({this.includeLabels});
 
   // this is tested with mocks
-  // dont want to print to console in tests
+  // don't want to print to console in tests
   // coverage:ignore-start
 
   @override
@@ -51,7 +51,6 @@ Beacon updated:
     final lazyLabel = lazy ? 'Lazy' : '';
     debugPrint('${lazyLabel}Beacon created: ${beacon.debugLabel}\n');
   }
-  // coverage:ignore-end
 
   bool shouldContinue(String label) {
     if (includeLabels == null) return true;
@@ -81,4 +80,5 @@ Effect stopped watching beacon:
   beacon: ${beacon.debugLabel}\n''',
     );
   }
+  // coverage:ignore-end
 }
