@@ -17,7 +17,6 @@ class _Effect {
 
     func = EffectClosure(_supportConditional
         ? () {
-            // print('executing conditional run');
             _effectStack.add(this);
             try {
               fn();
@@ -31,7 +30,6 @@ class _Effect {
   }
 
   VoidCallback execute(Function fn) {
-    // print('executing first run');
     _effectStack.add(this);
     try {
       fn();
@@ -46,7 +44,6 @@ class _Effect {
     Iterable<BaseBeacon<dynamic>> staleBeacons, {
     bool disposing = false,
   }) {
-    // print('removing $staleBeacons from $_beacons disposing: $disposing');
     for (final beacon in staleBeacons) {
       // remove self from beacon's listeners
       beacon._listeners.remove(func);
@@ -66,10 +63,8 @@ class _Effect {
     if (_beacons.contains(beacon)) {
       if (_supportConditional) _newDeps.add(beacon);
       return;
-      // return print('already watching $beacon');
     }
 
-    // print('adding $beacon to $_beacons');
     _beacons.add(beacon);
     beacon._listeners.add(func);
 
