@@ -154,18 +154,20 @@ void main() {
 
   test('should cancel the effect', () {
     var beacon = Beacon.writable(10);
-    var effectCalled = false;
+    var effectCalled = 0;
 
     var cancel = Beacon.createEffect(() {
-      effectCalled = true;
-      var _ = beacon.value;
+      effectCalled++;
+      beacon.value;
     });
 
+    expect(beacon.listenersCount, 1);
     cancel();
-    effectCalled = false;
+    expect(effectCalled, 1);
+    expect(beacon.listenersCount, 0);
 
     beacon.value = 20;
-    expect(effectCalled, isFalse);
+    expect(effectCalled, 1);
   });
 
   test('should throw when effect mutates its dependency', () {
