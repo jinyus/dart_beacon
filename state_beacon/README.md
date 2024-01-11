@@ -239,7 +239,7 @@ expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
-This beacon will recompute its value everytime one of it's dependencies change.
+This beacon will recompute its value every time one of it's dependencies change.
 
 Example:
 
@@ -293,7 +293,7 @@ Widget build(BuildContext context) {
 
 Can be transformed into a future with `myFutureBeacon.toFuture()`
 This can useful when a DerivedFutureBeacon depends on another DerivedFutureBeacon.
-This functionality is also availabe to regular FutureBeacons and StreamBeacons.
+This functionality is also available to regular FutureBeacons and StreamBeacons.
 
 ```dart
 var count = Beacon.writable(0);
