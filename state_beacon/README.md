@@ -74,6 +74,24 @@ class FutureCounter extends StatelessWidget {
 }
 ```
 
+## Linting (optional)
+
+It is recommended to use [state_beacon_lint](https://pub.dev/packages/state_beacon_lint) for package specific rules.
+
+```bash
+dart pub add custom_lint state_beacon_lint --dev
+```
+
+Enable the `custom_lint` plugin in your `analysis_options.yaml` file by adding the following.
+
+```yaml
+analyzer:
+    plugins:
+        - custom_lint
+```
+
+NB: Create the file if it doesn't exist.
+
 ## Features
 
 -   [Beacon.writable](#beaconwritable): Read and write values.

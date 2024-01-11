@@ -23,14 +23,15 @@ dev_dependencies:
   state_beacon_lint:
 ```
 
-Enable the `custom_lint` plugin in your `analysis_options.yaml` file.
-Create the file if it doesn't exist and add the following:
+Enable the `custom_lint` plugin in your `analysis_options.yaml` file by adding the following.
 
 ```yaml
 analyzer:
     plugins:
         - custom_lint
 ```
+
+NB: Create the file if it doesn't exist.
 
 ## Pitfalls of state_beacon
 
