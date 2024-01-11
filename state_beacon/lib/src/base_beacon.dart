@@ -98,7 +98,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
     final currentEffect = _Effect.current();
     if (currentEffect != null) {
-      _subscribe(currentEffect, _listeners);
+      currentEffect._startWatching(this);
     }
     return _value;
   }
@@ -320,4 +320,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     _disposeCallbacks.clear();
     BeaconObserver.instance?.onDispose(this);
   }
+
+  @override
+  String toString() => '$debugLabel(${_isEmpty ? 'uninitialized' : _value})';
 }
