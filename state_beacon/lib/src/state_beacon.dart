@@ -359,7 +359,7 @@ abstract class Beacon {
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value everytime one of it's dependencies change.
   ///
-  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`, the callback will not execute until [start()] is called.
   ///
   /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
