@@ -6,6 +6,10 @@ abstract class BeaconObserver {
 
   void onUpdate(BaseBeacon<dynamic> beacon);
 
+  void onWatch(String effectLabel, BaseBeacon<dynamic> beacon);
+
+  void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon);
+
   void onDispose(BaseBeacon<dynamic> beacon);
 
   static BeaconObserver? instance;
@@ -52,5 +56,29 @@ Beacon updated:
   bool shouldContinue(String label) {
     if (includeLabels == null) return true;
     return includeLabels?.contains(label) ?? false;
+  }
+
+  @override
+  void onWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.debugLabel)) return;
+
+    debugPrint(
+      '''
+Effect watching beacon:
+  effect: $effectLabel
+  beacon: ${beacon.debugLabel}\n''',
+    );
+  }
+
+  @override
+  void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.debugLabel)) return;
+
+    debugPrint(
+      '''
+Effect stopped watching beacon:
+  effect: $effectLabel
+  beacon: ${beacon.debugLabel}\n''',
+    );
   }
 }

@@ -3,14 +3,16 @@ part of 'base_beacon.dart';
 final _effectStack = <_Effect>[];
 
 class _Effect {
-  late final Set<BaseBeacon<dynamic>> _watchedBeacon;
+  late final Set<BaseBeacon<dynamic>> _watchedBeacons;
   late final EffectClosure func;
-  late final Set<BaseBeacon<dynamic>> _newDeps;
+  late final Set<BaseBeacon<dynamic>> _currentDeps;
+  late final String _debugLabel;
   final bool _supportConditional;
 
-  _Effect(this._supportConditional, {required Function fn}) {
-    _watchedBeacon = {};
-    _newDeps = {};
+  _Effect(this._supportConditional,
+      {required Function fn, String? debugLabel}) {
+    _watchedBeacons = {};
+    _currentDeps = {};
 
     // if we dont support conditional, never look for dependencies
     // in subsequent runs
@@ -21,11 +23,13 @@ class _Effect {
               fn();
             } finally {
               _effectStack.removeLast();
-              final toRemove = _watchedBeacon.difference(_newDeps);
+              final toRemove = _watchedBeacons.difference(_currentDeps);
               _remove(toRemove);
             }
           }
         : fn);
+
+    _debugLabel = debugLabel ?? 'Effect(${func.id})';
   }
 
   VoidCallback execute(Function fn) {
@@ -37,7 +41,7 @@ class _Effect {
       _effectStack.removeLast();
     }
 
-    return () => _remove(_watchedBeacon, disposing: true);
+    return () => _remove(_watchedBeacons, disposing: true);
   }
 
   void _remove(
@@ -47,29 +51,31 @@ class _Effect {
     for (final beacon in staleBeacons) {
       // remove self from beacon's listeners
       beacon._listeners.remove(func);
+      BeaconObserver.instance?.onStopWatch(_debugLabel, beacon);
     }
 
     // remove from local tracker
     if (disposing) {
-      _watchedBeacon.clear();
+      _watchedBeacons.clear();
     } else {
-      _watchedBeacon.removeAll(staleBeacons);
+      _watchedBeacons.removeAll(staleBeacons);
     }
 
-    _newDeps.clear();
+    _currentDeps.clear();
   }
 
   void _startWatching(BaseBeacon<dynamic> beacon) {
-    if (_watchedBeacon.contains(beacon)) {
-      if (_supportConditional) _newDeps.add(beacon);
+    if (_watchedBeacons.contains(beacon)) {
+      if (_supportConditional) _currentDeps.add(beacon);
       return;
     }
 
-    _watchedBeacon.add(beacon);
+    _watchedBeacons.add(beacon);
     beacon._listeners.add(func);
 
-    if (_supportConditional) _newDeps.add(beacon);
-    ;
+    BeaconObserver.instance?.onWatch(_debugLabel, beacon);
+
+    if (_supportConditional) _currentDeps.add(beacon);
   }
 
   static _Effect? current() {
@@ -77,7 +83,8 @@ class _Effect {
   }
 }
 
-VoidCallback effect(Function fn, {bool supportConditional = true}) {
-  final effect = _Effect(supportConditional, fn: fn);
+VoidCallback effect(Function fn,
+    {bool supportConditional = true, String? debugLabel}) {
+  final effect = _Effect(supportConditional, fn: fn, debugLabel: debugLabel);
   return effect.execute(fn);
 }

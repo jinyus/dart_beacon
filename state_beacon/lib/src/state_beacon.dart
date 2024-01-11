@@ -533,8 +533,13 @@ abstract class Beacon {
   static VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
+    String? debugLabel,
   }) {
-    return effect(fn, supportConditional: supportConditional);
+    return effect(
+      fn,
+      supportConditional: supportConditional,
+      debugLabel: debugLabel,
+    );
   }
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.
