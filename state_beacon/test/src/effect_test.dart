@@ -221,6 +221,42 @@ void main() {
     expect(effectCalled3, 2);
   });
 
+  test('should dispose sub effects when supportConditional is false', () {
+    var beacon1 = Beacon.writable<int>(10, debugLabel: 'beacon1');
+    var beacon2 = Beacon.writable<int>(20, debugLabel: 'beacon2');
+    var beacon3 = Beacon.writable<int>(30, debugLabel: 'beacon3');
+    var effectCalled = 0;
+    var effectCalled2 = 0;
+    var effectCalled3 = 0;
+
+    final dispose = Beacon.createEffect(() {
+      effectCalled++;
+      beacon1.value;
+
+      return Beacon.createEffect(() {
+        effectCalled2++;
+        beacon2.value;
+
+        return Beacon.createEffect(() {
+          effectCalled3++;
+          beacon3.value;
+        });
+      }, supportConditional: false);
+    }, supportConditional: false);
+
+    beacon1.value = 15;
+    expect(effectCalled, 2);
+    expect(effectCalled2, 2);
+    expect(effectCalled3, 2);
+
+    dispose();
+
+    beacon2.value = 25;
+    expect(effectCalled, 2);
+    expect(effectCalled2, 2);
+    expect(effectCalled3, 2);
+  });
+
   test('should not watch beacons accessed in child effects', () {
     var beacon1 = Beacon.writable<int>(10, debugLabel: 'beacon1');
     var beacon2 = Beacon.writable<int>(20, debugLabel: 'beacon2');
