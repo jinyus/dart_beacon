@@ -1,3 +1,7 @@
+## 0.19.2
+
+-   [Chore] Update documentation
+
 ## 0.19.1
 
 -   [Feat] Add `.next()` to all beacons that exposes the next value as a future
