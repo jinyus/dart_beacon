@@ -509,8 +509,9 @@ abstract class Beacon {
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///
-  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
+  /// and any beacon not accessed in the first run will not be tracked.
   /// Defaults to `true`.
   ///
   /// Example:
