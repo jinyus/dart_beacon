@@ -74,6 +74,24 @@ class FutureCounter extends StatelessWidget {
 }
 ```
 
+## Linting (optional)
+
+It is recommended to use [state_beacon_lint](https://pub.dev/packages/state_beacon_lint) for package specific rules.
+
+```bash
+dart pub add custom_lint state_beacon_lint --dev
+```
+
+Enable the `custom_lint` plugin in your `analysis_options.yaml` file by adding the following.
+
+```yaml
+analyzer:
+    plugins:
+        - custom_lint
+```
+
+NB: Create the file if it doesn't exist.
+
 ## Features
 
 -   [Beacon.writable](#beaconwritable): Read and write values.
@@ -221,7 +239,7 @@ expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
-This beacon will recompute its value everytime one of it's dependencies change.
+This beacon will recompute its value every time one of it's dependencies change.
 
 Example:
 
@@ -275,7 +293,7 @@ Widget build(BuildContext context) {
 
 Can be transformed into a future with `myFutureBeacon.toFuture()`
 This can useful when a DerivedFutureBeacon depends on another DerivedFutureBeacon.
-This functionality is also availabe to regular FutureBeacons and StreamBeacons.
+This functionality is also available to regular FutureBeacons and StreamBeacons.
 
 ```dart
 var count = Beacon.writable(0);
