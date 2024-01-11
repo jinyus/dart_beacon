@@ -357,7 +357,7 @@ abstract class Beacon {
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
-  /// This beacon will recompute its value everytime one of it's dependencies change.
+  /// This beacon will recompute its value every time one of it's dependencies change.
   ///
   /// If `manualStart` is `true`, the future will not execute until [start()] is called.
   ///
