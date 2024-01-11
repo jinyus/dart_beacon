@@ -15,6 +15,8 @@ class _Effect {
     _beacons = {};
     _newDeps = {};
 
+    // if we dont support conditional, never look for dependencies
+    // in subsequent runs
     func = EffectClosure(_supportConditional
         ? () {
             _effectStack.add(this);
@@ -30,6 +32,7 @@ class _Effect {
   }
 
   VoidCallback execute(Function fn) {
+    // first run to discover dependencies
     _effectStack.add(this);
     try {
       fn();
