@@ -14,6 +14,15 @@ class _Effect {
       {required Function fn, String? debugLabel}) {
     _watchedBeacons = {};
     _currentDeps = {};
+    _debugLabel = debugLabel ?? 'Effect(unlabeled)';
+  }
+
+  VoidCallback execute(Function fn) {
+    cleanUpAndRun() {
+      _disposeChild?.call();
+      final cleanup = fn();
+      if (cleanup is Function) _disposeChild = cleanup;
+    }
 
     // if we dont support conditional, never look for dependencies
     // in subsequent runs
@@ -21,9 +30,7 @@ class _Effect {
         ? () {
             _effectStack.add(this);
             try {
-              _disposeChild?.call();
-              final cleanup = fn();
-              if (cleanup is Function) _disposeChild = cleanup;
+              cleanUpAndRun();
             } finally {
               _effectStack.removeLast();
               final toRemove = _watchedBeacons.difference(_currentDeps);
@@ -31,25 +38,17 @@ class _Effect {
               _currentDeps.clear();
             }
           }
-        : () {
-            _disposeChild?.call();
-            final cleanup = fn();
-            if (cleanup is Function) _disposeChild = cleanup;
-          });
+        : cleanUpAndRun);
 
-    _debugLabel = debugLabel ?? 'Effect(${func.id})';
-  }
-
-  VoidCallback execute(Function fn) {
     // first run to discover dependencies
     _effectStack.add(this);
     try {
-      final cleanup = fn();
-      if (cleanup is Function) _disposeChild = cleanup;
+      cleanUpAndRun();
     } finally {
       _effectStack.removeLast();
     }
 
+    // dispose function
     return () {
       _remove(_watchedBeacons, disposing: true);
       _disposeChild?.call();
@@ -94,8 +93,11 @@ class _Effect {
   }
 }
 
-VoidCallback effect(Function fn,
-    {bool supportConditional = true, String? debugLabel}) {
+VoidCallback effect(
+  Function fn, {
+  bool supportConditional = true,
+  String? debugLabel,
+}) {
   final effect = _Effect(supportConditional, fn: fn, debugLabel: debugLabel);
   return effect.execute(fn);
 }
