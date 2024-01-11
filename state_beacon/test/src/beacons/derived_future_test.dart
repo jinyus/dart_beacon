@@ -7,25 +7,25 @@ import 'package:state_beacon/state_beacon.dart';
 import '../../common.dart';
 
 void main() {
-  test('should re-initializes when dependency changes', () async {
+  test('should re-run when dependency changes', () async {
     final count = Beacon.writable(0);
 
     var ran = 0;
 
-    final _ = Beacon.derivedFuture(() async {
+    Beacon.derivedFuture(() async {
       count.value;
       return ++ran;
     });
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(ran, equals(1));
+    expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(ran, equals(2));
+    expect(ran, 2);
   });
 
   test('should clean up internal status beacon when disposed', () async {
@@ -42,9 +42,9 @@ void main() {
 
     plus1.start();
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(plus1.value.unwrap(), equals(1));
+    expect(plus1.unwrapValue(), 1);
 
     expect(plus1Status.value, DerivedFutureStatus.running);
 
@@ -158,19 +158,19 @@ void main() {
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(0));
+    expect(ran, 0);
 
     futureBeacon.start();
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(1));
+    expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(2));
+    expect(ran, 2);
 
     futureBeacon.reset();
 
