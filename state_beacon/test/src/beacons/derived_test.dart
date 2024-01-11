@@ -73,7 +73,7 @@ void main() {
   test('should not watch new beacon conditionally', () {
     var num1 = Beacon.writable<int>(10);
     var num2 = Beacon.writable<int>(20);
-    // var cond = Beacon.writable<bool>(false);
+
     var derivedBeacon = Beacon.derived(
       () {
         if (num2().isEven) return num2();
