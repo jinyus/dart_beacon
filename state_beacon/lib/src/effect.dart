@@ -24,7 +24,8 @@ class _Effect {
             } finally {
               _effectStack.removeLast();
               final toRemove = _watchedBeacons.difference(_currentDeps);
-              _remove(toRemove);
+              if (toRemove.isNotEmpty) _remove(toRemove);
+              _currentDeps.clear();
             }
           }
         : fn);
@@ -57,11 +58,10 @@ class _Effect {
     // remove from local tracker
     if (disposing) {
       _watchedBeacons.clear();
+      _currentDeps.clear();
     } else {
       _watchedBeacons.removeAll(staleBeacons);
     }
-
-    _currentDeps.clear();
   }
 
   void _startWatching(BaseBeacon<dynamic> beacon) {
