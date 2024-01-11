@@ -3,7 +3,7 @@ part of '../base_beacon.dart';
 enum DerivedStatus { idle, running }
 
 mixin DerivedMixin<T> on ReadableBeacon<T> {
-  late final VoidCallback _unsubscribe;
+  late VoidCallback _unsubscribe;
 
   void $setInternalEffectUnsubscriber(VoidCallback unsubscribe) {
     _unsubscribe = unsubscribe;
