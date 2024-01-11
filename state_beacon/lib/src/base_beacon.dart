@@ -292,12 +292,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     return _value;
   }
 
-  /// Set the beacon to its initial value
-  /// and notify all listeners
-  void reset() {
-    _setValue(_initialValue);
-  }
-
   /// Registers a callback to be called when the beacon is disposed.
   void onDispose(VoidCallback callback) {
     if (isDisposed) return;

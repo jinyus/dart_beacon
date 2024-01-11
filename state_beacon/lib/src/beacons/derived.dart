@@ -23,9 +23,4 @@ class WritableDerivedBeacon<T> extends ReadableBeacon<T> with DerivedMixin<T> {
   void $forceSet(T newValue) {
     _setValue(newValue, force: true);
   }
-
-  @override
-  void reset() {
-    // noop
-  }
 }
