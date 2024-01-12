@@ -6,6 +6,8 @@ var _onCreateCalled = 0;
 var _onUpdateCalled = 0;
 var _onDisposeCalled = 0;
 var _lazyOnCreate = false;
+var _onWatchCalled = 0;
+var _onStopWatchCalled = 0;
 
 class MockLogginObserver extends LoggingObserver {
   MockLogginObserver({super.includeLabels});
@@ -28,6 +30,18 @@ class MockLogginObserver extends LoggingObserver {
     if (!shouldContinue(beacon.debugLabel)) return;
     _onUpdateCalled++;
   }
+
+  @override
+  void onWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.debugLabel)) return;
+    _onWatchCalled++;
+  }
+
+  @override
+  void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.debugLabel)) return;
+    _onStopWatchCalled++;
+  }
 }
 
 void main() {
@@ -46,10 +60,18 @@ void main() {
     beacon.increment();
     beacon.dispose();
 
+    var dispose = Beacon.createEffect(() {
+      beacon.value;
+    });
+
     expect(_onCreateCalled, equals(1));
     expect(_onUpdateCalled, equals(2));
     expect(_onDisposeCalled, equals(1));
+    expect(_onWatchCalled, equals(1));
     expect(_lazyOnCreate, isFalse);
+
+    dispose();
+    expect(_onStopWatchCalled, equals(1));
   });
 
   test('should call onCreate with lazy set as true', () {

@@ -35,7 +35,7 @@ part 'beacons/async.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
   BaseBeacon([T? initialValue]) {
-    if (initialValue != null || isNullable) {
+    if (initialValue != null || _isNullable) {
       _initialValue = initialValue as T;
       _value = initialValue;
       _isEmpty = false;
@@ -43,7 +43,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     BeaconObserver.instance?.onCreate(this, _isEmpty);
   }
 
-  bool get isNullable => null is T;
+  bool get _isNullable => null is T;
 
   String? _debugLabel;
   String get debugLabel => _debugLabel ?? runtimeType.toString();
@@ -98,7 +98,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
     final currentEffect = _Effect.current();
     if (currentEffect != null) {
-      _subscribe(currentEffect, _listeners);
+      currentEffect._startWatching(this);
     }
     return _value;
   }
@@ -292,12 +292,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     return _value;
   }
 
-  /// Set the beacon to its initial value
-  /// and notify all listeners
-  void reset() {
-    _setValue(_initialValue);
-  }
-
   /// Registers a callback to be called when the beacon is disposed.
   void onDispose(VoidCallback callback) {
     if (isDisposed) return;
@@ -320,4 +314,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     _disposeCallbacks.clear();
     BeaconObserver.instance?.onDispose(this);
   }
+
+  @override
+  String toString() => '$debugLabel(${_isEmpty ? 'uninitialized' : _value})';
 }

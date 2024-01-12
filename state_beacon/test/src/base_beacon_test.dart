@@ -133,4 +133,18 @@ void main() {
       expect(beacon.initialValue, equals([]));
     });
   });
+
+  test('toString should work correctly', () {
+    var beacon = Beacon.writable(10);
+    expect(beacon.toString(), 'Writable<int>(10)');
+
+    var fbeacon = Beacon.lazyFiltered<int>();
+    expect(fbeacon.toString(), 'LazyFilteredBeacon<int>(uninitialized)');
+
+    var nbeacon = Beacon.writable(10, debugLabel: 'num');
+    expect(nbeacon.toString(), 'num(10)');
+
+    var lnbeacon = Beacon.lazyWritable<int>(debugLabel: 'num');
+    expect(lnbeacon.toString(), 'num(uninitialized)');
+  });
 }

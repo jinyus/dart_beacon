@@ -109,6 +109,9 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     reset();
   }
 
+  /// Resets the beacon by calling the [Future] again
+  void reset();
+
   @override
   void dispose() {
     _cancelAwaitedSubscription?.call();

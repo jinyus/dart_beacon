@@ -7,25 +7,25 @@ import 'package:state_beacon/state_beacon.dart';
 import '../../common.dart';
 
 void main() {
-  test('should re-initializes when dependency changes', () async {
+  test('should re-run when dependency changes', () async {
     final count = Beacon.writable(0);
 
     var ran = 0;
 
-    final _ = Beacon.derivedFuture(() async {
+    Beacon.derivedFuture(() async {
       count.value;
       return ++ran;
     });
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(ran, equals(1));
+    expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(ran, equals(2));
+    expect(ran, 2);
   });
 
   test('should clean up internal status beacon when disposed', () async {
@@ -42,9 +42,9 @@ void main() {
 
     plus1.start();
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(plus1.value.unwrap(), equals(1));
+    expect(plus1.unwrapValue(), 1);
 
     expect(plus1Status.value, DerivedFutureStatus.running);
 
@@ -158,19 +158,19 @@ void main() {
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(0));
+    expect(ran, 0);
 
     futureBeacon.start();
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(1));
+    expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
     await Future<void>.delayed(k10ms);
 
-    expect(ran, equals(2));
+    expect(ran, 2);
 
     futureBeacon.reset();
 
@@ -295,5 +295,44 @@ void main() {
     await Future<void>.delayed(k10ms * 2);
 
     expect(stats.isError, isTrue);
+  });
+
+  test('should not watch new beacon conditionally', () async {
+    var num1 = Beacon.writable<int>(10);
+    var num2 = Beacon.writable<int>(20);
+
+    var derivedBeacon = Beacon.derivedFuture(
+      () async {
+        if (num2().isEven) return num2();
+        return num1.value + num2.value;
+      },
+      supportConditional: false,
+      manualStart: true,
+    );
+
+    expect(derivedBeacon(), isA<AsyncIdle>());
+
+    derivedBeacon.start();
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k10ms);
+
+    expect(derivedBeacon.unwrapValue(), 20);
+
+    num2.increment();
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k10ms);
+
+    expect(derivedBeacon.unwrapValue(), 31);
+
+    // should not trigger recompute as it wasn't accessed on first run
+    num1.value = 15;
+
+    expect(derivedBeacon.isLoading, false);
+
+    expect(derivedBeacon.unwrapValue(), 31);
   });
 }

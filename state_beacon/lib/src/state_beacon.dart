@@ -359,7 +359,7 @@ abstract class Beacon {
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value every time one of it's dependencies change.
   ///
-  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`, the callback will not execute until [start()] is called.
   ///
   /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
@@ -376,20 +376,16 @@ abstract class Beacon {
   ///
   /// print(canDrink.value); // Outputs: true
   /// ```
-  static DerivedBeacon<T> derived<T>(
+  static ReadableBeacon<T> derived<T>(
     T Function() compute, {
-    bool manualStart = false,
     String? debugLabel,
     bool supportConditional = true,
   }) {
-    final beacon = WritableDerivedBeacon<T>(manualStart: manualStart)
+    final beacon = WritableDerivedBeacon<T>()
       ..setDebugLabel(debugLabel ?? 'DerivedBeacon<$T>');
 
     final unsub = effect(
       () {
-        // beacon is manually triggered if in idle state
-        if (beacon.status.value == DerivedStatus.idle) return;
-
         beacon.$forceSet(compute());
       },
       supportConditional: supportConditional,
@@ -450,17 +446,19 @@ abstract class Beacon {
       cancelRunning: cancelRunning,
     )..setDebugLabel(debugLabel ?? 'DerivedFutureBeacon<$T>');
 
-    final unsub = effect(
-      () async {
-        // beacon is manually triggered if in idle state
-        if (beacon.status.value == DerivedFutureStatus.idle) return;
+    final dispose = effect(() {
+      // beacon is manually triggered if in idle state
+      if (beacon.status() == DerivedFutureStatus.idle) return null;
 
-        await beacon.run();
-      },
-      supportConditional: supportConditional,
-    );
+      return effect(
+        () async {
+          await beacon.run();
+        },
+        supportConditional: supportConditional,
+      );
+    });
 
-    beacon.$setInternalEffectUnsubscriber(unsub);
+    beacon.$setInternalEffectUnsubscriber(dispose);
 
     return beacon;
   }
@@ -509,8 +507,9 @@ abstract class Beacon {
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///
-  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
+  /// and any beacon not accessed in the first run will not be tracked.
   /// Defaults to `true`.
   ///
   /// Example:
@@ -532,8 +531,13 @@ abstract class Beacon {
   static VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
+    String? debugLabel,
   }) {
-    return effect(fn, supportConditional: supportConditional);
+    return effect(
+      fn,
+      supportConditional: supportConditional,
+      debugLabel: debugLabel,
+    );
   }
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.

@@ -8,7 +8,6 @@ export 'src/base_beacon.dart'
         BufferedCountBeacon,
         BufferedTimeBeacon,
         DebouncedBeacon,
-        DerivedBeacon,
         DerivedFutureBeacon,
         FilteredBeacon,
         FutureBeacon,
