@@ -2,7 +2,7 @@
 
 import 'package:example/counter/counter.dart';
 import 'package:example/infinite_list/infinite_list.dart';
-import 'package:example/konami_page.dart';
+import 'package:example/konami/konami.dart';
 import 'package:example/search/search.dart';
 import 'package:example/todo/todo.dart';
 import 'package:flutter/material.dart';
