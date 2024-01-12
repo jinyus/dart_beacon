@@ -110,7 +110,8 @@ class AsyncError<T> extends AsyncValue<T> {
   final Object error;
   final StackTrace stackTrace;
 
-  AsyncError(this.error, this.stackTrace);
+  AsyncError(this.error, [StackTrace? stackTrace])
+      : stackTrace = stackTrace ?? StackTrace.current;
 
   @override
   operator ==(other) =>

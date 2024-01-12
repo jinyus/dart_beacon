@@ -70,8 +70,10 @@ void main() {
     var stack = StackTrace.current;
     var error = AsyncError<int>('error', stack);
     var error2 = AsyncError<int>('error', stack);
+    var error3 = AsyncError<int>('error');
 
     expect(error, error2);
+    expect(error == error3, false);
     expect(error.hashCode, error2.hashCode);
 
     var idle = AsyncIdle<int>();
