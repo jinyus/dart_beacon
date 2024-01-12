@@ -1,3 +1,12 @@
+## 0.20.0
+
+-   [Feat] Add effect actions to Observer and debuglabel for effects.
+-   [Feat] A function can be returned from effect closures that will be called when the effect is disposed. This can be used to clean up sub effects.
+-   [Fix] Effects no longer do additional passes to discover new beacons when supportCOnditional is false;
+-   [Breaking] `isNullable` is no longer exposed
+-   [Breaking] remove `reset` from stream and readable beacons.
+-   [Breaking] remove `start` from derived beacon. Use late initialization instead.
+
 ## 0.19.2
 
 -   [Chore] Update documentation
