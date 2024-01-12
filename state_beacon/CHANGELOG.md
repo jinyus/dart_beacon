@@ -1,3 +1,7 @@
+## 0.20.1
+
+-   Stacktrace is now optional in AsyncError contructor. StackTrace.current is used if it is not provided.
+
 ## 0.20.0
 
 -   [Feat] Add effect actions to Observer and debuglabel for effects.
