@@ -1,37 +1,4 @@
-import 'dart:math' as math;
-
-import 'package:example/const.dart';
-import 'package:flutter/material.dart';
-import 'package:state_beacon/state_beacon.dart';
-
-enum Filter { all, active, done }
-
-final todosBeacon = Beacon.list(<Todo>[]);
-final inputTextBeacon = Beacon.writable('');
-final filterBeacon = Beacon.writable(Filter.all);
-
-final filteredTodos = Beacon.derived(() {
-  final todos = todosBeacon.value;
-
-  return switch (filterBeacon.value) {
-    Filter.all => todos,
-    Filter.active => todos.where((e) => !e.completed).toList(),
-    Filter.done => todos.where((e) => e.completed).toList()
-  };
-});
-
-void addTodo() {
-  final text = inputTextBeacon.value;
-  if (text.isNotEmpty) {
-    todosBeacon.add(
-      Todo(
-        id: DateTime.now().toIso8601String(),
-        description: text,
-      ),
-    );
-    inputTextBeacon.value = '';
-  }
-}
+part of 'todo.dart';
 
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
@@ -43,16 +10,19 @@ class TodoPage extends StatelessWidget {
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
-          child: const Column(
-            children: [
-              Text('Todo', style: TextStyle(fontSize: 48)),
-              k16SizeBox,
-              FilterButtons(),
-              k16SizeBox,
-              TodoInput(),
-              k16SizeBox,
-              TodoList(),
-            ],
+          child: Provider(
+            create: (_) => Controller(),
+            child: const Column(
+              children: [
+                Text('Todo', style: TextStyle(fontSize: 48)),
+                k16SizeBox,
+                FilterButtons(),
+                k16SizeBox,
+                TodoInput(),
+                k16SizeBox,
+                TodoList(),
+              ],
+            ),
           ),
         ),
       ],
@@ -68,20 +38,24 @@ class TodoInput extends StatefulWidget {
 }
 
 class _TodoInputState extends State<TodoInput> {
-  final controller = TextEditingController(text: inputTextBeacon.peek());
+  late final Controller controller;
+  late final textController = TextEditingController(
+    text: controller.inputTextBeacon.peek(),
+  );
   final focus = FocusNode();
 
   @override
   void initState() {
-    controller.addListener(() {
-      inputTextBeacon.value = controller.text;
+    controller = context.read<Controller>();
+    textController.addListener(() {
+      controller.inputTextBeacon.value = textController.text;
     });
     super.initState();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    textController.dispose();
     focus.dispose();
     super.dispose();
   }
@@ -91,14 +65,14 @@ class _TodoInputState extends State<TodoInput> {
     return TextField(
       style: k24Text,
       focusNode: focus,
-      controller: controller,
+      controller: textController,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Todo',
       ),
       onSubmitted: (_) {
-        addTodo();
-        controller.clear();
+        controller.addTodo();
+        textController.clear();
         focus.requestFocus();
       },
     );
@@ -110,6 +84,7 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final filteredTodos = context.read<Controller>().filteredTodos;
     final todos = filteredTodos.watch(context);
     return Expanded(
       child: ListView.separated(
@@ -131,6 +106,7 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final todosBeacon = context.read<Controller>().todosBeacon;
     return ListTile(
       tileColor: Theme.of(context).colorScheme.secondaryContainer,
       title: Text(todo.description, style: k24Text),
@@ -165,6 +141,7 @@ class FilterButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final filterBeacon = context.read<Controller>().filterBeacon;
     final current = filterBeacon.watch(context);
     return Wrap(
       spacing: 5.0,
@@ -182,23 +159,5 @@ class FilterButtons extends StatelessWidget {
         },
       ),
     );
-  }
-}
-
-@immutable
-class Todo {
-  const Todo({
-    required this.description,
-    required this.id,
-    this.completed = false,
-  });
-
-  final String id;
-  final String description;
-  final bool completed;
-
-  @override
-  String toString() {
-    return 'Todo(description: $description, completed: $completed)';
   }
 }

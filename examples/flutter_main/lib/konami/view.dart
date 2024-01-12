@@ -1,25 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:example/const.dart';
-import 'package:flutter/material.dart';
-import 'package:collection/collection.dart';
-import 'package:state_beacon/state_beacon.dart';
-
-const konamiCodes = [
-  "Arrow Up",
-  "Arrow Up",
-  "Arrow Down",
-  "Arrow Down",
-  "Arrow Left",
-  "Arrow Right",
-  "Arrow Left",
-  "Arrow Right",
-  "B",
-  "A",
-];
-
-final _keys = Beacon.lazyThrottled<String>(duration: k100ms * 2);
-final _last10 = Beacon.bufferedCount<String>(10);
+part of 'konami.dart';
 
 class KonamiPage extends StatefulWidget {
   const KonamiPage({super.key});
@@ -29,31 +8,35 @@ class KonamiPage extends StatefulWidget {
 }
 
 class _KonamiPageState extends State<KonamiPage> {
-  final fNode = FocusNode(
+  late final Controller controller;
+
+  late final fNode = FocusNode(
     onKey: (node, e) {
-      _keys.set(e.data.logicalKey.keyLabel, force: true);
+      controller.keys.set(e.data.logicalKey.keyLabel, force: true);
       return KeyEventResult.handled;
     },
   );
 
+  static const checker = IterableEquality();
+
   @override
   void initState() {
-    _last10.wrap(_keys, startNow: false);
+    controller = Controller();
 
-    _last10.subscribe((codes) {
+    controller.last10.subscribe((codes) {
       if (codes.isEmpty) return;
-      final won = IterableEquality().equals(codes, konamiCodes);
+      final won = checker.equals(codes, konamiCodes);
 
       if (won) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Congratulations!'),
-              content: Text('KONAMI! You won!'),
+              title: const Text('Congratulations!'),
+              content: const Text('KONAMI! You won!'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Close'),
+                  child: const Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -64,10 +47,10 @@ class _KonamiPageState extends State<KonamiPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Keep trying!'),
-            duration: const Duration(seconds: 2),
-            padding: const EdgeInsets.all(20),
+            duration: Duration(seconds: 2),
+            padding: EdgeInsets.all(20),
           ),
         );
       }
@@ -78,42 +61,43 @@ class _KonamiPageState extends State<KonamiPage> {
   @override
   void dispose() {
     fNode.dispose();
-    _keys.dispose();
-    _last10.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardListener(
-      autofocus: true,
-      focusNode: fNode,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Column(
-            children: [
-              Text('Enter the Konamic Codes', style: k32Text),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  KeyText('^'),
-                  KeyText('^'),
-                  KeyText('v'),
-                  KeyText('v'),
-                  KeyText('<'),
-                  KeyText('>'),
-                  KeyText('<'),
-                  KeyText('>'),
-                  KeyText('B'),
-                  KeyText('A'),
-                ],
-              ),
-            ],
-          ),
-          ResetButton(),
-          LastKey(),
-        ],
+    return Provider.value(
+      value: controller,
+      child: KeyboardListener(
+        autofocus: true,
+        focusNode: fNode,
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              children: [
+                Text('Enter the Konamic Codes', style: k32Text),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    KeyText('^'),
+                    KeyText('^'),
+                    KeyText('v'),
+                    KeyText('v'),
+                    KeyText('<'),
+                    KeyText('>'),
+                    KeyText('<'),
+                    KeyText('>'),
+                    KeyText('B'),
+                    KeyText('A'),
+                  ],
+                ),
+              ],
+            ),
+            ResetButton(),
+            LastKey(),
+          ],
+        ),
       ),
     );
   }
@@ -124,13 +108,14 @@ class LastKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keys = _last10.currentBuffer.watch(context);
+    final last10 = context.read<Controller>().last10;
+    final keys = last10.currentBuffer.watch(context);
     final lastKey = keys.lastOrNull;
 
     if (lastKey != null) {
       return Text('$lastKey (${keys.length})', style: k32Text);
     }
-    return Text('start typing...', style: k32Text);
+    return const Text('start typing...', style: k32Text);
   }
 }
 
@@ -150,7 +135,7 @@ class KeyText extends StatelessWidget {
       ),
       child: Text(
         char,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
         ),
@@ -164,15 +149,17 @@ class ResetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final last10 = context.read<Controller>().last10;
+    final keys = context.read<Controller>().keys;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.tertiary,
           foregroundColor: Theme.of(context).colorScheme.onTertiary,
           textStyle: k24Text,
-          minimumSize: Size(100, 100)),
+          minimumSize: const Size(100, 100)),
       onPressed: () {
-        _keys.reset();
-        _last10.reset();
+        keys.reset();
+        last10.reset();
       },
       child: const Text('Reset'),
     );

@@ -1,17 +1,4 @@
-import 'package:example/const.dart';
-import 'package:example/data/weather_model.dart';
-import 'package:example/data/weather_repo.dart';
-import 'package:flutter/material.dart';
-import 'dart:math' as math;
-
-import 'package:state_beacon/state_beacon.dart';
-
-final searchTextBeacon = Beacon.lazyDebounced(duration: k100ms * 10);
-
-final searchResults = Beacon.derivedFuture(() async {
-  final query = searchTextBeacon.value;
-  return await FakeWeatherRepository().fetchWeather(query);
-}, manualStart: true);
+part of 'search.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -23,13 +10,19 @@ class SearchPage extends StatelessWidget {
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
-          child: ListView(
-            children: const [
-              Text('Weather Search', style: TextStyle(fontSize: 48)),
-              k16SizeBox,
-              SearchInput(),
-              SearchResults(),
-            ],
+          child: Provider(
+            create: (_) => Controller(WeatherRepository()),
+            builder: (ctx, _) {
+              final controller = ctx.read<Controller>();
+              return ListView(
+                children: [
+                  const Text('Weather Search', style: TextStyle(fontSize: 48)),
+                  k16SizeBox,
+                  SearchInput(controller),
+                  SearchResults(controller),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -38,20 +31,23 @@ class SearchPage extends StatelessWidget {
 }
 
 class SearchInput extends StatefulWidget {
-  const SearchInput({super.key});
+  const SearchInput(this.controller, {super.key});
+
+  final Controller controller;
 
   @override
   State<SearchInput> createState() => _SearchInputState();
 }
 
 class _SearchInputState extends State<SearchInput> {
-  final controller = TextEditingController();
+  final textController = TextEditingController();
 
   @override
   void initState() {
-    controller.addListener(() {
-      if (controller.text.isEmpty) return;
-      searchTextBeacon.value = controller.text;
+    final searchTextBeacon = widget.controller.searchTextBeacon;
+    textController.addListener(() {
+      if (textController.text.isEmpty) return;
+      searchTextBeacon.value = textController.text;
     });
 
     late VoidCallback unsub;
@@ -59,7 +55,7 @@ class _SearchInputState extends State<SearchInput> {
     unsub = searchTextBeacon.subscribe((val) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // prevents concurrent modification exception
-        searchResults.start();
+        widget.controller.searchResults.start();
       });
       unsub();
     });
@@ -69,7 +65,7 @@ class _SearchInputState extends State<SearchInput> {
 
   @override
   void dispose() {
-    controller.dispose();
+    textController.dispose();
     super.dispose();
   }
 
@@ -77,7 +73,7 @@ class _SearchInputState extends State<SearchInput> {
   Widget build(BuildContext context) {
     return TextField(
       style: k24Text,
-      controller: controller,
+      controller: textController,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Enter a city',
@@ -87,7 +83,9 @@ class _SearchInputState extends State<SearchInput> {
 }
 
 class SearchResults extends StatelessWidget {
-  const SearchResults({super.key});
+  const SearchResults(this.controller, {super.key});
+
+  final Controller controller;
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +95,7 @@ class SearchResults extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           k16SizeBox,
-          switch (searchResults.watch(context)) {
+          switch (controller.searchResults.watch(context)) {
             AsyncData<Weather>(value: final v) => Text(
                 '$v',
                 style: k32Text,

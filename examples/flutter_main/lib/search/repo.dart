@@ -1,19 +1,10 @@
-import 'dart:math';
+part of 'search.dart';
 
-import 'package:example/const.dart';
-
-import 'weather_model.dart';
-
-abstract class WeatherRepository {
-  Future<Weather> fetchWeather(String cityName);
-}
-
-class FakeWeatherRepository implements WeatherRepository {
-  @override
+class WeatherRepository {
   Future<Weather> fetchWeather(String cityName) async {
     await Future<void>.delayed(k100ms * 10);
 
-    final random = Random();
+    final random = math.Random();
 
     if (random.nextInt(10) > 5 || cityName.isEmpty) {
       throw NetworkException();
