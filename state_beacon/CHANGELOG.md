@@ -1,6 +1,6 @@
 ## 0.22.0
 
--   [Breaking] intialValue is now a named argument for all beacon _classes_. This doesn't affect any existing public api provided by `Beacon.writable()` etc. This only affects you if you are using the `Beacon` class directly.
+-   [Breaking] initialValue is now a named argument for all beacon _classes_. This doesn't affect any existing public api provided by `Beacon.writable()` etc. This only affects you if you are using the `Beacon` class directly.
 
 ## 0.21.0
 
