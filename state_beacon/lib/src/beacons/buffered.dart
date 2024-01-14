@@ -22,11 +22,9 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   void add(T newValue);
 
-  /// Clears the buffer, unsubscribes from wrapped beacons
-  /// and resets the beacon to its initial state
+  /// Clears the buffer
   void reset() {
     clearBuffer();
-    clearWrapped();
     _setValue(_initialValue);
   }
 

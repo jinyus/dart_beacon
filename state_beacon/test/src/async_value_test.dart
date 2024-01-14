@@ -88,7 +88,7 @@ void main() {
 
     expect(loading.lastData, null);
     expect(loading.valueOrNull, null);
-    expect(loading.isLoading, true);
+    expect(loading.isIdleOrLoading, true);
 
     loading.setLastData(1);
 
@@ -99,7 +99,7 @@ void main() {
 
     expect(idle.lastData, null);
     expect(idle.valueOrNull, null);
-    expect(idle.isLoading, true);
+    expect(idle.isIdle, true);
 
     idle.setLastData(1);
 

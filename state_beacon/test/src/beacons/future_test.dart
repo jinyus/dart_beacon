@@ -36,7 +36,8 @@ void main() {
 
   test('should set initial state to AsyncLoading', () {
     final futureBeacon = Beacon.future(() async => 'result');
-    expect(futureBeacon.value, isA<AsyncLoading>());
+    expect(futureBeacon.isLoading, true);
+    expect(futureBeacon.isIdleOrLoading, true);
   });
 
   test('should re-executes the future on reset', () async {
@@ -65,7 +66,7 @@ void main() {
     final futureBeacon =
         Beacon.future(() async => ++counter, manualStart: true);
 
-    expect(futureBeacon.value, isA<AsyncIdle>());
+    expect(futureBeacon.isIdle, true);
 
     await Future<void>.delayed(k10ms);
 

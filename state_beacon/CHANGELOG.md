@@ -1,3 +1,8 @@
+## 0.21.0
+
+-   [Breaking] Separate `idle` and `loading` states for the `isLoading` getter in `AsyncValue`. Use `isIdleOrLoading` for the old behavior.
+-   [Fix] BufferedBeacon.reset() no longer unsubscribes from the wrapped beacon.
+
 ## 0.20.1
 
 -   Stacktrace is now optional in AsyncError contructor. StackTrace.current is used if it is not provided.
