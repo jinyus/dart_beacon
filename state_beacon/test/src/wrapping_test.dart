@@ -139,4 +139,76 @@ void main() {
     expect(streamCalled, equals(15));
     expect(throttledCalled, equals(1));
   });
+
+  test('should dispose together when wrapper is disposed', () {
+    // BeaconObserver.instance = LoggingObserver();
+    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+    var doubledCount = Beacon.derived<int>(
+      () => count.value * 2,
+      debugLabel: 'derived',
+    );
+
+    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+
+    wrapper.wrap(count, disposeTogether: true);
+    var buff = doubledCount.buffer(1).filter([]);
+
+    expect(wrapper.value, equals(10));
+
+    expect(doubledCount.listenersCount, 1);
+    expect(count.listenersCount, 2);
+
+    wrapper.dispose();
+
+    expect(doubledCount.listenersCount, 1);
+    expect(count.listenersCount, 0);
+    count.dispose();
+    buff.dispose();
+
+    expect(doubledCount.listenersCount, 0);
+  });
+
+  test('should dispose together when wrapped is disposed', () {
+    // BeaconObserver.instance = LoggingObserver();
+    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+    var doubledCount = Beacon.derived<int>(
+      () => count.value * 2,
+      debugLabel: 'derived',
+    );
+
+    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+
+    wrapper.wrap(count, disposeTogether: true);
+    var _ = doubledCount.filter(0).buffer(1).wrap(
+          wrapper,
+          disposeTogether: true,
+        );
+
+    expect(wrapper.value, equals(10));
+
+    expect(doubledCount.listenersCount, 1);
+    expect(count.listenersCount, 2);
+
+    wrapper.dispose();
+
+    expect(doubledCount.listenersCount, 0);
+    expect(count.listenersCount, 0);
+  });
+
+  test('should dispose together when wrapped is disposed(2)', () {
+    // BeaconObserver.instance = LoggingObserver();
+    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+
+    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+
+    wrapper.wrap(count, disposeTogether: true);
+
+    expect(wrapper.value, equals(10));
+
+    expect(count.listenersCount, 1);
+
+    count.dispose();
+
+    expect(count.listenersCount, 0);
+  });
 }

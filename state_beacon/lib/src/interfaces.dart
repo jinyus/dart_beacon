@@ -9,6 +9,9 @@ abstract class BeaconConsumer<S> {
   /// NB: If no `then` function is provided, the value type of the target must be
   /// the same as the wrapper beacon.
   ///
+  /// If the `disposeTogether` parameter is set to `true` (default), the wrapper beacon
+  /// will be disposed when the target beacon is disposed and vice versa.
+  ///
   /// Example:
   /// ```dart
   /// var bufferBeacon = Beacon.bufferedCount<int>(10);
@@ -31,6 +34,7 @@ abstract class BeaconConsumer<S> {
     ReadableBeacon<U> target, {
     void Function(S, U)? then,
     bool startNow = true,
+    bool disposeTogether = false,
   });
 
   void clearWrapped();

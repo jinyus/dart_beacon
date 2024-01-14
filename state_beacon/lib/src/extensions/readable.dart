@@ -82,7 +82,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
     return Beacon.bufferedCount(
       count,
       debugLabel: debugLabel,
-    )..wrap(this);
+    )..wrap(
+        this,
+        disposeTogether: true,
+      );
   }
 
   /// Returns a [BufferedTimeBeacon] that wraps this Beacon.
@@ -94,7 +97,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
     return Beacon.bufferedTime(
       duration: duration,
       debugLabel: debugLabel,
-    )..wrap(this);
+    )..wrap(
+        this,
+        disposeTogether: true,
+      );
   }
 
   /// Returns a [DebouncedBeacon] that wraps this Beacon.
@@ -108,7 +114,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       initialValue,
       duration: duration,
       debugLabel: debugLabel,
-    )..wrap(this);
+    )..wrap(
+        this,
+        disposeTogether: true,
+      );
   }
 
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
@@ -124,7 +133,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       duration: duration,
       dropBlocked: dropBlocked,
       debugLabel: debugLabel,
-    )..wrap(this);
+    )..wrap(
+        this,
+        disposeTogether: true,
+      );
   }
 
   /// Returns a [FilteredBeacon] that wraps this Beacon.
@@ -132,7 +144,12 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   FilteredBeacon<T> filter(
     T initialValue, {
     bool Function(T?, T)? filter,
+    String? debugLabel,
   }) {
-    return Beacon.filtered(initialValue, filter: filter)..wrap(this);
+    return Beacon.filtered(initialValue, filter: filter)
+      ..wrap(
+        this,
+        disposeTogether: true,
+      );
   }
 }

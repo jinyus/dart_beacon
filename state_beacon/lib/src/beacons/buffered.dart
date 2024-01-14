@@ -33,6 +33,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     ReadableBeacon<U> target, {
     void Function(BufferedBaseBeacon<T> p1, U p2)? then,
     bool startNow = true,
+    bool disposeTogether = false,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return this;
 
@@ -47,6 +48,22 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     }, startNow: startNow);
 
     _wrapped[target.hashCode] = unsub;
+
+    if (disposeTogether) {
+      bool isDisposing = false;
+
+      target.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        dispose();
+      });
+
+      this.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        target.dispose();
+      });
+    }
 
     return this;
   }

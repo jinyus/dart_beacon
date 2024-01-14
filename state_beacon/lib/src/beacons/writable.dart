@@ -26,6 +26,7 @@ class WritableBeacon<T> extends ReadableBeacon<T>
     ReadableBeacon<U> target, {
     void Function(WritableBeacon<T> beacon, U newValue)? then,
     bool startNow = true,
+    bool disposeTogether = false,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return this;
 
@@ -43,6 +44,22 @@ class WritableBeacon<T> extends ReadableBeacon<T>
     );
 
     _wrapped[target.hashCode] = unsub;
+
+    if (disposeTogether) {
+      bool isDisposing = false;
+
+      target.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        dispose();
+      });
+
+      this.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        target.dispose();
+      });
+    }
 
     return this;
   }
