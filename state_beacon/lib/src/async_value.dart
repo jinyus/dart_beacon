@@ -30,8 +30,14 @@ sealed class AsyncValue<T> {
     return (this as AsyncData<T>).value;
   }
 
-  /// Returns `true` if this is [AsyncLoading] or [AsyncIdle].
-  bool get isLoading => this is AsyncLoading || this is AsyncIdle;
+  /// Returns `true` if this is [AsyncLoading].
+  bool get isLoading => this is AsyncLoading;
+
+  /// Returns `true` if this is [AsyncIdle].
+  bool get isIdle => this is AsyncIdle;
+
+  /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
+  bool get isIdleOrLoading => this is AsyncIdle || this is AsyncLoading;
 
   /// Returns `true` if this is [AsyncData].
   bool get isData => this is AsyncData;

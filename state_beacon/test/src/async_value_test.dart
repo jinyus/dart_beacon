@@ -99,7 +99,7 @@ void main() {
 
     expect(idle.lastData, null);
     expect(idle.valueOrNull, null);
-    expect(idle.isLoading, true);
+    expect(idle.isIdle, true);
 
     idle.setLastData(1);
 

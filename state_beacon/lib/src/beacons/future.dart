@@ -24,8 +24,11 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   /// Casts its value to [AsyncData] and return it's value or throws [CastError] if this is not [AsyncData].
   T unwrapValue() => _value.unwrap();
 
-  /// Returns `true` if this is [AsyncLoading] or [AsyncIdle].
+  /// Returns `true` if this is [AsyncLoading].
   bool get isLoading => _value.isLoading;
+
+  /// Returns `true` if this is [AsyncIdle].
+  bool get isIdle => _value.isIdle;
 
   /// Returns `true` if this is [AsyncData].
   bool get isData => _value.isData;
