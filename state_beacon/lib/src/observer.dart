@@ -30,10 +30,10 @@ class LoggingObserver implements BeaconObserver {
 
     debugPrint(
       '''
-Beacon updated:
-  label: ${beacon.debugLabel}
+
+"${beacon.debugLabel}" was updated:
   old: ${beacon.previousValue}
-  new: ${beacon.peek()}\n''',
+  new: ${beacon.peek()}\n\n\n''',
     );
   }
 
@@ -41,7 +41,7 @@ Beacon updated:
   void onDispose(BaseBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.debugLabel)) return;
 
-    debugPrint('Beacon disposed: ${beacon.debugLabel}\n');
+    debugPrint('\n"${beacon.debugLabel}" was disposed\n\n');
   }
 
   @override
@@ -49,7 +49,7 @@ Beacon updated:
     if (!shouldContinue(beacon.debugLabel)) return;
 
     final lazyLabel = lazy ? 'Lazy' : '';
-    debugPrint('${lazyLabel}Beacon created: ${beacon.debugLabel}\n');
+    debugPrint('\n${lazyLabel}Beacon created: ${beacon.debugLabel}\n\n');
   }
 
   bool shouldContinue(String label) {
@@ -63,9 +63,8 @@ Beacon updated:
 
     debugPrint(
       '''
-Effect watching beacon:
-  effect: $effectLabel
-  beacon: ${beacon.debugLabel}\n''',
+
+$effectLabel is watching ${beacon.debugLabel}\n\n''',
     );
   }
 
@@ -75,9 +74,8 @@ Effect watching beacon:
 
     debugPrint(
       '''
-Effect stopped watching beacon:
-  effect: $effectLabel
-  beacon: ${beacon.debugLabel}\n''',
+
+$effectLabel stopped watching ${beacon.debugLabel}\n\n''',
     );
   }
   // coverage:ignore-end
