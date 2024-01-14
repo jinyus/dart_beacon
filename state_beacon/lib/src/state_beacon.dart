@@ -31,8 +31,9 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       WritableBeacon<T>(
-          initialValue: initialValue,
-          debugLabel: debugLabel ?? 'LazyWritable<$T>');
+        initialValue: initialValue,
+        debugLabel: debugLabel ?? 'LazyWritable<$T>',
+      );
 
   /// Creates a `ReadableBeacon` with an initial value.
   /// This beacon allows only reading the value.
@@ -47,7 +48,9 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       ReadableBeacon<T>(
-          initialValue: initialValue, debugLabel: debugLabel ?? 'Readable<$T>');
+        initialValue: initialValue,
+        debugLabel: debugLabel ?? 'Readable<$T>',
+      );
 
   /// Returns a `ReadableBeacon` and a function for setting its value.
   /// This is useful for creating a beacon that's readable by the public,
@@ -62,8 +65,9 @@ abstract class Beacon {
     String? debugLabel,
   }) {
     final beacon = WritableBeacon<T>(
-        initialValue: initialValue,
-        debugLabel: debugLabel ?? 'ScopedWritable<$T>');
+      initialValue: initialValue,
+      debugLabel: debugLabel ?? 'ScopedWritable<$T>',
+    );
     return (beacon, beacon.set);
   }
 
@@ -84,9 +88,10 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       DebouncedBeacon<T>(
-          initialValue: initialValue,
-          duration: duration,
-          debugLabel: debugLabel ?? 'DebouncedBeacon<$T>');
+        initialValue: initialValue,
+        duration: duration,
+        debugLabel: debugLabel ?? 'DebouncedBeacon<$T>',
+      );
 
   /// Like `debounced`, but the initial value is lazily initialized.
   static DebouncedBeacon<T> lazyDebounced<T>({
@@ -95,9 +100,10 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       DebouncedBeacon<T>(
-          initialValue: initialValue,
-          duration: duration,
-          debugLabel: debugLabel ?? 'LazyDebouncedBeacon<$T>');
+        initialValue: initialValue,
+        duration: duration,
+        debugLabel: debugLabel ?? 'LazyDebouncedBeacon<$T>',
+      );
 
   /// Creates a `ThrottledBeacon` with an initial value and a throttle duration.
   /// This beacon limits the rate of updates to its value based on the duration.
@@ -176,9 +182,10 @@ abstract class Beacon {
     String? debugLabel,
   }) {
     return FilteredBeacon<T>(
-        initialValue: initialValue,
-        filter: filter,
-        debugLabel: debugLabel ?? 'FilteredBeacon<$T>');
+      initialValue: initialValue,
+      filter: filter,
+      debugLabel: debugLabel ?? 'FilteredBeacon<$T>',
+    );
   }
 
   /// Like `filtered`, but the initial value is lazily initialized.
@@ -243,8 +250,9 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       BufferedTimeBeacon<T>(
-          duration: duration,
-          debugLabel: debugLabel ?? 'BufferedTimeBeacon<$T>');
+        duration: duration,
+        debugLabel: debugLabel ?? 'BufferedTimeBeacon<$T>',
+      );
 
   /// Creates an `UndoRedoBeacon` with an initial value and an optional history limit.
   /// This beacon allows undoing and redoing changes to its value, up to the specified
@@ -280,9 +288,10 @@ abstract class Beacon {
     String? debugLabel,
   }) {
     return UndoRedoBeacon<T>(
-        initialValue: initialValue,
-        historyLimit: historyLimit,
-        debugLabel: debugLabel ?? 'LazyUndoRedoBeacon<$T>');
+      initialValue: initialValue,
+      historyLimit: historyLimit,
+      debugLabel: debugLabel ?? 'LazyUndoRedoBeacon<$T>',
+    );
   }
 
   /// Creates a `TimestampBeacon` with an initial value.
@@ -296,8 +305,9 @@ abstract class Beacon {
   static TimestampBeacon<T> timestamped<T>(T initialValue,
           {String? debugLabel}) =>
       TimestampBeacon<T>(
-          initialValue: initialValue,
-          debugLabel: debugLabel ?? 'TimestampBeacon<$T>');
+        initialValue: initialValue,
+        debugLabel: debugLabel ?? 'TimestampBeacon<$T>',
+      );
 
   /// Like `timestamped`, but the initial value is lazily initialized.
   static TimestampBeacon<T> lazyTimestamped<T>({
@@ -305,8 +315,9 @@ abstract class Beacon {
     String? debugLabel,
   }) =>
       TimestampBeacon<T>(
-          initialValue: initialValue,
-          debugLabel: debugLabel ?? 'LazyTimestampBeacon<$T>');
+        initialValue: initialValue,
+        debugLabel: debugLabel ?? 'LazyTimestampBeacon<$T>',
+      );
 
   /// Creates a `StreamBeacon` from a given stream.
   /// This beacon updates its value based on the stream's emitted values.
@@ -414,6 +425,7 @@ abstract class Beacon {
         beacon.$forceSet(compute());
       },
       supportConditional: supportConditional,
+      debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
     );
 
     beacon.$setInternalEffectUnsubscriber(unsub);
@@ -481,6 +493,7 @@ abstract class Beacon {
           await beacon.run();
         },
         supportConditional: supportConditional,
+        debugLabel: debugLabel ?? 'DerivedFutureBeacon<$T>',
       );
     });
 
