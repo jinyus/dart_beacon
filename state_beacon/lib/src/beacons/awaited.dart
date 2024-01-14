@@ -8,7 +8,8 @@ class Awaited<T, S extends AsyncBeacon<T>>
 
   VoidCallback? cancel;
 
-  Awaited(this._futureBeacon, {String? debugName}) : super(Completer<T>()) {
+  Awaited(this._futureBeacon, {String? debugName})
+      : super(initialValue: Completer<T>()) {
     cancel = _futureBeacon.subscribe((v) {
       if (peek().isCompleted) {
         _setValue(Completer<T>());

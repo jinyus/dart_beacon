@@ -2,7 +2,7 @@ part of '../base_beacon.dart';
 
 class WritableBeacon<T> extends ReadableBeacon<T>
     implements BeaconConsumer<WritableBeacon<T>> {
-  WritableBeacon([super.initialValue]);
+  WritableBeacon({super.initialValue});
 
   final _wrapped = <int, VoidCallback>{};
 

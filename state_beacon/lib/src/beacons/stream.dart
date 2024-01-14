@@ -8,7 +8,7 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   StreamBeacon(
     this._stream, {
     this.cancelOnError = false,
-  }) : super(AsyncLoading()) {
+  }) : super(initialValue: AsyncLoading()) {
     unawaited(_init());
   }
 
@@ -72,12 +72,11 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     this.cancelOnError = false,
     this.onError,
     this.onDone,
-    T? initialValue,
-  })  : assert(
+    super.initialValue,
+  }) : assert(
           initialValue != null || null is T,
           'provide an initialValue or change the type parameter "$T" to "$T?"',
-        ),
-        super(initialValue) {
+        ) {
     unawaited(_init());
   }
 

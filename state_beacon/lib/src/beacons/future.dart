@@ -17,9 +17,8 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   FutureBeacon(
     this._operation, {
     bool cancelRunning = true,
-    AsyncValue<T>? initialValue,
-  })  : _cancelRunning = cancelRunning,
-        super(initialValue);
+    super.initialValue,
+  }) : _cancelRunning = cancelRunning;
 
   /// Casts its value to [AsyncData] and return it's value or throws [CastError] if this is not [AsyncData].
   T unwrapValue() => _value.unwrap();

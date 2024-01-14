@@ -1,7 +1,7 @@
 part of '../base_beacon.dart';
 
 class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
-  MapBeacon(super.initialValue);
+  MapBeacon(Map<K, V> initialValue) : super(initialValue: initialValue);
 
   void operator []=(K key, V value) {
     _value[key] = value;

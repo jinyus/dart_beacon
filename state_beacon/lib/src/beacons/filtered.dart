@@ -5,9 +5,8 @@ typedef BeaconFilter<T> = bool Function(T?, T);
 class FilteredBeacon<T> extends WritableBeacon<T> {
   BeaconFilter<T>? _filter;
 
-  FilteredBeacon({T? initialValue, BeaconFilter<T>? filter})
-      : _filter = filter,
-        super(initialValue);
+  FilteredBeacon({super.initialValue, BeaconFilter<T>? filter})
+      : _filter = filter;
 
   bool get hasFilter => _filter != null;
 

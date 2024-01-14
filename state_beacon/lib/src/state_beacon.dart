@@ -20,7 +20,7 @@ abstract class Beacon {
     T initialValue, {
     String? debugLabel,
   }) =>
-      WritableBeacon<T>(initialValue)
+      WritableBeacon<T>(initialValue: initialValue)
         ..setDebugLabel(debugLabel ?? 'Writable<$T>');
 
   /// Like `writable`, but the initial value is lazily initialized.
@@ -28,7 +28,7 @@ abstract class Beacon {
     T? initialValue,
     String? debugLabel,
   }) =>
-      WritableBeacon<T>(initialValue)
+      WritableBeacon<T>(initialValue: initialValue)
         ..setDebugLabel(debugLabel ?? 'LazyWritable<$T>');
 
   /// Creates a `ReadableBeacon` with an initial value.
@@ -43,7 +43,7 @@ abstract class Beacon {
     T initialValue, {
     String? debugLabel,
   }) =>
-      ReadableBeacon<T>(initialValue)
+      ReadableBeacon<T>(initialValue: initialValue)
         ..setDebugLabel(debugLabel ?? 'Readable<$T>');
 
   /// Returns a `ReadableBeacon` and a function for setting its value.
@@ -58,7 +58,7 @@ abstract class Beacon {
     T initialValue, {
     String? debugLabel,
   }) {
-    final beacon = WritableBeacon<T>(initialValue)
+    final beacon = WritableBeacon<T>(initialValue: initialValue)
       ..setDebugLabel(debugLabel ?? 'ScopedWritable<$T>');
     return (beacon, beacon.set);
   }

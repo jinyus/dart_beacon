@@ -3,10 +3,10 @@ part of '../base_beacon.dart';
 abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     implements BeaconConsumer<BufferedBaseBeacon<T>> {
   final List<T> _buffer = [];
-  final _currentBuffer = WritableBeacon<List<T>>([]);
+  final _currentBuffer = WritableBeacon<List<T>>(initialValue: []);
   final _wrapped = <int, VoidCallback>{};
 
-  BufferedBaseBeacon() : super([]);
+  BufferedBaseBeacon() : super(initialValue: []);
 
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
