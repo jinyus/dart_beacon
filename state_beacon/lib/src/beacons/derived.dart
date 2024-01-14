@@ -18,7 +18,7 @@ mixin DerivedMixin<T> on ReadableBeacon<T> {
 
 // this is only used internally
 class WritableDerivedBeacon<T> extends ReadableBeacon<T> with DerivedMixin<T> {
-  WritableDerivedBeacon();
+  WritableDerivedBeacon({super.debugLabel});
 
   void $forceSet(T newValue) {
     _setValue(newValue, force: true);

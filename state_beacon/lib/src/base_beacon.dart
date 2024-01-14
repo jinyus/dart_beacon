@@ -34,7 +34,7 @@ part 'beacons/awaited.dart';
 part 'beacons/async.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
-  BaseBeacon({T? initialValue}) {
+  BaseBeacon({T? initialValue, String? debugLabel}) : _debugLabel = debugLabel {
     if (initialValue != null || _isNullable) {
       _initialValue = initialValue as T;
       _value = initialValue;
@@ -47,10 +47,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
 
   String? _debugLabel;
   String get debugLabel => _debugLabel ?? runtimeType.toString();
-
-  void setDebugLabel(String? value) {
-    _debugLabel = value;
-  }
 
   var _isEmpty = true;
   late T _value;
