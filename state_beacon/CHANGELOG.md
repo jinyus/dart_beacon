@@ -1,3 +1,7 @@
+## 0.22.1
+
+-   Add `disposeTogether` option for beacon wrapping. This will dispose all wrapped beacons when the wrapping beacon is disposed and vice versa. It's set the `false` for manual wrapping and `true` when using extension methods like `mybeacon.buffer(10)`
+
 ## 0.22.0
 
 -   [Breaking] initialValue is now a named argument for all beacon _classes_. This doesn't affect any existing public api provided by `Beacon.writable()` etc. This only affects you if you are using the `Beacon` class directly.
