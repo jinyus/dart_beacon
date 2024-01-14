@@ -30,6 +30,9 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   /// Returns `true` if this is [AsyncIdle].
   bool get isIdle => _value.isIdle;
 
+  /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
+  bool get isIdleOrLoading => _value.isIdleOrLoading;
+
   /// Returns `true` if this is [AsyncData].
   bool get isData => _value.isData;
 
