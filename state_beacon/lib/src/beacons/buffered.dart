@@ -72,7 +72,8 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
   final int countThreshold;
 
-  BufferedCountBeacon({required this.countThreshold}) : super();
+  BufferedCountBeacon({required this.countThreshold, super.debugLabel})
+      : super();
 
   @override
   void add(T newValue) {
@@ -89,7 +90,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
   final Duration duration;
   Timer? _timer;
 
-  BufferedTimeBeacon({required this.duration}) : super();
+  BufferedTimeBeacon({required this.duration, super.debugLabel}) : super();
 
   @override
   void add(T newValue) {

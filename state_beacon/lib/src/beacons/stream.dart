@@ -8,6 +8,7 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   StreamBeacon(
     this._stream, {
     this.cancelOnError = false,
+    super.debugLabel,
   }) : super(initialValue: AsyncLoading()) {
     unawaited(_init());
   }

@@ -48,10 +48,6 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   String? _debugLabel;
   String get debugLabel => _debugLabel ?? runtimeType.toString();
 
-  void setDebugLabel(String? value) {
-    _debugLabel = value;
-  }
-
   var _isEmpty = true;
   late T _value;
   T? _previousValue;
