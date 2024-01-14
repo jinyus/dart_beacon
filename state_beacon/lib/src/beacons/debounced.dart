@@ -4,8 +4,11 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
   final Duration debounceDuration;
   Timer? _debounceTimer;
 
-  DebouncedBeacon({super.initialValue, required Duration duration})
-      : debounceDuration = duration;
+  DebouncedBeacon({
+    super.initialValue,
+    required Duration duration,
+    super.debugLabel,
+  }) : debounceDuration = duration;
 
   @override
   set value(T newValue) {

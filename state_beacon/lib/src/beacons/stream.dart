@@ -73,6 +73,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     this.onError,
     this.onDone,
     super.initialValue,
+    super.debugLabel,
   }) : assert(
           initialValue != null || null is T,
           'provide an initialValue or change the type parameter "$T" to "$T?"',

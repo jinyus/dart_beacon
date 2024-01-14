@@ -6,7 +6,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   final _currentBuffer = WritableBeacon<List<T>>(initialValue: []);
   final _wrapped = <int, VoidCallback>{};
 
-  BufferedBaseBeacon() : super(initialValue: []);
+  BufferedBaseBeacon({super.debugLabel}) : super(initialValue: []);
 
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 

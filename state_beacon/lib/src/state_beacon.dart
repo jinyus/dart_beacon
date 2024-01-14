@@ -276,7 +276,7 @@ abstract class Beacon {
   /// ```
   static TimestampBeacon<T> timestamped<T>(T initialValue,
           {String? debugLabel}) =>
-      TimestampBeacon<T>(initialValue)
+      TimestampBeacon<T>(initialValue: initialValue)
         ..setDebugLabel(debugLabel ?? 'TimestampBeacon<$T>');
 
   /// Like `timestamped`, but the initial value is lazily initialized.
@@ -284,7 +284,7 @@ abstract class Beacon {
     T? initialValue,
     String? debugLabel,
   }) =>
-      TimestampBeacon<T>(initialValue)
+      TimestampBeacon<T>(initialValue: initialValue)
         ..setDebugLabel(debugLabel ?? 'LazyTimestampBeacon<$T>');
 
   /// Creates a `StreamBeacon` from a given stream.
