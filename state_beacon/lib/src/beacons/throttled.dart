@@ -12,11 +12,10 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   final List<T> _buffer = [];
 
   ThrottledBeacon({
-    T? initialValue,
+    super.initialValue,
     required Duration duration,
     this.dropBlocked = true,
-  })  : _throttleDuration = duration,
-        super(initialValue);
+  }) : _throttleDuration = duration;
 
   bool get isBlocked => _blocked;
 
