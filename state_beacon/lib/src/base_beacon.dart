@@ -303,11 +303,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
     _widgetSubscribers.clear();
     if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
-    _isDisposed = true;
     for (final callback in _disposeCallbacks) {
       callback();
     }
     _disposeCallbacks.clear();
+    _isDisposed = true;
     BeaconObserver.instance?.onDispose(this);
   }
 
