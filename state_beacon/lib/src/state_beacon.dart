@@ -25,7 +25,9 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'Writable<$T>',
       );
 
-  /// Like `writable`, but the initial value is lazily initialized.
+  /// Like `Beacon.writable` but behaves like a late variable. It must be set before it's read.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set.
   static WritableBeacon<T> lazyWritable<T>({
     T? initialValue,
     String? debugLabel,
@@ -93,7 +95,9 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'DebouncedBeacon<$T>',
       );
 
-  /// Like `debounced`, but the initial value is lazily initialized.
+  /// Like `Beacon.debounced` but behaves like a late variable. It must be set before it's read.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set..
   static DebouncedBeacon<T> lazyDebounced<T>({
     T? initialValue,
     required Duration duration,
@@ -142,7 +146,9 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'ThrottledBeacon<$T>',
       );
 
-  /// Like `throttled`, but the initial value is lazily initialized.
+  /// Like `Beacon.throttled` but behaves like a late variable. It must be set before it's read.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set.
   static ThrottledBeacon<T> lazyThrottled<T>({
     T? initialValue,
     required Duration duration,
@@ -188,8 +194,10 @@ abstract class Beacon {
     );
   }
 
-  /// Like `filtered`, but the initial value is lazily initialized.
+  /// Like `Beacon.filtered` but behaves like a late variable. It must be set before it's read.
   /// The first will not be filtered if the `initialValue` is null.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set.
   static FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
@@ -281,7 +289,9 @@ abstract class Beacon {
     );
   }
 
-  /// Like `undoRedo`, but the initial value is lazily initialized.
+  /// Like `Beacon.undoRedo` but behaves like a late variable. It must be set before it's read.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set.
   static UndoRedoBeacon<T> lazyUndoRedo<T>({
     T? initialValue,
     int historyLimit = 10,
@@ -309,7 +319,9 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'TimestampBeacon<$T>',
       );
 
-  /// Like `timestamped`, but the initial value is lazily initialized.
+  /// Like `Beacon.timestamped` but behaves like a late variable. It must be set before it's read.
+  ///
+  /// Throws [UninitializeLazyReadException] if it's read before being set.
   static TimestampBeacon<T> lazyTimestamped<T>({
     T? initialValue,
     String? debugLabel,
