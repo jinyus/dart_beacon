@@ -20,7 +20,7 @@ jobs:
             includes: "*.md"
             modified_files_only: true
 
-    build:
+    test:
         runs-on: ubuntu-latest
 
         if: github.event.pull_request.draft == false
@@ -28,23 +28,27 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            # This step checks for modified .dart files outside the /examples directory.
+            - name: Check for modified .dart files
+              id: check_files
+              uses: tj-actions/changed-files@v42
+              with:
+                  files: |
+                      state_beacon/lib/**/*.dart
+                      state_beacon/test/**/*.dart
+
             - uses: subosito/flutter-action@v2
 
-            - name: Install dependencies
-              run: cd state_beacon && flutter pub get
+            - if: steps.check_files.outputs.any_modified == 'true'
+              name: Build and Test
+              run: |
+                  cd state_beacon
+                  flutter pub get
+                  flutter analyze
+                  flutter test --coverage
 
-            # Uncomment this step to verify the use of 'dart format' on each commit.
-            # - name: Verify formatting
-            #   run: dart format --output=none --set-exit-if-changed .
-
-            # Consider passing '--fatal-infos' for slightly stricter analysis.
-            - name: Analyze project source
-              run: cd state_beacon && flutter analyze
-
-            - name: Run tests
-              run: cd state_beacon && flutter test --coverage
-
-            - name: Upload coverage reports to Codecov
+            - if: steps.check_files.outputs.any_modified == 'true'
+              name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v3
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
