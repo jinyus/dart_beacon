@@ -15,8 +15,9 @@ const konamiCodes = [
 
 class Controller {
   final keys = Beacon.lazyThrottled<String>(duration: k100ms * 2);
-  late final last10 = Beacon.bufferedCount<String>(10).wrap(
-    keys,
-    startNow: false,
-  );
+  late final last10 = Beacon.bufferedCount<String>(10)
+    ..wrap(
+      keys,
+      startNow: false,
+    );
 }

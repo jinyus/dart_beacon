@@ -17,7 +17,8 @@ export 'src/base_beacon.dart'
         ThrottledBeacon,
         TimestampBeacon,
         UndoRedoBeacon,
-        WritableBeacon;
+        WritableBeacon,
+        WritableWrap;
 export 'src/extensions/extensions.dart';
 export 'src/observer.dart';
 export 'src/state_beacon.dart';

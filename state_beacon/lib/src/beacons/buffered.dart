@@ -1,10 +1,9 @@
 part of '../base_beacon.dart';
 
 abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
-    implements BeaconConsumer<BufferedBaseBeacon<T>> {
+    with BeaconConsumer<T, List<T>> {
   final List<T> _buffer = [];
   final _currentBuffer = WritableBeacon<List<T>>(initialValue: []);
-  final _wrapped = <int, VoidCallback>{};
 
   BufferedBaseBeacon({super.debugLabel}) : super(initialValue: []);
 
@@ -29,60 +28,18 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   }
 
   @override
-  BufferedBaseBeacon<T> wrap<U>(
-    ReadableBeacon<U> target, {
-    void Function(BufferedBaseBeacon<T> p1, U p2)? then,
-    bool startNow = true,
-    bool disposeTogether = false,
-  }) {
-    if (_wrapped.containsKey(target.hashCode)) return this;
-
-    if (then == null && U != T) {
-      throw WrapTargetWrongTypeException(debugLabel, target.debugLabel);
-    }
-
-    final fn = then ?? ((b, val) => b.add(val as T));
-
-    final unsub = target.subscribe((val) {
-      fn(this, val);
-    }, startNow: startNow);
-
-    _wrapped[target.hashCode] = unsub;
-
-    if (disposeTogether) {
-      bool isDisposing = false;
-
-      target.onDispose(() {
-        if (isDisposing) return;
-        isDisposing = true;
-        dispose();
-      });
-
-      this.onDispose(() {
-        if (isDisposing) return;
-        isDisposing = true;
-        target.dispose();
-      });
-    }
-
-    return this;
-  }
-
-  /// Disposes all currently wrapped beacons
-  @override
-  void clearWrapped() {
-    for (var e in _wrapped.values) {
-      e();
-    }
-    _wrapped.clear();
-  }
-
-  @override
   void dispose() {
     clearWrapped();
     clearBuffer();
     _currentBuffer.dispose();
     super.dispose();
+  }
+
+  // FOR BEACON CONSUMER MIXIN
+
+  @override
+  void _onNewValueFromWrapped(T value) {
+    add(value);
   }
 }
 

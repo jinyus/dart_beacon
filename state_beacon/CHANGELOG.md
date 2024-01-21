@@ -1,3 +1,7 @@
+## 0.23.0
+
+-   [Breaking] beacon.wrap() no longer returns the wrapper instance. This is redundant as it retuned the same instance that the method was called on. Chanining can be achieved by using `beacon..wrap()..wrap()`
+
 ## 0.22.1
 
 -   Add `disposeTogether` option for beacon wrapping. This will dispose all wrapped beacons when the wrapping beacon is disposed and vice versa. It's set the `false` for manual wrapping and `true` when using extension methods like `mybeacon.buffer(10)`

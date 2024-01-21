@@ -1,7 +1,7 @@
-import 'package:state_beacon/src/base_beacon.dart';
+part of '../base_beacon.dart';
 
-abstract class BeaconConsumer<S> {
-  /// Wraps a `ReadableBeacon` and comsumes its values
+extension WritableWrap<T, U> on BeaconConsumer<T, U> {
+  /// Wraps a `ReadableBeacon` and comsume its values
   ///
   /// Supply a (`then`) function to customize how the emitted values are
   /// processed.
@@ -30,19 +30,42 @@ abstract class BeaconConsumer<S> {
   ///
   /// print(bufferBeacon.buffer); // Outputs: [5, 5, 10, 10]
   /// ```
-  S wrap<U>(
+  void wrap<U>(
     ReadableBeacon<U> target, {
-    void Function(S, U)? then,
+    void Function(U)? then,
     bool startNow = true,
     bool disposeTogether = false,
-  });
+  }) {
+    if (_wrapped.containsKey(target.hashCode)) return;
 
-  void clearWrapped();
+    if (then == null && T != U) {
+      throw WrapTargetWrongTypeException(debugLabel, target.debugLabel);
+    }
+
+    final fn = then ?? ((val) => this._onNewValueFromWrapped(val as T));
+
+    final unsub = target.subscribe((val) {
+      fn(val);
+    }, startNow: startNow);
+
+    _wrapped[target.hashCode] = unsub;
+
+    if (disposeTogether) {
+      bool isDisposing = false;
+
+      target.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        dispose();
+      });
+
+      this.onDispose(() {
+        if (isDisposing) return;
+        isDisposing = true;
+        target.dispose();
+      });
+    }
+
+    return;
+  }
 }
-
-// abstract class StreamConsumer<T> {
-//   void ingest<U>(
-//     Stream<U> target, {
-//     Function(T, U)? then,
-//   });
-// }

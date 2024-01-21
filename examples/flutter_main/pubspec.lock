@@ -358,7 +358,7 @@ packages:
       path: "../../state_beacon"
       relative: true
     source: path
-    version: "0.20.1"
+    version: "0.22.1"
   state_beacon_lint:
     dependency: "direct dev"
     description:
