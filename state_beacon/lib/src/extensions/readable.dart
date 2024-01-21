@@ -123,7 +123,7 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
   /// See: [Beacon.throttled] for more details.
   ThrottledBeacon<T> throttle(
-    T? initialValue, {
+    T initialValue, {
     required Duration duration,
     bool dropBlocked = true,
     String? debugLabel,
