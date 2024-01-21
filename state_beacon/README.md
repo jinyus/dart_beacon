@@ -96,7 +96,7 @@ NB: Create the file if it doesn't exist.
 
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
-    -   [WritableBeacon.wrap](#mywritablewrapanybeacon): Wraps an existing beacon and comsumes its values
+    -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and comsumes its values
 -   [Beacon.readable](#beaconreadable): Read-only values.
     -   [next](#readblebeaconnext): Allows awaiting the next value as a future.
 -   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
