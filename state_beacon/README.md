@@ -96,6 +96,7 @@ NB: Create the file if it doesn't exist.
 
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
+    -   [WritableBeacon.wrap](#mywritablewrapanybeacon): Wraps an existing beacon and comsumes its values
 -   [Beacon.readable](#beaconreadable): Read-only values.
     -   [next](#readblebeaconnext): Allows awaiting the next value as a future.
 -   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
@@ -548,26 +549,21 @@ Supply a (`then`) function to customize how the emitted values are
 processed.
 
 ```dart
-var bufferBeacon = Beacon.bufferedCount<int>(10);
+var bufferBeacon = Beacon.bufferedCount<String>(10);
 var count = Beacon.writable(5);
 
-// Wrap the count beacon and provide a custom transformation.
-bufferBeacon.wrap(
-  count,
-  then: (thisBeacon, countValue) {
-
-      // Custom transformation: Add the value twice to the buffer.
-      thisBeacon.add(countValue);
-      thisBeacon.add(countValue);
-
+// Wrap the bufferBeacon with the readableBeacon and provide a custom transformation.
+bufferBeacon.wrap(count, then: (value) {
+  // Custom transformation: Convert the value to a string and add it to the buffer.
+  bufferBeacon.add(value.toString());
 });
 
-print(bufferBeacon.buffer); // Outputs: [5, 5]
-
+print(bufferBeacon.buffer); // Outputs: ['5']
 count.value = 10;
-
-print(bufferBeacon.buffer); // Outputs: [5, 5, 10, 10]
+print(bufferBeacon.buffer); // Outputs: ['5', '10']
 ```
+
+This method is available on all writable beacons, including BufferedBeacons; and can wrap any beacon since all beacons are readable.
 
 ### AsyncValue:
 
