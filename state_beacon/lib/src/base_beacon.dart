@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:state_beacon/src/common.dart';
-import 'package:state_beacon/src/interfaces.dart';
 import 'package:state_beacon/src/observer.dart';
 import 'package:state_beacon/src/untracked.dart';
 
@@ -32,6 +31,8 @@ part 'beacons/derived_future.dart';
 part 'beacons/value_notifier.dart';
 part 'beacons/awaited.dart';
 part 'beacons/async.dart';
+part 'extensions/wrap.dart';
+part 'mixins/beacon_consumer.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
   BaseBeacon({T? initialValue, String? debugLabel}) : _debugLabel = debugLabel {

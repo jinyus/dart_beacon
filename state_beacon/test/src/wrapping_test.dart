@@ -37,7 +37,7 @@ void main() {
 
     var wrapper = Beacon.bufferedCount<int>(5);
 
-    wrapper.wrap(count, then: (b, c) => b.add(c));
+    wrapper.wrap(count, then: (c) => wrapper.add(c));
     wrapper.wrap(doubledCount);
 
     expect(wrapper.value, equals([]));
@@ -71,8 +71,8 @@ void main() {
     var wrapper = Beacon.writable<String>("");
     var bufWrapper = Beacon.bufferedCount<String>(10);
 
-    wrapper.wrap(original, then: (w, val) => w.value = 'Number $val');
-    bufWrapper.wrap(original, then: (w, val) => w.add('Number $val'));
+    wrapper.wrap(original, then: (val) => wrapper.value = 'Number $val');
+    bufWrapper.wrap(original, then: (val) => bufWrapper.add('Number $val'));
 
     expect(wrapper.value, equals('Number 2'));
     expect(bufWrapper.currentBuffer.value, equals(['Number 2']));
