@@ -21,16 +21,16 @@ class Controller {
     parsedItems.wrap(
       rawItems,
       startNow: false,
-      then: (beacon, newAsyncValue) {
+      then: (newAsyncValue) {
         // get the current list
-        final newList = beacon.peek().toList();
+        final newList = parsedItems.peek().toList();
 
         // remove the last item if it's an ItemLoading or ItemError
         if (newList.last is! ItemData) {
           newList.removeLast();
         }
 
-        beacon.value = switch (newAsyncValue) {
+        parsedItems.value = switch (newAsyncValue) {
           // if the new value is AsyncData<List<String>>, add the items to the list
           AsyncData<List<String>>(value: final lst) => newList
             ..addAll(lst.map(ItemData.new))
