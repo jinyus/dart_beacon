@@ -79,5 +79,8 @@ void main() {
     await Future<void>.delayed(k1ms);
 
     expect(done, true);
+
+    expect(myBeacon.isDisposed, true);
+    expect(buffered.isDisposed, true);
   });
 }
