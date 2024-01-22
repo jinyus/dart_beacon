@@ -144,6 +144,15 @@ print(counter.value); // 10
 
 Like `Beacon.writable` but behaves like a `late` variable. It must be set before it's read.
 
+#### NB: All writable beacons have a lazy counterpart.
+
+````dart
+final counter = Beacon.lazyWritable();
+print(counter.value); // throws UninitializeLazyReadException()
+
+counter.value = 10;
+print(counter.value); // 10
+
 ### Beacon.scopedWritable:
 
 Returns a `ReadableBeacon` and a function for setting its value.
@@ -152,17 +161,9 @@ but writable only by the owner.
 
 ```dart
 var (count,setCount) = Beacon.scopedWritable(15);
-```
+````
 
-#### NB: All writable beacons have a lazy counterpart.
-
-```dart
-final counter = Beacon.lazyWritable();
-print(counter.value); // throws UninitializeLazyReadException()
-
-counter.value = 10;
-print(counter.value); // 10
-```
+````
 
 ### Beacon.readable:
 
@@ -177,7 +178,7 @@ final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
 ReadableBeacon<int> get counter => _internalCounter;
-```
+````
 
 ### Beacon.createEffect:
 
@@ -202,7 +203,7 @@ age.value = 20; // Outputs: "You can vote!"
 
 ### Beacon.doBatchUpdate:
 
-Executes a batched update which allows multiple updates to be batched into a single update.
+This allows multiple updates to be batched into a single update.
 This can be used to optimize performance by reducing the number of update notifications.
 
 ```dart
@@ -312,22 +313,30 @@ var fullName = Beacon.derivedFuture(() async {
 
 ### Beacon.debounced:
 
-Creates a `DebouncedBeacon` with an initial value and a debounce duration.
-This beacon delays updates to its value based on the duration.
+Creates a `DebouncedBeacon` that will delay updates to its value based on the duration. This is useful when you want to wait until a user has stopped typing before performing an action.
 
 ```dart
-var myBeacon = Beacon.debounced(10, duration: Duration(seconds: 1));
-myBeacon.value = 20; // Update is debounced
-print(myBeacon.value); // Outputs: 10
-await Future.delayed(Duration(seconds: 1));
-print(myBeacon.value); // Outputs: 20
+var query = Beacon.debounced('', duration: Duration(seconds: 1));
+
+query.subscribe((value) {
+  print(value); // Outputs: 'apple' after 1 second
+});
+
+// simulate user typing
+query.value = 'a';
+query.value = 'ap';
+query.value = 'app';
+query.value = 'appl';
+query.value = 'apple';
+
+// after 1 second, the value will be updated to 'apple'
 ```
 
 ### Beacon.throttled:
 
-Creates a `ThrottledBeacon` with an initial value and a throttle duration.
-This beacon limits the rate of updates to its value based on the duration.
-Updates that occur faster than the throttle duration are ignored.
+Creates a `ThrottledBeacon` that will limit the rate of updates to its value based on the duration.
+
+If `dropBlocked` is `true`(default), values will be dropped while the beacon is blocked, otherwise, values will be buffered and emitted one by one when the beacon is unblocked.
 
 ```dart
 const k10ms = Duration(milliseconds: 10);
@@ -347,33 +356,36 @@ expect(beacon.value, equals(30)); // throttle time passed, update allowed
 
 ### Beacon.filtered:
 
-Creates a `FilteredBeacon` with an initial value and a filter function.
-This beacon updates its value only if it passes the filter criteria.
+Creates a `FilteredBeacon` that will only updates its value if it passes the filter criteria.
 The filter function receives the previous and new values as arguments.
 The filter function can also be changed using the `setFilter` method.
 
 #### Simple Example:
 
 ```dart
-var pageNum = Beacon.filtered(10, (prev, next) => next > 0); // only positive values are allowed
+// only positive values are allowed
+var pageNum = Beacon.filtered(10, filter: (prev, next) => next > 0);
 pageNum.value = 20; // update is allowed
 pageNum.value = -5; // update is ignored
 ```
 
 #### Example when filter function depends on another beacon:
 
+In this example, `posts` is a derived future beacon that will fetch the posts whenever `pageNum` changes.
+We want to prevent the user from changing `pageNum` while `posts` is loading.
+
 ```dart
 var pageNum = Beacon.filtered(1); // we will set the filter function later
 
-final posts = Beacon.derivedFuture(() async {Repository.getPosts(pageNum.value);});
+final posts = Beacon.derivedFuture(() => Repository.getPosts(pageNum.value));
 
-pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
+// can't change pageNum while loading
+pageNum.setFilter((prev, next) => !posts.isLoading);
 ```
 
 ### Beacon.timestamped:
 
-Creates a `TimestampBeacon` with an initial value.
-This beacon attaches a timestamp to each value update.
+Creates a `TimestampBeacon` that attaches a timestamp to each value update.
 
 ```dart
 var myBeacon = Beacon.timestamped(10);
@@ -382,15 +394,16 @@ print(myBeacon.value); // Outputs: (value: 10, timestamp: __CURRENT_TIME__)
 
 ### Beacon.undoRedo:
 
-Creates an `UndoRedoBeacon` with an initial value and an optional history limit.
-This beacon allows undoing and redoing changes to its value.
+Creates an `UndoRedoBeacon` that allows undoing and redoing changes to its value.
 
 ```dart
-var undoRedoBeacon = UndoRedoBeacon<int>(0, historyLimit: 10);
-undoRedoBeacon.value = 10;
-undoRedoBeacon.value = 20;
-undoRedoBeacon.undo(); // Reverts to 10
-undoRedoBeacon.redo(); // Goes back to 20
+var age = Beacon.undoRedo(0, historyLimit: 10);
+
+age.value = 10;
+age.value = 20;
+
+age.undo(); // Reverts to 10
+age.redo(); // Goes back to 20
 ```
 
 ### Beacon.bufferedCount:
