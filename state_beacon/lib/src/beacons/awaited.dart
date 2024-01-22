@@ -1,8 +1,7 @@
 part of '../base_beacon.dart';
 
-class Awaited<T, S extends AsyncBeacon<T>>
-    extends ReadableBeacon<Completer<T>> {
-  late final S _futureBeacon;
+class Awaited<T> extends ReadableBeacon<Completer<T>> {
+  late final AsyncBeacon<T> _futureBeacon;
 
   Future<T> get future => value.future;
 
@@ -14,6 +13,7 @@ class Awaited<T, S extends AsyncBeacon<T>>
       if (peek().isCompleted) {
         _setValue(Completer<T>());
       }
+
       if (v case AsyncData<T>(:final value)) {
         super._value.complete(value);
       } else if (v case AsyncError(:final error, :final stackTrace)) {
@@ -22,22 +22,31 @@ class Awaited<T, S extends AsyncBeacon<T>>
     }, startNow: true);
   }
 
-  static Awaited<T, S>? find<T, S extends AsyncBeacon<T>>(S beacon) {
+  static Awaited<T> findOrCreate<T>(AsyncBeacon<T> beacon) {
     final existing = _awaitedBeacons[beacon];
+
     if (existing != null) {
-      return existing as Awaited<T, S>;
+      return existing as Awaited<T>;
     }
-    return null;
+
+    final newAwaited = Awaited(beacon);
+
+    _awaitedBeacons[beacon] = newAwaited;
+
+    return newAwaited;
   }
 
-  static void put<T, S extends AsyncBeacon<T>>(
-      S beacon, Awaited<T, S> awaited) {
-    _awaitedBeacons[beacon] = awaited;
+  static void remove<T>(AsyncBeacon<T> beacon) {
+    final awaitedBeacon = _awaitedBeacons.remove(beacon);
+
+    awaitedBeacon?.dispose();
   }
 
-  static void remove<T, S extends AsyncBeacon<T>>(S beacon) {
-    _awaitedBeacons.remove(beacon);
+  @override
+  void dispose() {
+    cancel?.call();
+    super.dispose();
   }
 }
 
-final _awaitedBeacons = <AsyncBeacon<dynamic>, Awaited<dynamic, dynamic>>{};
+final _awaitedBeacons = <AsyncBeacon<dynamic>, Awaited<dynamic>>{};
