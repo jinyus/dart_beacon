@@ -134,7 +134,7 @@ abstract class Beacon {
   /// ```
 
   static ThrottledBeacon<T> throttled<T>(
-    T? initialValue, {
+    T initialValue, {
     required Duration duration,
     bool dropBlocked = true,
     String? debugLabel,

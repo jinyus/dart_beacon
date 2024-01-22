@@ -96,9 +96,7 @@ NB: Create the file if it doesn't exist.
 
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
-    -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and comsumes its values
 -   [Beacon.readable](#beaconreadable): Read-only values.
-    -   [next](#readblebeaconnext): Allows awaiting the next value as a future.
 -   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
 -   [Beacon.doBatchUpdate](#beacondobatchupdate): Batch multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
@@ -121,6 +119,14 @@ NB: Create the file if it doesn't exist.
     -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return it's value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
+-   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
+    -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
+    -   [next](#mybeaconnext): Allows awaiting the next value as a future.
+    -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
+    -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
+    -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
+    -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+    -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 [Pitfalls](#pitfalls)
 
@@ -171,27 +177,6 @@ final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
 ReadableBeacon<int> get counter => _internalCounter;
-```
-
-#### ReadableBeacon.next():
-
-Listens for the next value emitted by this Beacon and returns it as a Future.
-
-This method subscribes to this Beacon and waits for the next value
-that matches the optional [filter] function. If [filter] is provided and
-returns `false` for a emitted value, the method continues waiting for the
-next value that matches the filter. If no [filter] is provided,
-the method completes with the first value received.
-
-If a value is not emitted within the specified [timeout] duration (default
-is 10 seconds), the method times out and returns the current value of the beacon.
-
-```dart
-final age = Beacon.writable(20);
-
-Timer(Duration(seconds: 1), () => age.value = 21;);
-
-final nextAge = await age.next(); // returns 21 after 1 second
 ```
 
 ### Beacon.createEffect:
@@ -541,30 +526,6 @@ nums.add(4); // Outputs: [1, 2, 3, 4]
 nums.remove(2); // Outputs: [1, 3, 4]
 ```
 
-### myWritable.wrap(anyBeacon):
-
-Wraps an existing beacon and comsumes its values
-
-Supply a (`then`) function to customize how the emitted values are
-processed.
-
-```dart
-var bufferBeacon = Beacon.bufferedCount<String>(10);
-var count = Beacon.writable(5);
-
-// Wrap the bufferBeacon with the readableBeacon and provide a custom transformation.
-bufferBeacon.wrap(count, then: (value) {
-  // Custom transformation: Convert the value to a string and add it to the buffer.
-  bufferBeacon.add(value.toString());
-});
-
-print(bufferBeacon.buffer); // Outputs: ['5']
-count.value = 10;
-print(bufferBeacon.buffer); // Outputs: ['5', '10']
-```
-
-This method is available on all writable beacons, including BufferedBeacons; and can wrap any beacon since all beacons are readable.
-
 ### AsyncValue:
 
 An `AsyncValue` is a wrapper around a value that can be in one of four states:`idle`, `loading`, `data`, or `error`.
@@ -646,6 +607,99 @@ final githubApiClient = apiClientFamily('https://api.github.com');
 final twitterApiClient = apiClientFamily('https://api.twitter.com');
 ```
 
+## Extensions:
+
+### myWritable.wrap(anyBeacon):
+
+Wraps an existing beacon and consumes its values
+
+Supply a (`then`) function to customize how the emitted values are
+processed.
+
+```dart
+var bufferBeacon = Beacon.bufferedCount<String>(10);
+var count = Beacon.writable(5);
+
+// Wrap the bufferBeacon with the readableBeacon and provide a custom transformation.
+bufferBeacon.wrap(count, then: (value) {
+  // Custom transformation: Convert the value to a string and add it to the buffer.
+  bufferBeacon.add(value.toString());
+});
+
+print(bufferBeacon.buffer); // Outputs: ['5']
+count.value = 10;
+print(bufferBeacon.buffer); // Outputs: ['5', '10']
+```
+
+This method is available on all writable beacons, including BufferedBeacons; and can wrap any beacon since all beacons are readable.
+
+### mybeacon.next():
+
+Listens for the next value emitted by this Beacon and returns it as a Future.
+
+This method subscribes to this Beacon and waits for the next value
+that matches the optional [filter] function. If [filter] is provided and
+returns `false` for a emitted value, the method continues waiting for the
+next value that matches the filter. If no [filter] is provided,
+the method completes with the first value received.
+
+If a value is not emitted within the specified [timeout] duration (default
+is 10 seconds), the method times out and returns the current value of the beacon.
+
+```dart
+final age = Beacon.writable(20);
+
+Timer(Duration(seconds: 1), () => age.value = 21;);
+
+final nextAge = await age.next(); // returns 21 after 1 second
+```
+
+### mybeacon.buffer():
+
+Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
+
+NB: The returned beacon will be disposed when the wrapped beacon is disposed.
+
+```dart
+final age = Beacon.writable(20);
+
+final bufferedAge = age.buffer(10);
+
+bufferedAge.subscribe((value) {
+  print(value); // Outputs: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+});
+
+for (var i = 0; i < 10; i++) {
+  age.value++;
+}
+```
+
+### mybeacon.bufferTime():
+
+Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
+
+### mybeacon.throttle():
+
+Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
+
+### mybeacon.filter():
+
+Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+
+### mybeacon.debounce():
+
+Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+
+```dart
+final query = Beacon.writable('');
+
+const k500ms = Duration(milliseconds: 500);
+
+final debouncedQuery = age
+                      .filter((prev,next) => next.length > 3);
+                      .debounce(duration: k500ms)
+```
+
 ## Pitfalls
 
 When using `Beacon.derivedFuture`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
@@ -669,7 +723,7 @@ final derivedFutureCounter = Beacon.derivedFuture(() async {
 
 When a derivedFuture depends on multiple future/stream beacons
 
--   DONT:
+-   DON'T:
 
 ```dart
 final derivedFutureCounter = Beacon.derivedFuture(() async {
