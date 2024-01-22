@@ -97,7 +97,7 @@ void main() {
     expect(called, equals(4));
   });
 
-  test('should throw is initial value is empty and type is non-nullable',
+  test('should throw if initial value is empty and type is non-nullable',
       () async {
     final myStream = Stream.periodic(k1ms, (i) => i + 1);
     expect(() => Beacon.streamRaw(myStream), throwsAssertionError);
