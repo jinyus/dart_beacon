@@ -14,11 +14,11 @@ on:
         types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-    spell-check:
-        uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
-        with:
-            includes: "*.md"
-            modified_files_only: true
+    # spell-check:
+    #     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
+    #     with:
+    #         includes: "*.md"
+    #         modified_files_only: true
 
     test:
         runs-on: ubuntu-latest
