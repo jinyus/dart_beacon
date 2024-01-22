@@ -146,12 +146,13 @@ Like `Beacon.writable` but behaves like a `late` variable. It must be set before
 
 #### NB: All writable beacons have a lazy counterpart.
 
-````dart
+```dart
 final counter = Beacon.lazyWritable();
 print(counter.value); // throws UninitializeLazyReadException()
 
 counter.value = 10;
 print(counter.value); // 10
+```
 
 ### Beacon.scopedWritable:
 
@@ -161,9 +162,7 @@ but writable only by the owner.
 
 ```dart
 var (count,setCount) = Beacon.scopedWritable(15);
-````
-
-````
+```
 
 ### Beacon.readable:
 
@@ -178,7 +177,7 @@ final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
 ReadableBeacon<int> get counter => _internalCounter;
-````
+```
 
 ### Beacon.effect:
 
