@@ -207,7 +207,7 @@ void main() {
       AsyncData('User 3'),
     ];
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       results.add(user.value);
     });
 

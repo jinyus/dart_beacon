@@ -97,7 +97,7 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
--   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
 -   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
@@ -180,7 +180,7 @@ final _internalCounter = Beacon.writable(10);
 ReadableBeacon<int> get counter => _internalCounter;
 ````
 
-### Beacon.createEffect:
+### Beacon.effect:
 
 An effect is just a function that will re-run whenever one of its
 dependencies change. An effect runs immediately after creation.
@@ -188,7 +188,7 @@ dependencies change. An effect runs immediately after creation.
 ```dart
 final age = Beacon.writable(15);
 
-Beacon.createEffect(() {
+Beacon.effect(() {
     if (age.value >= 18) {
       print("You can vote!");
     } else {
@@ -530,7 +530,7 @@ Similar to Beacon.list(), but for Maps.
 ```dart
 var nums = Beacon.list<int>([1, 2, 3]);
 
-Beacon.createEffect(() {
+Beacon.effect(() {
  print(nums.value); // Outputs: [1, 2, 3]
 });
 

@@ -16,7 +16,7 @@ void main() {
 
     expect(beacon.listenersCount, 1);
 
-    final unsub2 = Beacon.createEffect(() {
+    final unsub2 = Beacon.effect(() {
       beacon.value;
     });
 

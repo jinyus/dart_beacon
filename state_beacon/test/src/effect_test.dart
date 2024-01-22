@@ -12,7 +12,7 @@ void main() {
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       // ignore: unused_local_variable
       var msg = '${name()} is ${age()} years old';
 
@@ -51,7 +51,7 @@ void main() {
     final college = Beacon.writable("MIT", debugLabel: 'college');
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
-    Beacon.createEffect(
+    Beacon.effect(
       () {
         // ignore: unused_local_variable
         var msg = '${name.value} is ${age.value} years old';
@@ -91,7 +91,7 @@ void main() {
     var beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       effectCalled = true;
       beacon(); // Dependency
     });
@@ -108,7 +108,7 @@ void main() {
     var beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       effectCalled = true;
       beacon.value; // Dependency
     });
@@ -125,7 +125,7 @@ void main() {
     var beacon2 = Beacon.writable<int>(20);
     var effectCalled = false;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       effectCalled = true;
       beacon1.value;
       beacon2(); // Multiple dependencies
@@ -143,7 +143,7 @@ void main() {
     var beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       effectCalled = true;
       beacon.value;
     });
@@ -156,7 +156,7 @@ void main() {
     var beacon = Beacon.writable(10);
     var effectCalled = 0;
 
-    var cancel = Beacon.createEffect(() {
+    var cancel = Beacon.effect(() {
       effectCalled++;
       beacon.value;
     });
@@ -174,7 +174,7 @@ void main() {
     var beacon1 = Beacon.writable<int>(10);
 
     try {
-      Beacon.createEffect(() {
+      Beacon.effect(() {
         Beacon.batch(() {
           beacon1.value++;
         });
@@ -193,15 +193,15 @@ void main() {
     var effectCalled2 = 0;
     var effectCalled3 = 0;
 
-    final dispose = Beacon.createEffect(() {
+    final dispose = Beacon.effect(() {
       effectCalled++;
       beacon1.value;
 
-      return Beacon.createEffect(() {
+      return Beacon.effect(() {
         effectCalled2++;
         beacon2.value;
 
-        return Beacon.createEffect(() {
+        return Beacon.effect(() {
           effectCalled3++;
           beacon3.value;
         });
@@ -229,15 +229,15 @@ void main() {
     var effectCalled2 = 0;
     var effectCalled3 = 0;
 
-    final dispose = Beacon.createEffect(() {
+    final dispose = Beacon.effect(() {
       effectCalled++;
       beacon1.value;
 
-      return Beacon.createEffect(() {
+      return Beacon.effect(() {
         effectCalled2++;
         beacon2.value;
 
-        return Beacon.createEffect(() {
+        return Beacon.effect(() {
           effectCalled3++;
           beacon3.value;
         });
@@ -265,15 +265,15 @@ void main() {
     var effectCalled2 = 0;
     var effectCalled3 = 0;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       effectCalled++;
       beacon1.value;
 
-      return Beacon.createEffect(() {
+      return Beacon.effect(() {
         effectCalled2++;
         beacon2.value;
 
-        return Beacon.createEffect(() {
+        return Beacon.effect(() {
           effectCalled3++;
           beacon3.value;
         });

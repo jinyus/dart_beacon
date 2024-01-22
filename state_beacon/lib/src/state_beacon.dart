@@ -525,7 +525,7 @@ abstract class Beacon {
   /// ```dart
   /// var nums = Beacon.list<int>([1, 2, 3]);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///  print(nums.value); // Outputs: [1, 2, 3]
   /// });
   ///
@@ -574,7 +574,7 @@ abstract class Beacon {
   /// ```dart
   /// final age = Beacon.writable(15);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///     if (age.value >= 18) {
   ///       print("You can vote!");
   ///     } else {
@@ -586,6 +586,43 @@ abstract class Beacon {
   ///
   /// age.value = 20; // Outputs: "You can vote!"
   /// ```
+  static VoidCallback effect(
+    Function fn, {
+    bool supportConditional = true,
+    String? debugLabel,
+  }) {
+    return effect(
+      fn,
+      supportConditional: supportConditional,
+      debugLabel: debugLabel,
+    );
+  }
+
+  /// Creates an effect based on a provided function. The provided function will be called
+  /// whenever one of its dependencies change.
+  ///
+  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
+  /// and any beacon not accessed in the first run will not be tracked.
+  /// Defaults to `true`.
+  ///
+  /// Example:
+  /// ```dart
+  /// final age = Beacon.writable(15);
+  ///
+  /// Beacon.effect(() {
+  ///     if (age.value >= 18) {
+  ///       print("You can vote!");
+  ///     } else {
+  ///        print("You can't vote yet");
+  ///     }
+  ///  });
+  ///
+  /// // Outputs: "You can't vote yet"
+  ///
+  /// age.value = 20; // Outputs: "You can vote!"
+  /// ```
+  @Deprecated('Use Beacon.effect instead')
   static VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
@@ -656,7 +693,7 @@ abstract class Beacon {
   /// var callCount = 0;
   /// age.subscribe((_) => callCount++);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///      age.value;
   ///      Beacon.untracked(() {
   ///        age.value = 15;

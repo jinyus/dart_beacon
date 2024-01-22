@@ -6,7 +6,7 @@ void main() {
     final age = Beacon.writable<int>(10);
     var callCount = 0;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       age.value;
       callCount++;
       Beacon.untracked(() {
@@ -30,7 +30,7 @@ void main() {
       subCallCount++;
     });
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       age.value;
       callCount++;
       Beacon.untracked(() {
@@ -59,7 +59,7 @@ void main() {
 
     var callCount = 0;
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       age.value;
       callCount++;
       Beacon.untracked(() {

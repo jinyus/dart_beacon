@@ -84,7 +84,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   T call() => value;
 
   /// Returns the current value and subscribes to changes in the beacon
-  /// when used within a [Beacon.createEffect] or [Beacon.derived].
+  /// when used within a [Beacon.effect] or [Beacon.derived].
   @override
   T get value {
     if (_isEmpty) {

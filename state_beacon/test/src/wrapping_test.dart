@@ -225,7 +225,7 @@ void main() {
         .throttle(duration: k10ms)
         .debounce(duration: k10ms);
 
-    Beacon.createEffect(() => beacon.value);
+    Beacon.effect(() => beacon.value);
 
     expect(count.listenersCount, 1);
     expect(beacon.listenersCount, 1);
