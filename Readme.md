@@ -122,11 +122,11 @@ NB: Create the file if it doesn't exist.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and comsumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
-    -   [buffer](#mybeaconbuffer): Retuns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
-    -   [bufferTime](#mybeaconbuffertime): Retuns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
-    -   [throttle](#mybeaconthrottle): Retuns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
-    -   [filter](#mybeaconfilter): Retuns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
-    -   [debounce](#mybeacondebounce): Retuns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+    -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
+    -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
+    -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
+    -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+    -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 [Pitfalls](#pitfalls)
 
@@ -656,7 +656,7 @@ final nextAge = await age.next(); // returns 21 after 1 second
 
 ### mybeacon.buffer():
 
-Retuns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
+Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
 
 NB: The returned beacon will be disposed when the wrapped beacon is disposed.
 
@@ -676,19 +676,19 @@ for (var i = 0; i < 10; i++) {
 
 ### mybeacon.bufferTime():
 
-Retuns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
+Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
 
 ### mybeacon.throttle():
 
-Retuns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
+Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
 
 ### mybeacon.filter():
 
-Retuns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
 
 ### mybeacon.debounce():
 
-Retuns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 ```dart
 final query = Beacon.writable('');
