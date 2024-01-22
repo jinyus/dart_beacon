@@ -432,7 +432,7 @@ abstract class Beacon {
       debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
     );
 
-    final unsub = effect(
+    final unsub = doEffect(
       () {
         beacon.set(compute());
       },
@@ -496,11 +496,11 @@ abstract class Beacon {
       debugLabel: debugLabel ?? 'DerivedFutureBeacon<$T>',
     );
 
-    final dispose = effect(() {
+    final dispose = doEffect(() {
       // beacon is manually triggered if in idle state
       if (beacon.status() == DerivedFutureStatus.idle) return null;
 
-      return effect(
+      return doEffect(
         () async {
           await beacon.run();
         },
@@ -591,7 +591,7 @@ abstract class Beacon {
     bool supportConditional = true,
     String? debugLabel,
   }) {
-    return effect(
+    return doEffect(
       fn,
       supportConditional: supportConditional,
       debugLabel: debugLabel,
