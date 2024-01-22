@@ -148,6 +148,7 @@ Like `Beacon.writable` but behaves like a `late` variable. It must be set before
 
 ```dart
 final counter = Beacon.lazyWritable();
+
 print(counter.value); // throws UninitializeLazyReadException()
 
 counter.value = 10;
