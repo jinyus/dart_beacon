@@ -47,4 +47,10 @@ class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
     _setValue(_value, force: true);
     return result;
   }
+
+  /// Clears the map
+  @override
+  void reset() {
+    clear();
+  }
 }

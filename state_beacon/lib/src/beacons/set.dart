@@ -41,4 +41,10 @@ class SetBeacon<E> extends WritableBeacon<Set<E>> {
     _value.removeAll(iterable);
     _setValue(_value, force: true);
   }
+
+  /// Clears the set
+  @override
+  void reset() {
+    clear();
+  }
 }
