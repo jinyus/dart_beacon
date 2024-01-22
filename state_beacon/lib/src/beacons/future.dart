@@ -64,7 +64,7 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
       value.setLastData(lastData);
     }
 
-    _setValue(value, force: true);
+    _setValue(value);
   }
 
   Future<void> _run() async {
