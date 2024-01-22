@@ -7,7 +7,7 @@ void main() {
     var callCount = 0;
     age.subscribe((_) => callCount++);
 
-    Beacon.doBatchUpdate(() {
+    Beacon.batch(() {
       age.value = 15;
       age.value = 16;
       age.value = 20;
@@ -24,7 +24,7 @@ void main() {
     age.subscribe((_) => callCount++);
 
     expect(
-      () => Beacon.doBatchUpdate(() {
+      () => Beacon.batch(() {
         age.value = 15;
         age.value = 16;
         age.value = 20;
@@ -47,13 +47,13 @@ void main() {
     var callCount = 0;
     age.subscribe((_) => callCount++);
 
-    Beacon.doBatchUpdate(() {
+    Beacon.batch(() {
       age.value = 15;
       age.value = 16;
-      Beacon.doBatchUpdate(() {
+      Beacon.batch(() {
         age.value = 50;
         age.value = 51;
-        Beacon.doBatchUpdate(() {
+        Beacon.batch(() {
           age.value = 100;
           age.value = 200;
         });

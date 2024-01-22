@@ -175,7 +175,7 @@ void main() {
 
     try {
       Beacon.createEffect(() {
-        Beacon.doBatchUpdate(() {
+        Beacon.batch(() {
           beacon1.value++;
         });
       });

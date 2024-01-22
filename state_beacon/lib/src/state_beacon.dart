@@ -609,7 +609,7 @@ abstract class Beacon {
   ///
   /// age.subscribe((_) => callCount++);
   ///
-  /// Beacon.doBatchUpdate(() {
+  /// Beacon.batch(() {
   ///   age.value = 15;
   ///   age.value = 16;
   ///   age.value = 20;
@@ -618,6 +618,31 @@ abstract class Beacon {
   ///
   /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
   /// ```
+  static void batch(VoidCallback callback) {
+    batch(callback);
+  }
+
+  /// Executes a batched update which allows multiple updates to be batched into a single update.
+  /// This can be used to optimize performance by reducing the number of update notifications.
+  ///
+  /// Example:
+  /// ```dart
+  /// final age = Beacon.writable<int>(10);
+  ///
+  /// var callCount = 0;
+  ///
+  /// age.subscribe((_) => callCount++);
+  ///
+  /// Beacon.batch(() {
+  ///   age.value = 15;
+  ///   age.value = 16;
+  ///   age.value = 20;
+  ///   age.value = 23;
+  /// });
+  ///
+  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
+  /// ```
+  @Deprecated('Use Beacon.batch instead')
   static void doBatchUpdate(VoidCallback callback) {
     batch(callback);
   }
