@@ -1,3 +1,7 @@
+## 0.24.0
+
+-   [Breaking] Convenience wrapping methods: `.buffer()`, `.bufferTime()`, `.throttle()` and `.filter()` etc no longer needs an initial value. It fetches its initial value from the target beacon if `startNow` is true (which is the default).
+
 ## 0.23.0
 
 -   [Breaking] beacon.wrap() no longer returns the wrapper instance. This is redundant as it retuned the same instance that the method was called on. Chanining can be achieved by using `beacon..wrap()..wrap()`
