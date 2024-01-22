@@ -434,7 +434,7 @@ abstract class Beacon {
 
     final unsub = effect(
       () {
-        beacon.$forceSet(compute());
+        beacon.set(compute());
       },
       supportConditional: supportConditional,
       debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
