@@ -11,31 +11,16 @@ void main() {
   test('should emit values', () async {
     final myStream = Stream.periodic(k10ms, (i) => i);
     final myBeacon = Beacon.stream(myStream);
-    var called = 0;
 
-    myBeacon.subscribe((value) {
-      // print('called: $called with $value');
-      if (called == 0) {
-        expect(myBeacon.previousValue, isA<AsyncLoading>());
-        expect(value, isA<AsyncData<int>>());
-        called++;
-      } else if (called < 3) {
-        expect(myBeacon.previousValue, isA<AsyncData<int>>());
-        expect(value.unwrap(), equals(called));
-
-        if (called == 2) {
-          myBeacon.unsubscribe();
-        }
-
-        called++;
-      } else {
-        throw Exception('Should not have been called');
-      }
-    });
-
-    await Future<void>.delayed(k10ms * 5);
-
-    expect(called, equals(3));
+    expect(
+      myBeacon.toStream(),
+      emitsInOrder([
+        isA<AsyncLoading>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+      ]),
+    );
   });
 
   test('should be AsyncError when error is added to stream', () async {
@@ -49,52 +34,26 @@ void main() {
 
     final myBeacon = Beacon.stream(errorStream());
 
-    var called = 1;
-    myBeacon.subscribe(
-      (value) {
-        if (called == 1) {
-          expect(value, isA<AsyncLoading>());
-        } else if (called == 2) {
-          expect(value, isA<AsyncData<int>>());
-        } else if (called == 3) {
-          expect(value, isA<AsyncData<int>>());
-        } else if (called == 4) {
-          expect(value, isA<AsyncError>());
-        } else {
-          throw Exception('Should not have been called');
-        }
-        called++;
-      },
-      startNow: true,
+    expect(
+      myBeacon.toStream(),
+      emitsInOrder(
+        [
+          isA<AsyncLoading>(),
+          isA<AsyncData<int>>(),
+          isA<AsyncData<int>>(),
+          isA<AsyncError>(),
+        ],
+      ),
     );
   });
 
   test('should emit raw values', () async {
     final myStream = Stream.periodic(k1ms, (i) => i + 1);
-    final myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
-    var called = 0;
+    final beacon = Beacon.streamRaw(myStream, initialValue: 0);
 
-    final results = <int?>[];
+    final buffered = beacon.buffer(5);
 
-    myBeacon.subscribe((value) {
-      // print('called: $called with $value');
-      if (called == 0) {
-        results.add(myBeacon.previousValue);
-      }
-
-      results.add(value);
-
-      if (called == 3) {
-        myBeacon.unsubscribe();
-      }
-      called++;
-    });
-
-    await Future<void>.delayed(k10ms * 5);
-
-    expect(results, [0, 1, 2, 3, 4]);
-
-    expect(called, equals(4));
+    await expectLater(buffered.next(), completion(equals([0, 1, 2, 3, 4])));
   });
 
   test('should throw if initial value is empty and type is non-nullable',
@@ -105,24 +64,20 @@ void main() {
 
   test('should execute onDone callback', () async {
     final myStream = Stream.periodic(k10ms, (i) => i + 1).take(3);
-    var called = 0;
+
     var done = false;
-    final myBeacon = Beacon.streamRaw(
+
+    final myBeacon = Beacon.streamRaw<int?>(
       myStream,
-      initialValue: 0,
-      onDone: () {
-        done = true;
-      },
+      onDone: () => done = true,
     );
 
-    // ignore: cascade_invocations
-    myBeacon.subscribe((value) {
-      called++;
-    });
+    final buffered = myBeacon.buffer(4);
 
-    await Future<void>.delayed(k10ms * 4);
+    await expectLater(buffered.next(), completion(equals([null, 1, 2, 3])));
 
-    expect(called, equals(3));
+    await Future<void>.delayed(k1ms);
+
     expect(done, true);
   });
 }
