@@ -236,7 +236,7 @@ void main() {
     expect(beacon.listenersCount, 0);
   });
 
-  test('should throw when wrapping lazy beacon and startNow=true', () {
+  test('should throw when wrapping empty lazy beacon and startNow=true', () {
     var count = Beacon.lazyWritable<int>();
 
     var wrapper = Beacon.writable<int>(0);
