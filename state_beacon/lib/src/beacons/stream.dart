@@ -19,22 +19,6 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   final bool cancelOnError;
 
   StreamSubscription<T>? _subscription;
-  VoidCallback? _cancelAwaitedSubscription;
-
-  @override
-  Future<T> toFuture() {
-    final existing = Awaited.find<T, StreamBeacon<T>>(this);
-    if (existing != null) {
-      return existing.future;
-    }
-
-    final newAwaited = Awaited<T, StreamBeacon<T>>(this);
-    Awaited.put(this, newAwaited);
-
-    _cancelAwaitedSubscription = newAwaited.cancel;
-
-    return newAwaited.future;
-  }
 
   /// unsubscribes from the internal stream
   void unsubscribe() {
@@ -57,9 +41,6 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   @override
   void dispose() {
     unsubscribe();
-    _cancelAwaitedSubscription?.call();
-    // ignore: inference_failure_on_function_invocation
-    Awaited.remove(this);
     super.dispose();
   }
 }

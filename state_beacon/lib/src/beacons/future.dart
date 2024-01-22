@@ -67,37 +67,6 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     _setValue(value, force: true);
   }
 
-  VoidCallback? _cancelAwaitedSubscription;
-
-  /// Exposes this as a [Future] that can be awaited inside another [BaseFutureBeacon].
-  /// var count = Beacon.writable(0);
-  /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
-  ///
-  /// var lastName = Beacon.derivedFuture(() async => 'Smith ${count.value}');
-  ///
-  /// var fullName = Beacon.derivedFuture(() async {
-  ///
-  ///    // no need for a manual switch expression
-  ///   final fname = await firstName.toFuture();
-  ///   final lname = await lastName.toFuture();
-  ///
-  ///   return '$fname $lname';
-  /// });
-  @override
-  Future<T> toFuture() {
-    final existing = Awaited.find<T, FutureBeacon<T>>(this);
-    if (existing != null) {
-      return existing.future;
-    }
-
-    final newAwaited = Awaited<T, FutureBeacon<T>>(this);
-    Awaited.put(this, newAwaited);
-
-    _cancelAwaitedSubscription = newAwaited.cancel;
-
-    return newAwaited.future;
-  }
-
   Future<void> _run() async {
     final currentExeID = _startLoading();
 
@@ -117,13 +86,6 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
 
   /// Resets the beacon by calling the [Future] again
   void reset();
-
-  @override
-  void dispose() {
-    _cancelAwaitedSubscription?.call();
-    Awaited.remove(this);
-    super.dispose();
-  }
 }
 
 class DefaultFutureBeacon<T> extends FutureBeacon<T> {
