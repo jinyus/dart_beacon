@@ -3,15 +3,18 @@ part of '../base_beacon.dart';
 abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     with BeaconConsumer<T, List<T>> {
   final List<T> _buffer = [];
-  final _currentBuffer = WritableBeacon<List<T>>(initialValue: []);
+
+  final _currentBuffer = ListBeacon<T>([]);
+
+  /// The current buffer of values that have been added to this beacon.
+  /// This can be listened to directly.
+  ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
   BufferedBaseBeacon({super.debugLabel}) : super(initialValue: []);
 
-  ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
-
   void addToBuffer(T newValue) {
     _buffer.add(newValue);
-    _currentBuffer.value = List.from(_buffer);
+    _currentBuffer.add(newValue);
   }
 
   void clearBuffer() {
