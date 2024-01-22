@@ -1,7 +1,7 @@
 ## 0.25.0
 
--   [Deprecation] `Beacon.createEffect` is renamed to `Beacon.effect`
--   [Deprecation] `Beacon.doBatchUpdate` is renamed to `Beacon.batch`
+-   [Deprecation] `Beacon.createEffect`. Use `Beacon.effect` instead.
+-   [Deprecation] `Beacon.doBatchUpdate`. Use `Beacon.batch` instead.
 -   Add `reset` for list,set and map beacons.
 -   add `isEmpty` getter that returns true if a lazy beacon is uninitialized.
 -   Internal refactor
