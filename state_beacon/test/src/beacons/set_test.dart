@@ -76,6 +76,10 @@ void main() {
 
     expect(nums.value, equals({5}));
 
-    expect(called, 10);
+    nums.reset();
+
+    expect(nums.value, equals(<int>{}));
+
+    expect(called, 11);
   });
 }

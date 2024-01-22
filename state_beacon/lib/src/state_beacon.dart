@@ -622,6 +622,7 @@ abstract class Beacon {
   ///
   /// age.value = 20; // Outputs: "You can vote!"
   /// ```
+  // coverage:ignore-start
   @Deprecated('Use Beacon.effect instead')
   static VoidCallback createEffect(
     Function fn, {
@@ -634,6 +635,7 @@ abstract class Beacon {
       debugLabel: debugLabel,
     );
   }
+  // coverage:ignore-end
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.
   /// This can be used to optimize performance by reducing the number of update notifications.
@@ -679,10 +681,12 @@ abstract class Beacon {
   ///
   /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
   /// ```
+  // coverage:ignore-start
   @Deprecated('Use Beacon.batch instead')
   static void doBatchUpdate(VoidCallback callback) {
     doBatch(callback);
   }
+  // coverage:ignore-end
 
   /// Runs the function without tracking any changes to the state.
   /// This is useful when you want to run a function that

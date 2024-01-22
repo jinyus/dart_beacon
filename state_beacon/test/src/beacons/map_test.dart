@@ -60,7 +60,12 @@ void main() {
 
     data.updateAll((key, value) => value + 1);
 
-    expect(called, 9);
     expect(data.value, equals({'e': 6, 'a': 2}));
+
+    data.reset();
+
+    expect(data.value, equals(<String, int>{}));
+
+    expect(called, 10);
   });
 }
