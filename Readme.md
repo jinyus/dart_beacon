@@ -97,8 +97,8 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.writable](#beaconwritable): Read and write values.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
--   [Beacon.createEffect](#beaconcreateeffect): React to changes in beacon values.
--   [Beacon.doBatchUpdate](#beacondobatchupdate): Batch multiple updates into a single notification.
+-   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
@@ -146,12 +146,14 @@ Like `Beacon.writable` but behaves like a `late` variable. It must be set before
 
 #### NB: All writable beacons have a lazy counterpart.
 
-````dart
+```dart
 final counter = Beacon.lazyWritable();
+
 print(counter.value); // throws UninitializeLazyReadException()
 
 counter.value = 10;
 print(counter.value); // 10
+```
 
 ### Beacon.scopedWritable:
 
@@ -161,9 +163,7 @@ but writable only by the owner.
 
 ```dart
 var (count,setCount) = Beacon.scopedWritable(15);
-````
-
-````
+```
 
 ### Beacon.readable:
 
@@ -178,9 +178,9 @@ final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
 ReadableBeacon<int> get counter => _internalCounter;
-````
+```
 
-### Beacon.createEffect:
+### Beacon.effect:
 
 An effect is just a function that will re-run whenever one of its
 dependencies change. An effect runs immediately after creation.
@@ -188,7 +188,7 @@ dependencies change. An effect runs immediately after creation.
 ```dart
 final age = Beacon.writable(15);
 
-Beacon.createEffect(() {
+Beacon.effect(() {
     if (age.value >= 18) {
       print("You can vote!");
     } else {
@@ -201,7 +201,7 @@ Beacon.createEffect(() {
 age.value = 20; // Outputs: "You can vote!"
 ```
 
-### Beacon.doBatchUpdate:
+### Beacon.batch:
 
 This allows multiple updates to be batched into a single update.
 This can be used to optimize performance by reducing the number of update notifications.
@@ -213,7 +213,7 @@ var callCount = 0;
 
 age.subscribe((_) => callCount++);
 
-Beacon.doBatchUpdate(() {
+Beacon.batch(() {
   age.value = 15;
   age.value = 16;
   age.value = 20;
@@ -530,7 +530,7 @@ Similar to Beacon.list(), but for Maps.
 ```dart
 var nums = Beacon.list<int>([1, 2, 3]);
 
-Beacon.createEffect(() {
+Beacon.effect(() {
  print(nums.value); // Outputs: [1, 2, 3]
 });
 

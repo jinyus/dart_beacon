@@ -53,6 +53,11 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   String get debugLabel => _debugLabel ?? runtimeType.toString();
 
   var _isEmpty = true;
+
+  /// Returns true if the beacon has not been initialized.
+  /// This is only relevant for lazy beacons.
+  bool get isEmpty => _isEmpty;
+
   late T _value;
   T? _previousValue;
   late final T _initialValue;
@@ -84,7 +89,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
   T call() => value;
 
   /// Returns the current value and subscribes to changes in the beacon
-  /// when used within a [Beacon.createEffect] or [Beacon.derived].
+  /// when used within a [Beacon.effect] or [Beacon.derived].
   @override
   T get value {
     if (_isEmpty) {

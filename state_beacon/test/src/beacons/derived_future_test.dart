@@ -207,7 +207,7 @@ void main() {
       AsyncData('User 3'),
     ];
 
-    Beacon.createEffect(() {
+    Beacon.effect(() {
       results.add(user.value);
     });
 
@@ -274,7 +274,7 @@ void main() {
 
     expect(stats.unwrapValue(), 'Bob is 20 years old and runs at 10 mph');
 
-    Beacon.doBatchUpdate(() {
+    Beacon.batch(() {
       nameBeacon.value = 'Sally';
       ageBeacon.value = 21;
       speedBeacon.value = 11;

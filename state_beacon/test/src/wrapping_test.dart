@@ -225,7 +225,7 @@ void main() {
         .throttle(duration: k10ms)
         .debounce(duration: k10ms);
 
-    Beacon.createEffect(() => beacon.value);
+    Beacon.effect(() => beacon.value);
 
     expect(count.listenersCount, 1);
     expect(beacon.listenersCount, 1);
@@ -234,5 +234,13 @@ void main() {
 
     expect(count.listenersCount, 0);
     expect(beacon.listenersCount, 0);
+  });
+
+  test('should throw when wrapping empty lazy beacon and startNow=true', () {
+    var count = Beacon.lazyWritable<int>();
+
+    var wrapper = Beacon.writable<int>(0);
+
+    expect(() => wrapper.wrap(count), throwsException);
   });
 }

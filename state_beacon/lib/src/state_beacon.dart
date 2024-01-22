@@ -361,7 +361,7 @@ abstract class Beacon {
     Stream<T> stream, {
     bool cancelOnError = false,
     Function? onError,
-    Function? onDone,
+    VoidCallback? onDone,
     T? initialValue,
     String? debugLabel,
   }) {
@@ -432,9 +432,9 @@ abstract class Beacon {
       debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
     );
 
-    final unsub = effect(
+    final unsub = doEffect(
       () {
-        beacon.$forceSet(compute());
+        beacon.set(compute());
       },
       supportConditional: supportConditional,
       debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
@@ -496,11 +496,11 @@ abstract class Beacon {
       debugLabel: debugLabel ?? 'DerivedFutureBeacon<$T>',
     );
 
-    final dispose = effect(() {
+    final dispose = doEffect(() {
       // beacon is manually triggered if in idle state
       if (beacon.status() == DerivedFutureStatus.idle) return null;
 
-      return effect(
+      return doEffect(
         () async {
           await beacon.run();
         },
@@ -525,7 +525,7 @@ abstract class Beacon {
   /// ```dart
   /// var nums = Beacon.list<int>([1, 2, 3]);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///  print(nums.value); // Outputs: [1, 2, 3]
   /// });
   ///
@@ -574,7 +574,7 @@ abstract class Beacon {
   /// ```dart
   /// final age = Beacon.writable(15);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///     if (age.value >= 18) {
   ///       print("You can vote!");
   ///     } else {
@@ -586,16 +586,79 @@ abstract class Beacon {
   ///
   /// age.value = 20; // Outputs: "You can vote!"
   /// ```
+  static VoidCallback effect(
+    Function fn, {
+    bool supportConditional = true,
+    String? debugLabel,
+  }) {
+    return doEffect(
+      fn,
+      supportConditional: supportConditional,
+      debugLabel: debugLabel,
+    );
+  }
+
+  /// Creates an effect based on a provided function. The provided function will be called
+  /// whenever one of its dependencies change.
+  ///
+  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
+  /// and any beacon not accessed in the first run will not be tracked.
+  /// Defaults to `true`.
+  ///
+  /// Example:
+  /// ```dart
+  /// final age = Beacon.writable(15);
+  ///
+  /// Beacon.effect(() {
+  ///     if (age.value >= 18) {
+  ///       print("You can vote!");
+  ///     } else {
+  ///        print("You can't vote yet");
+  ///     }
+  ///  });
+  ///
+  /// // Outputs: "You can't vote yet"
+  ///
+  /// age.value = 20; // Outputs: "You can vote!"
+  /// ```
+  // coverage:ignore-start
+  @Deprecated('Use Beacon.effect instead')
   static VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
     String? debugLabel,
   }) {
-    return effect(
+    return doEffect(
       fn,
       supportConditional: supportConditional,
       debugLabel: debugLabel,
     );
+  }
+  // coverage:ignore-end
+
+  /// Executes a batched update which allows multiple updates to be batched into a single update.
+  /// This can be used to optimize performance by reducing the number of update notifications.
+  ///
+  /// Example:
+  /// ```dart
+  /// final age = Beacon.writable<int>(10);
+  ///
+  /// var callCount = 0;
+  ///
+  /// age.subscribe((_) => callCount++);
+  ///
+  /// Beacon.batch(() {
+  ///   age.value = 15;
+  ///   age.value = 16;
+  ///   age.value = 20;
+  ///   age.value = 23;
+  /// });
+  ///
+  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
+  /// ```
+  static void batch(VoidCallback callback) {
+    doBatch(callback);
   }
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.
@@ -609,7 +672,7 @@ abstract class Beacon {
   ///
   /// age.subscribe((_) => callCount++);
   ///
-  /// Beacon.doBatchUpdate(() {
+  /// Beacon.batch(() {
   ///   age.value = 15;
   ///   age.value = 16;
   ///   age.value = 20;
@@ -618,9 +681,12 @@ abstract class Beacon {
   ///
   /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
   /// ```
+  // coverage:ignore-start
+  @Deprecated('Use Beacon.batch instead')
   static void doBatchUpdate(VoidCallback callback) {
-    batch(callback);
+    doBatch(callback);
   }
+  // coverage:ignore-end
 
   /// Runs the function without tracking any changes to the state.
   /// This is useful when you want to run a function that
@@ -631,7 +697,7 @@ abstract class Beacon {
   /// var callCount = 0;
   /// age.subscribe((_) => callCount++);
   ///
-  /// Beacon.createEffect(() {
+  /// Beacon.effect(() {
   ///      age.value;
   ///      Beacon.untracked(() {
   ///        age.value = 15;

@@ -5,7 +5,7 @@ void main() {
   final age = Beacon.writable(20);
   final college = Beacon.writable("MIT");
 
-  Beacon.createEffect(() {
+  Beacon.effect(() {
     var msg = '${name.value} is ${age.value} years old';
 
     if (age.value > 21) {

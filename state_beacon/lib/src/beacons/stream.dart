@@ -10,7 +10,7 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
     this.cancelOnError = false,
     super.debugLabel,
   }) : super(initialValue: AsyncLoading()) {
-    unawaited(_init());
+    _init();
   }
 
   final Stream<T> _stream;
@@ -19,30 +19,13 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   final bool cancelOnError;
 
   StreamSubscription<T>? _subscription;
-  VoidCallback? _cancelAwaitedSubscription;
-
-  @override
-  Future<T> toFuture() {
-    final existing = Awaited.find<T, StreamBeacon<T>>(this);
-    if (existing != null) {
-      return existing.future;
-    }
-
-    final newAwaited = Awaited<T, StreamBeacon<T>>(this);
-    Awaited.put(this, newAwaited);
-
-    _cancelAwaitedSubscription = newAwaited.cancel;
-
-    return newAwaited.future;
-  }
 
   /// unsubscribes from the internal stream
   void unsubscribe() {
     unawaited(_subscription?.cancel());
   }
 
-  Future<void> _init() async {
-    await _subscription?.cancel();
+  void _init() {
     _subscription = _stream.listen(
       (value) {
         _setValue(AsyncData(value));
@@ -58,9 +41,6 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   @override
   void dispose() {
     unsubscribe();
-    _cancelAwaitedSubscription?.call();
-    // ignore: inference_failure_on_function_invocation
-    Awaited.remove(this);
     super.dispose();
   }
 }
@@ -79,14 +59,14 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
           initialValue != null || null is T,
           'provide an initialValue or change the type parameter "$T" to "$T?"',
         ) {
-    unawaited(_init());
+    _init();
   }
 
   /// called when the stream emits an error
   final Function? onError;
 
   /// called when the stream is done
-  final Function? onDone;
+  final void Function()? onDone;
   final Stream<T> _stream;
 
   /// passed to the internal stream subscription
@@ -99,13 +79,11 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     unawaited(_subscription?.cancel());
   }
 
-  Future<void> _init() async {
-    await _subscription?.cancel();
+  void _init() {
     _subscription = _stream.listen(
       _setValue,
       onError: onError,
       onDone: () {
-        // ignore: avoid_dynamic_calls
         onDone?.call();
         dispose();
       },

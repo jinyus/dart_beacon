@@ -121,4 +121,10 @@ class ListBeacon<E> extends WritableBeacon<List<E>> {
     _value.sort(compare);
     _setValue(_value, force: true);
   }
+
+  /// Clears the list
+  @override
+  void reset() {
+    clear();
+  }
 }

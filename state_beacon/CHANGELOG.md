@@ -1,3 +1,11 @@
+## 0.25.0
+
+-   [Deprecation] `Beacon.createEffect` is renamed to `Beacon.effect`
+-   [Deprecation] `Beacon.doBatchUpdate` is renamed to `Beacon.batch`
+-   Add `reset` for list,set and map beacons.
+-   add `isEmpty` getter that returns true if a lazy beacon is uninitialized.
+-   Internal refactor
+
 ## 0.24.0
 
 -   [Breaking] Convenience wrapping methods: `.buffer()`, `.bufferTime()`, `.throttle()` and `.filter()` etc no longer needs an initial value. It fetches its initial value from the target beacon if `startNow` is true (which is the default).

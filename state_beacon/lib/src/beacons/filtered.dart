@@ -11,13 +11,13 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
 
   bool get hasFilter => _filter != null;
 
-  @override
-  set value(T newValue) => set(newValue);
-
   // Set the function that will be used to filter subsequent values.
   void setFilter(BeaconFilter<T> newFilter) {
     _filter = newFilter;
   }
+
+  @override
+  set value(T newValue) => set(newValue);
 
   @override
   void set(T newValue, {bool force = false}) {

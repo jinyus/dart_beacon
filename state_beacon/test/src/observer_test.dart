@@ -60,7 +60,7 @@ void main() {
     beacon.increment();
     beacon.dispose();
 
-    var dispose = Beacon.createEffect(() {
+    var dispose = Beacon.effect(() {
       beacon.value;
     });
 
