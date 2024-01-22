@@ -93,7 +93,7 @@ class _Effect {
   }
 }
 
-VoidCallback effect(
+VoidCallback doEffect(
   Function fn, {
   bool supportConditional = true,
   String? debugLabel,

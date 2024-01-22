@@ -628,7 +628,7 @@ abstract class Beacon {
     bool supportConditional = true,
     String? debugLabel,
   }) {
-    return effect(
+    return doEffect(
       fn,
       supportConditional: supportConditional,
       debugLabel: debugLabel,
@@ -656,7 +656,7 @@ abstract class Beacon {
   /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
   /// ```
   static void batch(VoidCallback callback) {
-    batch(callback);
+    doBatch(callback);
   }
 
   /// Executes a batched update which allows multiple updates to be batched into a single update.
@@ -681,7 +681,7 @@ abstract class Beacon {
   /// ```
   @Deprecated('Use Beacon.batch instead')
   static void doBatchUpdate(VoidCallback callback) {
-    batch(callback);
+    doBatch(callback);
   }
 
   /// Runs the function without tracking any changes to the state.

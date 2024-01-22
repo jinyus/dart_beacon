@@ -6,7 +6,7 @@ var _batchStack = 0;
 
 bool _isRunningBatchJob() => _batchStack > 0;
 
-void batch(void Function() compute) {
+void doBatch(void Function() compute) {
   if (_isRunningBatchJob()) {
     compute();
     return;
