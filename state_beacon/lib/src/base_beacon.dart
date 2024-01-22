@@ -3,12 +3,13 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:state_beacon/src/common.dart';
-import 'package:state_beacon/src/observer.dart';
 import 'package:state_beacon/src/untracked.dart';
 
 import 'async_value.dart';
 import 'effect_closure.dart';
 import 'listeners.dart';
+import 'observer.dart';
+import 'state_beacon.dart';
 
 part 'effect.dart';
 part 'batch.dart';
@@ -32,6 +33,7 @@ part 'beacons/value_notifier.dart';
 part 'beacons/awaited.dart';
 part 'beacons/async.dart';
 part 'extensions/wrap.dart';
+part 'extensions/wrap_utils.dart';
 part 'mixins/beacon_consumer.dart';
 
 abstract class BaseBeacon<T> implements ValueListenable<T> {
@@ -41,6 +43,7 @@ abstract class BaseBeacon<T> implements ValueListenable<T> {
       _value = initialValue;
       _isEmpty = false;
     }
+
     BeaconObserver.instance?.onCreate(this, _isEmpty);
   }
 
