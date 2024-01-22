@@ -10,9 +10,9 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   }) {
     final controller = StreamController<T>();
 
-    controller.add(value);
+    if (!isEmpty) controller.add(peek());
 
-    final unsub = subscribe((v) => controller.add(v));
+    final unsub = subscribe(controller.add);
 
     void cancel() {
       unsub();
