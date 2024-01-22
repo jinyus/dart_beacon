@@ -9,16 +9,18 @@ void main() {
 
     // ignore: cascade_invocations
     beacon.set(20);
-    expect(beacon.value, equals(20)); // first update allowed
+    expect(beacon.value, 20); // first update allowed
 
     beacon.set(30);
-    expect(beacon.value, equals(20)); // too fast, update ignored
+    expect(beacon.value, 20); // too fast, update ignored
     expect(beacon.isBlocked, true);
 
     await Future<void>.delayed(k10ms * 1.1);
 
     beacon.set(30);
-    expect(beacon.value, equals(30)); // throttle time passed, update allowed
+
+    // throttle time passed, update allowed
+    expect(beacon.value, 30);
   });
 
   test('should respect newly set throttle duration', () async {
@@ -26,16 +28,16 @@ void main() {
 
     // ignore: cascade_invocations
     beacon.set(20);
-    expect(beacon.value, equals(20)); // first update allowed
+    expect(beacon.value, 20); // first update allowed
 
     beacon.set(30);
-    expect(beacon.value, equals(20)); // too fast, update ignored
+    expect(beacon.value, 20); // too fast, update ignored
 
     beacon
       ..setDuration(Duration.zero)
       ..set(30);
 
-    expect(beacon.value, equals(30));
+    expect(beacon.value, 30);
   });
 
   test('should not be blocked on reset and dispose', () async {
@@ -43,53 +45,54 @@ void main() {
 
     // ignore: cascade_invocations
     beacon.set(20);
-    expect(beacon.value, equals(20)); // first update allowed
+    expect(beacon.value, 20); // first update allowed
 
     beacon.set(30);
-    expect(beacon.value, equals(20)); // too fast, update ignored
+    expect(beacon.value, 20); // too fast, update ignored
 
     beacon
       ..reset()
       ..set(30);
 
-    expect(beacon.value, equals(30));
+    expect(beacon.value, 30);
 
     beacon.set(40);
-    expect(beacon.value, equals(30)); // too fast, update ignored
+    expect(beacon.value, 30); // too fast, update ignored
 
     beacon
       ..dispose()
       ..set(40);
-    expect(beacon.value, equals(40));
+    expect(beacon.value, 40);
   });
 
   test('should update value at most once in specified duration', () async {
-    final beacon = Beacon.throttled(0, duration: k10ms * 10);
+    final beacon = Beacon.throttled(0, duration: k10ms);
     var called = 0;
 
     beacon
       ..subscribe((_) => called++)
-      ..value = 10;
-
-    expect(beacon.value, equals(10));
-
-    beacon
+      ..value = 10
       ..value = 20
       ..value = 30
       ..value = 40;
 
-    await Future<void>.delayed(k10ms * 5);
+    expect(beacon.value, 10);
 
-    expect(beacon.value, equals(10));
+    await Future<void>.delayed(k1ms * 3);
 
-    await Future<void>.delayed(k10ms * 6);
+    beacon.increment();
 
-    beacon.value = 30;
+    expect(beacon.value, 10); // still blocked
 
-    expect(beacon.value, equals(30));
+    await Future<void>.delayed(k10ms);
+
+    // 13ms passed, update allowed
+    beacon.value = 50;
+
+    expect(beacon.value, 50);
 
     // only ran twice even though value was updated 5 times
-    expect(called, equals(2));
+    expect(called, 2);
   });
 
   test('should buffer blocked updates', () async {

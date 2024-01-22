@@ -26,7 +26,11 @@ void main() {
     final futureBeacon = Beacon.future<String>(
       () async => throw Exception('error'),
     );
+
+    expect(futureBeacon.isLoading, true);
+
     await Future<void>.delayed(k10ms);
+
     expect(futureBeacon.value, isA<AsyncError>());
 
     final error = futureBeacon.value as AsyncError;
@@ -45,38 +49,42 @@ void main() {
 
     final futureBeacon = Beacon.future(() async => ++counter);
 
-    await Future<void>.delayed(k10ms);
+    expect(futureBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(futureBeacon.unwrapValue(), 1);
 
     futureBeacon.reset();
 
-    expect(futureBeacon.value, isA<AsyncLoading>());
+    expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
-    expect(futureBeacon.value, isA<AsyncData<int>>());
+    expect(futureBeacon.isData, isTrue);
 
-    final value = futureBeacon.value.unwrap();
-
-    expect(value, equals(2));
+    expect(futureBeacon.unwrapValue(), 2);
   });
 
   test('should not executes until start() is called', () async {
     var counter = 0;
 
-    final futureBeacon =
-        Beacon.future(() async => ++counter, manualStart: true);
+    final futureBeacon = Beacon.future(
+      () async => ++counter,
+      manualStart: true,
+    );
 
     expect(futureBeacon.isIdle, true);
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
     expect(counter, 0);
 
     futureBeacon.start();
 
-    expect(futureBeacon.value, isA<AsyncLoading>());
+    expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k10ms);
+    await Future<void>.delayed(k1ms);
 
     expect(futureBeacon.isData, isTrue);
 
