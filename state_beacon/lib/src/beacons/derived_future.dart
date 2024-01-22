@@ -25,7 +25,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
 
   Future<void> run() => _run();
 
-  final _status = WritableBeacon<DerivedFutureStatus>();
+  final _status = Beacon.lazyWritable<DerivedFutureStatus>();
   ReadableBeacon<DerivedFutureStatus> get status => _status;
 
   @override
