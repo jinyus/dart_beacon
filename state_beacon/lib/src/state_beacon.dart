@@ -361,7 +361,7 @@ abstract class Beacon {
     Stream<T> stream, {
     bool cancelOnError = false,
     Function? onError,
-    Function? onDone,
+    VoidCallback? onDone,
     T? initialValue,
     String? debugLabel,
   }) {

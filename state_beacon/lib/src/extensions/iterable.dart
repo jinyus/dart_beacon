@@ -17,7 +17,7 @@ extension StreamUtils<T> on Stream<T> {
   RawStreamBeacon<T> toRawBeacon({
     bool cancelOnError = false,
     Function? onError,
-    Function? onDone,
+    VoidCallback? onDone,
     T? initialValue,
   }) {
     return RawStreamBeacon<T>(
