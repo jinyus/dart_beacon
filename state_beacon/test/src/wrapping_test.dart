@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/src/base_beacon.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+import '../common.dart';
+
 void main() {
   test('should reflect original beacon value in wrapper beacon', () {
     var original = Beacon.readable<int>(10);
@@ -151,7 +153,7 @@ void main() {
     var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
-    var buff = doubledCount.buffer(1).filter([]);
+    var buff = doubledCount.buffer(1).filter();
 
     expect(wrapper.value, equals(10));
 
@@ -161,11 +163,11 @@ void main() {
     wrapper.dispose();
 
     expect(doubledCount.listenersCount, 1);
-    expect(count.listenersCount, 0);
-    count.dispose();
-    buff.dispose();
 
-    expect(doubledCount.listenersCount, 0);
+    doubledCount.dispose();
+
+    expect(count.listenersCount, 0);
+    expect(buff.listenersCount, 0);
   });
 
   test('should dispose together when wrapped is disposed', () {
@@ -179,7 +181,8 @@ void main() {
     var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
-    var _ = doubledCount.filter(0).buffer(1).wrap(
+
+    doubledCount.filter().buffer(1).wrap(
           wrapper,
           disposeTogether: true,
         );
@@ -210,5 +213,26 @@ void main() {
     count.dispose();
 
     expect(count.listenersCount, 0);
+  });
+
+  test('should dispose together when wrapped is disposed(3)', () {
+    // BeaconObserver.instance = LoggingObserver();
+    var count = Beacon.readable<int>(10);
+
+    var beacon = count
+        .buffer(2)
+        .filter()
+        .throttle(duration: k10ms)
+        .debounce(duration: k10ms);
+
+    Beacon.createEffect(() => beacon.value);
+
+    expect(count.listenersCount, 1);
+    expect(beacon.listenersCount, 1);
+
+    count.dispose();
+
+    expect(count.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
   });
 }
