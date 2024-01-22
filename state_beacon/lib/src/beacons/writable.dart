@@ -21,6 +21,7 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
   @override
   void dispose() {
     clearWrapped();
+    reset();
     super.dispose();
   }
 
