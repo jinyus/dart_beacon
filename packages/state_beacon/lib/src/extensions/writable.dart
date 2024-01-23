@@ -11,6 +11,10 @@ extension WritableBeaconFlutterUtils<T> on WritableBeacon<T> {
 
     notifier.addDisposeCallback(unsub);
 
+    onDispose(() {
+      notifier.dispose();
+    });
+
     return notifier;
   }
 }
