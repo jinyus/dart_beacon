@@ -17,11 +17,11 @@ abstract class Beacon {
   /// ```
   static WritableBeacon<T> writable<T>(
     T initialValue, {
-    String? debugLabel,
+    String? name,
   }) =>
       WritableBeacon<T>(
         initialValue: initialValue,
-        debugLabel: debugLabel ?? 'Writable<$T>',
+        name: name ?? 'Writable<$T>',
       );
 
   /// Like `Beacon.writable` but behaves like a late variable. It must be set before it's read.
@@ -29,11 +29,11 @@ abstract class Beacon {
   /// Throws [UninitializeLazyReadException] if it's read before being set.
   static WritableBeacon<T> lazyWritable<T>({
     T? initialValue,
-    String? debugLabel,
+    String? name,
   }) =>
       WritableBeacon<T>(
         initialValue: initialValue,
-        debugLabel: debugLabel ?? 'LazyWritable<$T>',
+        name: name ?? 'LazyWritable<$T>',
       );
 
   /// Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
@@ -49,11 +49,11 @@ abstract class Beacon {
   /// ```
   static ReadableBeacon<T> readable<T>(
     T initialValue, {
-    String? debugLabel,
+    String? name,
   }) =>
       ReadableBeacon<T>(
         initialValue: initialValue,
-        debugLabel: debugLabel ?? 'Readable<$T>',
+        name: name ?? 'Readable<$T>',
       );
 
   /// Returns a `ReadableBeacon` and a function for setting its value.
@@ -66,11 +66,11 @@ abstract class Beacon {
   /// ```
   static (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
     T initialValue, {
-    String? debugLabel,
+    String? name,
   }) {
     final beacon = WritableBeacon<T>(
       initialValue: initialValue,
-      debugLabel: debugLabel ?? 'ScopedWritable<$T>',
+      name: name ?? 'ScopedWritable<$T>',
     );
     return (beacon, beacon.set);
   }
@@ -96,12 +96,12 @@ abstract class Beacon {
   static DebouncedBeacon<T> debounced<T>(
     T initialValue, {
     required Duration duration,
-    String? debugLabel,
+    String? name,
   }) =>
       DebouncedBeacon<T>(
         initialValue: initialValue,
         duration: duration,
-        debugLabel: debugLabel ?? 'DebouncedBeacon<$T>',
+        name: name ?? 'DebouncedBeacon<$T>',
       );
 
   /// Like `Beacon.debounced` but behaves like a late variable. It must be set before it's read.
@@ -110,12 +110,12 @@ abstract class Beacon {
   static DebouncedBeacon<T> lazyDebounced<T>({
     T? initialValue,
     required Duration duration,
-    String? debugLabel,
+    String? name,
   }) =>
       DebouncedBeacon<T>(
         initialValue: initialValue,
         duration: duration,
-        debugLabel: debugLabel ?? 'LazyDebouncedBeacon<$T>',
+        name: name ?? 'LazyDebouncedBeacon<$T>',
       );
 
   /// Creates a `ThrottledBeacon` that will limit the rate of updates to its value based on the duration.
@@ -143,13 +143,13 @@ abstract class Beacon {
     T initialValue, {
     required Duration duration,
     bool dropBlocked = true,
-    String? debugLabel,
+    String? name,
   }) =>
       ThrottledBeacon<T>(
         initialValue: initialValue,
         duration: duration,
         dropBlocked: dropBlocked,
-        debugLabel: debugLabel ?? 'ThrottledBeacon<$T>',
+        name: name ?? 'ThrottledBeacon<$T>',
       );
 
   /// Like `Beacon.throttled` but behaves like a late variable. It must be set before it's read.
@@ -159,13 +159,13 @@ abstract class Beacon {
     T? initialValue,
     required Duration duration,
     bool dropBlocked = true,
-    String? debugLabel,
+    String? name,
   }) =>
       ThrottledBeacon<T>(
         initialValue: initialValue,
         duration: duration,
         dropBlocked: dropBlocked,
-        debugLabel: debugLabel ?? 'LazyThrottledBeacon<$T>',
+        name: name ?? 'LazyThrottledBeacon<$T>',
       );
 
   /// Creates a `FilteredBeacon` that will only updates its value if it passes the filter criteria.
@@ -190,12 +190,12 @@ abstract class Beacon {
   static FilteredBeacon<T> filtered<T>(
     T initialValue, {
     BeaconFilter<T>? filter,
-    String? debugLabel,
+    String? name,
   }) {
     return FilteredBeacon<T>(
       initialValue: initialValue,
       filter: filter,
-      debugLabel: debugLabel ?? 'FilteredBeacon<$T>',
+      name: name ?? 'FilteredBeacon<$T>',
     );
   }
 
@@ -206,12 +206,12 @@ abstract class Beacon {
   static FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
-    String? debugLabel,
+    String? name,
   }) {
     return FilteredBeacon<T>(
       initialValue: initialValue,
       filter: filter,
-      debugLabel: debugLabel ?? 'LazyFilteredBeacon<$T>',
+      name: name ?? 'LazyFilteredBeacon<$T>',
     );
   }
 
@@ -232,11 +232,10 @@ abstract class Beacon {
   /// countBeacon.value = 2;
   /// countBeacon.value = 3; // Triggers update with [1, 2, 3]
   /// ```
-  static BufferedCountBeacon<T> bufferedCount<T>(int count,
-          {String? debugLabel}) =>
+  static BufferedCountBeacon<T> bufferedCount<T>(int count, {String? name}) =>
       BufferedCountBeacon<T>(
         countThreshold: count,
-        debugLabel: debugLabel ?? 'BufferedCountBeacon<$T>',
+        name: name ?? 'BufferedCountBeacon<$T>',
       );
 
   /// Creates a `BufferedTimeBeacon` that collects values over a specified time duration.
@@ -260,11 +259,11 @@ abstract class Beacon {
   /// ```
   static BufferedTimeBeacon<T> bufferedTime<T>({
     required Duration duration,
-    String? debugLabel,
+    String? name,
   }) =>
       BufferedTimeBeacon<T>(
         duration: duration,
-        debugLabel: debugLabel ?? 'BufferedTimeBeacon<$T>',
+        name: name ?? 'BufferedTimeBeacon<$T>',
       );
 
   /// Creates an `UndoRedoBeacon` with an initial value and an optional history limit.
@@ -285,12 +284,12 @@ abstract class Beacon {
   static UndoRedoBeacon<T> undoRedo<T>(
     T initialValue, {
     int historyLimit = 10,
-    String? debugLabel,
+    String? name,
   }) {
     return UndoRedoBeacon<T>(
       initialValue: initialValue,
       historyLimit: historyLimit,
-      debugLabel: debugLabel ?? 'UndoRedoBeacon<$T>',
+      name: name ?? 'UndoRedoBeacon<$T>',
     );
   }
 
@@ -300,12 +299,12 @@ abstract class Beacon {
   static UndoRedoBeacon<T> lazyUndoRedo<T>({
     T? initialValue,
     int historyLimit = 10,
-    String? debugLabel,
+    String? name,
   }) {
     return UndoRedoBeacon<T>(
       initialValue: initialValue,
       historyLimit: historyLimit,
-      debugLabel: debugLabel ?? 'LazyUndoRedoBeacon<$T>',
+      name: name ?? 'LazyUndoRedoBeacon<$T>',
     );
   }
 
@@ -317,11 +316,10 @@ abstract class Beacon {
   /// var myBeacon = Beacon.timestamped(10);
   /// print(myBeacon.value); // Outputs: (value: 10, timestamp: DateTime.now())
   /// ```
-  static TimestampBeacon<T> timestamped<T>(T initialValue,
-          {String? debugLabel}) =>
+  static TimestampBeacon<T> timestamped<T>(T initialValue, {String? name}) =>
       TimestampBeacon<T>(
         initialValue: initialValue,
-        debugLabel: debugLabel ?? 'TimestampBeacon<$T>',
+        name: name ?? 'TimestampBeacon<$T>',
       );
 
   /// Like `Beacon.timestamped` but behaves like a late variable. It must be set before it's read.
@@ -329,11 +327,11 @@ abstract class Beacon {
   /// Throws [UninitializeLazyReadException] if it's read before being set.
   static TimestampBeacon<T> lazyTimestamped<T>({
     T? initialValue,
-    String? debugLabel,
+    String? name,
   }) =>
       TimestampBeacon<T>(
         initialValue: initialValue,
-        debugLabel: debugLabel ?? 'LazyTimestampBeacon<$T>',
+        name: name ?? 'LazyTimestampBeacon<$T>',
       );
 
   /// Creates a `StreamBeacon` from a given stream.
@@ -351,12 +349,12 @@ abstract class Beacon {
   static StreamBeacon<T> stream<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
-    String? debugLabel,
+    String? name,
   }) {
     return StreamBeacon<T>(
       stream,
       cancelOnError: cancelOnError,
-      debugLabel: debugLabel ?? 'StreamBeacon<$T>',
+      name: name ?? 'StreamBeacon<$T>',
     );
   }
 
@@ -368,7 +366,7 @@ abstract class Beacon {
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
-    String? debugLabel,
+    String? name,
   }) {
     return RawStreamBeacon<T>(
       stream,
@@ -376,7 +374,7 @@ abstract class Beacon {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
-      debugLabel: debugLabel ?? 'RawStreamBeacon<$T>',
+      name: name ?? 'RawStreamBeacon<$T>',
     );
   }
 
@@ -398,13 +396,13 @@ abstract class Beacon {
     Future<T> Function() future, {
     bool manualStart = false,
     bool cancelRunning = true,
-    String? debugLabel,
+    String? name,
   }) {
     return DefaultFutureBeacon<T>(
       future,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
-      debugLabel: debugLabel ?? 'FutureBeacon<$T>',
+      name: name ?? 'FutureBeacon<$T>',
     );
   }
 
@@ -430,11 +428,11 @@ abstract class Beacon {
   /// ```
   static ReadableBeacon<T> derived<T>(
     T Function() compute, {
-    String? debugLabel,
+    String? name,
     bool supportConditional = true,
   }) {
     final beacon = WritableDerivedBeacon<T>(
-      debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
+      name: name ?? 'DerivedBeacon<$T>',
     );
 
     final unsub = doEffect(
@@ -442,7 +440,7 @@ abstract class Beacon {
         beacon.set(compute());
       },
       supportConditional: supportConditional,
-      debugLabel: debugLabel ?? 'DerivedBeacon<$T>',
+      name: name ?? 'DerivedBeacon<$T>',
     );
 
     beacon.$setInternalEffectUnsubscriber(unsub);
@@ -491,14 +489,14 @@ abstract class Beacon {
     FutureCallback<T> compute, {
     bool manualStart = false,
     bool cancelRunning = true,
-    String? debugLabel,
+    String? name,
     bool supportConditional = true,
   }) {
     final beacon = DerivedFutureBeacon<T>(
       compute,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
-      debugLabel: debugLabel ?? 'DerivedFutureBeacon<$T>',
+      name: name ?? 'DerivedFutureBeacon<$T>',
     );
 
     final dispose = doEffect(() {
@@ -510,7 +508,7 @@ abstract class Beacon {
           await beacon.run();
         },
         supportConditional: supportConditional,
-        debugLabel: debugLabel ?? 'DerivedFutureBeacon<$T>',
+        name: name ?? 'DerivedFutureBeacon<$T>',
       );
     });
 
@@ -538,20 +536,20 @@ abstract class Beacon {
   ///
   /// nums.remove(2); // Outputs: [1, 3, 4]
   /// ```
-  static ListBeacon<T> list<T>(List<T> initialValue, {String? debugLabel}) =>
+  static ListBeacon<T> list<T>(List<T> initialValue, {String? name}) =>
       ListBeacon<T>(
         initialValue,
-        debugLabel: debugLabel ?? 'ListBeacon<$T>',
+        name: name ?? 'ListBeacon<$T>',
       );
 
   /// Creates a `SetBeacon` with an initial set value.
   /// This beacon manages a set of items, allowing for reactive updates and manipulations of the set.
   ///
   /// The `SetBeacon` provides methods to add, remove, and update items in the set and notifies listeners without having to make a copy.
-  static SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? debugLabel}) =>
+  static SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? name}) =>
       SetBeacon<T>(
         initialValue,
-        debugLabel: debugLabel ?? 'SetBeacon<$T>',
+        name: name ?? 'SetBeacon<$T>',
       );
 
   /// Creates a `MapBeacon` with an initial map value.
@@ -560,11 +558,11 @@ abstract class Beacon {
   /// The `MapBeacon` provides methods to add, remove, and update items in the map and notifies listeners without having to make a copy.
   static MapBeacon<K, V> hashMap<K, V>(
     Map<K, V> initialValue, {
-    String? debugLabel,
+    String? name,
   }) =>
       MapBeacon<K, V>(
         initialValue,
-        debugLabel: debugLabel ?? 'MapBeacon<$K,$V>',
+        name: name ?? 'MapBeacon<$K,$V>',
       );
 
   /// Creates an effect based on a provided function. The provided function will be called
@@ -594,12 +592,12 @@ abstract class Beacon {
   static VoidCallback effect(
     Function fn, {
     bool supportConditional = true,
-    String? debugLabel,
+    String? name,
   }) {
     return doEffect(
       fn,
       supportConditional: supportConditional,
-      debugLabel: debugLabel,
+      name: name,
     );
   }
 
@@ -632,12 +630,12 @@ abstract class Beacon {
   static VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
-    String? debugLabel,
+    String? name,
   }) {
     return doEffect(
       fn,
       supportConditional: supportConditional,
-      debugLabel: debugLabel,
+      name: name,
     );
   }
   // coverage:ignore-end

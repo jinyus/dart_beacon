@@ -3,7 +3,7 @@ part of '../base_beacon.dart';
 class SetBeacon<E> extends WritableBeacon<Set<E>> {
   SetBeacon(
     Set<E> initialValue, {
-    super.debugLabel,
+    super.name,
   }) : super(initialValue: initialValue);
 
   void add(E value) {

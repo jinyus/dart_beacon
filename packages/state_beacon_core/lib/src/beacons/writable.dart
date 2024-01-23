@@ -1,7 +1,7 @@
 part of '../base_beacon.dart';
 
 class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
-  WritableBeacon({super.initialValue, super.debugLabel});
+  WritableBeacon({super.initialValue, super.name});
 
   set value(T newValue) {
     set(newValue);

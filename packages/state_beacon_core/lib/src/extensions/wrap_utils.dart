@@ -5,11 +5,11 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// See: [Beacon.bufferedCount] for more details.
   BufferedCountBeacon<T> buffer(
     int count, {
-    String? debugLabel,
+    String? name,
   }) {
     final beacon = Beacon.bufferedCount<T>(
       count,
-      debugLabel: debugLabel,
+      name: name,
     )..wrap(
         this,
         disposeTogether: true,
@@ -27,11 +27,11 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// See: [Beacon.bufferedTime] for more details.
   BufferedTimeBeacon<T> bufferTime({
     required Duration duration,
-    String? debugLabel,
+    String? name,
   }) {
     final beacon = Beacon.bufferedTime<T>(
       duration: duration,
-      debugLabel: debugLabel,
+      name: name,
     )..wrap(
         this,
         disposeTogether: true,
@@ -50,17 +50,17 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   DebouncedBeacon<T> debounce({
     bool startNow = true,
     required Duration duration,
-    String? debugLabel,
+    String? name,
   }) {
     if (startNow && !_isNullable && _isEmpty) {
       throw Exception(
-        'startNow must be false if this beacon($debugLabel) is uninitialized',
+        'startNow must be false if this beacon($name) is uninitialized',
       );
     }
 
     return Beacon.lazyDebounced(
       duration: duration,
-      debugLabel: debugLabel,
+      name: name,
     )..wrap(
         this,
         disposeTogether: true,
@@ -74,18 +74,18 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     bool startNow = true,
     required Duration duration,
     bool dropBlocked = true,
-    String? debugLabel,
+    String? name,
   }) {
     if (startNow && !_isNullable && _isEmpty) {
       throw Exception(
-        'startNow must be false if this beacon($debugLabel) is uninitialized',
+        'startNow must be false if this beacon($name) is uninitialized',
       );
     }
 
     return Beacon.lazyThrottled(
       duration: duration,
       dropBlocked: dropBlocked,
-      debugLabel: debugLabel,
+      name: name,
     )..wrap(
         this,
         disposeTogether: true,
@@ -98,17 +98,17 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   FilteredBeacon<T> filter({
     bool startNow = true,
     bool Function(T?, T)? filter,
-    String? debugLabel,
+    String? name,
   }) {
     if (startNow && !_isNullable && _isEmpty) {
       throw Exception(
-        'startNow must be false if this beacon($debugLabel) is uninitialized',
+        'startNow must be false if this beacon($name) is uninitialized',
       );
     }
 
     return Beacon.lazyFiltered(
       filter: filter,
-      debugLabel: debugLabel,
+      name: name,
     )..wrap(
         this,
         disposeTogether: true,

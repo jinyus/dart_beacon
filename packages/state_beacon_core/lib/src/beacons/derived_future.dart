@@ -12,7 +12,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     super._operation, {
     bool manualStart = false,
     super.cancelRunning = true,
-    super.debugLabel,
+    super.name,
   }) {
     if (manualStart) {
       _status.set(DerivedFutureStatus.idle);

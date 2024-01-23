@@ -1,7 +1,7 @@
 part of '../base_beacon.dart';
 
 abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
-  AsyncBeacon({super.initialValue, super.debugLabel});
+  AsyncBeacon({super.initialValue, super.name});
 
   /// Exposes this as a [Future] that can be awaited in a derived future beacon.
   /// This will trigger a re-run of the derived beacon when its state changes.

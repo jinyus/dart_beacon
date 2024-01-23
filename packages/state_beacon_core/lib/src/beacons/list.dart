@@ -3,7 +3,7 @@ part of '../base_beacon.dart';
 class ListBeacon<E> extends WritableBeacon<List<E>> {
   ListBeacon(
     List<E> initialValue, {
-    super.debugLabel,
+    super.name,
   }) : super(initialValue: initialValue);
 
   set first(E val) {

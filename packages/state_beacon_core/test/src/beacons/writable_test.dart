@@ -113,7 +113,7 @@ void main() {
       uBeacon.value;
     } catch (e) {
       expect(e, isA<UninitializeLazyReadException>());
-      expect(e.toString(), contains(uBeacon.debugLabel));
+      expect(e.toString(), contains(uBeacon.name));
     }
 
     uBeacon.set(10);

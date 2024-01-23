@@ -15,7 +15,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
     super.initialValue,
     required Duration duration,
     this.dropBlocked = true,
-    super.debugLabel,
+    super.name,
   }) : _throttleDuration = duration;
 
   bool get isBlocked => _blocked;

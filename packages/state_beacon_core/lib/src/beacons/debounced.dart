@@ -7,7 +7,7 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
   DebouncedBeacon({
     super.initialValue,
     required Duration duration,
-    super.debugLabel,
+    super.name,
   }) : debounceDuration = duration;
 
   @override

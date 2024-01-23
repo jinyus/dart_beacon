@@ -5,9 +5,9 @@ abstract class BeaconObserver {
 
   void onUpdate(BaseBeacon<dynamic> beacon);
 
-  void onWatch(String effectLabel, BaseBeacon<dynamic> beacon);
+  void onWatch(String effectName, BaseBeacon<dynamic> beacon);
 
-  void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon);
+  void onStopWatch(String effectName, BaseBeacon<dynamic> beacon);
 
   void onDispose(BaseBeacon<dynamic> beacon);
 
@@ -15,9 +15,9 @@ abstract class BeaconObserver {
 }
 
 class LoggingObserver implements BeaconObserver {
-  final List<String>? includeLabels;
+  final List<String>? includeNames;
 
-  LoggingObserver({this.includeLabels});
+  LoggingObserver({this.includeNames});
 
   // this is tested with mocks
   // don't want to print to console in tests
@@ -25,56 +25,53 @@ class LoggingObserver implements BeaconObserver {
 
   @override
   void onUpdate(BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
 
     print(
       '''
-
-"${beacon.debugLabel}" was updated:
+"${beacon.name}" was updated:
   old: ${beacon.previousValue}
-  new: ${beacon.peek()}\n\n\n''',
+  new: ${beacon.peek()}\n\n''',
     );
   }
 
   @override
   void onDispose(BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
 
-    print('\n"${beacon.debugLabel}" was disposed\n\n');
+    print('\n"${beacon.name}" was disposed\n\n');
   }
 
   @override
   void onCreate(BaseBeacon<dynamic> beacon, bool lazy) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
 
     final lazyLabel = lazy ? 'Lazy' : '';
-    print('\n${lazyLabel}Beacon created: ${beacon.debugLabel}\n\n');
+    print('\n${lazyLabel}Beacon created: ${beacon.name}\n\n');
   }
 
-  bool shouldContinue(String label) {
-    if (includeLabels == null) return true;
-    return includeLabels?.contains(label) ?? false;
+  bool shouldContinue(String name) {
+    if (includeNames == null) return true;
+    return includeNames?.contains(name) ?? false;
   }
 
   @override
-  void onWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+  void onWatch(String effectName, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.name)) return;
 
     print(
       '''
-
-$effectLabel is watching ${beacon.debugLabel}\n\n''',
+$effectName is watching ${beacon.name}\n\n''',
     );
   }
 
   @override
-  void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+  void onStopWatch(String effectName, BaseBeacon<dynamic> beacon) {
+    if (!shouldContinue(beacon.name)) return;
 
     print(
       '''
-
-$effectLabel stopped watching ${beacon.debugLabel}\n\n''',
+$effectName stopped watching ${beacon.name}\n\n''',
     );
   }
   // coverage:ignore-end

@@ -3,7 +3,7 @@ part of '../base_beacon.dart';
 typedef TimestampValue<T> = ({T value, DateTime timestamp});
 
 class TimestampBeacon<T> extends ReadableBeacon<TimestampValue<T>> {
-  TimestampBeacon({T? initialValue, super.debugLabel})
+  TimestampBeacon({T? initialValue, super.name})
       : super(
             initialValue: initialValue != null || null is T
                 ? (value: initialValue as T, timestamp: DateTime.now())
