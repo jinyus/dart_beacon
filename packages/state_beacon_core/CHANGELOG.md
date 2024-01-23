@@ -1,8 +1,10 @@
 ## 0.26.0
 
-The core of the package was extracted into `state_beacon_core` so it can be usuable from pure dart. The flutter related parts remain in this package and the core is exported so nothing should change for consumers of this package.
-
 -   [Breaking] beacons **NO** longer implements ValueListenable. Use `mybeacon.toListenable()` as a replacement.
+
+## Everything below was written before the state_beacon -> state_beacon_core migration
+
+The core of state_beacon was extracted into a separate package to make it usuable in pure dart projects.
 
 ## 0.25.0
 
