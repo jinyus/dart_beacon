@@ -1,3 +1,7 @@
+## 0.27.0
+
+-   [Breaking] rename `debugLabel` to `name`
+
 ## 0.26.0
 
 -   [Breaking] beacons **NO** longer implements ValueListenable. Use `mybeacon.toListenable()` as a replacement.

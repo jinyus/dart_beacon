@@ -48,6 +48,9 @@ abstract class BaseBeacon<T> {
   bool get _isNullable => null is T;
 
   String? _name;
+
+  /// Returns the name of the beacon.
+  /// This can be used for logging/observability
   String get name => _name ?? runtimeType.toString();
 
   var _isEmpty = true;

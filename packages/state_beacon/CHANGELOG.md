@@ -1,3 +1,7 @@
+## 0.27.0
+
+-   [Breaking] rename `debugLabel` to `name`
+
 ## 0.26.1
 
 -   [Fix] memory leak in `toListenable()` and `toValueNotifier()`
