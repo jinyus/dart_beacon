@@ -13,7 +13,6 @@ void main() {
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
 
     Beacon.effect(() {
-      // ignore: unused_local_variable
       var msg = '${name()} is ${age()} years old';
 
       if (age.value > 21) {

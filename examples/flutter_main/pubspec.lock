@@ -355,10 +355,10 @@ packages:
   state_beacon:
     dependency: "direct main"
     description:
-      path: "../../state_beacon"
+      path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.24.0"
+    version: "0.25.0"
   state_beacon_lint:
     dependency: "direct dev"
     description:

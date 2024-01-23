@@ -160,10 +160,10 @@ packages:
   state_beacon:
     dependency: "direct main"
     description:
-      path: "../../state_beacon"
+      path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.12.7"
+    version: "0.25.0"
   stream_channel:
     dependency: transitive
     description:
