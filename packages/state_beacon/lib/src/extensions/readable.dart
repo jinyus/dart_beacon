@@ -9,6 +9,10 @@ extension ReadableBeaconFlutterUtils<T> on ReadableBeacon<T> {
 
     notifier.addDisposeCallback(unsub);
 
+    onDispose(() {
+      notifier.dispose();
+    });
+
     return notifier;
   }
 }

@@ -28,4 +28,30 @@ void main() {
 
     expect(called, 2);
   });
+
+  test('should not notify after source beacon is disposed', () {
+    var beacon = Beacon.writable(0);
+
+    var valueNotifier = beacon.toValueNotifier();
+
+    expect(valueNotifier, isA<ValueNotifier<int>>());
+
+    var called = 0;
+
+    valueNotifier.addListener(() => called++);
+
+    beacon.value = 1;
+
+    expect(called, 1);
+
+    beacon.value = 2;
+
+    expect(called, 2);
+
+    beacon.dispose();
+
+    beacon.value = 3;
+
+    expect(called, 2);
+  });
 }

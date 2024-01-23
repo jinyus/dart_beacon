@@ -1,3 +1,7 @@
+## 0.26.1
+
+-   [Fix] memory leak in `toListenable()` and `toValueNotifier()`
+
 ## 0.26.0
 
 The core of the package was extracted into `state_beacon_core` so it can be usuable from pure dart. The flutter related parts remain in this package and the core is exported so nothing should change for consumers of this package.
