@@ -73,7 +73,7 @@ class App extends StatelessWidget {
 
     // changes on the listenable will cause the router to refresh it's route
     // every beacon is ValueListenable, so you can use any beacon here
-    refreshListenable: _authController.loggedIn,
+    refreshListenable: _authController.loggedIn.toListenable(),
   );
 }
 

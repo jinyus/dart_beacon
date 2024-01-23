@@ -156,6 +156,13 @@ packages:
       relative: true
     source: path
     version: "0.25.0"
+  state_beacon_core:
+    dependency: transitive
+    description:
+      path: "../../packages/state_beacon_core"
+      relative: true
+    source: path
+    version: "0.25.0"
   stream_channel:
     dependency: transitive
     description:
