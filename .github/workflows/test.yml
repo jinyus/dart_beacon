@@ -30,8 +30,15 @@ jobs:
 
             - uses: subosito/flutter-action@v2
 
-            - name: Build and Test
+            - name: Build and Test Core
               working-directory: ./packages/state_beacon_core
+              run: |
+                  flutter pub get
+                  flutter analyze
+                  flutter test --coverage
+
+            - name: Build and Test Flutter
+              working-directory: ./packages/state_beacon
               run: |
                   flutter pub get
                   flutter analyze
