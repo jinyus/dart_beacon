@@ -28,30 +28,19 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            # This step checks for modified .dart files outside the /examples directory.
-            - name: Check for modified .dart files
-              id: check_files
-              uses: tj-actions/changed-files@v42
-              with:
-                  files: |
-                      state_beacon/lib/**/*.dart
-                      state_beacon/test/**/*.dart
-
             - uses: subosito/flutter-action@v2
 
-            - if: steps.check_files.outputs.any_modified == 'true'
-              name: Build and Test
+            - name: Build and Test
+              working-directory: ./packages/state_beacon
               run: |
-                  cd state_beacon
                   flutter pub get
                   flutter analyze
                   flutter test --coverage
 
-            - if: steps.check_files.outputs.any_modified == 'true'
-              name: Upload coverage reports to Codecov
+            - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v3
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
               with:
-                  files: ./state_beacon/coverage/lcov.info
+                  files: ./packages/state_beacon/coverage/lcov.info
                   flags: unittests

@@ -15,7 +15,7 @@ dependencies:
     flutter_localizations:
         sdk: flutter
     state_beacon:
-        path: ../../state_beacon
+        path: ../../packages/state_beacon
 
 dev_dependencies:
     flutter_test:
