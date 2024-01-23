@@ -31,7 +31,7 @@ jobs:
             - uses: subosito/flutter-action@v2
 
             - name: Build and Test
-              working-directory: ./packages/state_beacon
+              working-directory: ./packages/state_beacon_core
               run: |
                   flutter pub get
                   flutter analyze
@@ -42,5 +42,5 @@ jobs:
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
               with:
-                  files: ./packages/state_beacon/coverage/lcov.info
+                  files: ./packages/state_beacon_core/coverage/lcov.info
                   flags: unittests
