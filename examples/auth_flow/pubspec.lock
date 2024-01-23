@@ -163,7 +163,7 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.26.0"
+    version: "0.27.0"
   state_beacon_core:
     dependency: transitive
     description:
