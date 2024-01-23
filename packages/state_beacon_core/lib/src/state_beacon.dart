@@ -7,8 +7,7 @@ import 'base_beacon.dart';
 import 'common.dart';
 
 abstract class Beacon {
-  /// Creates a `WritableBeacon` with an initial value.
-  /// This beacon allows both reading and writing the value.
+  /// Creates a `WritableBeacon` that can be read and written to.
   ///
   /// Example:
   /// ```dart
@@ -37,13 +36,16 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'LazyWritable<$T>',
       );
 
-  /// Creates a `ReadableBeacon` with an initial value.
-  /// This beacon allows only reading the value.
-  ///
-  /// Example:
+  /// Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
   /// ```dart
-  /// var myBeacon = Beacon.readable(15);
-  /// print(myBeacon.value); // Outputs: 15
+  /// final counter = Beacon.readable(10);
+  /// counter.value = 10; // Compilation error
+  ///
+  ///
+  /// final _internalCounter = Beacon.writable(10);
+  ///
+  /// // Expose the beacon's value without allowing it to be modified
+  /// ReadableBeacon<int> get counter => _internalCounter;
   /// ```
   static ReadableBeacon<T> readable<T>(
     T initialValue, {
@@ -73,16 +75,23 @@ abstract class Beacon {
     return (beacon, beacon.set);
   }
 
-  /// Creates a `DebouncedBeacon` with an initial value and a debounce duration.
-  /// This beacon delays updates to its value based on the duration.
+  /// Creates a `DebouncedBeacon` that will delay updates to its value based on the duration. This is useful when you want to wait until a user has stopped typing before performing an action.
   ///
-  /// Example:
   /// ```dart
-  /// var myBeacon = Beacon.debounced(10, duration: Duration(seconds: 1));
-  /// myBeacon.value = 20; // Update is debounced
-  /// print(myBeacon.value); // Outputs: 10
-  /// await Future.delayed(Duration(seconds: 1));
-  /// print(myBeacon.value); // Outputs: 20
+  /// var query = Beacon.debounced('', duration: Duration(seconds: 1));
+  ///
+  /// query.subscribe((value) {
+  ///   print(value); // Outputs: 'apple' after 1 second
+  /// });
+  ///
+  /// // simulate user typing
+  /// query.value = 'a';
+  /// query.value = 'ap';
+  /// query.value = 'app';
+  /// query.value = 'appl';
+  /// query.value = 'apple';
+  ///
+  /// // after 1 second, the value will be updated to 'apple'
   /// ```
   static DebouncedBeacon<T> debounced<T>(
     T initialValue, {
@@ -109,12 +118,9 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'LazyDebouncedBeacon<$T>',
       );
 
-  /// Creates a `ThrottledBeacon` with an initial value and a throttle duration.
-  /// This beacon limits the rate of updates to its value based on the duration.
-  /// Updates that occur faster than the throttle duration are ignored.
+  /// Creates a `ThrottledBeacon` that will limit the rate of updates to its value based on the duration.
   ///
-  /// If `dropBlocked` is `true`, values will be dropped while the beacon is blocked.
-  /// If `dropBlocked` is `false`, values will be buffered and emitted when the beacon is unblocked.
+  /// If `dropBlocked` is `true`(default), values will be dropped while the beacon is blocked, otherwise, values will be buffered and emitted one by one when the beacon is unblocked.
   ///
   /// Example:
   /// ```dart
@@ -162,8 +168,7 @@ abstract class Beacon {
         debugLabel: debugLabel ?? 'LazyThrottledBeacon<$T>',
       );
 
-  /// Creates a `FilteredBeacon` with an initial value and a filter function.
-  /// This beacon updates its value only if it passes the filter criteria.
+  /// Creates a `FilteredBeacon` that will only updates its value if it passes the filter criteria.
   /// The filter function receives the previous and new values as arguments.
   /// The filter function can also be changed using the `setFilter` method.
   ///
