@@ -6,15 +6,14 @@ class _Effect {
   late final Set<BaseBeacon<dynamic>> _watchedBeacons;
   late final EffectClosure func;
   late final Set<BaseBeacon<dynamic>> _currentDeps;
-  late final String _debugLabel;
+  late final String _name;
   final bool _supportConditional;
   Function? _disposeChild;
 
-  _Effect(this._supportConditional,
-      {required Function fn, String? debugLabel}) {
+  _Effect(this._supportConditional, {required Function fn, String? name}) {
     _watchedBeacons = {};
     _currentDeps = {};
-    _debugLabel = debugLabel ?? 'Effect(unlabeled)';
+    _name = name ?? 'Effect(unlabeled)';
   }
 
   VoidCallback execute(Function fn) {
@@ -62,7 +61,7 @@ class _Effect {
     for (final beacon in staleBeacons) {
       // remove self from beacon's listeners
       beacon._listeners.remove(func);
-      BeaconObserver.instance?.onStopWatch(_debugLabel, beacon);
+      BeaconObserver.instance?.onStopWatch(_name, beacon);
     }
 
     // remove from local tracker
@@ -83,7 +82,7 @@ class _Effect {
     _watchedBeacons.add(beacon);
     beacon._listeners.add(func);
 
-    BeaconObserver.instance?.onWatch(_debugLabel, beacon);
+    BeaconObserver.instance?.onWatch(_name, beacon);
 
     if (_supportConditional) _currentDeps.add(beacon);
   }
@@ -96,8 +95,8 @@ class _Effect {
 VoidCallback doEffect(
   Function fn, {
   bool supportConditional = true,
-  String? debugLabel,
+  String? name,
 }) {
-  final effect = _Effect(supportConditional, fn: fn, debugLabel: debugLabel);
+  final effect = _Effect(supportConditional, fn: fn, name: name);
   return effect.execute(fn);
 }

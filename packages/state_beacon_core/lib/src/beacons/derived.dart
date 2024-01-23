@@ -18,5 +18,5 @@ mixin DerivedMixin<T> on ReadableBeacon<T> {
 
 // this is only used internally
 class WritableDerivedBeacon<T> extends WritableBeacon<T> with DerivedMixin<T> {
-  WritableDerivedBeacon({super.debugLabel});
+  WritableDerivedBeacon({super.name});
 }

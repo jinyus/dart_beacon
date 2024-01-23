@@ -141,10 +141,10 @@ void main() {
     var fbeacon = Beacon.lazyFiltered<int>();
     expect(fbeacon.toString(), 'LazyFilteredBeacon<int>(uninitialized)');
 
-    var nbeacon = Beacon.writable(10, debugLabel: 'num');
+    var nbeacon = Beacon.writable(10, name: 'num');
     expect(nbeacon.toString(), 'num(10)');
 
-    var lnbeacon = Beacon.lazyWritable<int>(debugLabel: 'num');
+    var lnbeacon = Beacon.lazyWritable<int>(name: 'num');
     expect(lnbeacon.toString(), 'num(uninitialized)');
   });
 }

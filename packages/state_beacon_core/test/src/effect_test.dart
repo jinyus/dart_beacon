@@ -6,9 +6,9 @@ import '../common.dart';
 
 void main() {
   test('should conditionally stop listening to beacons', () async {
-    final name = Beacon.writable("Bob", debugLabel: 'name');
-    final age = Beacon.writable(20, debugLabel: 'age');
-    final college = Beacon.writable("MIT", debugLabel: 'college');
+    final name = Beacon.writable("Bob", name: 'name');
+    final age = Beacon.writable(20, name: 'age');
+    final college = Beacon.writable("MIT", name: 'college');
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
 
@@ -45,9 +45,9 @@ void main() {
   });
 
   test('should never listen to beacons not accessed on first run', () async {
-    final name = Beacon.writable("Bob", debugLabel: 'name');
-    final age = Beacon.writable(20, debugLabel: 'age');
-    final college = Beacon.writable("MIT", debugLabel: 'college');
+    final name = Beacon.writable("Bob", name: 'name');
+    final age = Beacon.writable(20, name: 'age');
+    final college = Beacon.writable("MIT", name: 'college');
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
     Beacon.effect(
@@ -185,9 +185,9 @@ void main() {
   });
 
   test('should dispose sub effects', () {
-    var beacon1 = Beacon.writable<int>(10, debugLabel: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, debugLabel: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, debugLabel: 'beacon3');
+    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;
@@ -221,9 +221,9 @@ void main() {
   });
 
   test('should dispose sub effects when supportConditional is false', () {
-    var beacon1 = Beacon.writable<int>(10, debugLabel: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, debugLabel: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, debugLabel: 'beacon3');
+    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;
@@ -257,9 +257,9 @@ void main() {
   });
 
   test('should not watch beacons accessed in child effects', () {
-    var beacon1 = Beacon.writable<int>(10, debugLabel: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, debugLabel: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, debugLabel: 'beacon3');
+    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;

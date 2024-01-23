@@ -18,7 +18,7 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     this._operation, {
     bool cancelRunning = true,
     super.initialValue,
-    super.debugLabel,
+    super.name,
   }) : _cancelRunning = cancelRunning;
 
   /// Casts its value to [AsyncData] and return it's value or throws [CastError] if this is not [AsyncData].
@@ -93,7 +93,7 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
     super.operation, {
     bool manualStart = false,
     super.cancelRunning = true,
-    super.debugLabel,
+    super.name,
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     if (!manualStart) _run();
   }

@@ -1,5 +1,5 @@
 part of '../base_beacon.dart';
 
 class ReadableBeacon<T> extends BaseBeacon<T> {
-  ReadableBeacon({super.initialValue, super.debugLabel});
+  ReadableBeacon({super.initialValue, super.name});
 }

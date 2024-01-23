@@ -38,7 +38,7 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
     if (_wrapped.containsKey(target.hashCode)) return;
 
     if (then == null && T != U) {
-      throw WrapTargetWrongTypeException(debugLabel, target.debugLabel);
+      throw WrapTargetWrongTypeException(name, target.name);
     }
 
     if (startNow && target.isEmpty) {

@@ -10,36 +10,36 @@ var _onWatchCalled = 0;
 var _onStopWatchCalled = 0;
 
 class MockLogginObserver extends LoggingObserver {
-  MockLogginObserver({super.includeLabels});
+  MockLogginObserver({super.includeNames});
 
   @override
   void onCreate(BaseBeacon<dynamic> beacon, bool lazy) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
     _lazyOnCreate = lazy;
     _onCreateCalled++;
   }
 
   @override
   void onDispose(BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
     _onDisposeCalled++;
   }
 
   @override
   void onUpdate(BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
     _onUpdateCalled++;
   }
 
   @override
   void onWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
     _onWatchCalled++;
   }
 
   @override
   void onStopWatch(String effectLabel, BaseBeacon<dynamic> beacon) {
-    if (!shouldContinue(beacon.debugLabel)) return;
+    if (!shouldContinue(beacon.name)) return;
     _onStopWatchCalled++;
   }
 }
@@ -81,7 +81,7 @@ void main() {
   });
 
   test('should not call when label is not included', () {
-    BeaconObserver.instance = MockLogginObserver(includeLabels: ['foo']);
+    BeaconObserver.instance = MockLogginObserver(includeNames: ['foo']);
 
     var beacon = Beacon.lazyWritable<int>();
 

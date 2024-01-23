@@ -92,7 +92,7 @@ void main() {
       bufWrapper.wrap(original);
     } catch (e) {
       expect(e, isA<WrapTargetWrongTypeException>());
-      expect(e.toString(), contains(bufWrapper.debugLabel));
+      expect(e.toString(), contains(bufWrapper.name));
     }
 
     expect(
@@ -144,13 +144,13 @@ void main() {
 
   test('should dispose together when wrapper is disposed', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+    var count = Beacon.readable<int>(10, name: 'readable');
     var doubledCount = Beacon.derived<int>(
       () => count.value * 2,
-      debugLabel: 'derived',
+      name: 'derived',
     );
 
-    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
     var buff = doubledCount.buffer(1).filter();
@@ -172,13 +172,13 @@ void main() {
 
   test('should dispose together when wrapped is disposed', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+    var count = Beacon.readable<int>(10, name: 'readable');
     var doubledCount = Beacon.derived<int>(
       () => count.value * 2,
-      debugLabel: 'derived',
+      name: 'derived',
     );
 
-    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 
@@ -200,9 +200,9 @@ void main() {
 
   test('should dispose together when wrapped is disposed(2)', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, debugLabel: 'readable');
+    var count = Beacon.readable<int>(10, name: 'readable');
 
-    var wrapper = Beacon.writable<int>(0, debugLabel: 'wrapper');
+    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 

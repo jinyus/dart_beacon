@@ -35,7 +35,7 @@ part 'extensions/wrap_utils.dart';
 part 'mixins/beacon_consumer.dart';
 
 abstract class BaseBeacon<T> {
-  BaseBeacon({T? initialValue, String? debugLabel}) : _debugLabel = debugLabel {
+  BaseBeacon({T? initialValue, String? name}) : _name = name {
     if (initialValue != null || _isNullable) {
       _initialValue = initialValue as T;
       _value = initialValue;
@@ -47,8 +47,11 @@ abstract class BaseBeacon<T> {
 
   bool get _isNullable => null is T;
 
-  String? _debugLabel;
-  String get debugLabel => _debugLabel ?? runtimeType.toString();
+  String? _name;
+
+  /// Returns the name of the beacon.
+  /// This can be used for logging/observability
+  String get name => _name ?? runtimeType.toString();
 
   var _isEmpty = true;
 
@@ -90,7 +93,7 @@ abstract class BaseBeacon<T> {
   /// when used within a [Beacon.effect] or [Beacon.derived].
   T get value {
     if (_isEmpty) {
-      throw UninitializeLazyReadException(debugLabel);
+      throw UninitializeLazyReadException(name);
     }
 
     if (isRunningUntracked()) {
@@ -162,7 +165,7 @@ abstract class BaseBeacon<T> {
 
     if (currentEffect != null) {
       if (_listeners.contains(currentEffect.func)) {
-        throw CircularDependencyException(debugLabel);
+        throw CircularDependencyException(name);
       }
     }
 
@@ -195,5 +198,5 @@ abstract class BaseBeacon<T> {
   }
 
   @override
-  String toString() => '$debugLabel(${_isEmpty ? 'uninitialized' : _value})';
+  String toString() => '$name(${_isEmpty ? 'uninitialized' : _value})';
 }
