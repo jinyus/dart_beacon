@@ -5,7 +5,7 @@ import 'package:state_beacon/src/value_notifier_beacon.dart';
 
 void main() {
   test('should notify listener and call dispose callbacks', () {
-    var beacon = ValueNotifierBeacon(0);
+    final beacon = ValueNotifierBeacon(0);
     var called = 0;
 
     void disposeTest() => called++;
@@ -19,9 +19,9 @@ void main() {
     expect(beacon.value, 1);
     expect(called, 1);
 
-    beacon.addDisposeCallback(disposeTest);
-
-    beacon.dispose();
+    beacon
+      ..addDisposeCallback(disposeTest)
+      ..dispose();
 
     expect(called, 2);
   });

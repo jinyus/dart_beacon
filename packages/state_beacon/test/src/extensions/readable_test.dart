@@ -4,15 +4,15 @@ import 'package:state_beacon/state_beacon.dart';
 
 void main() {
   test('should convert to a value listenable', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var valueNotifier = beacon.toListenable();
+    final valueNotifier = beacon.toListenable();
 
     expect(valueNotifier, isA<ValueListenable<int>>());
 
     var called = 0;
 
-    fn() => called++;
+    int fn() => called++;
     valueNotifier.addListener(fn);
 
     beacon.value = 1;
@@ -31,9 +31,9 @@ void main() {
   });
 
   test('should not notify after source beacon is disposed', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var valueNotifier = beacon.toListenable();
+    final valueNotifier = beacon.toListenable();
 
     expect(valueNotifier, isA<ValueListenable<int>>());
 
@@ -49,9 +49,9 @@ void main() {
 
     expect(called, 2);
 
-    beacon.dispose();
-
-    beacon.value = 3;
+    beacon
+      ..dispose()
+      ..value = 3;
 
     expect(called, 2);
   });

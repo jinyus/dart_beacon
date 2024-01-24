@@ -1,7 +1,8 @@
-// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: invalid_use_of_protected_member, use_if_null_to_convert_nulls_to_bools, lines_longer_than_80_chars
 
 part of 'extensions.dart';
 
+// ignore: public_member_api_docs
 typedef ObserverCallback<T> = void Function(T prev, T next);
 
 // coverage:ignore-start
@@ -9,6 +10,7 @@ typedef ObserverCallback<T> = void Function(T prev, T next);
 final Finalizer<void Function()> _finalizer = Finalizer((fn) => fn());
 // coverage:ignore-end
 
+/// @macro WidgetUtils
 extension WidgetUtils<T> on BaseBeacon<T> {
   /// Watches a beacon and triggers a widget
   /// rebuild when its value changes.
@@ -86,7 +88,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
 
-    rebuildWidget() {
+    void rebuildWidget() {
       elementRef.target!.markNeedsBuild();
     }
 

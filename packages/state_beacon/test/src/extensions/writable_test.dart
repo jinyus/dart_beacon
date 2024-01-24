@@ -4,9 +4,9 @@ import 'package:state_beacon/state_beacon.dart';
 
 void main() {
   test('should convert to a value notifier', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var valueNotifier = beacon.toValueNotifier();
+    final valueNotifier = beacon.toValueNotifier();
 
     expect(valueNotifier, isA<ValueNotifier<int>>());
 
@@ -30,9 +30,9 @@ void main() {
   });
 
   test('should not notify after source beacon is disposed', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var valueNotifier = beacon.toValueNotifier();
+    final valueNotifier = beacon.toValueNotifier();
 
     expect(valueNotifier, isA<ValueNotifier<int>>());
 
@@ -48,9 +48,9 @@ void main() {
 
     expect(called, 2);
 
-    beacon.dispose();
-
-    beacon.value = 3;
+    beacon
+      ..dispose()
+      ..value = 3;
 
     expect(called, 2);
   });

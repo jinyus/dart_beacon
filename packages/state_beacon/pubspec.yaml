@@ -13,11 +13,11 @@ dependencies:
     state_beacon_core: ^0.26.0
 
 dev_dependencies:
-    austerity: ^1.1.0
     flutter_lints: ^3.0.0
     flutter_test:
         sdk: flutter
     lints: ^3.0.0
+    very_good_analysis: ^5.1.0
 
 platforms:
     android:
