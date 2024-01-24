@@ -12,15 +12,15 @@ export 'src/base_beacon.dart'
         FilteredBeacon,
         FutureBeacon,
         ListBeacon,
-        SetBeacon,
         MapBeacon,
         ReadableBeacon,
+        ReadableBeaconWrapUtils,
+        SetBeacon,
         StreamBeacon,
         ThrottledBeacon,
         TimestampBeacon,
         UndoRedoBeacon,
         WritableBeacon,
-        ReadableBeaconWrapUtils,
         WritableWrap;
 export 'src/extensions/extensions.dart';
 export 'src/observer.dart';

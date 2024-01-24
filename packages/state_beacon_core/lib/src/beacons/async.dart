@@ -1,6 +1,8 @@
 part of '../base_beacon.dart';
 
+/// A beacon that exposes an [AsyncValue].
 abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
+  /// @macro [AsyncBeacon]
   AsyncBeacon({super.initialValue, super.name});
 
   /// Exposes this as a [Future] that can be awaited in a derived future beacon.
@@ -23,14 +25,14 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   ///   return '$fname $lname';
   /// });
   Future<T> toFuture() {
-    final awaitedBeacon = Awaited.findOrCreate(this);
+    final awaitedBeacon = _Awaited.findOrCreate(this);
 
     return awaitedBeacon.future;
   }
 
   @override
   void dispose() {
-    Awaited.remove(this);
+    _Awaited.remove(this);
     super.dispose();
   }
 }

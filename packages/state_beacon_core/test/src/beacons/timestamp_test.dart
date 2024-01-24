@@ -1,12 +1,12 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should attach a timestamp to each value', () {
-    var beacon = Beacon.timestamped(0);
-    var timestampBefore = DateTime.now();
+    final beacon = Beacon.timestamped(0);
+    final timestampBefore = DateTime.now();
     beacon.set(10);
-    var timestampAfter = DateTime.now();
+    final timestampAfter = DateTime.now();
 
     expect(beacon.value.value, equals(10)); // Check value
     expect(

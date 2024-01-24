@@ -6,6 +6,7 @@ var _batchStack = 0;
 
 bool _isRunningBatchJob() => _batchStack > 0;
 
+// ignore: public_member_api_docs
 void doBatch(void Function() compute) {
   if (_isRunningBatchJob()) {
     compute();
@@ -30,6 +31,7 @@ void doBatch(void Function() compute) {
   }
 
   for (final listener in _listenersToPingAfterBatchJob) {
+    // ignore: avoid_dynamic_calls
     listener.run();
   }
   _listenersToPingAfterBatchJob.clear();

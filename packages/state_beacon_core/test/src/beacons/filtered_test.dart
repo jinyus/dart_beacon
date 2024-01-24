@@ -1,9 +1,9 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should update value only if it satisfies the filter criteria', () {
-    var beacon = Beacon.filtered(0, filter: (prev, next) => next > 5);
+    final beacon = Beacon.filtered(0, filter: (prev, next) => next > 5);
     beacon.value = 4;
     expect(beacon.value, equals(0)); // Value should not update
 
@@ -12,7 +12,7 @@ void main() {
   });
 
   test('should update value if filter function is null', () {
-    var beacon = Beacon.filtered(0);
+    final beacon = Beacon.filtered(0);
     beacon.value = 4;
     expect(beacon.value, equals(4)); // Value should update
 
@@ -26,7 +26,7 @@ void main() {
   });
 
   test('should bypass filter function for first value', () {
-    var beacon = Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
+    final beacon = Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
     beacon.value = 4;
     expect(beacon.value, equals(4)); // Value should update
 
@@ -38,7 +38,7 @@ void main() {
   });
 
   test('should set hasFilter to false if not is provided', () {
-    var beacon = Beacon.filtered(0);
+    final beacon = Beacon.filtered(0);
     beacon.value = 4;
     expect(beacon.value, equals(4)); // Value should update
 

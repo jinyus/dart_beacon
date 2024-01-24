@@ -1,9 +1,9 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should set previous and initial values', () {
-    var beacon = Beacon.hashSet<int>({});
+    final beacon = Beacon.hashSet<int>({});
     beacon.value = {1, 2, 3};
     expect(beacon.previousValue, equals(<int>{}));
     beacon.value = {4, 5, 6};
@@ -12,7 +12,7 @@ void main() {
   });
 
   test('should notify listeners when set is modified', () {
-    var nums = Beacon.hashSet<int>({1, 2, 3});
+    final nums = Beacon.hashSet<int>({1, 2, 3});
 
     var called = 0;
 
@@ -60,7 +60,7 @@ void main() {
 
     expect(called, 7);
 
-    nums.removeWhere((e) => e % 2 == 0);
+    nums.removeWhere((e) => e.isEven);
 
     expect(nums.value, equals({1, 3, 5}));
 

@@ -1,8 +1,8 @@
 // ignore_for_file: strict_raw_type
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../../common.dart';
 
@@ -151,10 +151,13 @@ void main() {
 
     var ran = 0;
 
-    final futureBeacon = Beacon.derivedFuture(() async {
-      count.value;
-      return ++ran;
-    }, manualStart: true);
+    final futureBeacon = Beacon.derivedFuture(
+      () async {
+        count.value;
+        return ++ran;
+      },
+      manualStart: true,
+    );
 
     await Future<void>.delayed(k10ms);
 
@@ -298,10 +301,10 @@ void main() {
   });
 
   test('should not watch new beacon conditionally', () async {
-    var num1 = Beacon.writable<int>(10);
-    var num2 = Beacon.writable<int>(20);
+    final num1 = Beacon.writable<int>(10);
+    final num2 = Beacon.writable<int>(20);
 
-    var derivedBeacon = Beacon.derivedFuture(
+    final derivedBeacon = Beacon.derivedFuture(
       () async {
         if (num2().isEven) return num2();
         return num1.value + num2.value;

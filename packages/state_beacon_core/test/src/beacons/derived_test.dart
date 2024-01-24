@@ -1,6 +1,6 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should run immediately', () {
@@ -20,24 +20,24 @@ void main() {
   });
 
   test('should be correct derived value upon initialization', () {
-    var beacon = Beacon.writable<int>(10);
-    var derivedBeacon = Beacon.derived(() => beacon.value * 2);
+    final beacon = Beacon.writable<int>(10);
+    final derivedBeacon = Beacon.derived(() => beacon.value * 2);
 
     expect(derivedBeacon.value, equals(20));
   });
 
   test('should update derived value when dependency changes', () {
-    var beacon = Beacon.writable<int>(10);
-    var derivedBeacon = Beacon.derived(() => beacon.value * 2);
+    final beacon = Beacon.writable<int>(10);
+    final derivedBeacon = Beacon.derived(() => beacon.value * 2);
 
     beacon.value = 20;
     expect(derivedBeacon.value, equals(40));
   });
 
   test('should run once per update', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var called = 0;
-    var derivedBeacon = Beacon.derived(() {
+    final derivedBeacon = Beacon.derived(() {
       called++;
       return beacon.value * 2;
     });
@@ -49,9 +49,9 @@ void main() {
   });
 
   test('should recompute when watching multiple dependencies', () {
-    var beacon1 = Beacon.writable<int>(10);
-    var beacon2 = Beacon.writable<int>(20);
-    var derivedBeacon = Beacon.derived(() => beacon1.value + beacon2.value);
+    final beacon1 = Beacon.writable<int>(10);
+    final beacon2 = Beacon.writable<int>(20);
+    final derivedBeacon = Beacon.derived(() => beacon1.value + beacon2.value);
 
     beacon1.value = 15;
     expect(derivedBeacon.value, equals(35));
@@ -61,7 +61,7 @@ void main() {
   });
 
   test('should throw when derived computation mutates', () {
-    var beacon1 = Beacon.writable<int>(10);
+    final beacon1 = Beacon.writable<int>(10);
 
     try {
       Beacon.derived(() => beacon1.value++);
@@ -71,10 +71,10 @@ void main() {
   });
 
   test('should not watch new beacon conditionally', () {
-    var num1 = Beacon.writable<int>(10);
-    var num2 = Beacon.writable<int>(20);
+    final num1 = Beacon.writable<int>(10);
+    final num2 = Beacon.writable<int>(20);
 
-    var derivedBeacon = Beacon.derived(
+    final derivedBeacon = Beacon.derived(
       () {
         if (num2().isEven) return num2();
         return num1.value + num2.value;

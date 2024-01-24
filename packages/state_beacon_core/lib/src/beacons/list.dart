@@ -1,6 +1,10 @@
+// ignore_for_file: avoid_setters_without_getters, public_member_api_docs
+
 part of '../base_beacon.dart';
 
+/// A beacon that holds a list of values.
 class ListBeacon<E> extends WritableBeacon<List<E>> {
+  /// @macro [ListBeacon]
   ListBeacon(
     List<E> initialValue, {
     super.name,

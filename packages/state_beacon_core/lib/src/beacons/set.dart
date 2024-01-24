@@ -1,6 +1,10 @@
+// ignore_for_file: public_member_api_docs
+
 part of '../base_beacon.dart';
 
+/// A beacon that holds a set of values.
 class SetBeacon<E> extends WritableBeacon<Set<E>> {
+  /// @macro [SetBeacon]
   SetBeacon(
     Set<E> initialValue, {
     super.name,

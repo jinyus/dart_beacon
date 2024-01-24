@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 import 'dart:collection';
 
 import 'effect_closure.dart';
@@ -9,7 +11,7 @@ class Listeners {
   int get length => _set.length;
 
   bool add(EffectClosure item) {
-    bool added = _set.add(item);
+    final added = _set.add(item);
     if (added) {
       _list.add(item);
     }
@@ -22,7 +24,7 @@ class Listeners {
   }
 
   bool remove(EffectClosure item) {
-    bool removed = _set.remove(item);
+    final removed = _set.remove(item);
     if (removed) {
       // prevent concurrent modification
       _list = _list.toList()..remove(item);

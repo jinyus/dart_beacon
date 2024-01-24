@@ -1,11 +1,12 @@
 part of '../base_beacon.dart';
 
+/// A utility mixin for beacons that consume other beacons.
 mixin BeaconConsumer<T, U> on BaseBeacon<U> {
   final _wrapped = <int, VoidCallback>{};
 
   /// Disposes all currently wrapped beacons
   void clearWrapped() {
-    for (var unsub in _wrapped.values) {
+    for (final unsub in _wrapped.values) {
       unsub();
     }
     _wrapped.clear();

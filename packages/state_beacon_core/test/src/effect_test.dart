@@ -1,14 +1,14 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../common.dart';
 
 void main() {
   test('should conditionally stop listening to beacons', () async {
-    final name = Beacon.writable("Bob", name: 'name');
+    final name = Beacon.writable('Bob', name: 'name');
     final age = Beacon.writable(20, name: 'age');
-    final college = Beacon.writable("MIT", name: 'college');
+    final college = Beacon.writable('MIT', name: 'college');
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
 
@@ -22,15 +22,15 @@ void main() {
       buff.add(msg);
     });
 
-    name.value = "Alice";
+    name.value = 'Alice';
     age.value = 21;
-    college.value = "Stanford"; // Should not run because age is less than 21
+    college.value = 'Stanford'; // Should not run because age is less than 21
     age.value = 22;
-    college.value = "Harvard";
+    college.value = 'Harvard';
     age.value = 18;
 
     // Should stop listening to college beacon because age is less than 21
-    college.value = "Yale";
+    college.value = 'Yale';
 
     await Future<void>.delayed(k10ms * 2);
 
@@ -45,9 +45,9 @@ void main() {
   });
 
   test('should never listen to beacons not accessed on first run', () async {
-    final name = Beacon.writable("Bob", name: 'name');
+    final name = Beacon.writable('Bob', name: 'name');
     final age = Beacon.writable(20, name: 'age');
-    final college = Beacon.writable("MIT", name: 'college');
+    final college = Beacon.writable('MIT', name: 'college');
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
     Beacon.effect(
@@ -66,14 +66,14 @@ void main() {
       supportConditional: false,
     );
 
-    name.value = "Alice";
+    name.value = 'Alice';
     age.value = 21;
-    college.value = "Stanford";
+    college.value = 'Stanford';
     age.value = 22;
-    college.value = "Harvard";
+    college.value = 'Harvard';
     age.value = 18;
 
-    college.value = "Yale";
+    college.value = 'Yale';
 
     await Future<void>.delayed(k10ms * 2);
 
@@ -87,7 +87,7 @@ void main() {
   });
 
   test('should run when a dependency changes', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
     Beacon.effect(() {
@@ -104,7 +104,7 @@ void main() {
   });
 
   test('should not run when dependencies are unchanged', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
     Beacon.effect(() {
@@ -120,8 +120,8 @@ void main() {
   });
 
   test('should run when any of its multiple dependencies change', () {
-    var beacon1 = Beacon.writable<int>(10);
-    var beacon2 = Beacon.writable<int>(20);
+    final beacon1 = Beacon.writable<int>(10);
+    final beacon2 = Beacon.writable<int>(20);
     var effectCalled = false;
 
     Beacon.effect(() {
@@ -139,7 +139,7 @@ void main() {
   });
 
   test('should run immediately upon creation', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var effectCalled = false;
 
     Beacon.effect(() {
@@ -152,10 +152,10 @@ void main() {
   });
 
   test('should cancel the effect', () {
-    var beacon = Beacon.writable(10);
+    final beacon = Beacon.writable(10);
     var effectCalled = 0;
 
-    var cancel = Beacon.effect(() {
+    final cancel = Beacon.effect(() {
       effectCalled++;
       beacon.value;
     });
@@ -170,7 +170,7 @@ void main() {
   });
 
   test('should throw when effect mutates its dependency', () {
-    var beacon1 = Beacon.writable<int>(10);
+    final beacon1 = Beacon.writable<int>(10);
 
     try {
       Beacon.effect(() {
@@ -185,9 +185,9 @@ void main() {
   });
 
   test('should dispose sub effects', () {
-    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
+    final beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    final beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    final beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;
@@ -221,9 +221,9 @@ void main() {
   });
 
   test('should dispose sub effects when supportConditional is false', () {
-    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
+    final beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    final beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    final beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;
@@ -240,8 +240,8 @@ void main() {
           effectCalled3++;
           beacon3.value;
         });
-      }, supportConditional: false);
-    }, supportConditional: false);
+      }, supportConditional: false,);
+    }, supportConditional: false,);
 
     beacon1.value = 15;
     expect(effectCalled, 2);
@@ -257,9 +257,9 @@ void main() {
   });
 
   test('should not watch beacons accessed in child effects', () {
-    var beacon1 = Beacon.writable<int>(10, name: 'beacon1');
-    var beacon2 = Beacon.writable<int>(20, name: 'beacon2');
-    var beacon3 = Beacon.writable<int>(30, name: 'beacon3');
+    final beacon1 = Beacon.writable<int>(10, name: 'beacon1');
+    final beacon2 = Beacon.writable<int>(20, name: 'beacon2');
+    final beacon3 = Beacon.writable<int>(30, name: 'beacon3');
     var effectCalled = 0;
     var effectCalled2 = 0;
     var effectCalled3 = 0;

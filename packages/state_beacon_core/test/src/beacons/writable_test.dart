@@ -1,10 +1,12 @@
-import 'package:test/test.dart';
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should notify listeners when value changes', () {
-    var beacon = Beacon.writable(10);
+    final beacon = Beacon.writable(10);
     var called = false;
     beacon.subscribe((_) => called = true);
     beacon.value = 20;
@@ -12,7 +14,7 @@ void main() {
   });
 
   test('should not notify listeners when the value remains unchanged', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var callCount = 0;
     beacon.subscribe((_) => callCount++);
     beacon.value = 10;
@@ -20,17 +22,17 @@ void main() {
   });
 
   test('should reset the value to initial state', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     beacon.value = 20;
     beacon.reset();
     expect(beacon.value, equals(10));
   });
 
   test('should subscribe and unsubscribe correctly', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var callCount = 0;
 
-    var unsubscribe = beacon.subscribe((_) => callCount++);
+    final unsubscribe = beacon.subscribe((_) => callCount++);
     beacon.value = 20;
     expect(callCount, equals(1));
 
@@ -40,7 +42,7 @@ void main() {
   });
 
   test('should notify multiple listeners', () {
-    var beacon = Beacon.writable<int>(10);
+    final beacon = Beacon.writable<int>(10);
     var callCount1 = 0;
     var callCount2 = 0;
 
@@ -54,7 +56,7 @@ void main() {
   });
 
   test('should return a function that can write to the beacon', () {
-    var (count, setCount) = Beacon.scopedWritable(0);
+    final (count, setCount) = Beacon.scopedWritable(0);
     var called = 0;
     count.subscribe((_) => called++);
     setCount(10);
@@ -121,12 +123,12 @@ void main() {
   });
 
   test('should notify when same value is set with force option', () async {
-    var beacon = Beacon.writable(10);
+    final beacon = Beacon.writable(10);
     const time = Duration(milliseconds: 5);
-    var throttleBeacon = Beacon.throttled(10, duration: time);
-    var debounceBeacon = Beacon.debounced(10, duration: time);
-    var filterBeacon = Beacon.filtered(10, filter: (prev, next) => next > 5);
-    var undoRedoBeacon = UndoRedoBeacon(initialValue: 10);
+    final throttleBeacon = Beacon.throttled(10, duration: time);
+    final debounceBeacon = Beacon.debounced(10, duration: time);
+    final filterBeacon = Beacon.filtered(10, filter: (prev, next) => next > 5);
+    final undoRedoBeacon = UndoRedoBeacon(initialValue: 10);
 
     var called = 0;
     var tCalled = 0;
@@ -150,7 +152,7 @@ void main() {
     undoRedoBeacon.set(10, force: true);
     undoRedoBeacon.set(10, force: true);
 
-    await Future<void>.delayed(Duration(milliseconds: 6));
+    await Future<void>.delayed(const Duration(milliseconds: 6));
 
     throttleBeacon.set(10, force: true);
 
