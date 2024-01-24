@@ -22,11 +22,14 @@ void doBatch(void Function() compute) {
 
   // We don't want to notify the current effect
   // since that would cause an infinite loop
-  final currentEffect = _Effect.current();
+  final currentEffect = _currentEffect;
 
   if (currentEffect != null) {
     if (_listenersToPingAfterBatchJob.contains(currentEffect.func)) {
-      throw CircularDependencyException('batch update');
+      throw CircularDependencyException(
+        currentEffect._name,
+        'a beacon inside a batch job',
+      );
     }
   }
 

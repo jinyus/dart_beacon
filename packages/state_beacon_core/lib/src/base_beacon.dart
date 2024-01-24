@@ -104,23 +104,25 @@ abstract class BaseBeacon<T> {
       return _value;
     }
 
-    final currentEffect = _Effect.current();
-    if (currentEffect != null) {
-      currentEffect._startWatching(this);
-    }
+    _currentEffect?._startWatching(this);
+
     return _value;
   }
 
   void _notifyOrDeferBatch() {
     if (isRunningUntracked()) {
-      final currentEffects = <EffectClosure>[];
-      for (final effect in _effectStack) {
-        _listeners.remove(effect.func);
-        currentEffects.add(effect.func);
+      final currentEffect = _currentEffect;
+      _currentEffect = null;
+
+      if (currentEffect != null) {
+        final removed = _listeners.remove(currentEffect.func);
+        if (removed) {
+          reAddListeners = () {
+            _currentEffect = currentEffect;
+            _listeners.add(currentEffect.func);
+          };
+        }
       }
-      reAddListeners = () {
-        _listeners.addAll(currentEffects);
-      };
     }
 
     if (_isRunningBatchJob()) {
@@ -164,11 +166,11 @@ abstract class BaseBeacon<T> {
   void _notifyListeners() {
     // We don't want to notify the current effect
     // since that would cause an infinite loop
-    final currentEffect = _Effect.current();
+    final currentEffect = _currentEffect;
 
     if (currentEffect != null) {
       if (_listeners.contains(currentEffect.func)) {
-        throw CircularDependencyException(name);
+        throw CircularDependencyException(currentEffect._name, name);
       }
     }
 
