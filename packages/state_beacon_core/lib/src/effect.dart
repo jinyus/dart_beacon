@@ -19,6 +19,7 @@ class _Effect {
   late final String _name;
   final bool _supportConditional;
   Function? _disposeChild;
+  _Effect? _parentEffect;
 
   VoidCallback execute(Function fn) {
     void cleanUpAndRun() {
@@ -32,12 +33,13 @@ class _Effect {
     func = EffectClosure(
       _supportConditional
           ? () {
-              final parentEffect = _currentEffect;
+              _parentEffect = _currentEffect;
               _currentEffect = this;
               try {
                 cleanUpAndRun();
               } finally {
-                _currentEffect = parentEffect;
+                _currentEffect = _parentEffect;
+                _parentEffect = null;
                 final toRemove = _watchedBeacons.difference(_currentDeps);
                 if (toRemove.isNotEmpty) _remove(toRemove);
                 _currentDeps.clear();
@@ -47,12 +49,13 @@ class _Effect {
     );
 
     // first run to discover dependencies
-    final parentEffect = _currentEffect;
+    _parentEffect = _currentEffect;
     _currentEffect = this;
     try {
       cleanUpAndRun();
     } finally {
-      _currentEffect = parentEffect;
+      _currentEffect = _parentEffect;
+      _parentEffect = null;
     }
 
     // dispose function
