@@ -106,6 +106,7 @@ void main() {
       () => tsBeacon.value,
       throwsA(isA<UninitializeLazyReadException>()),
     );
+
     tsBeacon.set(10);
     expect(tsBeacon.value.value, equals(10));
 
@@ -116,6 +117,12 @@ void main() {
     } catch (e) {
       expect(e, isA<UninitializeLazyReadException>());
       expect(e.toString(), contains(uBeacon.name));
+    }
+
+    try {
+      uBeacon.peek();
+    } catch (e) {
+      expect(e, isA<Error>());
     }
 
     uBeacon.set(10);
