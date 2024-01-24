@@ -76,17 +76,13 @@ abstract class BaseBeacon<T> {
   @protected
   final widgetSubscribers = <int>{};
 
-  // coverage:ignore-start
-  // requires a manual GC trigger to test
-  // coverage:ignore-end
-
   /// Returns the previous value without subscribing to the beacon.
   T? get previousValue => _previousValue;
 
   /// Returns the initial value without subscribing to the beacon.
   T get initialValue => _initialValue;
 
-  /// Returns true if the beacon has been initialized.
+  /// Returns the number of listeners currently subscribed to this beacon.
   int get listenersCount => _listeners.length;
 
   /// Returns the current value without subscribing to the beacon.
