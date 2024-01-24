@@ -115,13 +115,23 @@ abstract class BaseBeacon<T> {
       _currentEffect = null;
 
       if (currentEffect != null) {
-        final removed = _listeners.remove(currentEffect.func);
-        if (removed) {
-          reAddListeners = () {
-            _currentEffect = currentEffect;
-            _listeners.add(currentEffect.func);
-          };
+        final toReadd = <EffectClosure>[];
+        // removes all parent effects from the listeners
+        _Effect? root = currentEffect;
+        while (root != null) {
+          final removed = _listeners.remove(root.func);
+
+          if (removed) {
+            toReadd.add(root.func);
+          }
+
+          root = root._parentEffect;
         }
+
+        reAddListeners = () {
+          _currentEffect = currentEffect;
+          _listeners.addAll(toReadd);
+        };
       }
     }
 
