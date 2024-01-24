@@ -1,3 +1,7 @@
+## 0.29.0
+
+-   [Breaking] `toStream()` now has a broadcast option that defaults to false. This is a breaking change because it changes the default behavior of `toStream()`. If you want to keep the old behavior, set `broadcast` to true.
+
 ## 0.28.0
 
 -   Internal refactor
