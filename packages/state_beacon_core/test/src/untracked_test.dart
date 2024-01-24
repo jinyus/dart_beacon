@@ -22,7 +22,7 @@ void main() {
   });
 
   test('should not send notification when doing nested untracked updates', () {
-    final age = Beacon.writable<int>(10);
+    final age = Beacon.writable<int>(10, name: 'age');
     var callCount = 0;
     var subCallCount = 0;
 

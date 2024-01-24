@@ -2,7 +2,9 @@
 
 part of 'base_beacon.dart';
 
-final _effectStack = <_Effect>[];
+// final _effectStack = <_Effect>[];
+
+_Effect? _currentEffect;
 
 class _Effect {
   _Effect(this._supportConditional, {String? name}) {
@@ -30,11 +32,12 @@ class _Effect {
     func = EffectClosure(
       _supportConditional
           ? () {
-              _effectStack.add(this);
+              final parentEffect = _currentEffect;
+              _currentEffect = this;
               try {
                 cleanUpAndRun();
               } finally {
-                _effectStack.removeLast();
+                _currentEffect = parentEffect;
                 final toRemove = _watchedBeacons.difference(_currentDeps);
                 if (toRemove.isNotEmpty) _remove(toRemove);
                 _currentDeps.clear();
@@ -44,11 +47,12 @@ class _Effect {
     );
 
     // first run to discover dependencies
-    _effectStack.add(this);
+    final parentEffect = _currentEffect;
+    _currentEffect = this;
     try {
       cleanUpAndRun();
     } finally {
-      _effectStack.removeLast();
+      _currentEffect = parentEffect;
     }
 
     // dispose function
@@ -89,10 +93,6 @@ class _Effect {
     BeaconObserver.instance?.onWatch(_name, beacon);
 
     if (_supportConditional) _currentDeps.add(beacon);
-  }
-
-  static _Effect? current() {
-    return _effectStack.lastOrNull;
   }
 }
 

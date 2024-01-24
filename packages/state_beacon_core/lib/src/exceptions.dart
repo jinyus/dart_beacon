@@ -14,10 +14,12 @@ $label was read before being initialized.  You must either provide an initial va
 }
 
 class CircularDependencyException implements Exception {
-  CircularDependencyException(String label)
-      : message = 'Circular dependency detected in $label. '
-            'Effects/DerivedBeacons cannot mutate values they depend on. '
-            'You might want to wrap the mutation in a `Beacon.untracked()`';
+  CircularDependencyException(String watcher, String label)
+      : message = '''
+Circular dependency detected:
+$watcher tried to mutate $label.
+Effects/DerivedBeacons cannot mutate values they depend on. 
+You might want to wrap the mutation in a `Beacon.untracked()`''';
 
   late final String message;
 
