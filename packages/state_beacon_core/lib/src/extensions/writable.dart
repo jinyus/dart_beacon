@@ -1,6 +1,6 @@
 part of 'extensions.dart';
 
-/// @macro [BoolUtils]
+// ignore: public_member_api_docs
 extension BoolUtils on WritableBeacon<bool> {
   /// Toggles the value of this beacon.
   void toggle() {
@@ -8,7 +8,7 @@ extension BoolUtils on WritableBeacon<bool> {
   }
 }
 
-/// @macro [IntUtils]
+// ignore: public_member_api_docs
 extension IntUtils<T extends num> on WritableBeacon<T> {
   /// Increments the value of this beacon.
   void increment() {
@@ -21,13 +21,13 @@ extension IntUtils<T extends num> on WritableBeacon<T> {
   }
 }
 
-/// @macro [WritableBeaconUtils]
+// ignore: public_member_api_docs
 extension WritableBeaconUtils<T> on WritableBeacon<T> {
   /// Returns a [ReadableBeacon] that is not writable.
   ReadableBeacon<T> freeze() => this;
 }
 
-/// @macro [WritableBeaconUtils]
+// ignore: public_member_api_docs
 extension WritableAsyncBeacon<T> on WritableBeacon<AsyncValue<T>> {
   /// Executes the future provided and automatically sets
   /// the beacon to the appropriate state.

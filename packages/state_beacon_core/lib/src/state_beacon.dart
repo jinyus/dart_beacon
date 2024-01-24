@@ -6,7 +6,7 @@ import 'package:state_beacon_core/src/untracked.dart';
 import 'base_beacon.dart';
 import 'common.dart';
 
-/// @macro [Beacon]
+/// The class with all the static methods for creating beacons.
 abstract class Beacon {
   /// Creates a `WritableBeacon` that can be read and written to.
   ///
