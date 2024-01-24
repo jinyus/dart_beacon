@@ -383,6 +383,8 @@ final posts = Beacon.derivedFuture(() => Repository.getPosts(pageNum.value));
 pageNum.setFilter((prev, next) => !posts.isLoading);
 ```
 
+Extracted from the [infinite list example](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib/infinite_list)
+
 ### Beacon.timestamped:
 
 Creates a `TimestampBeacon` that attaches a timestamp to each value update.
@@ -417,14 +419,18 @@ number of values before processing them together.
 
 ```dart
 var countBeacon = Beacon.bufferedCount<int>(3);
+
 countBeacon.subscribe((values) {
   print(values);
 });
 
-countBeacon.value = 1;
-countBeacon.value = 2;
-countBeacon.value = 3; // Triggers update and prints [1, 2, 3]
+countBeacon.add(1);
+countBeacon.add(2);
+countBeacon.add(3); // Triggers update and prints [1, 2, 3]
 ```
+
+You may also access the `currentBuffer` as a readable beacon.
+See it in use in the [konami example](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib/konami);
 
 ### Beacon.bufferedTime:
 
@@ -439,8 +445,8 @@ timeBeacon.subscribe((values) {
   print(values);
 });
 
-timeBeacon.value = 1;
-timeBeacon.value = 2;
+timeBeacon.add(1);
+timeBeacon.add(2);
 // After 5 seconds, it will output [1, 2]
 ```
 
