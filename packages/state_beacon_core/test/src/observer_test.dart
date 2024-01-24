@@ -1,5 +1,7 @@
-import 'package:test/test.dart';
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 // info: Don't want to use a mock library for this simple test
 var _onCreateCalled = 0;
@@ -55,12 +57,12 @@ void main() {
   });
 
   test('should call relevant methods of observer', () {
-    var beacon = Beacon.writable(10);
+    final beacon = Beacon.writable(10);
     beacon.value = 20;
     beacon.increment();
     beacon.dispose();
 
-    var dispose = Beacon.effect(() {
+    final dispose = Beacon.effect(() {
       beacon.value;
     });
 
@@ -75,7 +77,7 @@ void main() {
   });
 
   test('should call onCreate with lazy set as true', () {
-    var _ = Beacon.lazyWritable<int>();
+    final _ = Beacon.lazyWritable<int>();
     expect(_onCreateCalled, equals(1));
     expect(_lazyOnCreate, isTrue);
   });
@@ -83,7 +85,7 @@ void main() {
   test('should not call when label is not included', () {
     BeaconObserver.instance = MockLogginObserver(includeNames: ['foo']);
 
-    var beacon = Beacon.lazyWritable<int>();
+    final beacon = Beacon.lazyWritable<int>();
 
     beacon.value = 20;
     beacon.increment();

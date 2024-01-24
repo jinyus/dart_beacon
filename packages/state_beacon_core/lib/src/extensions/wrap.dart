@@ -1,5 +1,8 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 part of '../base_beacon.dart';
 
+// ignore: public_member_api_docs
 extension WritableWrap<T, U> on BeaconConsumer<T, U> {
   /// Wraps a `ReadableBeacon` and comsume its values
   ///
@@ -29,15 +32,15 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
   ///
   /// print(bufferBeacon.buffer); // Outputs: ['5', '10']
   /// ```
-  void wrap<U>(
-    ReadableBeacon<U> target, {
-    void Function(U)? then,
+  void wrap<V>(
+    ReadableBeacon<V> target, {
+    void Function(V)? then,
     bool startNow = true,
     bool disposeTogether = false,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return;
 
-    if (then == null && T != U) {
+    if (then == null && T != V) {
       throw WrapTargetWrongTypeException(name, target.name);
     }
 
@@ -47,16 +50,17 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
       );
     }
 
-    final fn = then ?? ((val) => this._onNewValueFromWrapped(val as T));
+    final fn = then ?? ((val) => _onNewValueFromWrapped(val as T));
 
-    final unsub = target.subscribe((val) {
-      fn(val);
-    }, startNow: startNow);
+    final unsub = target.subscribe(
+      fn,
+      startNow: startNow,
+    );
 
     _wrapped[target.hashCode] = unsub;
 
     if (disposeTogether) {
-      bool isDisposing = false;
+      var isDisposing = false;
 
       target.onDispose(() {
         if (isDisposing) return;
@@ -64,7 +68,7 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
         dispose();
       });
 
-      this.onDispose(() {
+      onDispose(() {
         if (isDisposing) return;
         isDisposing = true;
         target.dispose();

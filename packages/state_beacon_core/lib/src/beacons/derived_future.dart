@@ -1,13 +1,21 @@
 part of '../base_beacon.dart';
 
+/// Represents the status of a [DerivedFutureBeacon].
 enum DerivedFutureStatus {
+  /// The future has not yet started.
   idle,
+
+  /// The future is currently running.
   running,
+
+  /// The future has been restarted.
   restarted,
 }
 
+/// A beacon that reruns a future when its dependencies change.
 class DerivedFutureBeacon<T> extends FutureBeacon<T>
     with DerivedMixin<AsyncValue<T>> {
+  /// @macro [DerivedFutureBeacon]
   DerivedFutureBeacon(
     super._operation, {
     bool manualStart = false,
@@ -23,9 +31,12 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     }
   }
 
+  /// Runs the future.
   Future<void> run() => _run();
 
   final _status = Beacon.lazyWritable<DerivedFutureStatus>();
+
+  /// The status of the future.
   ReadableBeacon<DerivedFutureStatus> get status => _status;
 
   @override

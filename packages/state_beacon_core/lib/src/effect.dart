@@ -1,8 +1,16 @@
+// ignore_for_file: public_member_api_docs, avoid_dynamic_calls
+
 part of 'base_beacon.dart';
 
 final _effectStack = <_Effect>[];
 
 class _Effect {
+  _Effect(this._supportConditional, {String? name}) {
+    _watchedBeacons = {};
+    _currentDeps = {};
+    _name = name ?? 'Effect(unlabeled)';
+  }
+
   late final Set<BaseBeacon<dynamic>> _watchedBeacons;
   late final EffectClosure func;
   late final Set<BaseBeacon<dynamic>> _currentDeps;
@@ -10,14 +18,8 @@ class _Effect {
   final bool _supportConditional;
   Function? _disposeChild;
 
-  _Effect(this._supportConditional, {required Function fn, String? name}) {
-    _watchedBeacons = {};
-    _currentDeps = {};
-    _name = name ?? 'Effect(unlabeled)';
-  }
-
   VoidCallback execute(Function fn) {
-    cleanUpAndRun() {
+    void cleanUpAndRun() {
       _disposeChild?.call();
       final cleanup = fn();
       if (cleanup is Function) _disposeChild = cleanup;
@@ -25,19 +27,21 @@ class _Effect {
 
     // if we dont support conditional, never look for dependencies
     // in subsequent runs
-    func = EffectClosure(_supportConditional
-        ? () {
-            _effectStack.add(this);
-            try {
-              cleanUpAndRun();
-            } finally {
-              _effectStack.removeLast();
-              final toRemove = _watchedBeacons.difference(_currentDeps);
-              if (toRemove.isNotEmpty) _remove(toRemove);
-              _currentDeps.clear();
+    func = EffectClosure(
+      _supportConditional
+          ? () {
+              _effectStack.add(this);
+              try {
+                cleanUpAndRun();
+              } finally {
+                _effectStack.removeLast();
+                final toRemove = _watchedBeacons.difference(_currentDeps);
+                if (toRemove.isNotEmpty) _remove(toRemove);
+                _currentDeps.clear();
+              }
             }
-          }
-        : cleanUpAndRun);
+          : cleanUpAndRun,
+    );
 
     // first run to discover dependencies
     _effectStack.add(this);
@@ -97,6 +101,6 @@ VoidCallback doEffect(
   bool supportConditional = true,
   String? name,
 }) {
-  final effect = _Effect(supportConditional, fn: fn, name: name);
+  final effect = _Effect(supportConditional, name: name);
   return effect.execute(fn);
 }

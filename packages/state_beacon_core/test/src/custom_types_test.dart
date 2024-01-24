@@ -1,6 +1,6 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/src/effect_closure.dart';
 import 'package:state_beacon_core/src/listeners.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should mirror internal set', () {

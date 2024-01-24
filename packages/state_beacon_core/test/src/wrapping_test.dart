@@ -1,23 +1,25 @@
-import 'package:test/test.dart';
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../common.dart';
 
 void main() {
   test('should reflect original beacon value in wrapper beacon', () {
-    var original = Beacon.readable<int>(10);
-    var wrapper = Beacon.writable<int>(0);
+    final original = Beacon.readable<int>(10);
+    final wrapper = Beacon.writable<int>(0);
     wrapper.wrap(original);
 
     expect(wrapper.value, equals(10));
   });
 
   test('should remove subscription for all wrapped beacons on dispose', () {
-    var count = Beacon.readable<int>(10);
-    var doubledCount = Beacon.derived<int>(() => count.value * 2);
+    final count = Beacon.readable<int>(10);
+    final doubledCount = Beacon.derived<int>(() => count.value * 2);
 
-    var wrapper = Beacon.writable<int>(0);
+    final wrapper = Beacon.writable<int>(0);
 
     wrapper.wrap(count);
     wrapper.wrap(doubledCount);
@@ -34,12 +36,12 @@ void main() {
   });
 
   test('should remove subscription for all wrapped beacons', () {
-    var count = Beacon.readable<int>(10);
-    var doubledCount = Beacon.derived<int>(() => count.value * 2);
+    final count = Beacon.readable<int>(10);
+    final doubledCount = Beacon.derived<int>(() => count.value * 2);
 
-    var wrapper = Beacon.bufferedCount<int>(5);
+    final wrapper = Beacon.bufferedCount<int>(5);
 
-    wrapper.wrap(count, then: (c) => wrapper.add(c));
+    wrapper.wrap(count, then: wrapper.add);
     wrapper.wrap(doubledCount);
 
     expect(wrapper.value, equals([]));
@@ -55,7 +57,7 @@ void main() {
   });
 
   test('should dispose internal currentBuffer on dispose', () {
-    var beacon = Beacon.bufferedCount<int>(5);
+    final beacon = Beacon.bufferedCount<int>(5);
 
     beacon.add(1);
     beacon.add(2);
@@ -69,9 +71,9 @@ void main() {
   });
 
   test('should apply transformation function', () {
-    var original = Beacon.readable<int>(2);
-    var wrapper = Beacon.writable<String>("");
-    var bufWrapper = Beacon.bufferedCount<String>(10);
+    final original = Beacon.readable<int>(2);
+    final wrapper = Beacon.writable<String>('');
+    final bufWrapper = Beacon.bufferedCount<String>(10);
 
     wrapper.wrap(original, then: (val) => wrapper.value = 'Number $val');
     bufWrapper.wrap(original, then: (val) => bufWrapper.add('Number $val'));
@@ -81,12 +83,14 @@ void main() {
   });
 
   test('should throw when no then function is supplied', () {
-    var original = Beacon.readable<int>(2);
-    var wrapper = Beacon.writable<String>("");
-    var bufWrapper = Beacon.bufferedCount<String>(10);
+    final original = Beacon.readable<int>(2);
+    final wrapper = Beacon.writable<String>('');
+    final bufWrapper = Beacon.bufferedCount<String>(10);
 
-    expect(() => wrapper.wrap(original),
-        throwsA(isA<WrapTargetWrongTypeException>()));
+    expect(
+      () => wrapper.wrap(original),
+      throwsA(isA<WrapTargetWrongTypeException>()),
+    );
 
     try {
       bufWrapper.wrap(original);
@@ -102,12 +106,12 @@ void main() {
   });
 
   test('should throttle wrapped StreamBeacon', () async {
-    final stream = Stream.periodic(Duration(milliseconds: 20), (i) => i);
+    final stream = Stream.periodic(const Duration(milliseconds: 20), (i) => i);
 
     final numsFast = Beacon.stream(stream);
     final numsSlow = Beacon.throttled<AsyncValue<int>>(
       AsyncLoading(),
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
     );
 
     const maxCalls = 15;
@@ -136,7 +140,7 @@ void main() {
       }
     });
 
-    await Future<void>.delayed(Duration(milliseconds: 400));
+    await Future<void>.delayed(const Duration(milliseconds: 400));
 
     expect(streamCalled, equals(15));
     expect(throttledCalled, equals(1));
@@ -144,16 +148,16 @@ void main() {
 
   test('should dispose together when wrapper is disposed', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, name: 'readable');
-    var doubledCount = Beacon.derived<int>(
+    final count = Beacon.readable<int>(10, name: 'readable');
+    final doubledCount = Beacon.derived<int>(
       () => count.value * 2,
       name: 'derived',
     );
 
-    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
+    final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
-    var buff = doubledCount.buffer(1).filter();
+    final buff = doubledCount.buffer(1).filter();
 
     expect(wrapper.value, equals(10));
 
@@ -172,13 +176,13 @@ void main() {
 
   test('should dispose together when wrapped is disposed', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, name: 'readable');
-    var doubledCount = Beacon.derived<int>(
+    final count = Beacon.readable<int>(10, name: 'readable');
+    final doubledCount = Beacon.derived<int>(
       () => count.value * 2,
       name: 'derived',
     );
 
-    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
+    final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 
@@ -200,9 +204,9 @@ void main() {
 
   test('should dispose together when wrapped is disposed(2)', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10, name: 'readable');
+    final count = Beacon.readable<int>(10, name: 'readable');
 
-    var wrapper = Beacon.writable<int>(0, name: 'wrapper');
+    final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 
@@ -217,9 +221,9 @@ void main() {
 
   test('should dispose together when wrapped is disposed(3)', () {
     // BeaconObserver.instance = LoggingObserver();
-    var count = Beacon.readable<int>(10);
+    final count = Beacon.readable<int>(10);
 
-    var beacon = count
+    final beacon = count
         .buffer(2)
         .filter()
         .throttle(duration: k10ms)
@@ -237,9 +241,9 @@ void main() {
   });
 
   test('should throw when wrapping empty lazy beacon and startNow=true', () {
-    var count = Beacon.lazyWritable<int>();
+    final count = Beacon.lazyWritable<int>();
 
-    var wrapper = Beacon.writable<int>(0);
+    final wrapper = Beacon.writable<int>(0);
 
     expect(() => wrapper.wrap(count), throwsException);
   });

@@ -1,16 +1,18 @@
-import 'package:test/test.dart';
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../async_value_test.dart';
 
 void main() {
   test('should return immutable beacon', () {
-    var beacon = Beacon.writable(10);
-    var immutableBeacon = beacon.freeze();
+    final beacon = Beacon.writable(10);
+    final immutableBeacon = beacon.freeze();
     expect(immutableBeacon, isA<ReadableBeacon<int>>());
   });
   test('should toggle boolean beacon', () {
-    var beacon = Beacon.writable(true);
+    final beacon = Beacon.writable(true);
 
     beacon.toggle();
 
@@ -22,7 +24,7 @@ void main() {
   });
 
   test('should increment/decrement num beacon', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
     beacon.increment();
 

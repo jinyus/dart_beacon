@@ -1,5 +1,6 @@
 part of '../base_beacon.dart';
 
+// ignore: public_member_api_docs
 extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [BufferedCountBeacon] that wraps this Beacon.
   /// See: [Beacon.bufferedCount] for more details.
@@ -16,7 +17,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
         startNow: false,
       );
 
-    if (!this._isEmpty) {
+    if (!isEmpty) {
       beacon.add(peek());
     }
 
@@ -38,7 +39,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
         startNow: false,
       );
 
-    if (!this._isEmpty) {
+    if (!isEmpty) {
       beacon.add(peek());
     }
 
@@ -48,8 +49,8 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [DebouncedBeacon] that wraps this Beacon.
   /// See: [Beacon.debounced] for more details.
   DebouncedBeacon<T> debounce({
-    bool startNow = true,
     required Duration duration,
+    bool startNow = true,
     String? name,
   }) {
     if (startNow && !_isNullable && _isEmpty) {
@@ -71,8 +72,8 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
   /// See: [Beacon.throttled] for more details.
   ThrottledBeacon<T> throttle({
-    bool startNow = true,
     required Duration duration,
+    bool startNow = true,
     bool dropBlocked = true,
     String? name,
   }) {

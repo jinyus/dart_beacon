@@ -1,9 +1,9 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should set previous and initial values', () {
-    var beacon = Beacon.hashMap<String, int>({});
+    final beacon = Beacon.hashMap<String, int>({});
     beacon.value = {'a': 1, 'b': 2};
     expect(beacon.previousValue, equals(<String, int>{}));
     beacon.value = {'c': 3, 'd': 4};
@@ -12,7 +12,7 @@ void main() {
   });
 
   test('should notify listeners when map is modified', () {
-    var data = Beacon.hashMap<String, int>({});
+    final data = Beacon.hashMap<String, int>({});
 
     var called = 0;
 

@@ -1,4 +1,4 @@
-// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: invalid_use_of_protected_member, lines_longer_than_80_chars
 
 import 'package:state_beacon_core/src/beacons/family.dart';
 import 'package:state_beacon_core/src/untracked.dart';
@@ -6,6 +6,7 @@ import 'package:state_beacon_core/src/untracked.dart';
 import 'base_beacon.dart';
 import 'common.dart';
 
+/// @macro [Beacon]
 abstract class Beacon {
   /// Creates a `WritableBeacon` that can be read and written to.
   ///
@@ -108,8 +109,8 @@ abstract class Beacon {
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set..
   static DebouncedBeacon<T> lazyDebounced<T>({
-    T? initialValue,
     required Duration duration,
+    T? initialValue,
     String? name,
   }) =>
       DebouncedBeacon<T>(
@@ -156,8 +157,8 @@ abstract class Beacon {
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
   static ThrottledBeacon<T> lazyThrottled<T>({
-    T? initialValue,
     required Duration duration,
+    T? initialValue,
     bool dropBlocked = true,
     String? name,
   }) =>

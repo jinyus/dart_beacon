@@ -1,12 +1,12 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../common.dart';
 
 void main() {
   group('Previous value Tests', () {
     test('should set previous and initial values - writable', () {
-      var beacon = Beacon.writable(10);
+      final beacon = Beacon.writable(10);
       beacon.value = 20;
       expect(beacon.previousValue, equals(10));
       beacon.value = 30;
@@ -18,13 +18,13 @@ void main() {
     });
 
     test('should set previous and initial values - readable', () {
-      var beacon = Beacon.readable(10);
+      final beacon = Beacon.readable(10);
       expect(beacon.previousValue, equals(null));
       expect(beacon.initialValue, 10);
     });
 
     test('should set previous and initial values - undoredo', () {
-      var beacon = Beacon.undoRedo(10);
+      final beacon = Beacon.undoRedo(10);
       beacon.value = 20;
       expect(beacon.previousValue, equals(10));
       beacon.value = 30;
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('should set previous and initial values - timestamp', () {
-      var beacon = Beacon.timestamped(10);
+      final beacon = Beacon.timestamped(10);
       beacon.set(20);
       expect(beacon.previousValue?.value, equals(10));
       beacon.set(30);
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('should set previous and initial values - throttled', () async {
-      var beacon = Beacon.throttled(10, duration: k10ms);
+      final beacon = Beacon.throttled(10, duration: k10ms);
       beacon.set(20);
       expect(beacon.previousValue, equals(10));
       await Future<void>.delayed(k10ms * 1.1);
@@ -52,7 +52,7 @@ void main() {
     });
 
     test('should set previous and initial values - filtered', () {
-      var beacon = Beacon.lazyFiltered<int>(filter: (p, x) => x > 5);
+      final beacon = Beacon.lazyFiltered<int>(filter: (p, x) => x > 5);
       beacon.set(10);
       expect(beacon.previousValue, equals(10));
       beacon.set(15);
@@ -65,8 +65,8 @@ void main() {
     });
 
     test('should set previous and initial values - derived', () {
-      var count = Beacon.writable(0);
-      var beacon = Beacon.derived(() => count.value * 2);
+      final count = Beacon.writable(0);
+      final beacon = Beacon.derived(() => count.value * 2);
       count.set(1);
       expect(beacon.previousValue, equals(0));
       count.set(5);
@@ -75,8 +75,8 @@ void main() {
     });
 
     test('should set lastdata', () async {
-      var count = Beacon.writable(0);
-      var beacon = Beacon.derivedFuture(() async => count.value * 2);
+      final count = Beacon.writable(0);
+      final beacon = Beacon.derivedFuture(() async => count.value * 2);
 
       expect(beacon.value, isA<AsyncLoading<int>>());
       await Future<void>.delayed(k1ms);
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('should set previous and initial values - debounced', () async {
-      var beacon = Beacon.debounced<int>(5, duration: k10ms);
+      final beacon = Beacon.debounced<int>(5, duration: k10ms);
 
       beacon.set(10);
       await Future<void>.delayed(k10ms * 1.1);
@@ -116,7 +116,7 @@ void main() {
     });
 
     test('should set previous and initial values - buffered', () async {
-      var beacon = Beacon.bufferedCount<int>(2);
+      final beacon = Beacon.bufferedCount<int>(2);
 
       beacon.add(5);
       beacon.add(5);
@@ -135,16 +135,16 @@ void main() {
   });
 
   test('toString should work correctly', () {
-    var beacon = Beacon.writable(10);
+    final beacon = Beacon.writable(10);
     expect(beacon.toString(), 'Writable<int>(10)');
 
-    var fbeacon = Beacon.lazyFiltered<int>();
+    final fbeacon = Beacon.lazyFiltered<int>();
     expect(fbeacon.toString(), 'LazyFilteredBeacon<int>(uninitialized)');
 
-    var nbeacon = Beacon.writable(10, name: 'num');
+    final nbeacon = Beacon.writable(10, name: 'num');
     expect(nbeacon.toString(), 'num(10)');
 
-    var lnbeacon = Beacon.lazyWritable<int>(name: 'num');
+    final lnbeacon = Beacon.lazyWritable<int>(name: 'num');
     expect(lnbeacon.toString(), 'num(uninitialized)');
   });
 }

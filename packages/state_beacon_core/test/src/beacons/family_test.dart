@@ -2,8 +2,8 @@
 // ignore_for_file: avoid_types_on_closure_parameters
 // ignore_for_file: inference_failure_on_instance_creation
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../../common.dart';
 
@@ -28,7 +28,7 @@ void main() {
           final count = await counterMirror.toFuture();
           await Future<void>.delayed(k10ms);
           return (count * arg).toString();
-        }));
+        }),);
 
     final doubled = family(2);
 

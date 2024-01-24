@@ -1,3 +1,7 @@
+## 0.28.0
+
+-   Internal refactor
+
 ## 0.27.0
 
 -   [Breaking] rename `debugLabel` to `name`

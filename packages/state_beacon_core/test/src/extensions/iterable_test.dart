@@ -1,10 +1,10 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should create relevant beacons', () {
-    var listBeacon = <int>[].toBeacon();
+    final listBeacon = <int>[].toBeacon();
 
     expect(listBeacon, isA<ListBeacon<int>>());
 
@@ -12,13 +12,13 @@ void main() {
 
     expect(listBeacon.value, equals([1]));
 
-    var streamBeacon = Stream.value(1).toBeacon();
+    final streamBeacon = Stream.value(1).toBeacon();
 
     expect(streamBeacon, isA<StreamBeacon<int>>());
 
     expect(streamBeacon.value, isA<AsyncLoading<int>>());
 
-    var rawStreamBeacon = Stream.value(1).toRawBeacon(initialValue: 1);
+    final rawStreamBeacon = Stream.value(1).toRawBeacon(initialValue: 1);
 
     expect(rawStreamBeacon, isA<RawStreamBeacon<int>>());
 

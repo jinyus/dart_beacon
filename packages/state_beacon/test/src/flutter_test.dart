@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
@@ -14,7 +16,7 @@ Future<String> counterFuture(int count) async {
 }
 
 class CounterColmn extends StatelessWidget {
-  const CounterColmn({super.key, required this.counter, required this.show});
+  const CounterColmn({required this.counter, required this.show, super.key});
 
   final WritableBeacon<int> counter;
   final WritableBeacon<bool> show;
@@ -36,7 +38,7 @@ class CounterColmn extends StatelessWidget {
 }
 
 class Counter extends StatelessWidget {
-  const Counter({super.key, required this.counter});
+  const Counter({required this.counter, super.key});
 
   final WritableBeacon<int> counter;
 
@@ -61,13 +63,13 @@ class Counter extends StatelessWidget {
     });
     return Text(
       counter.watch(context).toString(),
-      style: Theme.of(context).textTheme.headlineMedium!,
+      style: Theme.of(context).textTheme.headlineMedium,
     );
   }
 }
 
 class FutureCounter extends StatelessWidget {
-  const FutureCounter({super.key, required this.derived});
+  const FutureCounter({required this.derived, super.key});
 
   final FutureBeacon<String> derived;
 
@@ -86,21 +88,25 @@ void main() {
       (WidgetTester tester) async {
     final counter = Beacon.writable(0);
 
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Counter(counter: counter),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Counter(counter: counter),
+        ),
       ),
-    ));
+    );
 
     expect(find.text('0'), findsOneWidget);
 
     counter.increment();
 
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Counter(counter: counter),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Counter(counter: counter),
+        ),
       ),
-    ));
+    );
 
     // Verify updated state
     expect(find.text('1'), findsOneWidget);
@@ -112,40 +118,43 @@ void main() {
 
     final derivedFutureCounter = Beacon.derivedFuture(() async {
       final count = counter.value;
-      return await counterFuture(count);
+      return counterFuture(count);
     });
 
     await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FutureCounter(derived: derivedFutureCounter),
-          ),
+      MaterialApp(
+        home: Scaffold(
+          body: FutureCounter(derived: derivedFutureCounter),
         ),
-        k10ms);
+      ),
+      k10ms,
+    );
 
     expect(find.text('${counter.value} second has passed.'), findsOneWidget);
 
     counter.increment();
 
     await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FutureCounter(derived: derivedFutureCounter),
-          ),
+      MaterialApp(
+        home: Scaffold(
+          body: FutureCounter(derived: derivedFutureCounter),
         ),
-        k10ms * 2);
+      ),
+      k10ms * 2,
+    );
     // Verify loading indicator
     expect(find.text('${counter.value} second has passed.'), findsOneWidget);
 
     counter.value = 5;
 
     await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FutureCounter(derived: derivedFutureCounter),
-          ),
+      MaterialApp(
+        home: Scaffold(
+          body: FutureCounter(derived: derivedFutureCounter),
         ),
-        k10ms * 2);
+      ),
+      k10ms * 2,
+    );
 
     expect(
       find.text('Exception: Count(${counter.value}) too large'),
@@ -157,11 +166,13 @@ void main() {
       (WidgetTester tester) async {
     // Build the Counter widget
     final counter = Beacon.writable(0);
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Counter(counter: counter),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Counter(counter: counter),
+        ),
       ),
-    ));
+    );
 
     // Increase counter beyond limit
     counter.value = 4;
@@ -176,11 +187,13 @@ void main() {
       (WidgetTester tester) async {
     // Build the Counter widget
     final counter = Beacon.writable(0);
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: Counter(counter: counter),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Counter(counter: counter),
+        ),
       ),
-    ));
+    );
 
     // Decrease counter below limit
     counter.value = -1;
@@ -200,16 +213,19 @@ void main() {
 
     // Build the 5 Counter widget, each with 2 listeners
     // 1 for the text and 1 for the observer
-    await tester.pumpWidget(MaterialApp(
+    await tester.pumpWidget(
+      MaterialApp(
         home: Column(
-      children: [
-        Counter(counter: testCounter),
-        Counter(counter: testCounter),
-        Counter(counter: testCounter),
-        Counter(counter: testCounter),
-        Counter(counter: testCounter),
-      ],
-    )));
+          children: [
+            Counter(counter: testCounter),
+            Counter(counter: testCounter),
+            Counter(counter: testCounter),
+            Counter(counter: testCounter),
+            Counter(counter: testCounter),
+          ],
+        ),
+      ),
+    );
 
     // Check listeners count after widget is built
     expect(testCounter.listenersCount, 10);

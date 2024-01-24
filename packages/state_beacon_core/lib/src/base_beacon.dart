@@ -34,7 +34,9 @@ part 'extensions/wrap.dart';
 part 'extensions/wrap_utils.dart';
 part 'mixins/beacon_consumer.dart';
 
+/// The base class for all beacons.
 abstract class BaseBeacon<T> {
+  /// @macro [BaseBeacon]
   BaseBeacon({T? initialValue, String? name}) : _name = name {
     if (initialValue != null || _isNullable) {
       _initialValue = initialValue as T;
@@ -47,7 +49,7 @@ abstract class BaseBeacon<T> {
 
   bool get _isNullable => null is T;
 
-  String? _name;
+  final String? _name;
 
   /// Returns the name of the beacon.
   /// This can be used for logging/observability
@@ -65,8 +67,12 @@ abstract class BaseBeacon<T> {
   final _listeners = Listeners();
   final List<VoidCallback> _disposeCallbacks = [];
   var _isDisposed = false;
+
+  /// Returns true if the beacon has been disposed.
   bool get isDisposed => _isDisposed;
 
+  /// The hashcode of all widgets subscribed to this beacon.
+  /// This should not be used directly.
   @protected
   final widgetSubscribers = <int>{};
 
@@ -97,7 +103,8 @@ abstract class BaseBeacon<T> {
     }
 
     if (isRunningUntracked()) {
-      // if we are running untracked, we don't want to add the current effect to the listeners
+      // if we are running untracked, we don't want
+      // to add the current effect to the listeners
       return _value;
     }
 
@@ -147,7 +154,7 @@ abstract class BaseBeacon<T> {
   /// Subscribes to changes in the beacon
   /// returns a function that can be called to unsubscribe
   VoidCallback subscribe(void Function(T) callback, {bool startNow = false}) {
-    listener() => callback(_value);
+    void listener() => callback(_value);
     final effectClosure = EffectClosure(listener);
     _listeners.add(effectClosure);
 
@@ -171,6 +178,7 @@ abstract class BaseBeacon<T> {
 
     // toList() is used to avoid concurrent modification
     for (final listener in _listeners.items) {
+      // ignore: avoid_dynamic_calls
       listener.run();
     }
   }
@@ -183,7 +191,7 @@ abstract class BaseBeacon<T> {
   }
 
   /// Clears all registered listeners and
-  /// [reset] the beacon to its initial state.
+  /// reset the beacon to its initial state.
   void dispose() {
     _listeners.clear();
     widgetSubscribers.clear();
