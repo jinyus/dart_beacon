@@ -1,23 +1,27 @@
 part of '../base_beacon.dart';
 
+/// A beacon that throttles updates to its value.
 class ThrottledBeacon<T> extends WritableBeacon<T> {
+  /// @macro [ThrottledBeacon]
+  ThrottledBeacon({
+    required Duration duration,
+    super.initialValue,
+    this.dropBlocked = true,
+    super.name,
+  }) : _throttleDuration = duration;
+
   Duration _throttleDuration;
   Timer? _timer;
   bool _blocked = false;
 
   /// If true, values will be dropped while the beacon is blocked.
-  /// If false, values will be buffered and emitted when the beacon is unblocked.
+  /// If false, values will be buffered and
+  /// emitted when the beacon is unblocked.
   final bool dropBlocked;
 
   final List<T> _buffer = [];
 
-  ThrottledBeacon({
-    super.initialValue,
-    required Duration duration,
-    this.dropBlocked = true,
-    super.name,
-  }) : _throttleDuration = duration;
-
+  /// Whether or not this beacon is currently blocked.
   bool get isBlocked => _blocked;
 
   /// Sets the duration of the throttle.
@@ -48,7 +52,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
     _timer?.cancel();
     _timer = Timer.periodic(_throttleDuration, (_) {
       if (_buffer.isNotEmpty) {
-        T bufferedValue = _buffer.removeAt(0);
+        final bufferedValue = _buffer.removeAt(0);
         super.set(bufferedValue, force: force);
       } else {
         _timer?.cancel();

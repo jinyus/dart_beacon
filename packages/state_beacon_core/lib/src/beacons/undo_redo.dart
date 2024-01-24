@@ -1,10 +1,8 @@
 part of '../base_beacon.dart';
 
+/// A beacon that allows undo/redo operations.
 class UndoRedoBeacon<T> extends WritableBeacon<T> {
-  final int historyLimit;
-  List<T> _history = [];
-  int _currentHistoryIndex = -1;
-
+  /// @macro [UndoRedoBeacon]
   UndoRedoBeacon({T? initialValue, this.historyLimit = 10, super.name})
       : super(initialValue: initialValue) {
     if (initialValue != null || _isNullable) {
@@ -12,8 +10,18 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
     }
   }
 
+  /// the maximum number of history entries to keep
+  final int historyLimit;
+  List<T> _history = [];
+  int _currentHistoryIndex = -1;
+
+  /// Whether the beacon can be undone.
   bool get canUndo => _currentHistoryIndex > 0;
+
+  /// Whether the beacon can be redone.
   bool get canRedo => _currentHistoryIndex < _history.length - 1;
+
+  /// The history of values.
   List<T> get history => List.unmodifiable(_history);
 
   @override
@@ -29,6 +37,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
     _trimHistoryIfNeeded();
   }
 
+  /// Undo the last change.
   void undo() {
     if (canUndo) {
       _currentHistoryIndex--;
@@ -36,6 +45,7 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
     }
   }
 
+  /// Redo the last change.
   void redo() {
     if (canRedo) {
       _currentHistoryIndex++;

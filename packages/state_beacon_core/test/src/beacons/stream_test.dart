@@ -2,8 +2,8 @@
 
 import 'dart:async';
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../../common.dart';
 

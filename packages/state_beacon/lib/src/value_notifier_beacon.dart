@@ -1,5 +1,8 @@
+// ignore_for_file: public_member_api_docs, use_setters_to_change_properties
+
 import 'package:flutter/foundation.dart';
 
+/// @macro [ValueNotifierBeacon]
 class ValueNotifierBeacon<T> extends ValueNotifier<T> {
   ValueNotifierBeacon(super.value);
 
@@ -15,7 +18,7 @@ class ValueNotifierBeacon<T> extends ValueNotifier<T> {
 
   @override
   void dispose() {
-    for (var cb in disposeListeners) {
+    for (final cb in disposeListeners) {
       cb();
     }
     super.dispose();

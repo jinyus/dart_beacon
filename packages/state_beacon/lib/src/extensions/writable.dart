@@ -1,5 +1,6 @@
 part of 'extensions.dart';
 
+/// @macro [WritableBeaconFlutterUtils]
 extension WritableBeaconFlutterUtils<T> on WritableBeacon<T> {
   /// Converts this to a [ValueNotifier]
   ValueNotifier<T> toValueNotifier() {
@@ -7,13 +8,11 @@ extension WritableBeaconFlutterUtils<T> on WritableBeacon<T> {
 
     final unsub = subscribe(notifier.set);
 
-    notifier.addListener(() => value = notifier.value);
+    notifier
+      ..addListener(() => value = notifier.value)
+      ..addDisposeCallback(unsub);
 
-    notifier.addDisposeCallback(unsub);
-
-    onDispose(() {
-      notifier.dispose();
-    });
+    onDispose(notifier.dispose);
 
     return notifier;
   }

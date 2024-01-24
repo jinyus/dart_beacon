@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs, lines_longer_than_80_chars
+
 part of 'extensions.dart';
 
 const _k10seconds = Duration(seconds: 10);
@@ -65,7 +67,7 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
 
     final result = await completer.future.timeout(
       timeout,
-      onTimeout: () => peek(),
+      onTimeout: peek,
     );
 
     unsub();

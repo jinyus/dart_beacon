@@ -2,26 +2,30 @@
 
 part of '../base_beacon.dart';
 
+// ignore: public_member_api_docs
 typedef FutureCallback<T> = Future<T> Function();
 
+/// A beacon that executes a [Future] and updates its value accordingly.
 abstract class FutureBeacon<T> extends AsyncBeacon<T> {
-  var _executionID = 0;
-
-  final bool _cancelRunning;
-
-  /// Alias for peek().lastData. Returns the last data that was successfully loaded
-  T? get lastData => _value.lastData;
-
-  FutureCallback<T> _operation;
-
+  /// @macro [FutureBeacon]
   FutureBeacon(
     this._operation, {
     bool cancelRunning = true,
     super.initialValue,
     super.name,
   }) : _cancelRunning = cancelRunning;
+  var _executionID = 0;
 
-  /// Casts its value to [AsyncData] and return it's value or throws [CastError] if this is not [AsyncData].
+  final bool _cancelRunning;
+
+  /// Alias for peek().lastData.
+  /// Returns the last data that was successfully loaded
+  T? get lastData => _value.lastData;
+
+  FutureCallback<T> _operation;
+
+  /// Casts its value to [AsyncData] and return
+  /// it's value or throws `CastError` if this is not [AsyncData].
   T unwrapValue() => _value.unwrap();
 
   /// Returns `true` if this is [AsyncLoading].
@@ -88,7 +92,9 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   void reset();
 }
 
+/// A beacon that executes a [Future] and updates its value accordingly.
 class DefaultFutureBeacon<T> extends FutureBeacon<T> {
+  /// @macro [FutureBeacon]
   DefaultFutureBeacon(
     super.operation, {
     bool manualStart = false,

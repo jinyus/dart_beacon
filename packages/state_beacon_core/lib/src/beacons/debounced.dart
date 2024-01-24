@@ -1,14 +1,18 @@
 part of '../base_beacon.dart';
 
+/// A beacon that debounces updates to its value.
 class DebouncedBeacon<T> extends WritableBeacon<T> {
-  final Duration debounceDuration;
-  Timer? _debounceTimer;
-
+  /// @macro [DebouncedBeacon]
   DebouncedBeacon({
-    super.initialValue,
     required Duration duration,
+    super.initialValue,
     super.name,
   }) : debounceDuration = duration;
+
+  /// The duration to debounce updates for.
+  final Duration debounceDuration;
+
+  Timer? _debounceTimer;
 
   @override
   set value(T newValue) {

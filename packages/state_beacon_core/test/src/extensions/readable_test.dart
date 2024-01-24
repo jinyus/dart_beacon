@@ -1,15 +1,17 @@
+// ignore_for_file: cascade_invocations
+
 import 'dart:async';
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../../common.dart';
 
 void main() {
   test('should convert a beacon to a stream', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
     var onCanceledCalled = false;
-    var stream = beacon.toStream(
+    final stream = beacon.toStream(
       onCancel: () {
         onCanceledCalled = true;
       },
@@ -18,13 +20,14 @@ void main() {
     expect(stream, isA<Stream<int>>());
 
     expect(
-        stream,
-        emitsInOrder([
-          0,
-          1,
-          2,
-          emitsDone,
-        ]));
+      stream,
+      emitsInOrder([
+        0,
+        1,
+        2,
+        emitsDone,
+      ]),
+    );
 
     beacon.value = 1;
     beacon.value = 2;
@@ -34,7 +37,7 @@ void main() {
   });
 
   test('next method completes with the setted value', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
     Timer(k10ms, () => beacon.set(42));
 
@@ -44,7 +47,7 @@ void main() {
   });
 
   test('next method with filter only completes with matching values', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
     final futureValue = beacon.next(filter: (value) => value.isEven);
 
@@ -62,7 +65,7 @@ void main() {
 
   test('next method with timeout completes with peek value on timeout',
       () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
     final futureValue = beacon.next(timeout: k10ms);
 
@@ -75,7 +78,7 @@ void main() {
   });
 
   test('next method unsubscribes after value is setted', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
     final futureValue = beacon.next();
 
@@ -98,9 +101,9 @@ void main() {
   });
 
   test('should return a BufferedCountBeacon', () {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var buffered = beacon.buffer(3);
+    final buffered = beacon.buffer(3);
 
     expect(buffered, isA<BufferedCountBeacon<int>>());
 
@@ -113,13 +116,13 @@ void main() {
   });
 
   test('should work properly when wrapping a lazy beacon', () async {
-    var beacon = Beacon.lazyWritable<int>();
+    final beacon = Beacon.lazyWritable<int>();
 
-    var buffered = beacon.buffer(3);
-    var bufferedTime = beacon.bufferTime(duration: k10ms);
-    var debounced = beacon.debounce(duration: k10ms, startNow: false);
-    var throttled = beacon.throttle(duration: k10ms, startNow: false);
-    var filtered = beacon.filter(
+    final buffered = beacon.buffer(3);
+    final bufferedTime = beacon.bufferTime(duration: k10ms);
+    final debounced = beacon.debounce(duration: k10ms, startNow: false);
+    final throttled = beacon.throttle(duration: k10ms, startNow: false);
+    final filtered = beacon.filter(
       startNow: false,
       filter: (p0, p1) => p1.isEven,
     );
@@ -150,9 +153,9 @@ void main() {
   });
 
   test('should return a BufferedTimeBeacon', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var buffered = beacon.bufferTime(duration: k10ms);
+    final buffered = beacon.bufferTime(duration: k10ms);
 
     expect(buffered, isA<BufferedTimeBeacon<int>>());
 
@@ -170,9 +173,9 @@ void main() {
   });
 
   test('should return a DebouncedBeacon', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var debounced = beacon.debounce(duration: k10ms);
+    final debounced = beacon.debounce(duration: k10ms);
 
     expect(debounced, isA<DebouncedBeacon<int>>());
 
@@ -189,9 +192,9 @@ void main() {
   });
 
   test('should return a ThrottledBeacon', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var throttled = beacon.throttle(duration: k10ms);
+    final throttled = beacon.throttle(duration: k10ms);
 
     expect(throttled, isA<ThrottledBeacon<int>>());
 
@@ -208,9 +211,9 @@ void main() {
   });
 
   test('should return a FilteredBeacon', () async {
-    var beacon = Beacon.writable(0);
+    final beacon = Beacon.writable(0);
 
-    var filtered = beacon.filter(filter: (prev, next) => next.isEven);
+    final filtered = beacon.filter(filter: (prev, next) => next.isEven);
 
     expect(filtered, isA<FilteredBeacon<int>>());
 
@@ -223,7 +226,7 @@ void main() {
   });
 
   test('should throw when wrapping a lazy beacon with start=true', () {
-    var beacon = Beacon.lazyWritable<int>();
+    final beacon = Beacon.lazyWritable<int>();
 
     expect(
       () => beacon.throttle(duration: k10ms),
@@ -236,7 +239,7 @@ void main() {
     );
 
     expect(
-      () => beacon.filter(),
+      beacon.filter,
       throwsException,
     );
   });

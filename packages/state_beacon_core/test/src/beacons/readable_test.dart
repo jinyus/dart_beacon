@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should set initial value', () {
-    var beacon = Beacon.readable(10);
+    final beacon = Beacon.readable(10);
     expect(beacon.peek(), equals(10));
   });
 
   test('should decrease listenersCount when unsubscribed', () {
-    var beacon = Beacon.readable(10);
+    final beacon = Beacon.readable(10);
 
     final unsub1 = beacon.subscribe((_) {});
 

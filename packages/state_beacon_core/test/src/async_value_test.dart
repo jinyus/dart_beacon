@@ -1,7 +1,7 @@
 // ignore_for_file: strict_raw_type, inference_failure_on_instance_creation
 
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 Future<int> testFuture(bool crash) async {
   if (crash) {
@@ -56,35 +56,35 @@ void main() {
   });
 
   test('should share the same hashCode with sister instances', () {
-    var data = AsyncData(1);
-    var data2 = AsyncData(1);
+    final data = AsyncData(1);
+    final data2 = AsyncData(1);
 
     expect(data.hashCode, data2.hashCode);
 
-    var load = AsyncLoading<int>();
-    var load2 = AsyncLoading<int>();
+    final load = AsyncLoading<int>();
+    final load2 = AsyncLoading<int>();
 
     expect(load, load2);
     expect(load.hashCode, load2.hashCode);
 
-    var stack = StackTrace.current;
-    var error = AsyncError<int>('error', stack);
-    var error2 = AsyncError<int>('error', stack);
-    var error3 = AsyncError<int>('error');
+    final stack = StackTrace.current;
+    final error = AsyncError<int>('error', stack);
+    final error2 = AsyncError<int>('error', stack);
+    final error3 = AsyncError<int>('error');
 
     expect(error, error2);
     expect(error == error3, false);
     expect(error.hashCode, error2.hashCode);
 
-    var idle = AsyncIdle<int>();
-    var idle2 = AsyncIdle<int>();
+    final idle = AsyncIdle<int>();
+    final idle2 = AsyncIdle<int>();
 
     expect(idle, idle2);
     expect(idle.hashCode, idle2.hashCode);
   });
 
   test('should set lastData', () {
-    var loading = AsyncLoading();
+    final loading = AsyncLoading();
 
     expect(loading.lastData, null);
     expect(loading.valueOrNull, null);
@@ -95,7 +95,7 @@ void main() {
     expect(loading.lastData, 1);
     expect(loading.valueOrNull, null);
 
-    var idle = AsyncIdle();
+    final idle = AsyncIdle();
 
     expect(idle.lastData, null);
     expect(idle.valueOrNull, null);
@@ -106,7 +106,7 @@ void main() {
     expect(idle.lastData, 1);
     expect(idle.valueOrNull, null);
 
-    var error = AsyncError('error', StackTrace.current);
+    final error = AsyncError('error', StackTrace.current);
 
     expect(error.lastData, null);
     expect(error.valueOrNull, null);
@@ -117,7 +117,7 @@ void main() {
     expect(error.lastData, 1);
     expect(error.valueOrNull, null);
 
-    var data = AsyncData(1);
+    final data = AsyncData(1);
 
     expect(data.lastData, 1);
     expect(data.valueOrNull, 1);

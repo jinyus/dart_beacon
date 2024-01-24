@@ -1,9 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
-  final name = Beacon.writable("Bob");
+  final name = Beacon.writable('Bob');
   final age = Beacon.writable(20);
-  final college = Beacon.writable("MIT");
+  final college = Beacon.writable('MIT');
 
   Beacon.effect(() {
     var msg = '${name.value} is ${age.value} years old';
@@ -15,17 +17,17 @@ void main() {
   });
 
   // prints "Alice is 20 years old"
-  name.value = "Alice";
+  name.value = 'Alice';
 
   // prints "Alice is 21 years old"
   age.value = 21;
 
   // prints "Alice is 21 years old"
-  college.value = "Stanford";
+  college.value = 'Stanford';
 
   // prints "Alice is 22 years old and can go to Stanford"
   age.value = 22;
 
   // prints "Alice is 22 years old and can go to Harvard"
-  college.value = "Harvard";
+  college.value = 'Harvard';
 }

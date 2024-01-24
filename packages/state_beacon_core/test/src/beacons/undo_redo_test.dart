@@ -1,9 +1,9 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should notify listeners when value changes', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     var called = 0;
 
     beacon.subscribe((_) => called++);
@@ -14,7 +14,7 @@ void main() {
   });
 
   test('undo should revert to the previous value', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     beacon.value = 10; // History: [0, 10]
     beacon.value = 20; // History: [0, 10, 20]
 
@@ -24,7 +24,7 @@ void main() {
   });
 
   test('redo should revert to the next value after undo', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     beacon.value = 10; // History: [0, 10]
     beacon.value = 20; // History: [0, 10, 20]
     beacon.undo(); // History: [0, <10>, 20]
@@ -35,7 +35,7 @@ void main() {
   });
 
   test('should not undo beyond the initial value', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     beacon.value = 10;
     beacon.undo(); // Should stay at initial value
 
@@ -43,7 +43,7 @@ void main() {
   });
 
   test('should not redo beyond the latest value', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     beacon.value = 10; // History: [0, 10]
     beacon.value = 20; // History: [0, 10, 20]
     beacon.undo(); // History: [0, <10>, 20]
@@ -54,7 +54,7 @@ void main() {
   });
 
   test('should truncate future history if value is set after undo', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
     // Set initial values
     beacon.set(1);
     beacon.set(2);
@@ -73,7 +73,7 @@ void main() {
   });
 
   test('should respect history limit', () {
-    var beacon = UndoRedoBeacon<int>(initialValue: 0, historyLimit: 2);
+    final beacon = UndoRedoBeacon<int>(initialValue: 0, historyLimit: 2);
     beacon.value = 10; // History: [0, 10]
     beacon.value = 20; // History: [10, 20]
     beacon.value = 30; // History: [20, 30] (0 should be pushed out)

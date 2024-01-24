@@ -1,5 +1,13 @@
+// ignore_for_file: use_setters_to_change_properties, avoid_equals_and_hash_code_on_mutable_classes, lines_longer_than_80_chars
+
 import 'package:state_beacon_core/src/base_beacon.dart';
 
+/// A class that represents a value that is loaded asynchronously.
+/// It can be in one of the following states:
+/// - [AsyncIdle] - the initial state
+/// - [AsyncLoading] - when the value is being loaded
+/// - [AsyncData] - when the value is successfully loaded
+/// - [AsyncError] - when an error occurred while loading the value
 sealed class AsyncValue<T> {
   T? _oldData;
 
@@ -25,7 +33,7 @@ sealed class AsyncValue<T> {
   T? get lastData => valueOrNull ?? _oldData;
 
   /// Casts this [AsyncValue] to [AsyncData] and return it's value
-  /// or throws [CastError] if this is not [AsyncData].
+  /// or throws `CastError` if this is not [AsyncData].
   T unwrap() {
     return (this as AsyncData<T>).value;
   }
@@ -45,10 +53,11 @@ sealed class AsyncValue<T> {
   /// Returns `true` if this is [AsyncError].
   bool get isError => this is AsyncError;
 
-  /// Executes the future provided and returns [AsyncData] with the result if successful
-  /// or [AsyncError] if an exception is thrown.
+  /// Executes the future provided and returns [AsyncData] with the result
+  /// if successful or [AsyncError] if an exception is thrown.
   ///
-  /// Supply an optional [WritableBeacon] that will be set throughout the various states.
+  /// Supply an optional [WritableBeacon] that will be set throughout the
+  /// various states.
   ///
   /// /// Example:
   /// ```dart
@@ -60,13 +69,15 @@ sealed class AsyncValue<T> {
   ///   beacon.value = AsyncLoading();
   ///   beacon.value = await AsyncValue.tryCatch(fetchUserData);
   ///```
-  /// You can also pass the beacon as a parameter; `loading`,`data` and `error` states,
+  /// You can also pass the beacon as a parameter.
+  /// `loading`,`data` and `error` states,
   /// as well as the last successful data will be set automatically.
   ///```dart
   ///  await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
   /// ```
   ///
-  /// Without `tryCatch`, handling the potential error requires more boilerplate code:
+  /// Without `tryCatch`, handling the potential error requires more
+  /// boilerplate code:
   /// ```dart
   ///   beacon.value = AsyncLoading();
   ///   try {
@@ -95,10 +106,13 @@ sealed class AsyncValue<T> {
   }
 }
 
+/// A class that represents a value that is loaded asynchronously.
 class AsyncData<T> extends AsyncValue<T> {
-  final T value;
-
+  /// Creates an instance of [AsyncData].
   AsyncData(this.value);
+
+  /// The value that was loaded.
+  final T value;
 
   @override
   String toString() {
@@ -106,21 +120,27 @@ class AsyncData<T> extends AsyncValue<T> {
   }
 
   @override
-  operator ==(other) => other is AsyncData<T> && other.value == value;
+  bool operator ==(Object other) =>
+      other is AsyncData<T> && other.value == value;
 
   @override
   int get hashCode => toString().hashCode ^ value.hashCode;
 }
 
+/// A class that represents an error that occurred while loading a value.
 class AsyncError<T> extends AsyncValue<T> {
-  final Object error;
-  final StackTrace stackTrace;
-
+  /// Creates an instance of [AsyncError].
   AsyncError(this.error, [StackTrace? stackTrace])
       : stackTrace = stackTrace ?? StackTrace.current;
 
+  /// The error that occurred.
+  final Object error;
+
+  /// The stack trace of the error.
+  final StackTrace stackTrace;
+
   @override
-  operator ==(other) =>
+  bool operator ==(Object other) =>
       other is AsyncError<T> &&
       other.error == error &&
       other.stackTrace == stackTrace;
@@ -130,17 +150,19 @@ class AsyncError<T> extends AsyncValue<T> {
       toString().hashCode ^ error.hashCode ^ stackTrace.hashCode;
 }
 
+/// A class that represents a value that is being loaded asynchronously.
 class AsyncLoading<T> extends AsyncValue<T> {
   @override
-  operator ==(other) => other is AsyncLoading<T>;
+  bool operator ==(Object other) => other is AsyncLoading<T>;
 
   @override
   int get hashCode => toString().hashCode;
 }
 
+/// A class that represents an idle state.
 class AsyncIdle<T> extends AsyncValue<T> {
   @override
-  operator ==(other) => other is AsyncIdle<T>;
+  bool operator ==(Object other) => other is AsyncIdle<T>;
 
   @override
   int get hashCode => toString().hashCode;

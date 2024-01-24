@@ -1,5 +1,7 @@
-import 'package:test/test.dart';
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 void main() {
   test('should send 1 notification when doing batch updates', () {
@@ -8,10 +10,11 @@ void main() {
     age.subscribe((_) => callCount++);
 
     Beacon.batch(() {
-      age.value = 15;
-      age.value = 16;
-      age.value = 20;
-      age.value = 23;
+      age
+        ..value = 5
+        ..value = 16
+        ..value = 20
+        ..value = 23;
     });
 
     // There were 4 updates, but only 1 notification
@@ -25,10 +28,11 @@ void main() {
 
     expect(
       () => Beacon.batch(() {
-        age.value = 15;
-        age.value = 16;
-        age.value = 20;
-        age.value = 23;
+        age
+          ..value = 15
+          ..value = 16
+          ..value = 20
+          ..value = 23;
         throw Exception('Something went wrong');
       }),
       throwsException,

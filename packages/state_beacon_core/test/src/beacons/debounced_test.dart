@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:test/test.dart';
 
 import '../../common.dart';
 
@@ -8,14 +8,15 @@ void main() {
     final beacon = Beacon.debounced('', duration: k10ms);
     var called = 0;
 
-    beacon.subscribe((_) => called++);
+    beacon
+      ..subscribe((_) => called++)
 
-    // simulate typing
-    beacon.value = 'a';
-    beacon.value = 'ap';
-    beacon.value = 'app';
-    beacon.value = 'appl';
-    beacon.value = 'apple';
+      // simulate typing
+      ..value = 'a'
+      ..value = 'ap'
+      ..value = 'app'
+      ..value = 'appl'
+      ..value = 'apple';
 
     // Value should still be 0 immediately after setting it
     expect(beacon.value, equals(''));

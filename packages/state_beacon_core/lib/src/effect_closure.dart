@@ -1,11 +1,13 @@
+// ignore_for_file: public_member_api_docs, avoid_equals_and_hash_code_on_mutable_classes, lines_longer_than_80_chars
+
 var _globalEffectID = 0;
 
-// This wrapper makes Set lookups faster
+/// This wrapper makes Set lookups faster
 class EffectClosure {
+  /// Creates an [EffectClosure] with a custom ID.
+  EffectClosure(this.run, {int? customID}) : id = customID ?? ++_globalEffectID;
   final int id;
   Function run;
-
-  EffectClosure(this.run, {int? customID}) : id = customID ?? ++_globalEffectID;
 
   @override
   int get hashCode => id.hashCode;

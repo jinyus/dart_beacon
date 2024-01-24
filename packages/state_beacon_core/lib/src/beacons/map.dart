@@ -1,6 +1,10 @@
+// ignore_for_file: public_member_api_docs
+
 part of '../base_beacon.dart';
 
+/// A beacon that holds a map of values.
 class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
+  /// @macro [MapBeacon]
   MapBeacon(
     Map<K, V> initialValue, {
     super.name,
