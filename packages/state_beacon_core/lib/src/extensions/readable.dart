@@ -9,6 +9,7 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// The stream can only be canceled by calling [dispose]
   Stream<T> toStream({
     FutureOr<void> Function()? onCancel,
+    bool broadcast = false,
   }) {
     final controller = StreamController<T>();
 
@@ -24,7 +25,9 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
 
     onDispose(cancel);
 
-    return controller.stream.asBroadcastStream();
+    return broadcast
+        ? controller.stream.asBroadcastStream()
+        : controller.stream;
   }
 
   /// Listens for the next value emitted by this Beacon and returns it as a Future.
