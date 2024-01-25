@@ -56,7 +56,14 @@ extension WritableAsyncBeacon<T> on WritableBeacon<AsyncValue<T>> {
   ///     beacon.value = AsyncError(err, stacktrace);
   ///   }
   /// ```
-  Future<void> tryCatch(Future<T> Function() future) async {
-    await AsyncValue.tryCatch(future, beacon: this);
+  Future<void> tryCatch(
+    Future<T> Function() future, {
+    T? optimisticResult,
+  }) async {
+    await AsyncValue.tryCatch(
+      future,
+      beacon: this,
+      optimisticResult: optimisticResult,
+    );
   }
 }

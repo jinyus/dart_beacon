@@ -99,6 +99,8 @@ NB: Create the file if it doesn't exist.
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
     -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return it's value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
+    -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
+    -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
@@ -577,6 +579,55 @@ myBeacon.reset();
 print(myBeacon.value); // Outputs AsyncLoading
 
 print(myBeacon.value.lastData); // Outputs 'Hello' as the last valid data when in loading state
+```
+
+#### AsyncValue.tryCatch:
+
+Executes the future provided and returns [AsyncData] with the result
+if successful or [AsyncError] if an exception is thrown.
+
+Supply an optional [WritableBeacon] that will be set throughout the
+various states.
+
+Supply an optional [optimisticResult] that will be set while loading, instead of [AsyncLoading].
+
+```dart
+Future<String> fetchUserData() {
+  // Imagine this is a network request that might throw an error
+  return Future.delayed(Duration(seconds: 1), () => 'User data');
+}
+  beacon.value = AsyncLoading();
+  beacon.value = await AsyncValue.tryCatch(fetchUserData);
+```
+
+You can also pass the beacon as a parameter.
+`loading`,`data` and `error` states,
+as well as the last successful data will be set automatically.
+
+```dart
+await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
+
+// or use the extension method.
+
+await beacon.tryCatch(fetchUserData);
+```
+
+If you want to do optimistic updates, you can supply an optional `optimisticResult` parameter.
+
+```dart
+await beacon.tryCatch(mutateUserData, optimisticResult: 'User data');
+```
+
+Without `tryCatch`, handling the potential error requires more
+boilerplate code:
+
+```dart
+  beacon.value = AsyncLoading();
+  try {
+    beacon.value = AsyncData(await fetchUserData());
+  } catch (err,stacktrace) {
+    beacon.value = AsyncError(err, stacktrace);
+  }
 ```
 
 ### Beacon.family:

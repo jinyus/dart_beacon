@@ -59,6 +59,8 @@ sealed class AsyncValue<T> {
   /// Supply an optional [WritableBeacon] that will be set throughout the
   /// various states.
   ///
+  /// Supply an optional [optimisticResult] that will be set while loadin, instead of [AsyncLoading].
+  ///
   /// /// Example:
   /// ```dart
   /// Future<String> fetchUserData() {
@@ -89,10 +91,19 @@ sealed class AsyncValue<T> {
   static Future<AsyncValue<T>> tryCatch<T>(
     Future<T> Function() future, {
     WritableBeacon<AsyncValue<T>>? beacon,
+    T? optimisticResult,
   }) async {
-    final oldData = beacon?.peek().lastData;
+    T? oldData;
 
-    beacon?.set(AsyncLoading()..setLastData(oldData));
+    if (beacon != null) {
+      oldData = beacon.peek().lastData;
+
+      if (optimisticResult != null) {
+        beacon.set(AsyncData(optimisticResult));
+      } else {
+        beacon.set(AsyncLoading()..setLastData(oldData));
+      }
+    }
 
     try {
       final data = AsyncData(await future());
