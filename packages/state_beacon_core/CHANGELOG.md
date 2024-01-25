@@ -1,3 +1,29 @@
+## 0.30.0
+
+-   [Feat] Add BeaconGroup that allows you to group beacons together and dispose/reset them all at once.
+
+    ```dart
+    final myGroup = BeaconGroup();
+
+    final name = myGroup.writable('Bob');
+    final age = myGroup.writable(20);
+
+    age.value = 21;
+    name.value = 'Alice';
+
+    myGroup.resetAll();
+
+    print(name.value); // Bob
+    print(age.value); // 20
+
+    myGroup.disposeAll();
+
+    print(name.isDisposed); // true
+    print(age.isDisposed); // true
+    ```
+
+-   [Fix] resetting an uninitialized lazybeacon no longer throws an error.
+
 ## 0.29.3
 
 -   [Feat] Add ability to do optimistic update when using AsyncValue.tryCatch()
@@ -384,3 +410,7 @@ The core of state_beacon was extracted into a separate package to make it usuabl
 ## 0.1.0
 
 -   Initial version.
+
+```
+
+```
