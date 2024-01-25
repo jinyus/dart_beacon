@@ -5,51 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "flutter_state_beacon",
-            "cwd": "flutter_state_beacon",
+            "name": "main example",
+            "cwd": "examples/flutter_main",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "flutter_state_beacon (profile mode)",
-            "cwd": "flutter_state_beacon",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "flutter_state_beacon (release mode)",
-            "cwd": "flutter_state_beacon",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        },
-        {
-            "name": "state_beacon",
-            "cwd": "state_beacon",
+            "name": "auth flow example",
+            "cwd": "examples/auth_flow",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "example",
-            "cwd": "flutter_state_beacon/example",
+            "name": "shopping cart example",
+            "cwd": "examples/shopping_cart",
             "request": "launch",
-            "type": "dart",
-            "flutterMode": "debug"
+            "type": "dart"
         },
         {
-            "name": "example (profile mode)",
-            "cwd": "flutter_state_beacon/example",
+            "name": "skeleton example",
+            "cwd": "examples/skeleton",
             "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
+            "type": "dart"
         },
         {
-            "name": "example (release mode)",
-            "cwd": "flutter_state_beacon/example",
+            "name": "vgv best practices example",
+            "cwd": "examples/vgv_best_practices",
             "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
+            "type": "dart"
+        },
     ]
 }
