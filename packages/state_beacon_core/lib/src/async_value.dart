@@ -59,6 +59,8 @@ sealed class AsyncValue<T> {
   /// Supply an optional [WritableBeacon] that will be set throughout the
   /// various states.
   ///
+  /// Supply an optional [optimisticResult] that will be set while loadin, instead of [AsyncLoading].
+  ///
   /// /// Example:
   /// ```dart
   /// Future<String> fetchUserData() {
