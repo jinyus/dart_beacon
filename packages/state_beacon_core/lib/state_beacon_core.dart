@@ -22,6 +22,6 @@ export 'src/base_beacon.dart'
         UndoRedoBeacon,
         WritableBeacon,
         WritableWrap;
+export 'src/creator/creator.dart';
 export 'src/extensions/extensions.dart';
 export 'src/observer.dart';
-export 'src/state_beacon.dart';

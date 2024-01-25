@@ -3,7 +3,7 @@ part of '../base_beacon.dart';
 // ignore: public_member_api_docs
 extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [BufferedCountBeacon] that wraps this Beacon.
-  /// See: [Beacon.bufferedCount] for more details.
+  /// See: `Beacon.bufferedCount` for more details.
   BufferedCountBeacon<T> buffer(
     int count, {
     String? name,
@@ -25,7 +25,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   }
 
   /// Returns a [BufferedTimeBeacon] that wraps this Beacon.
-  /// See: [Beacon.bufferedTime] for more details.
+  /// See: `Beacon.bufferedTime` for more details.
   BufferedTimeBeacon<T> bufferTime({
     required Duration duration,
     String? name,
@@ -47,7 +47,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   }
 
   /// Returns a [DebouncedBeacon] that wraps this Beacon.
-  /// See: [Beacon.debounced] for more details.
+  /// See: `Beacon.debounced` for more details.
   DebouncedBeacon<T> debounce({
     required Duration duration,
     bool startNow = true,
@@ -70,7 +70,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   }
 
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
-  /// See: [Beacon.throttled] for more details.
+  /// See: `Beacon.throttled` for more details.
   ThrottledBeacon<T> throttle({
     required Duration duration,
     bool startNow = true,
@@ -95,7 +95,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   }
 
   /// Returns a [FilteredBeacon] that wraps this Beacon.
-  /// See: [Beacon.filtered] for more details.
+  /// See: `Beacon.filtered` for more details.
   FilteredBeacon<T> filter({
     bool startNow = true,
     bool Function(T?, T)? filter,
