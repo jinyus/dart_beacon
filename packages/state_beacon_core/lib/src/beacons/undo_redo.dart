@@ -68,4 +68,11 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
       _currentHistoryIndex = historyLimit - 1;
     }
   }
+
+  @override
+  void reset() {
+    _history.clear();
+    _currentHistoryIndex = -1;
+    super.reset();
+  }
 }

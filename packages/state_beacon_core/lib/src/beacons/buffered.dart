@@ -1,8 +1,10 @@
 part of '../base_beacon.dart';
 
-abstract class _BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
+/// Base class for buffered beacons.
+abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
     with BeaconConsumer<T, List<T>> {
-  _BufferedBaseBeacon({super.name}) : super(initialValue: []);
+  // ignore: public_member_api_docs
+  BufferedBaseBeacon({super.name}) : super(initialValue: []);
 
   final List<T> _buffer = [];
 
@@ -12,28 +14,29 @@ abstract class _BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   /// This can be listened to directly.
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
-  void addToBuffer(T newValue) {
+  void _addToBuffer(T newValue) {
     _buffer.add(newValue);
     _currentBuffer.add(newValue);
   }
 
-  void clearBuffer() {
+  void _clearBuffer() {
     _buffer.clear();
     _currentBuffer.reset();
   }
 
+  /// Adds a new value to the buffer.
   void add(T newValue);
 
   /// Clears the buffer
   void reset() {
-    clearBuffer();
+    _clearBuffer();
     _setValue(_initialValue);
   }
 
   @override
   void dispose() {
     clearWrapped();
-    clearBuffer();
+    _clearBuffer();
     _currentBuffer.dispose();
     super.dispose();
   }
@@ -47,7 +50,7 @@ abstract class _BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 }
 
 /// A beacon that exposes a buffer of values that have been added to it.
-class BufferedCountBeacon<T> extends _BufferedBaseBeacon<T> {
+class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
   /// @macro [BufferedCountBeacon]
   BufferedCountBeacon({required this.countThreshold, super.name}) : super();
 
@@ -57,18 +60,18 @@ class BufferedCountBeacon<T> extends _BufferedBaseBeacon<T> {
 
   @override
   void add(T newValue) {
-    super.addToBuffer(newValue);
+    super._addToBuffer(newValue);
 
     if (_buffer.length == countThreshold) {
       _setValue(List.from(_buffer));
-      super.clearBuffer();
+      super._clearBuffer();
     }
   }
 }
 
 /// A beacon that exposes a buffer of values that
 /// have been added to it based on a timer.
-class BufferedTimeBeacon<T> extends _BufferedBaseBeacon<T> {
+class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
   /// @macro [BufferedTimeBeacon]
   BufferedTimeBeacon({required this.duration, super.name}) : super();
 
@@ -79,7 +82,7 @@ class BufferedTimeBeacon<T> extends _BufferedBaseBeacon<T> {
 
   @override
   void add(T newValue) {
-    super.addToBuffer(newValue);
+    super._addToBuffer(newValue);
     _startTimerIfNeeded();
   }
 
@@ -87,7 +90,7 @@ class BufferedTimeBeacon<T> extends _BufferedBaseBeacon<T> {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer(duration, () {
         _setValue(List.from(_buffer));
-        super.clearBuffer();
+        super._clearBuffer();
         _timer = null;
       });
     }

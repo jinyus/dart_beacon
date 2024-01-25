@@ -83,4 +83,16 @@ void main() {
 
     expect(beacon.value, 20);
   });
+
+  test('should clear history when resetted', () {
+    final beacon = UndoRedoBeacon<int>(initialValue: 0);
+    beacon.value = 10; // History: [0, 10]
+    beacon.value = 20; // History: [0, 10, 20]
+
+    expect(beacon.history, equals([0, 10, 20]));
+
+    beacon.reset();
+
+    expect(beacon.history, isEmpty);
+  });
 }

@@ -1,13 +1,11 @@
-// ignore_for_file: invalid_use_of_protected_member, lines_longer_than_80_chars
+// ignore_for_file: lines_longer_than_80_chars
 
-import 'package:state_beacon_core/src/beacons/family.dart';
-import 'package:state_beacon_core/src/untracked.dart';
+part of 'creator.dart';
 
-import 'base_beacon.dart';
-import 'common.dart';
+/// The class with all the methods for creating beacons.
+class _BeaconCreator {
+  const _BeaconCreator();
 
-/// The class with all the static methods for creating beacons.
-abstract class Beacon {
   /// Creates a `WritableBeacon` that can be read and written to.
   ///
   /// Example:
@@ -16,7 +14,7 @@ abstract class Beacon {
   /// print(myBeacon.value); // Outputs: 10
   /// myBeacon.value = 20;
   /// ```
-  static WritableBeacon<T> writable<T>(
+  WritableBeacon<T> writable<T>(
     T initialValue, {
     String? name,
   }) =>
@@ -25,10 +23,11 @@ abstract class Beacon {
         name: name ?? 'Writable<$T>',
       );
 
-  /// Like `Beacon.writable` but behaves like a late variable. It must be set before it's read.
+  /// Like `Beacon.writable` but behaves like a late variable.
+  /// It must be set before it's read.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
-  static WritableBeacon<T> lazyWritable<T>({
+  WritableBeacon<T> lazyWritable<T>({
     T? initialValue,
     String? name,
   }) =>
@@ -37,7 +36,10 @@ abstract class Beacon {
         name: name ?? 'LazyWritable<$T>',
       );
 
-  /// Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
+  /// Creates an immutable `ReadableBeacon` from a value.
+  /// This is useful for exposing a beacon's value to consumers
+  /// without allowing them to modify it.
+  ///
   /// ```dart
   /// final counter = Beacon.readable(10);
   /// counter.value = 10; // Compilation error
@@ -48,7 +50,7 @@ abstract class Beacon {
   /// // Expose the beacon's value without allowing it to be modified
   /// ReadableBeacon<int> get counter => _internalCounter;
   /// ```
-  static ReadableBeacon<T> readable<T>(
+  ReadableBeacon<T> readable<T>(
     T initialValue, {
     String? name,
   }) =>
@@ -65,7 +67,7 @@ abstract class Beacon {
   /// ```dart
   /// var (count,setCount) = Beacon.scopedWritable(15);
   /// ```
-  static (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
+  (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
     T initialValue, {
     String? name,
   }) {
@@ -76,7 +78,9 @@ abstract class Beacon {
     return (beacon, beacon.set);
   }
 
-  /// Creates a `DebouncedBeacon` that will delay updates to its value based on the duration. This is useful when you want to wait until a user has stopped typing before performing an action.
+  /// Creates a `DebouncedBeacon` that will delay updates to its value based on
+  /// the duration. This is useful when you want to wait until a user has
+  /// stopped typing before performing an action.
   ///
   /// ```dart
   /// var query = Beacon.debounced('', duration: Duration(seconds: 1));
@@ -94,7 +98,7 @@ abstract class Beacon {
   ///
   /// // after 1 second, the value will be updated to 'apple'
   /// ```
-  static DebouncedBeacon<T> debounced<T>(
+  DebouncedBeacon<T> debounced<T>(
     T initialValue, {
     required Duration duration,
     String? name,
@@ -105,10 +109,11 @@ abstract class Beacon {
         name: name ?? 'DebouncedBeacon<$T>',
       );
 
-  /// Like `Beacon.debounced` but behaves like a late variable. It must be set before it's read.
+  /// Like `Beacon.debounced` but behaves like a late variable.
+  /// It must be set before it's read.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set..
-  static DebouncedBeacon<T> lazyDebounced<T>({
+  DebouncedBeacon<T> lazyDebounced<T>({
     required Duration duration,
     T? initialValue,
     String? name,
@@ -119,9 +124,12 @@ abstract class Beacon {
         name: name ?? 'LazyDebouncedBeacon<$T>',
       );
 
-  /// Creates a `ThrottledBeacon` that will limit the rate of updates to its value based on the duration.
+  /// Creates a `ThrottledBeacon` that will limit the rate of updates to
+  /// its value based on the duration.
   ///
-  /// If `dropBlocked` is `true`(default), values will be dropped while the beacon is blocked, otherwise, values will be buffered and emitted one by one when the beacon is unblocked.
+  /// If `dropBlocked` is `true`(default), values will be dropped while the
+  /// beacon is blocked, otherwise, values will be buffered and emitted
+  /// one by one when the beacon is unblocked.
   ///
   /// Example:
   /// ```dart
@@ -140,7 +148,7 @@ abstract class Beacon {
   /// expect(beacon.value, equals(30)); // throttle time passed, update allowed
   /// ```
 
-  static ThrottledBeacon<T> throttled<T>(
+  ThrottledBeacon<T> throttled<T>(
     T initialValue, {
     required Duration duration,
     bool dropBlocked = true,
@@ -156,7 +164,7 @@ abstract class Beacon {
   /// Like `Beacon.throttled` but behaves like a late variable. It must be set before it's read.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
-  static ThrottledBeacon<T> lazyThrottled<T>({
+  ThrottledBeacon<T> lazyThrottled<T>({
     required Duration duration,
     T? initialValue,
     bool dropBlocked = true,
@@ -188,7 +196,7 @@ abstract class Beacon {
   ///
   /// pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
   /// ```
-  static FilteredBeacon<T> filtered<T>(
+  FilteredBeacon<T> filtered<T>(
     T initialValue, {
     BeaconFilter<T>? filter,
     String? name,
@@ -204,7 +212,7 @@ abstract class Beacon {
   /// The first will not be filtered if the `initialValue` is null.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
-  static FilteredBeacon<T> lazyFiltered<T>({
+  FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
     String? name,
@@ -233,7 +241,7 @@ abstract class Beacon {
   /// countBeacon.value = 2;
   /// countBeacon.value = 3; // Triggers update with [1, 2, 3]
   /// ```
-  static BufferedCountBeacon<T> bufferedCount<T>(int count, {String? name}) =>
+  BufferedCountBeacon<T> bufferedCount<T>(int count, {String? name}) =>
       BufferedCountBeacon<T>(
         countThreshold: count,
         name: name ?? 'BufferedCountBeacon<$T>',
@@ -258,7 +266,7 @@ abstract class Beacon {
   /// timeBeacon.value = 2;
   /// // After 5 seconds, it will output [1, 2]
   /// ```
-  static BufferedTimeBeacon<T> bufferedTime<T>({
+  BufferedTimeBeacon<T> bufferedTime<T>({
     required Duration duration,
     String? name,
   }) =>
@@ -282,7 +290,7 @@ abstract class Beacon {
   /// undoRedoBeacon.undo(); // Reverts to 10
   /// undoRedoBeacon.redo(); // Goes back to 20
   /// ```
-  static UndoRedoBeacon<T> undoRedo<T>(
+  UndoRedoBeacon<T> undoRedo<T>(
     T initialValue, {
     int historyLimit = 10,
     String? name,
@@ -297,7 +305,7 @@ abstract class Beacon {
   /// Like `Beacon.undoRedo` but behaves like a late variable. It must be set before it's read.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
-  static UndoRedoBeacon<T> lazyUndoRedo<T>({
+  UndoRedoBeacon<T> lazyUndoRedo<T>({
     T? initialValue,
     int historyLimit = 10,
     String? name,
@@ -317,7 +325,7 @@ abstract class Beacon {
   /// var myBeacon = Beacon.timestamped(10);
   /// print(myBeacon.value); // Outputs: (value: 10, timestamp: DateTime.now())
   /// ```
-  static TimestampBeacon<T> timestamped<T>(T initialValue, {String? name}) =>
+  TimestampBeacon<T> timestamped<T>(T initialValue, {String? name}) =>
       TimestampBeacon<T>(
         initialValue: initialValue,
         name: name ?? 'TimestampBeacon<$T>',
@@ -326,7 +334,7 @@ abstract class Beacon {
   /// Like `Beacon.timestamped` but behaves like a late variable. It must be set before it's read.
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
-  static TimestampBeacon<T> lazyTimestamped<T>({
+  TimestampBeacon<T> lazyTimestamped<T>({
     T? initialValue,
     String? name,
   }) =>
@@ -347,7 +355,7 @@ abstract class Beacon {
   ///   print(value); // Outputs the stream's emitted values
   /// });
   /// ```
-  static StreamBeacon<T> stream<T>(
+  StreamBeacon<T> stream<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
     String? name,
@@ -361,7 +369,7 @@ abstract class Beacon {
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
   /// If you dont supply an initial value, the type has to be nullable.
-  static RawStreamBeacon<T> streamRaw<T>(
+  RawStreamBeacon<T> streamRaw<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
     Function? onError,
@@ -393,7 +401,7 @@ abstract class Beacon {
   ///   print(value); // Outputs 'Hello' after 1 second
   /// });
   /// ```
-  static FutureBeacon<T> future<T>(
+  FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
     bool cancelRunning = true,
@@ -427,7 +435,7 @@ abstract class Beacon {
   ///
   /// print(canDrink.value); // Outputs: true
   /// ```
-  static ReadableBeacon<T> derived<T>(
+  ReadableBeacon<T> derived<T>(
     T Function() compute, {
     String? name,
     bool supportConditional = true,
@@ -486,7 +494,7 @@ abstract class Beacon {
   ///   }
   /// }
   /// ```
-  static FutureBeacon<T> derivedFuture<T>(
+  FutureBeacon<T> derivedFuture<T>(
     FutureCallback<T> compute, {
     bool manualStart = false,
     bool cancelRunning = true,
@@ -537,8 +545,7 @@ abstract class Beacon {
   ///
   /// nums.remove(2); // Outputs: [1, 3, 4]
   /// ```
-  static ListBeacon<T> list<T>(List<T> initialValue, {String? name}) =>
-      ListBeacon<T>(
+  ListBeacon<T> list<T>(List<T> initialValue, {String? name}) => ListBeacon<T>(
         initialValue,
         name: name ?? 'ListBeacon<$T>',
       );
@@ -547,8 +554,7 @@ abstract class Beacon {
   /// This beacon manages a set of items, allowing for reactive updates and manipulations of the set.
   ///
   /// The `SetBeacon` provides methods to add, remove, and update items in the set and notifies listeners without having to make a copy.
-  static SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? name}) =>
-      SetBeacon<T>(
+  SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? name}) => SetBeacon<T>(
         initialValue,
         name: name ?? 'SetBeacon<$T>',
       );
@@ -557,7 +563,7 @@ abstract class Beacon {
   /// This beacon manages a map of items, allowing for reactive updates and manipulations of the map.
   ///
   /// The `MapBeacon` provides methods to add, remove, and update items in the map and notifies listeners without having to make a copy.
-  static MapBeacon<K, V> hashMap<K, V>(
+  MapBeacon<K, V> hashMap<K, V>(
     Map<K, V> initialValue, {
     String? name,
   }) =>
@@ -590,7 +596,7 @@ abstract class Beacon {
   ///
   /// age.value = 20; // Outputs: "You can vote!"
   /// ```
-  static VoidCallback effect(
+  VoidCallback effect(
     Function fn, {
     bool supportConditional = true,
     String? name,
@@ -628,7 +634,7 @@ abstract class Beacon {
   /// ```
   // coverage:ignore-start
   @Deprecated('Use Beacon.effect instead')
-  static VoidCallback createEffect(
+  VoidCallback createEffect(
     Function fn, {
     bool supportConditional = true,
     String? name,
@@ -661,7 +667,7 @@ abstract class Beacon {
   ///
   /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
   /// ```
-  static void batch(VoidCallback callback) {
+  void batch(VoidCallback callback) {
     doBatch(callback);
   }
 
@@ -687,7 +693,7 @@ abstract class Beacon {
   /// ```
   // coverage:ignore-start
   @Deprecated('Use Beacon.batch instead')
-  static void doBatchUpdate(VoidCallback callback) {
+  void doBatchUpdate(VoidCallback callback) {
     doBatch(callback);
   }
   // coverage:ignore-end
@@ -711,7 +717,7 @@ abstract class Beacon {
   /// expect(callCount, equals(0));
   /// expect(age.value, 15);
   /// ```
-  static void untracked(VoidCallback fn) {
+  void untracked(VoidCallback fn) {
     doUntracked(fn);
   }
 
@@ -739,7 +745,7 @@ abstract class Beacon {
   /// final githubApiClient = apiClientFamily('https://api.github.com');
   /// final twitterApiClient = apiClientFamily('https://api.twitter.com');
   /// ```
-  static BeaconFamily<Arg, BeaconType>
+  BeaconFamily<Arg, BeaconType>
       family<T, Arg, BeaconType extends BaseBeacon<T>>(
     BeaconType Function(Arg) create, {
     bool cache = true,

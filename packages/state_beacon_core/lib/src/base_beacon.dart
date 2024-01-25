@@ -5,10 +5,10 @@ import 'package:state_beacon_core/src/common.dart';
 import 'package:state_beacon_core/src/untracked.dart';
 
 import 'async_value.dart';
+import 'creator/creator.dart';
 import 'effect_closure.dart';
 import 'listeners.dart';
 import 'observer.dart';
-import 'state_beacon.dart';
 
 part 'effect.dart';
 part 'batch.dart';
@@ -92,7 +92,7 @@ abstract class BaseBeacon<T> {
   T call() => value;
 
   /// Returns the current value and subscribes to changes in the beacon
-  /// when used within a [Beacon.effect] or [Beacon.derived].
+  /// when used within a `Beacon.effect` or `Beacon.derived`.
   T get value {
     if (_isEmpty) {
       throw UninitializeLazyReadException(name);
