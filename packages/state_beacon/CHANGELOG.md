@@ -1,3 +1,7 @@
+## 0.29.2
+
+-   Internal refactor that enables deeply nested untracked withing nested effects. This is just covers a rare edge case and should not affect any existing code.
+
 ## 0.29.1
 
 -   [Refactor] Internal refactor to improve performance
