@@ -55,6 +55,42 @@ void main() {
     expect(errorResult, isA<AsyncError>());
   });
 
+  test('should set optimistic result while loading', () async {
+    final beacon = Beacon.writable<AsyncValue<int>>(AsyncData(0));
+
+    final beaconStream = beacon.toStream();
+
+    expect(
+      beaconStream,
+      emitsInOrder(
+        [
+          AsyncData(0),
+          AsyncData(1), // optimistic result
+
+          // start errorResult
+          AsyncData(2), // optimistic result
+          isA<AsyncError>(),
+        ],
+      ),
+    );
+
+    final successResult = await AsyncValue.tryCatch(
+      () => testFuture(false),
+      beacon: beacon,
+      optimisticResult: 1,
+    );
+
+    expect(successResult, isA<AsyncData>());
+
+    final errorResult = await AsyncValue.tryCatch(
+      () => testFuture(true),
+      beacon: beacon,
+      optimisticResult: 2,
+    );
+
+    expect(errorResult, isA<AsyncError>());
+  });
+
   test('should share the same hashCode with sister instances', () {
     final data = AsyncData(1);
     final data2 = AsyncData(1);
