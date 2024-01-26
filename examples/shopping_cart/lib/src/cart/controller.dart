@@ -12,13 +12,15 @@ class CartController {
 
   final CartService _cartService;
 
-  final _removingItem = Beacon.hashSet<Product>({});
-  ReadableBeacon<Set<Product>> get removingIndex => _removingItem;
-
-  final _addingItem = Beacon.hashSet<Product>({});
-  ReadableBeacon<Set<Product>> get addingItem => _addingItem;
-
   late final _cart = Beacon.writable<AsyncValue<Cart>>(AsyncIdle());
+
+  // these beacons are used to grey out the item while it is being removed/added;
+  // thus preventing the user from clicking the item multiple times
+  final _removingItem = Beacon.hashSet<Product>({});
+  final _addingItem = Beacon.hashSet<Product>({});
+
+  ReadableBeacon<Set<Product>> get removingIndex => _removingItem;
+  ReadableBeacon<Set<Product>> get addingItem => _addingItem;
   ReadableBeacon<AsyncValue<Cart>> get cart => _cart;
 
   Future<void> dispatch(CartEvent event) async {
