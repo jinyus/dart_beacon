@@ -1,3 +1,7 @@
+## 0.30.1
+
+-   [Perf] Cache the notifier/listenable returned by `toValueNotifier()` and `toListenable()` to avoid creating new instances on every call.
+
 ## 0.30.0
 
 -   [Feat] Add BeaconGroup that allows you to group beacons together and dispose/reset them all at once.
