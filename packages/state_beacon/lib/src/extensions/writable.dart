@@ -4,15 +4,9 @@ part of 'extensions.dart';
 extension WritableBeaconFlutterUtils<T> on WritableBeacon<T> {
   /// Converts this to a [ValueNotifier]
   ValueNotifier<T> toValueNotifier() {
-    final notifier = ValueNotifierBeacon(value);
+    final notifier = _toValueNotifier(this);
 
-    final unsub = subscribe(notifier.set);
-
-    notifier
-      ..addListener(() => value = notifier.value)
-      ..addDisposeCallback(unsub);
-
-    onDispose(notifier.dispose);
+    notifier.addListener(() => set(notifier.value));
 
     return notifier;
   }
