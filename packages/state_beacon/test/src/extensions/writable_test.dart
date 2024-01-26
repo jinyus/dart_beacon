@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:state_beacon/src/extensions/extensions.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
@@ -53,5 +54,47 @@ void main() {
       ..value = 3;
 
     expect(called, 2);
+  });
+
+  test('should return the same notifier instance', () {
+    final beacon = Beacon.writable(0);
+
+    final valueNotifier = beacon.toValueNotifier();
+    final valueNotifier2 = beacon.toValueNotifier();
+    final valueNotifier3 = beacon.toValueNotifier();
+
+    expect(valueNotifier, valueNotifier2);
+    expect(valueNotifier2, valueNotifier3);
+
+    expect(hasNotifier(beacon), isTrue);
+
+    beacon.dispose();
+
+    expect(hasNotifier(beacon), isFalse);
+  });
+
+  test('should remove notifier from cache when notifier is disposed.', () {
+    final age = Beacon.writable(50);
+    final name = Beacon.writable('bob');
+
+    final aNotifier = age.toValueNotifier();
+    final nNotifier = name.toValueNotifier();
+
+    expect(hasNotifier(age), isTrue);
+    expect(hasNotifier(name), isTrue);
+    expect(age.listenersCount, 1);
+    expect(name.listenersCount, 1);
+
+    aNotifier.dispose();
+
+    expect(hasNotifier(age), isFalse);
+    expect(hasNotifier(name), isTrue);
+    expect(age.listenersCount, 0);
+
+    nNotifier.dispose();
+
+    expect(hasNotifier(age), isFalse);
+    expect(hasNotifier(name), isFalse);
+    expect(name.listenersCount, 0);
   });
 }
