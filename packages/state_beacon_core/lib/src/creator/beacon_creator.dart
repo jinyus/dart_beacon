@@ -505,7 +505,6 @@ class _BeaconCreator {
     bool manualStart = false,
     bool cancelRunning = true,
     String? name,
-    bool supportConditional = true,
   }) {
     final beacon = DerivedFutureBeacon<T>(
       compute,
@@ -515,20 +514,15 @@ class _BeaconCreator {
     );
 
     final dispose = doEffect(
-      () {
+      () async {
         // beacon is manually triggered if in idle state
         if (beacon.status() == DerivedFutureStatus.idle) {
-          return null;
+          return;
         }
 
-        return doEffect(
-          () async {
-            await beacon.run();
-          },
-          supportConditional: supportConditional,
-          name: name ?? 'DerivedFutureBeacon<$T>',
-        );
+        await beacon.run();
       },
+      name: name ?? 'DerivedFutureBeacon<$T>',
     );
 
     beacon.$setInternalEffectUnsubscriber(dispose);

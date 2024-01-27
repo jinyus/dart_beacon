@@ -300,47 +300,9 @@ void main() {
     expect(stats.isError, isTrue);
   });
 
-  test('should not watch new beacon conditionally', () async {
-    final num1 = Beacon.writable<int>(10);
-    final num2 = Beacon.writable<int>(20);
-
-    final derivedBeacon = Beacon.derivedFuture(
-      () async {
-        if (num2().isEven) return num2();
-        return num1.value + num2.value;
-      },
-      supportConditional: false,
-      manualStart: true,
-    );
-
-    expect(derivedBeacon(), isA<AsyncIdle>());
-
-    derivedBeacon.start();
-
-    expect(derivedBeacon.isLoading, true);
-
-    await Future<void>.delayed(k10ms);
-
-    expect(derivedBeacon.unwrapValue(), 20);
-
-    num2.increment();
-
-    expect(derivedBeacon.isLoading, true);
-
-    await Future<void>.delayed(k10ms);
-
-    expect(derivedBeacon.unwrapValue(), 31);
-
-    // should not trigger recompute as it wasn't accessed on first run
-    num1.value = 15;
-
-    expect(derivedBeacon.isLoading, false);
-
-    expect(derivedBeacon.unwrapValue(), 31);
-  });
-
   test('should stop watching dependencies when it has no more watchers',
       () async {
+    // BeaconObserver.instance = LoggingObserver();
     final num1 = Beacon.writable<int>(10, name: 'num1');
     final num2 = Beacon.writable<int>(20, name: 'num2');
 

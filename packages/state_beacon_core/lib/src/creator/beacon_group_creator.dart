@@ -85,14 +85,12 @@ class BeaconGroup extends _BeaconCreator {
     bool manualStart = false,
     bool cancelRunning = true,
     String? name,
-    bool supportConditional = true,
   }) {
     final beacon = super.derivedFuture<T>(
       compute,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
       name: name,
-      supportConditional: supportConditional,
     );
     _beacons.add(beacon);
     return beacon;
