@@ -31,17 +31,17 @@ class Controller {
         }
 
         parsedItems.value = switch (newAsyncValue) {
-          // if the new value is AsyncData<List<String>>, add the items to the list
+          // if successful, add the items to the list
           AsyncData<List<String>>(value: final lst) => newList
             ..addAll(lst.map(ItemData.new))
             ..add(lst.length < pageSize
                 ? ItemError(NoMoreItemsException())
                 : ItemLoading()),
 
-          // if the new value is AsyncError, add the error to the list
+          // if an error occured, add the error to the list
           AsyncError(:final error) => newList..add(ItemError(error)),
 
-          // if the new value is AsyncLoading, add the loading indicator to the list
+          // add the loading indicator to the list
           _ => newList..add(ItemLoading()),
         };
       },
