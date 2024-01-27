@@ -1,3 +1,22 @@
+# 0.31.0
+
+-   [Breaking] Derived and DerivedFuture beacons will now enter a sleep state when a widget/effect watching it is unmounted/disposed.
+
+    Currently derived & derivedFuture beacons always execute even if it has no listeners.
+    It will now enter a sleep state when nothing is watching it.
+
+    Pro: No unneeded computation so it saves battery life.
+    Con: It will not have the latest state when a widget starts watching it again so it will be in the loading state when woken up.
+
+    It is configurable with a `shouldSleep` option which defaults to true.
+
+    NB: It still start eagerly, the above only kicks in when listeners decrease from 1 to 0. If you want a lazy start, just declare it as a late variable.
+
+    ```dart
+    // with late keyword, someFuture won't run until stats is used.
+    late final stats = Beacon.derivedFuture(() async => someFuture());
+    ```
+
 ## 0.30.0
 
 -   [Feat] Add BeaconGroup that allows you to group beacons together and dispose/reset them all at once.
