@@ -14,10 +14,9 @@ const konamiCodes = [
 ];
 
 class Controller {
+  // this is throttled because FocusNode.onKey can be
+  // triggered multiple times for a single key press
   final keys = Beacon.lazyThrottled<String>(duration: k100ms * 2);
-  late final last10 = Beacon.bufferedCount<String>(10)
-    ..wrap(
-      keys,
-      startNow: false,
-    );
+
+  late final last10 = keys.buffer(10);
 }
