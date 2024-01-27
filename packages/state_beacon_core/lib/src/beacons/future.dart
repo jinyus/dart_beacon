@@ -20,28 +20,35 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
 
   /// Alias for peek().lastData.
   /// Returns the last data that was successfully loaded
-  T? get lastData => _value.lastData;
+  /// equivalent to `beacon.peek().lastData`
+  T? get lastData => peek().lastData;
 
   FutureCallback<T> _operation;
 
   /// Casts its value to [AsyncData] and return
   /// it's value or throws `CastError` if this is not [AsyncData].
-  T unwrapValue() => _value.unwrap();
+  /// equivalent to `beacon.peek().unwrap()`
+  T unwrapValue() => peek().unwrap();
 
   /// Returns `true` if this is [AsyncLoading].
-  bool get isLoading => _value.isLoading;
+  /// This is equivalent to `beacon.peek().isLoading`.
+  bool get isLoading => peek().isLoading;
 
   /// Returns `true` if this is [AsyncIdle].
-  bool get isIdle => _value.isIdle;
+  /// This is equivalent to `beacon.peek().isIdle`.
+  bool get isIdle => peek().isIdle;
 
   /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
-  bool get isIdleOrLoading => _value.isIdleOrLoading;
+  /// This is equivalent to `beacon.peek().isIdleOrLoading`.
+  bool get isIdleOrLoading => peek().isIdleOrLoading;
 
   /// Returns `true` if this is [AsyncData].
-  bool get isData => _value.isData;
+  /// This is equivalent to `beacon.peek().isData`.
+  bool get isData => peek().isData;
 
   /// Returns `true` if this is [AsyncError].
-  bool get isError => _value.isError;
+  /// This is equivalent to `beacon.peek().isError`.
+  bool get isError => peek().isError;
 
   /// Starts executing an idle [Future]
   ///

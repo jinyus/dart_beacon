@@ -418,11 +418,11 @@ class _BeaconCreator {
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value every time one of it's dependencies change.
   ///
-  /// If `manualStart` is `true`, the callback will not execute until [start()] is called.
+  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+  /// It will resume executing once a listener is added or it's value is accessed.
   ///
-  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
+  /// If `supportConditional` is `true`(default), the effect look for its dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
-  /// Defaults to `true`.
   ///
   /// Example:
   /// ```dart
@@ -438,21 +438,29 @@ class _BeaconCreator {
   ReadableBeacon<T> derived<T>(
     T Function() compute, {
     String? name,
+    bool shouldSleep = true,
     bool supportConditional = true,
   }) {
     final beacon = WritableDerivedBeacon<T>(
       name: name ?? 'DerivedBeacon<$T>',
+      shouldSleep: shouldSleep,
     );
 
-    final unsub = doEffect(
-      () {
-        beacon.set(compute());
-      },
-      supportConditional: supportConditional,
-      name: name ?? 'DerivedBeacon<$T>',
-    );
+    void start() {
+      final unsub = doEffect(
+        () {
+          beacon.set(compute());
+        },
+        supportConditional: supportConditional,
+        name: name ?? 'DerivedBeacon<$T>',
+      );
 
-    beacon.$setInternalEffectUnsubscriber(unsub);
+      beacon.$setInternalEffectUnsubscriber(unsub);
+    }
+
+    beacon.$setInternalEffectRestarter(start);
+
+    start();
 
     return beacon;
   }
@@ -461,14 +469,15 @@ class _BeaconCreator {
   /// This beacon will recompute its value every time one of its dependencies change.
   /// The result is wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
   ///
-  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
+  /// If `manualStart` is `true`(default:false), the future will not execute until [start()] is called.
   ///
-  /// If `cancelRunning` is `true`, the results of a current execution will be discarded
+  /// If `cancelRunning` is `true`(default), the results of a current execution will be discarded
   /// if another execution is triggered before the current one finishes.
   ///
-  /// If `supportConditional` is `true`, the effect look for its dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
-  /// Defaults to `true`.
+  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+  /// It will resume executing once a listener is added or it's value is accessed.
+  /// This means that it will enter the `loading` state when woken up.
+  ///
   ///
   /// Example:
   /// ```dart
@@ -498,28 +507,28 @@ class _BeaconCreator {
     FutureCallback<T> compute, {
     bool manualStart = false,
     bool cancelRunning = true,
+    bool shouldSleep = true,
     String? name,
-    bool supportConditional = true,
   }) {
     final beacon = DerivedFutureBeacon<T>(
       compute,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
+      shouldSleep: shouldSleep,
       name: name ?? 'DerivedFutureBeacon<$T>',
     );
 
-    final dispose = doEffect(() {
-      // beacon is manually triggered if in idle state
-      if (beacon.status() == DerivedFutureStatus.idle) return null;
+    final dispose = doEffect(
+      () async {
+        // beacon is manually triggered if in idle state
+        if (beacon.status() == DerivedFutureStatus.idle) {
+          return;
+        }
 
-      return doEffect(
-        () async {
-          await beacon.run();
-        },
-        supportConditional: supportConditional,
-        name: name ?? 'DerivedFutureBeacon<$T>',
-      );
-    });
+        await beacon.run();
+      },
+      name: name ?? 'DerivedFutureBeacon<$T>',
+    );
 
     beacon.$setInternalEffectUnsubscriber(dispose);
 

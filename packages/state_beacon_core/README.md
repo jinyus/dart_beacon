@@ -211,6 +211,12 @@ expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 Creates a `DerivedBeacon` whose value is derived from a computation function.
 This beacon will recompute its value every time one of it's dependencies change.
 
+If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+It will resume executing once a listener is added or it's value is accessed.
+
+If `supportConditional` is `true`(default), it will only look dependencies on its first run.
+This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
+
 Example:
 
 ```dart
@@ -230,10 +236,14 @@ Creates a `DerivedBeacon` whose value is derived from an asynchronous computatio
 This beacon will recompute its value every time one of its dependencies change.
 The result is wrapped in an `AsyncValue`, which can be in one of four states: `idle`, `loading`, `data`, or `error`.
 
-If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until [start()] is called.
+If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
 
 If `cancelRunning` is `true` (default: true), the results of a current execution will be discarded
 if another execution is triggered before the current one finishes.
+
+If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+It will resume executing once a listener is added or it's value is accessed.
+This means that it will enter the `loading` state when woken up.
 
 Example:
 

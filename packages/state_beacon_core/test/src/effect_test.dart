@@ -12,15 +12,18 @@ void main() {
 
     final buff = Beacon.bufferedTime<String>(duration: k10ms);
 
-    Beacon.effect(() {
-      var msg = '${name()} is ${age()} years old';
+    Beacon.effect(
+      () {
+        var msg = '${name()} is ${age()} years old';
 
-      if (age.value > 21) {
-        msg += ' and can go to ${college.value}';
-      }
+        if (age.value > 21) {
+          msg += ' and can go to ${college.value}';
+        }
 
-      buff.add(msg);
-    });
+        buff.add(msg);
+      },
+      name: 'effect',
+    );
 
     name.value = 'Alice';
     age.value = 21;
@@ -228,20 +231,26 @@ void main() {
     var effectCalled2 = 0;
     var effectCalled3 = 0;
 
-    final dispose = Beacon.effect(() {
-      effectCalled++;
-      beacon1.value;
+    final dispose = Beacon.effect(
+      () {
+        effectCalled++;
+        beacon1.value;
 
-      return Beacon.effect(() {
-        effectCalled2++;
-        beacon2.value;
+        return Beacon.effect(
+          () {
+            effectCalled2++;
+            beacon2.value;
 
-        return Beacon.effect(() {
-          effectCalled3++;
-          beacon3.value;
-        });
-      }, supportConditional: false,);
-    }, supportConditional: false,);
+            return Beacon.effect(() {
+              effectCalled3++;
+              beacon3.value;
+            });
+          },
+          supportConditional: false,
+        );
+      },
+      supportConditional: false,
+    );
 
     beacon1.value = 15;
     expect(effectCalled, 2);

@@ -2,11 +2,15 @@
 
 import 'dart:collection';
 
+import 'package:state_beacon_core/src/common.dart';
+
 import 'effect_closure.dart';
 
 class Listeners {
   final HashSet<EffectClosure> _set = HashSet<EffectClosure>();
   List<EffectClosure> _list = [];
+
+  late final _whenEmptyCallbacks = <VoidCallback>[];
 
   int get length => _set.length;
 
@@ -28,13 +32,17 @@ class Listeners {
     if (removed) {
       // prevent concurrent modification
       _list = _list.toList()..remove(item);
+
+      if (_set.isEmpty) {
+        for (final callback in _whenEmptyCallbacks) {
+          callback();
+        }
+      }
     }
     return removed;
   }
 
-  bool contains(EffectClosure item) {
-    return _set.contains(item);
-  }
+  bool contains(EffectClosure item) => _set.contains(item);
 
   List<EffectClosure> get items => _list;
   HashSet<EffectClosure> get itemsSet => _set;
@@ -42,6 +50,10 @@ class Listeners {
   void clear() {
     _set.clear();
     _list.clear();
+  }
+
+  void whenEmpty(VoidCallback callback) {
+    _whenEmptyCallbacks.add(callback);
   }
 
   // coverage:ignore-start

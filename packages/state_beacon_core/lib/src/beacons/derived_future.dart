@@ -21,6 +21,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     bool manualStart = false,
     super.cancelRunning = true,
     super.name,
+    bool shouldSleep = true,
   }) {
     if (manualStart) {
       _status.set(DerivedFutureStatus.idle);
@@ -29,12 +30,43 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
       _status.set(DerivedFutureStatus.running);
       _setValue(AsyncLoading());
     }
+
+    if (!shouldSleep) return;
+
+    _listeners.whenEmpty(() {
+      // setting status to idle will dispose the internal effect
+      // and stop listening to dependencies
+      _status.set(DerivedFutureStatus.idle);
+      _sleeping = true;
+    });
+  }
+
+  var _sleeping = false;
+
+  @override
+  AsyncValue<T> get value {
+    if (_sleeping) {
+      start();
+      _sleeping = false;
+    }
+    return super.value;
+  }
+
+  @override
+  AsyncValue<T> peek() {
+    if (_sleeping) {
+      start();
+      _sleeping = false;
+    }
+    return super.peek();
   }
 
   /// Runs the future.
   Future<void> run() => _run();
 
-  final _status = Beacon.lazyWritable<DerivedFutureStatus>();
+  late final _status = Beacon.lazyWritable<DerivedFutureStatus>(
+    name: "$name's status",
+  );
 
   /// The status of the future.
   ReadableBeacon<DerivedFutureStatus> get status => _status;
