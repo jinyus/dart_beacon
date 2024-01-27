@@ -36,6 +36,7 @@ class _Effect {
               _parentEffect = _currentEffect;
               _currentEffect = this;
               try {
+                _currentDeps.clear();
                 cleanUpAndRun();
               } finally {
                 _currentEffect = _parentEffect;
