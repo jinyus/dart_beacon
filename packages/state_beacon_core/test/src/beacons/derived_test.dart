@@ -181,4 +181,46 @@ void main() {
 
     expect(ran, 4);
   });
+  test('should run when it has no more watchers when shouldSleep=false', () {
+    final num1 = Beacon.writable<int>(10);
+    final num2 = Beacon.writable<int>(20);
+    var ran = 0;
+
+    final derivedBeacon = Beacon.derived(
+      () {
+        ran++;
+        return num1.value + num2.value;
+      },
+      shouldSleep: false,
+    );
+
+    expect(ran, 1);
+
+    final unsub = Beacon.effect(() => derivedBeacon.value);
+
+    expect(ran, 1);
+
+    num1.increment();
+
+    expect(ran, 2);
+
+    unsub();
+
+    num1.increment();
+    num2.increment();
+
+    expect(ran, 4);
+
+    expect(derivedBeacon(), 33);
+
+    expect(ran, 4);
+
+    num1.increment();
+
+    expect(ran, 5);
+
+    expect(derivedBeacon(), 34);
+
+    expect(ran, 5);
+  });
 }
