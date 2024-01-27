@@ -423,7 +423,6 @@ class _BeaconCreator {
   ///
   /// If `supportConditional` is `true`(default), the effect look for its dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
-  /// Defaults to `true`.
   ///
   /// Example:
   /// ```dart
