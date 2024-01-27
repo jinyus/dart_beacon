@@ -31,6 +31,8 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     }
 
     _listeners.whenEmpty(() {
+      // setting status to idle will dispose the internal effect
+      // and stop listening to dependencies
       _status.set(DerivedFutureStatus.idle);
       _sleeping = true;
     });
@@ -40,7 +42,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
 
   @override
   AsyncValue<T> get value {
-    if (_sleeping && _status.peek() == DerivedFutureStatus.idle) {
+    if (_sleeping) {
       start();
       _sleeping = false;
     }
@@ -49,7 +51,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
 
   @override
   AsyncValue<T> peek() {
-    if (_sleeping && _status.peek() == DerivedFutureStatus.idle) {
+    if (_sleeping) {
       start();
       _sleeping = false;
     }
