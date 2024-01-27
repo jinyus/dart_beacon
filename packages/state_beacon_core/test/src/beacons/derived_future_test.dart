@@ -338,4 +338,128 @@ void main() {
 
     expect(derivedBeacon.unwrapValue(), 31);
   });
+
+  test('should stop watching dependencies when it has no more watchers',
+      () async {
+    final num1 = Beacon.writable<int>(10, name: 'num1');
+    final num2 = Beacon.writable<int>(20, name: 'num2');
+
+    final derivedBeacon = Beacon.derivedFuture(
+      () async => num1.value + num2.value,
+      name: 'derived',
+    );
+
+    final status = (derivedBeacon as DerivedFutureBeacon).status;
+
+    expect(num1.listenersCount, 1);
+    expect(num2.listenersCount, 1);
+    expect(derivedBeacon.listenersCount, 0);
+
+    final unsub = Beacon.effect(
+      () => derivedBeacon.value,
+      name: 'custom effect',
+    );
+
+    expect(derivedBeacon.listenersCount, 1);
+
+    expect(
+      status.value,
+      DerivedFutureStatus.running,
+    );
+
+    unsub();
+
+    expect(derivedBeacon.listenersCount, 0);
+    expect(num1.listenersCount, 0);
+    expect(num2.listenersCount, 0);
+
+    // should start listening again when value is accessed
+    num1.value = 15;
+
+    expect(status.value, DerivedFutureStatus.idle);
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 35);
+
+    expect(derivedBeacon.listenersCount, 0);
+    expect(num1.listenersCount, 1);
+    expect(num2.listenersCount, 1);
+
+    // should stop listening again when it has no more listeners
+
+    final unsub2 = Beacon.effect(() => derivedBeacon.value);
+
+    expect(derivedBeacon.listenersCount, 1);
+
+    expect(status.value, DerivedFutureStatus.running);
+
+    unsub2();
+
+    expect(status.value, DerivedFutureStatus.idle);
+
+    expect(derivedBeacon.listenersCount, 0);
+    expect(num1.listenersCount, 0);
+    expect(num2.listenersCount, 0);
+
+    // should start listening again when value is accessed
+    num1.value = 20;
+
+    expect(derivedBeacon.value.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.peek().unwrap(), 40);
+
+    expect(derivedBeacon.listenersCount, 0);
+    expect(num1.listenersCount, 1);
+    expect(num2.listenersCount, 1);
+  });
+
+  test('should not run when it has no more watchers', () async {
+    final num1 = Beacon.writable<int>(10);
+    final num2 = Beacon.writable<int>(20);
+    var ran = 0;
+
+    final derivedBeacon = Beacon.derivedFuture(() async {
+      ran++;
+      return num1.value + num2.value;
+    });
+
+    expect(ran, 1);
+
+    final unsub = Beacon.effect(() => derivedBeacon.value);
+
+    expect(ran, 1);
+
+    num1.increment();
+
+    await Future<void>.delayed(k1ms);
+
+    expect(ran, 2);
+
+    unsub();
+
+    // derived should not execute when it has no more watchers
+    num1.increment();
+    num2.increment();
+
+    expect(ran, 2);
+
+    expect(derivedBeacon.isLoading, true);
+
+    expect(ran, 3);
+
+    num1.increment();
+
+    expect(ran, 4);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 34);
+
+    expect(ran, 4);
+  });
 }

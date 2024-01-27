@@ -444,15 +444,21 @@ class _BeaconCreator {
       name: name ?? 'DerivedBeacon<$T>',
     );
 
-    final unsub = doEffect(
-      () {
-        beacon.set(compute());
-      },
-      supportConditional: supportConditional,
-      name: name ?? 'DerivedBeacon<$T>',
-    );
+    void start() {
+      final unsub = doEffect(
+        () {
+          beacon.set(compute());
+        },
+        supportConditional: supportConditional,
+        name: name ?? 'DerivedBeacon<$T>',
+      );
 
-    beacon.$setInternalEffectUnsubscriber(unsub);
+      beacon.$setInternalEffectUnsubscriber(unsub);
+    }
+
+    beacon.$setInternalEffectRestarter(start);
+
+    start();
 
     return beacon;
   }
@@ -508,18 +514,22 @@ class _BeaconCreator {
       name: name ?? 'DerivedFutureBeacon<$T>',
     );
 
-    final dispose = doEffect(() {
-      // beacon is manually triggered if in idle state
-      if (beacon.status() == DerivedFutureStatus.idle) return null;
+    final dispose = doEffect(
+      () {
+        // beacon is manually triggered if in idle state
+        if (beacon.status() == DerivedFutureStatus.idle) {
+          return null;
+        }
 
-      return doEffect(
-        () async {
-          await beacon.run();
-        },
-        supportConditional: supportConditional,
-        name: name ?? 'DerivedFutureBeacon<$T>',
-      );
-    });
+        return doEffect(
+          () async {
+            await beacon.run();
+          },
+          supportConditional: supportConditional,
+          name: name ?? 'DerivedFutureBeacon<$T>',
+        );
+      },
+    );
 
     beacon.$setInternalEffectUnsubscriber(dispose);
 

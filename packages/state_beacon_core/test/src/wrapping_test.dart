@@ -29,10 +29,10 @@ void main() {
     expect(doubledCount.listenersCount, 1);
     expect(count.listenersCount, 2);
 
-    wrapper.clearWrapped();
+    wrapper.dispose();
 
     expect(doubledCount.listenersCount, 0);
-    expect(count.listenersCount, 1);
+    expect(count.listenersCount, 0);
   });
 
   test('should remove subscription for all wrapped beacons', () {
@@ -53,7 +53,7 @@ void main() {
     wrapper.clearWrapped();
 
     expect(doubledCount.listenersCount, 0);
-    expect(count.listenersCount, 1);
+    expect(count.listenersCount, 0);
   });
 
   test('should dispose internal currentBuffer on dispose', () {

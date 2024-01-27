@@ -29,12 +29,39 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
       _status.set(DerivedFutureStatus.running);
       _setValue(AsyncLoading());
     }
+
+    _listeners.whenEmpty(() {
+      _status.set(DerivedFutureStatus.idle);
+      _sleeping = true;
+    });
+  }
+
+  var _sleeping = false;
+
+  @override
+  AsyncValue<T> get value {
+    if (_sleeping && _status.peek() == DerivedFutureStatus.idle) {
+      start();
+      _sleeping = false;
+    }
+    return super.value;
+  }
+
+  @override
+  AsyncValue<T> peek() {
+    if (_sleeping && _status.peek() == DerivedFutureStatus.idle) {
+      start();
+      _sleeping = false;
+    }
+    return super.peek();
   }
 
   /// Runs the future.
   Future<void> run() => _run();
 
-  final _status = Beacon.lazyWritable<DerivedFutureStatus>();
+  late final _status = Beacon.lazyWritable<DerivedFutureStatus>(
+    name: "$name's status",
+  );
 
   /// The status of the future.
   ReadableBeacon<DerivedFutureStatus> get status => _status;
