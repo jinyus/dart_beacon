@@ -9,7 +9,7 @@ class Controller {
     final todos = todosBeacon.value;
 
     return switch (filterBeacon.value) {
-      Filter.all => todos,
+      Filter.all => todos.toList(),
       Filter.active => todos.where((e) => !e.completed).toList(),
       Filter.done => todos.where((e) => e.completed).toList()
     };
