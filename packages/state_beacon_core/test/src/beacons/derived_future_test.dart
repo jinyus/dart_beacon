@@ -478,5 +478,17 @@ void main() {
     await Future<void>.delayed(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 21);
+
+    guard.value = true;
+
+    expect(num1.listenersCount, 1);
+    expect(num2.listenersCount, 0);
+    expect(num3.listenersCount, 0);
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 12);
   });
 }
