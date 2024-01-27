@@ -25,7 +25,12 @@ mixin DerivedMixin<T> on ReadableBeacon<T> {
 
 // this is only used internally
 class WritableDerivedBeacon<T> extends WritableBeacon<T> with DerivedMixin<T> {
-  WritableDerivedBeacon({super.name}) {
+  WritableDerivedBeacon({
+    super.name,
+    bool shouldSleep = true,
+  }) {
+    if (!shouldSleep) return;
+
     _listeners.whenEmpty(() {
       _unsubscribe();
       _sleeping = true;

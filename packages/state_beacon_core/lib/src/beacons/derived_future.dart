@@ -21,6 +21,7 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     bool manualStart = false,
     super.cancelRunning = true,
     super.name,
+    bool shouldSleep = true,
   }) {
     if (manualStart) {
       _status.set(DerivedFutureStatus.idle);
@@ -29,6 +30,8 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
       _status.set(DerivedFutureStatus.running);
       _setValue(AsyncLoading());
     }
+
+    if (!shouldSleep) return;
 
     _listeners.whenEmpty(() {
       // setting status to idle will dispose the internal effect

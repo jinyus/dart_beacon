@@ -68,11 +68,13 @@ class BeaconGroup extends _BeaconCreator {
   ReadableBeacon<T> derived<T>(
     T Function() compute, {
     String? name,
+    bool shouldSleep = true,
     bool supportConditional = true,
   }) {
     final beacon = super.derived<T>(
       compute,
       name: name,
+      shouldSleep: shouldSleep,
       supportConditional: supportConditional,
     );
     _beacons.add(beacon);
@@ -84,12 +86,14 @@ class BeaconGroup extends _BeaconCreator {
     FutureCallback<T> compute, {
     bool manualStart = false,
     bool cancelRunning = true,
+    bool shouldSleep = true,
     String? name,
   }) {
     final beacon = super.derivedFuture<T>(
       compute,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
+      shouldSleep: shouldSleep,
       name: name,
     );
     _beacons.add(beacon);
