@@ -113,7 +113,7 @@ void main() {
     expect(fullName.value.unwrap(), 'Sally 1 Smith 2');
   });
 
-  test('should return error when dependency throws error', () async {
+  test('should return error when callback throws error', () async {
     final count = Beacon.writable(0);
 
     final firstName = Beacon.derivedFuture(() async {
@@ -423,5 +423,60 @@ void main() {
     expect(derivedBeacon.unwrapValue(), 34);
 
     expect(ran, 4);
+  });
+
+  test('should conditionally stop listening to dependencies', () async {
+    final num1 = Beacon.writable<int>(10);
+    final num2 = Beacon.writable<int>(10);
+    final num3 = Beacon.writable<int>(10);
+    final guard = Beacon.writable<bool>(true);
+
+    final derivedBeacon = Beacon.derivedFuture(() async {
+      if (guard.value) return num1.value;
+
+      return num2.value + num3.value;
+    });
+
+    expect(num1.listenersCount, 1);
+    expect(num2.listenersCount, 0);
+    expect(num3.listenersCount, 0);
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 10);
+
+    num1.increment();
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 11);
+
+    guard.value = false;
+
+    expect(num1.listenersCount, 0);
+    expect(num2.listenersCount, 1);
+    expect(num3.listenersCount, 1);
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 20);
+
+    num1.increment();
+
+    expect(derivedBeacon.unwrapValue(), 20);
+
+    num2.increment();
+
+    expect(derivedBeacon.isLoading, true);
+
+    await Future<void>.delayed(k1ms);
+
+    expect(derivedBeacon.unwrapValue(), 21);
   });
 }
