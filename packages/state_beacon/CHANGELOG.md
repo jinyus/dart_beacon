@@ -1,3 +1,7 @@
+# 0.31.1
+
+-   [Fix] mirror force option of wrapped beacons.
+
 # 0.31.0
 
 -   [Breaking] Derived and DerivedFuture beacons will now enter a sleep state when a widget/effect watching it is unmounted/disposed.
