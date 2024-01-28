@@ -31,6 +31,6 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
 
   @override
   void _onNewValueFromWrapped(T value) {
-    set(value);
+    set(value, force: true);
   }
 }
