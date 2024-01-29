@@ -70,9 +70,9 @@ class UndoRedoBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  void reset() {
+  void reset({bool force = false}) {
     _history.clear();
     _currentHistoryIndex = -1;
-    super.reset();
+    super.reset(force: force);
   }
 }

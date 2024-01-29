@@ -426,7 +426,7 @@ class ListBeacon<E> extends WritableBeacon<List<E>> {
 
   /// Clears the list
   @override
-  void reset() {
+  void reset({bool force = false}) {
     clear();
   }
 }

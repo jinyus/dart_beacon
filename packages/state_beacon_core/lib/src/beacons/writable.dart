@@ -11,9 +11,9 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
 
   /// Set the beacon to its initial value
   /// and notify all listeners
-  void reset() {
+  void reset({bool force = false}) {
     if (_isEmpty) return;
-    _setValue(_initialValue);
+    _setValue(_initialValue, force: force);
   }
 
   /// Sets the value of the beacon and allows a force notification
