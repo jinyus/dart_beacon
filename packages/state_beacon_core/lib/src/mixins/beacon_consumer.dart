@@ -1,7 +1,11 @@
 part of '../base_beacon.dart';
 
+// the input type can differ from the output type
+// eg: in the case of buffered beacons,
+// the input type is int then the output type is List<int>
+
 /// A utility mixin for beacons that consume other beacons.
-mixin BeaconConsumer<T, U> on BaseBeacon<U> {
+mixin BeaconConsumer<InputT, OutputT> on BaseBeacon<OutputT> {
   final _wrapped = <int, VoidCallback>{};
 
   /// Disposes all currently wrapped beacons
@@ -14,7 +18,7 @@ mixin BeaconConsumer<T, U> on BaseBeacon<U> {
 
   /// Wrapper beacons can have different methods to set the value,
   /// so this is should be implemented by the wrapper.
-  void _onNewValueFromWrapped(T value);
+  void _onNewValueFromWrapped(InputT value);
 
   // String get _label;
 
