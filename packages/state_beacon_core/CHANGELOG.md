@@ -1,3 +1,18 @@
+# 0.32.0
+
+-   [Feat] Add `.stream` getter for all beacons
+-   [Deprecation] `toStream()` is now deprecated. Use `.stream` instead.
+
+    ```dart
+    // before
+    final myBeacon = Beacon.writable(0);
+    final myStream = myBeacon.toStream();
+
+    // after
+    final myBeacon = Beacon.writable(0);
+    final myStream = myBeacon.stream;
+    ```
+
 # 0.31.2
 
 -   [Perf] This is an internal change. Only create 1 `StreamController` per beacon.
