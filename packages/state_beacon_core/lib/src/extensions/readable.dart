@@ -30,10 +30,10 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
     final unsub = subscribe(controller.add);
 
     void cancel() {
+      _streamCache.remove(hashCode);
       unsub();
       controller.close();
       onCancel?.call();
-      _streamCache.remove(hashCode);
     }
 
     onDispose(cancel);
