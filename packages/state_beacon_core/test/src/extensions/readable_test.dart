@@ -36,6 +36,15 @@ void main() {
     expect(onCanceledCalled, true);
   });
 
+  test('should cache stream', () {
+    final beacon = Beacon.writable(0);
+
+    final stream1 = beacon.toStream();
+    final stream2 = beacon.toStream();
+
+    expect(stream1, same(stream2));
+  });
+
   test('next method completes with the setted value', () async {
     final beacon = Beacon.writable(0);
 

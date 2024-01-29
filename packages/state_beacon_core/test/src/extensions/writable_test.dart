@@ -46,7 +46,7 @@ void main() {
   test('should set correct async state', () async {
     final beacon = Beacon.writable<AsyncValue<int>>(AsyncData(0));
 
-    final beaconStream = beacon.toStream(broadcast: true);
+    final beaconStream = beacon.toStream();
 
     expect(
       beaconStream,
