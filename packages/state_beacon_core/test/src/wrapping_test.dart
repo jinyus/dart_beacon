@@ -1,4 +1,4 @@
-// ignore_for_file: cascade_invocations
+// ignore_for_file: cascade_invocations, unnecessary_statements
 
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
@@ -246,5 +246,33 @@ void main() {
     final wrapper = Beacon.writable<int>(0);
 
     expect(() => wrapper.wrap(count), throwsException);
+  });
+
+  test('should injest stream', () async {
+    final beacon = Beacon.writable<int>(0);
+    final myStream = Stream.fromIterable([1, 2, 3]);
+    final buffered = beacon.buffer(4);
+
+    beacon
+      ..ingest(myStream)
+      ..ingest(myStream, then: (v) => v * 2); // should have no effect
+
+    await expectLater(
+      buffered.next(),
+      completion([0, 1, 2, 3]),
+    );
+  });
+
+  test('should injest stream and transform values', () async {
+    final beacon = Beacon.writable<int>(0);
+    final myStream = Stream.fromIterable([1, 2, 3]);
+    final buffered = beacon.buffer(4);
+
+    beacon.ingest(myStream, then: (v) => beacon.value = v * 2);
+
+    await expectLater(
+      buffered.next(),
+      completion([0, 2, 4, 6]),
+    );
   });
 }

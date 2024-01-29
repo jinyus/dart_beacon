@@ -18,16 +18,20 @@ extension StreamUtils<T> on Stream<T> {
   /// Converts a stream to [RawStreamBeacon].
   RawStreamBeacon<T> toRawBeacon({
     bool cancelOnError = false,
+    bool isLazy = false,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
+    String? name,
   }) {
     return RawStreamBeacon<T>(
       this,
       cancelOnError: cancelOnError,
+      isLazy: isLazy,
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
+      name: name,
     );
   }
 }

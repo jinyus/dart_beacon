@@ -83,4 +83,12 @@ void main() {
     expect(myBeacon.isDisposed, true);
     expect(buffered.isDisposed, true);
   });
+
+  test('should be equal to beacon with the same stream', () {
+    final myStream = Stream.periodic(k10ms, (i) => i + 1).asBroadcastStream();
+    final myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
+    final myBeacon2 = Beacon.streamRaw(myStream, initialValue: 0);
+
+    expect(myBeacon, equals(myBeacon2));
+  });
 }

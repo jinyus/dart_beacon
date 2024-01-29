@@ -295,6 +295,7 @@ class BeaconGroup extends _BeaconCreator {
   RawStreamBeacon<T> streamRaw<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
+    bool isLazy = false,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
@@ -306,6 +307,7 @@ class BeaconGroup extends _BeaconCreator {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
+      isLazy: isLazy,
       name: name,
     );
     _beacons.add(beacon);

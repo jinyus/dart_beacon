@@ -8,7 +8,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   final List<T> _buffer = [];
 
-  final _currentBuffer = ListBeacon<T>([]);
+  late final _currentBuffer = ListBeacon<T>([], name: "$name's currentBuffer");
 
   /// The current buffer of values that have been added to this beacon.
   /// This can be listened to directly.

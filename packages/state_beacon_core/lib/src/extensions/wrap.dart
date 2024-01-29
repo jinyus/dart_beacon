@@ -77,4 +77,31 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
 
     return;
   }
+
+  /// Injest a `Stream` and add all values emitted from it to this beacon
+  ///
+  /// example:
+  /// ```dart
+  /// var beacon = Beacon.writable(0);
+  /// var myStream = Stream.fromIterable([1, 2, 3]);
+  ///
+  /// beacon.injest(myStream);
+  /// ```
+  void ingest(Stream<T> source, {void Function(T)? then}) {
+    final internalBeacon = RawStreamBeacon<T>(source, isLazy: true);
+
+    wrap(
+      internalBeacon,
+      then: then,
+      startNow: false,
+    );
+
+    internalBeacon.onDispose(() {
+      _wrapped.remove(internalBeacon.hashCode);
+      // don't dispose parent beacon because
+      // internal is disposed when the stream ends
+    });
+
+    onDispose(internalBeacon.dispose);
+  }
 }
