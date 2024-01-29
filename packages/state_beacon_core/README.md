@@ -103,7 +103,9 @@ NB: Create the file if it doesn't exist.
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
+    -   [stream](#mybeaconstream): Returns a stream that emits the beacon's value whenever it changes.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
+    -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
     -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
     -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
@@ -670,6 +672,10 @@ final twitterApiClient = apiClientFamily('https://api.twitter.com');
 
 ## Extensions:
 
+### myBeacon.stream:
+
+This returns a stream that emits the beacon's value whenever it changes.
+
 ### myWritable.wrap(anyBeacon):
 
 Wraps an existing beacon and consumes its values
@@ -693,6 +699,21 @@ print(bufferBeacon.buffer); // Outputs: ['5', '10']
 ```
 
 This method is available on all writable beacons, including BufferedBeacons; and can wrap any beacon since all beacons are readable.
+
+### myWritable.ingest(anyStream):
+
+This functions like `.wrap()` but it's specifically for streams. It listens to the stream and updates the beacon's value with the emitted values.
+
+```dart
+final beacon = Beacon.writable(0);
+final myStream = Stream.fromIterable([1, 2, 3]);
+
+beacon.ingest(myStream);
+
+beacon.subscribe((value) {
+  print(value); // Outputs: 1, 2, 3
+});
+```
 
 ### mybeacon.next():
 

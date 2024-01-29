@@ -248,7 +248,7 @@ void main() {
     expect(() => wrapper.wrap(count), throwsException);
   });
 
-  test('should injest stream', () async {
+  test('should ingest stream', () async {
     final beacon = Beacon.writable<int>(0);
     final myStream = Stream.fromIterable([1, 2, 3]);
     final buffered = beacon.buffer(4);
@@ -263,7 +263,7 @@ void main() {
     );
   });
 
-  test('should injest stream and transform values', () async {
+  test('should ingest stream and transform values', () async {
     final beacon = Beacon.writable<int>(0);
     final myStream = Stream.fromIterable([1, 2, 3]);
     final buffered = beacon.buffer(4);

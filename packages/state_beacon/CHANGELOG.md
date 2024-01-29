@@ -1,3 +1,14 @@
+# 0.32.1
+
+-   [Feat] Any writable can now wrap a stream with the new .injest() method.
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    final myStream = myBeacon.ingest(anyStream);
+    ```
+
+-   [Feat] `RawStreamBeacon`s can now be initialized lazily by setting the `isLazy` option to true.
+
 # 0.32.0
 
 -   [Feat] Add `.stream` getter for all beacons
