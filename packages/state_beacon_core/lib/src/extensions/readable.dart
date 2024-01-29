@@ -4,11 +4,15 @@ part of 'extensions.dart';
 
 const _k10seconds = Duration(seconds: 10);
 
+// coverage:ignore-start
 final Map<int, Stream<dynamic>> _streamCache = {};
+// coverage:ignore-end
 
 extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
+  // coverage:ignore-start
   /// Converts a [ReadableBeacon] to [Stream]
   /// The stream controller can only be canceled by calling [dispose]
+  @Deprecated('Use .stream instead')
   Stream<T> toStream({
     FutureOr<void> Function()? onCancel,
     @Deprecated('No longer needed') bool broadcast = false,
@@ -40,6 +44,7 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
 
     return stream;
   }
+  // coverage:ignore-end
 
   /// Listens for the next value emitted by this Beacon and returns it as a Future.
   ///

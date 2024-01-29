@@ -24,7 +24,7 @@ void main() {
   test('should set the beacon supplied', () async {
     final beacon = Beacon.writable<AsyncValue<int>>(AsyncData(0));
 
-    final beaconStream = beacon.toStream();
+    final beaconStream = beacon.stream;
 
     expect(
       beaconStream,
@@ -58,7 +58,7 @@ void main() {
   test('should set optimistic result while loading', () async {
     final beacon = Beacon.writable<AsyncValue<int>>(AsyncData(0));
 
-    final beaconStream = beacon.toStream();
+    final beaconStream = beacon.stream;
 
     expect(
       beaconStream,

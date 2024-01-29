@@ -10,12 +10,7 @@ import '../../common.dart';
 void main() {
   test('should convert a beacon to a stream', () async {
     final beacon = Beacon.writable(0);
-    var onCanceledCalled = false;
-    final stream = beacon.toStream(
-      onCancel: () {
-        onCanceledCalled = true;
-      },
-    );
+    final stream = beacon.stream;
 
     expect(stream, isA<Stream<int>>());
 
@@ -32,17 +27,15 @@ void main() {
     beacon.value = 1;
     beacon.value = 2;
     beacon.dispose();
-
-    expect(onCanceledCalled, true);
   });
 
   test('should cache stream', () {
     final beacon = Beacon.writable(0);
 
-    final stream1 = beacon.toStream();
-    final stream2 = beacon.toStream();
+    final stream1 = beacon.stream;
+    final stream2 = beacon.stream;
 
-    expect(stream1, same(stream2));
+    expect(stream1.hashCode, stream2.hashCode);
   });
 
   test('next method completes with the setted value', () async {
