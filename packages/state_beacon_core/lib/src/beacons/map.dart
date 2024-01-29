@@ -146,7 +146,7 @@ class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
 
   /// Clears the map
   @override
-  void reset() {
+  void reset({bool force = false}) {
     clear();
   }
 }

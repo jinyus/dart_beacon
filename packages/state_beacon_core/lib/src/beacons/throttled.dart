@@ -68,9 +68,9 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  void reset() {
+  void reset({bool force = false}) {
     _cleanUp();
-    super.reset();
+    super.reset(force: force);
   }
 
   @override

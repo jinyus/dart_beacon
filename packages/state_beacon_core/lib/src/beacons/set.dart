@@ -114,7 +114,7 @@ class SetBeacon<E> extends WritableBeacon<Set<E>> {
 
   /// Clears the set
   @override
-  void reset() {
+  void reset({bool force = false}) {
     clear();
   }
 }
