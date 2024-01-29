@@ -756,9 +756,7 @@ final query = Beacon.writable('');
 
 const k500ms = Duration(milliseconds: 500);
 
-final debouncedQuery = age
-                      .filter((prev,next) => next.length > 3);
-                      .debounce(duration: k500ms)
+final debouncedQuery = query.debounce(duration: k500ms);
 ```
 
 ## Pitfalls
