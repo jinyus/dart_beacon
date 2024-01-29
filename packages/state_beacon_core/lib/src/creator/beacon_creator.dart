@@ -368,10 +368,14 @@ class _BeaconCreator {
   }
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
-  /// If you dont supply an initial value, the type has to be nullable.
+  ///
+  /// One of the following must be `true` if an initial value isn't provided:
+  ///   1. The type is nullable
+  ///   2. `isLazy` is true (beacon must be set before it's read from)
   RawStreamBeacon<T> streamRaw<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
+    bool isLazy = false,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
@@ -383,6 +387,7 @@ class _BeaconCreator {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
+      isLazy: isLazy,
       name: name ?? 'RawStreamBeacon<$T>',
     );
   }
