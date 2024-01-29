@@ -1,3 +1,18 @@
+# 0.31.2
+
+-   [Perf] This is an internal change. Only create 1 `StreamController` per beacon.
+-   [Deprecation] The `broadcast` option for `toStream()` is now deprecated as it's not redundant.
+
+    ```dart
+    // before
+    final myBeacon = Beacon.writable(0);
+    final myStream = myBeacon.toStream(broadcast: true);
+
+    // after
+    final myBeacon = Beacon.writable(0);
+    final myStream = myBeacon.toStream();
+    ```
+
 # 0.31.1
 
 -   [Fix] mirror force option of wrapped beacons.
