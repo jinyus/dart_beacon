@@ -1,4 +1,5 @@
-// ignore_for_file: avoid_types_on_closure_parameters
+// ignore: lines_longer_than_80_chars
+// ignore_for_file: avoid_types_on_closure_parameters, avoid_equals_and_hash_code_on_mutable_classes
 
 part of '../base_beacon.dart';
 
@@ -50,17 +51,27 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// @macro rawStream
   RawStreamBeacon(
     this._stream, {
+    this.isLazy = false,
     this.cancelOnError = false,
     this.onError,
     this.onDone,
     super.initialValue,
     super.name,
   }) : assert(
-          initialValue != null || null is T,
-          'provide an initialValue or change the type parameter "$T" to "$T?"',
+          initialValue != null || null is T || isLazy,
+          '''
+
+          Do one of the following:
+            1. provide an initialValue
+            2. change the type parameter "$T" to "$T?"
+            3. set isLazy to true (beacon must be set before it's read from)
+          ''',
         ) {
     _init();
   }
+
+  /// Whether the beacon has lazy initialization.
+  final bool isLazy;
 
   /// called when the stream emits an error
   final Function? onError;
@@ -96,5 +107,21 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     unsubscribe();
 
     super.dispose();
+  }
+
+  @override
+  int get hashCode =>
+      _stream.hashCode ^
+      cancelOnError.hashCode ^
+      onError.hashCode ^
+      onDone.hashCode ^
+      (isLazy ? 1 : initialValue.hashCode) ^
+      name.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is RawStreamBeacon && other.hashCode == hashCode;
   }
 }
