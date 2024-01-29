@@ -4,14 +4,26 @@ part of 'extensions.dart';
 
 const _k10seconds = Duration(seconds: 10);
 
+final Map<int, Stream<dynamic>> _streamCache = {};
+
 extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// Converts a [ReadableBeacon] to [Stream]
-  /// The stream can only be canceled by calling [dispose]
+  /// The stream controller can only be canceled by calling [dispose]
   Stream<T> toStream({
     FutureOr<void> Function()? onCancel,
-    bool broadcast = false,
+    @Deprecated('No longer needed') bool broadcast = false,
   }) {
+    final existing = _streamCache[hashCode];
+
+    if (existing != null) {
+      return existing as Stream<T>;
+    }
+
     final controller = StreamController<T>();
+
+    final stream = controller.stream.asBroadcastStream();
+
+    _streamCache[hashCode] = stream;
 
     if (!isEmpty) controller.add(peek());
 
@@ -21,13 +33,12 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       unsub();
       controller.close();
       onCancel?.call();
+      _streamCache.remove(hashCode);
     }
 
     onDispose(cancel);
 
-    return broadcast
-        ? controller.stream.asBroadcastStream()
-        : controller.stream;
+    return stream;
   }
 
   /// Listens for the next value emitted by this Beacon and returns it as a Future.
