@@ -1,10 +1,14 @@
+# 0.32.2
+
+-   Allow `initialValue` to be passed to `ingest` method
+
 # 0.32.1
 
--   [Feat] Any writable can now wrap a stream with the new .injest() method.
+-   [Feat] Any writable can now wrap a stream with the new .ingest() method.
 
     ```dart
     final myBeacon = Beacon.writable(0);
-    final myStream = myBeacon.ingest(anyStream);
+    myBeacon.ingest(anyStream);
     ```
 
 -   [Feat] `RawStreamBeacon`s can now be initialized lazily by setting the `isLazy` option to true.

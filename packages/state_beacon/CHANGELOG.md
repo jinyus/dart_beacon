@@ -1,10 +1,14 @@
+# 0.32.2
+
+-   Allow `initialValue` to be passed to `ingest` method
+
 # 0.32.1
 
--   [Feat] Any writable can now wrap a stream with the new .injest() method.
+-   [Feat] Any writable can now wrap a stream with the new .ingest() method.
 
     ```dart
     final myBeacon = Beacon.writable(0);
-    final myStream = myBeacon.ingest(anyStream);
+    myBeacon.ingest(anyStream);
     ```
 
 -   [Feat] `RawStreamBeacon`s can now be initialized lazily by setting the `isLazy` option to true.
@@ -62,10 +66,6 @@
     late final stats = Beacon.derivedFuture(() async => someFuture());
     ```
 
-## 0.30.1
-
--   [Perf] Cache the notifier/listenable returned by `toValueNotifier()` and `toListenable()` to avoid creating new instances on every call.
-
 ## 0.30.0
 
 -   [Feat] Add BeaconGroup that allows you to group beacons together and dispose/reset them all at once.
@@ -116,15 +116,13 @@
 
 -   [Breaking] rename `debugLabel` to `name`
 
-## 0.26.1
-
--   [Fix] memory leak in `toListenable()` and `toValueNotifier()`
-
 ## 0.26.0
 
-The core of the package was extracted into `state_beacon_core` so it can be usuable from pure dart. The flutter related parts remain in this package and the core is exported so nothing should change for consumers of this package.
-
 -   [Breaking] beacons **NO** longer implements ValueListenable. Use `mybeacon.toListenable()` as a replacement.
+
+## Everything below was written before the state_beacon -> state_beacon_core migration
+
+The core of state_beacon was extracted into a separate package to make it usuable in pure dart projects.
 
 ## 0.25.0
 
@@ -480,3 +478,7 @@ The core of the package was extracted into `state_beacon_core` so it can be usua
 ## 0.1.0
 
 -   Initial version.
+
+```
+
+```

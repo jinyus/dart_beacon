@@ -87,8 +87,16 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
   ///
   /// beacon.injest(myStream);
   /// ```
-  void ingest(Stream<T> source, {void Function(T)? then}) {
-    final internalBeacon = RawStreamBeacon<T>(source, isLazy: true);
+  void ingest(
+    Stream<T> source, {
+    void Function(T)? then,
+    T? initialValue,
+  }) {
+    final internalBeacon = RawStreamBeacon<T>(
+      source,
+      isLazy: true,
+      initialValue: initialValue,
+    );
 
     wrap(
       internalBeacon,
