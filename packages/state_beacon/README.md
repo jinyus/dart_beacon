@@ -755,6 +755,12 @@ Timer(Duration(seconds: 1), () => age.value = 21;);
 final nextAge = await age.next(); // returns 21 after 1 second
 ```
 
+## Quick Wrapping:
+
+This are extension methods that allow you to quickly wrap a beacon with another beacon.
+
+NB: These cannot be chained.
+
 ### mybeacon.buffer():
 
 Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
