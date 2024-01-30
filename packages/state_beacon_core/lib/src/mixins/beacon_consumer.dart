@@ -19,17 +19,4 @@ mixin BeaconConsumer<InputT, OutputT> on BaseBeacon<OutputT> {
   /// Wrapper beacons can have different methods to set the value,
   /// so this is should be implemented by the wrapper.
   void _onNewValueFromWrapped(InputT value);
-
-  // String get _label;
-
-  // void _dispose();
-
-  // void _onDispose(VoidCallback callback);
 }
-
-// abstract class StreamConsumer<T> {
-//   void ingest<U>(
-//     Stream<U> target, {
-//     Function(T, U)? then,
-//   });
-// }
