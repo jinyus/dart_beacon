@@ -3,6 +3,20 @@ part of '../base_beacon.dart';
 // ignore: public_member_api_docs
 extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [BufferedCountBeacon] that wraps this Beacon.
+  ///
+  /// NB: All writes to the buffered beacon
+  /// will be delegated to the wrapped beacon.
+  ///
+  /// ```
+  /// final count = Beacon.writable(10);
+  /// final bufferedBeacon = count.buffer(2);
+  ///
+  /// bufferedBeacon.add(20); //  equivalent to count.value = 20;
+  ///
+  /// expect(count.value, equals(20));
+  /// expect(bufferedBeacon.value, equals([]));
+  /// expect(bufferedBeacon.currentBuffer.value, equals([20]));
+  /// ```
   /// See: `Beacon.bufferedCount` for more details.
   BufferedCountBeacon<T> buffer(
     int count, {
@@ -41,6 +55,24 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   }
 
   /// Returns a [BufferedTimeBeacon] that wraps this Beacon.
+  ///
+  /// NB: All writes to the buffered beacon
+  /// will be delegated to the wrapped beacon.
+  ///
+  /// ```
+  /// final count = Beacon.writable(10);
+  /// final bufferedBeacon = count.bufferTime(duration: k10ms);
+  ///
+  /// bufferedBeacon.add(20); //  equivalent to count.value = 20;
+  ///
+  /// expect(count.value, equals(20));
+  /// expect(bufferedBeacon.value, equals([]));
+  /// expect(bufferedBeacon.currentBuffer.value, equals([20]));
+  ///
+  /// await Future.delayed(k10ms);
+  ///
+  /// expect(bufferedBeacon.value, equals([20]));
+  /// ```
   /// See: `Beacon.bufferedTime` for more details.
   BufferedTimeBeacon<T> bufferTime({
     required Duration duration,
