@@ -4,6 +4,8 @@ import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
+import '../../common.dart';
+
 void main() {
   test('should reflect original beacon value in wrapper beacon', () {
     final original = Beacon.readable<int>(10);
@@ -138,7 +140,7 @@ void main() {
       }
     });
 
-    await Future<void>.delayed(const Duration(milliseconds: 400));
+    await delay(k10ms * 40);
 
     expect(streamCalled, equals(15));
     expect(throttledCalled, equals(1));

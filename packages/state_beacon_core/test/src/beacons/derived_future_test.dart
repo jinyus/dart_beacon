@@ -17,13 +17,13 @@ void main() {
       return ++ran;
     });
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(ran, 2);
   });
@@ -42,7 +42,7 @@ void main() {
 
     plus1.start();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(plus1.unwrapValue(), 1);
 
@@ -60,13 +60,13 @@ void main() {
 
     final firstName = Beacon.derivedFuture(() async {
       final val = count.value;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return 'Sally $val';
     });
 
     final lastName = Beacon.derivedFuture(() async {
       final val = count2.value + 1;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return 'Smith $val';
     });
 
@@ -92,7 +92,7 @@ void main() {
 
     expect(fullName.value, isA<AsyncLoading>());
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(fullName.value.unwrap(), 'Sally 0 Smith 1');
 
@@ -100,7 +100,7 @@ void main() {
 
     expect(fullName.value, isA<AsyncLoading>());
 
-    await Future<void>.delayed(k10ms * 3);
+    await delay(k10ms * 3);
 
     expect(fullName.value.unwrap(), 'Sally 1 Smith 1');
 
@@ -108,7 +108,7 @@ void main() {
 
     expect(fullName.value, isA<AsyncLoading>());
 
-    await Future<void>.delayed(k10ms * 3);
+    await delay(k10ms * 3);
 
     expect(fullName.value.unwrap(), 'Sally 1 Smith 2');
   });
@@ -118,7 +118,7 @@ void main() {
 
     final firstName = Beacon.derivedFuture(() async {
       final val = count.value;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       if (val > 0) {
         throw Exception('error');
       }
@@ -133,7 +133,7 @@ void main() {
 
     expect(greeting.value, isA<AsyncLoading>());
 
-    await Future<void>.delayed(k10ms * 1.1);
+    await delay(k10ms * 1.1);
 
     expect(greeting.value.unwrap(), 'Hello Sally 0');
 
@@ -141,7 +141,7 @@ void main() {
 
     expect(greeting.value, isA<AsyncLoading>());
 
-    await Future<void>.delayed(k10ms * 3);
+    await delay(k10ms * 3);
 
     expect(greeting.value, isA<AsyncError>());
   });
@@ -159,39 +159,39 @@ void main() {
       manualStart: true,
     );
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(ran, 0);
 
     futureBeacon.start();
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(ran, 1);
 
     count.value = 1; // Changing dependency
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(ran, 2);
 
     futureBeacon.reset();
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(ran, equals(3));
   });
   test('should await StreamBeacon exposed a future', () async {
     Stream<int> idChanges() async* {
       yield 1;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       yield 2;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       yield 3;
     }
 
     Future<String> fetchUser(int id) async {
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return 'User $id';
     }
 
@@ -214,7 +214,7 @@ void main() {
       results.add(user.value);
     });
 
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await delay(const Duration(seconds: 1));
 
     expect(results, correctResults);
   });
@@ -231,11 +231,11 @@ void main() {
     final numsDoubled = Beacon.derivedFuture(() async {
       // This will trigger a rerun because it is accessed before await
       final currentNums = nums.value;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return currentNums.map((e) => e * 2).toList();
     });
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(numsDoubled.value.unwrap(), equals([0, 2, 4]));
 
@@ -243,7 +243,7 @@ void main() {
 
     expect(nums.value, equals([0, 1, 2, 3, 4]));
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(numsDoubled.value.unwrap(), equals([0, 2, 4, 6, 8]));
   });
@@ -257,7 +257,7 @@ void main() {
     final ageFB = Beacon.derivedFuture(() async => ageBeacon());
     final speedFB = Beacon.derivedFuture(() async {
       final val = speedBeacon();
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return val;
     });
 
@@ -273,7 +273,7 @@ void main() {
 
     expect(stats.isLoading, isTrue);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(stats.unwrapValue(), 'Bob is 20 years old and runs at 10 mph');
 
@@ -285,7 +285,7 @@ void main() {
 
     expect(stats.isLoading, isTrue);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(stats.unwrapValue(), 'Sally is 21 years old and runs at 11 mph');
 
@@ -295,7 +295,7 @@ void main() {
 
     expect(stats.isLoading, isTrue);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(stats.isError, isTrue);
   });
@@ -342,7 +342,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 35);
 
@@ -371,7 +371,7 @@ void main() {
 
     expect(derivedBeacon.value.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.peek().unwrap(), 40);
 
@@ -398,7 +398,7 @@ void main() {
 
     num1.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(ran, 2);
 
@@ -418,7 +418,7 @@ void main() {
 
     expect(ran, 4);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 34);
 
@@ -447,7 +447,7 @@ void main() {
 
     num1.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(ran, 2);
 
@@ -467,7 +467,7 @@ void main() {
 
     expect(ran, 5);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 34);
 
@@ -492,7 +492,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 10);
 
@@ -500,7 +500,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 11);
 
@@ -512,7 +512,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 20);
 
@@ -524,7 +524,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 21);
 
@@ -536,7 +536,7 @@ void main() {
 
     expect(derivedBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 12);
   });

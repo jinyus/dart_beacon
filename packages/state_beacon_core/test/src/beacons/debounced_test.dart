@@ -21,7 +21,7 @@ void main() {
     // Value should still be 0 immediately after setting it
     expect(beacon.value, equals(''));
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(beacon.value, equals('apple')); // Value should be updated now
 

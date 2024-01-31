@@ -35,7 +35,7 @@ void main() {
     // Should stop listening to college beacon because age is less than 21
     college.value = 'Yale';
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(buff.value, [
       'Bob is 20 years old',
@@ -78,7 +78,7 @@ void main() {
 
     college.value = 'Yale';
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(buff.value, [
       'Bob is 20 years old',

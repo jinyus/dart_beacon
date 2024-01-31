@@ -24,6 +24,7 @@ void main() {
     expect(count.listenersCount, 0);
     expect(beacon.listenersCount, 0);
   });
+
   test('should delegate writes to parent when chained', () {
     final beacon = Beacon.writable<int>(0);
     final filtered = beacon.filter(filter: (p, n) => n.isEven);
@@ -51,7 +52,7 @@ void main() {
 
     filtered.value = 1;
 
-    await Future<void>.delayed(k10ms * 1.1);
+    await delay(k10ms * 1.1);
 
     expect(filtered.value, 1);
 
@@ -59,7 +60,7 @@ void main() {
 
     expect(filtered.value, 1); // debouncing so not updated yet
 
-    await Future<void>.delayed(k10ms * 1.1);
+    await delay(k10ms * 1.1);
 
     expect(filtered.value, 2);
   });
@@ -115,7 +116,7 @@ void main() {
 
     expect(filtered.value, 10);
 
-    await Future<void>.delayed(k10ms * 2.1);
+    await delay(k10ms * 2.1);
 
     expect(filtered.value, 10);
 
@@ -123,7 +124,7 @@ void main() {
 
     expect(filtered.value, 10); // debounced
 
-    await Future<void>.delayed(k10ms * 1.1);
+    await delay(k10ms * 1.1);
 
     expect(filtered.value, 30);
   });

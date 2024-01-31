@@ -72,7 +72,7 @@ void main() {
     final futureValue = beacon.next(timeout: k10ms);
 
     // Delay beyond timeout
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     final result = await futureValue;
 
@@ -144,7 +144,7 @@ void main() {
 
     expect(bufferedTime.value, <int>[]);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(debounced.value, 5);
 
@@ -168,7 +168,7 @@ void main() {
     expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
     expect(buffered.value, isEmpty);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
     expect(buffered.value, [0, 1, 2, 3]);
     expect(buffered.currentBuffer.value, isEmpty);
   });
@@ -187,7 +187,7 @@ void main() {
 
     expect(debounced.value, 0);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(debounced.value, 3);
   });
@@ -206,7 +206,7 @@ void main() {
 
     expect(throttled.value, 0);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(throttled.value, 0);
   });

@@ -20,21 +20,23 @@ void main() {
 
     final counterMirror = Beacon.derivedFuture(() async {
       final count = counter.value;
-      await Future<void>.delayed(k10ms);
+      await delay(k10ms);
       return count;
     });
 
-    final family = Beacon.family((int arg) => Beacon.derivedFuture(() async {
-          final count = await counterMirror.toFuture();
-          await Future<void>.delayed(k10ms);
-          return (count * arg).toString();
-        }),);
+    final family = Beacon.family(
+      (int arg) => Beacon.derivedFuture(() async {
+        final count = await counterMirror.toFuture();
+        await delay(k10ms);
+        return (count * arg).toString();
+      }),
+    );
 
     final doubled = family(2);
 
     expect(doubled.value, AsyncLoading());
 
-    await Future<void>.delayed(k10ms * 2.1);
+    await delay(k10ms * 2.1);
 
     expect(doubled.value.unwrap(), '20');
 
@@ -42,7 +44,7 @@ void main() {
 
     expect(tripled.value, AsyncLoading());
 
-    await Future<void>.delayed(k10ms * 2.1);
+    await delay(k10ms * 2.1);
 
     expect(tripled.value.unwrap(), '30');
 
@@ -51,7 +53,7 @@ void main() {
     expect(doubled.value, AsyncLoading());
     expect(tripled.value, AsyncLoading());
 
-    await Future<void>.delayed(k10ms * 4);
+    await delay(k10ms * 4);
 
     expect(doubled.value.unwrap(), '22');
     expect(tripled.value.unwrap(), '33');

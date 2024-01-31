@@ -55,19 +55,19 @@ void main() {
     final sub2 = stream.listen((v) => called++);
     final sub3 = stream.listen((v) => called++);
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     // should only add on first listen
     expect(called, 1);
 
     a.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     // all subs get notified
     expect(called, 4);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     await sub1.cancel();
 
@@ -75,35 +75,35 @@ void main() {
 
     a.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(called, 5);
 
     await sub3.cancel();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     a.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(called, 5);
 
     final sub4 = stream.listen((v) => called++);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(called, 6);
 
     a.increment();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(called, 7);
 
     await sub4.cancel();
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     a.increment();
 

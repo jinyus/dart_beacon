@@ -15,7 +15,7 @@ void main() {
     expect(beacon.value, 20); // too fast, update ignored
     expect(beacon.isBlocked, true);
 
-    await Future<void>.delayed(k10ms * 1.1);
+    await delay(k10ms * 1.1);
 
     beacon.set(30);
 
@@ -79,13 +79,13 @@ void main() {
 
     expect(beacon.value, 10);
 
-    await Future<void>.delayed(k1ms * 3);
+    await delay(k1ms * 3);
 
     beacon.increment();
 
     expect(beacon.value, 10); // still blocked
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     // 13ms passed, update allowed
     beacon.value = 50;
@@ -110,10 +110,10 @@ void main() {
     expect(values, equals([1])); // first update is allowed
 
     beacon.set(2);
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
     expect(values, equals([1])); // update blocked
 
-    await Future<void>.delayed(k10ms * 5.5);
+    await delay(k10ms * 5.5);
 
     expect(values, equals([1, 2])); // buffered update sent
 
@@ -122,15 +122,15 @@ void main() {
       ..set(4)
       ..set(5);
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(values, equals([1, 2])); // all blocked and buffered
 
-    await Future<void>.delayed(k10ms * 10);
+    await delay(k10ms * 10);
 
     expect(values, equals([1, 2, 3, 4]));
 
-    await Future<void>.delayed(k10ms * 4);
+    await delay(k10ms * 4);
 
     expect(values, equals([1, 2, 3, 4, 5]));
   });
