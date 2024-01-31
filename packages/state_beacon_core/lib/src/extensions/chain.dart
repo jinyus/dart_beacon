@@ -41,15 +41,9 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
     final beacon = Beacon.bufferedCount<T>(
       count,
       name: name,
-    )..wrap(
-        this,
-        disposeTogether: true,
-        startNow: !isEmpty,
-      );
+    );
 
-    if (this case final WritableBeacon<T> w) {
-      beacon._delegate = w;
-    }
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -93,18 +87,13 @@ eg:
 final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
 ''',
     );
+
     final beacon = Beacon.bufferedTime<T>(
       duration: duration,
       name: name,
-    )..wrap(
-        this,
-        disposeTogether: true,
-        startNow: !isEmpty,
-      );
+    );
 
-    if (this case final WritableBeacon<T> w) {
-      beacon._delegate = w;
-    }
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -149,21 +138,15 @@ eg:
 final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
 ''',
     );
+
     final beacon = Beacon.lazyDebounced<T>(
       duration: duration,
       name: name,
     );
 
-    if (this case final WritableBeacon<T> w) {
-      beacon._delegate = w;
-    }
+    _wrapAndDelegate(beacon);
 
-    return beacon
-      ..wrap(
-        this,
-        disposeTogether: true,
-        startNow: !isEmpty,
-      );
+    return beacon;
   }
 
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
@@ -201,22 +184,16 @@ eg:
 final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
 ''',
     );
+
     final beacon = Beacon.lazyThrottled<T>(
       duration: duration,
       dropBlocked: dropBlocked,
       name: name,
     );
 
-    if (this case final WritableBeacon<T> w) {
-      beacon._delegate = w;
-    }
+    _wrapAndDelegate(beacon);
 
-    return beacon
-      ..wrap(
-        this,
-        disposeTogether: true,
-        startNow: !isEmpty,
-      );
+    return beacon;
   }
 
   /// Returns a [FilteredBeacon] that wraps this Beacon.
@@ -253,20 +230,28 @@ eg:
 final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
 ''',
     );
+
     final beacon = Beacon.lazyFiltered<T>(
       filter: filter,
       name: name,
     );
 
-    if (this case final WritableBeacon<T> w) {
-      beacon._delegate = w;
-    }
+    _wrapAndDelegate(beacon);
 
-    return beacon
-      ..wrap(
-        this,
-        disposeTogether: true,
-        startNow: !isEmpty,
-      );
+    return beacon;
+  }
+
+  void _wrapAndDelegate<InputT, OutputT>(
+    BeaconConsumer<InputT, OutputT> beacon,
+  ) {
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty,
+    );
+
+    if (this is WritableBeacon<InputT>) {
+      beacon._delegate = this as WritableBeacon<InputT>;
+    }
   }
 }
