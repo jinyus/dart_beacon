@@ -8,17 +8,33 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     int count, {
     String? name,
   }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.filter().buffer(10);
+
+Bad: someBeacon.buffer(10).filter();
+
+If you absolutely need this functionality, it has to be done manually with "wrap".
+eg:
+final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
+''',
+    );
+
     final beacon = Beacon.bufferedCount<T>(
       count,
       name: name,
     )..wrap(
         this,
         disposeTogether: true,
-        startNow: false,
+        startNow: !isEmpty,
       );
 
-    if (!isEmpty) {
-      beacon.add(peek());
+    if (this case final WritableBeacon<T> w) {
+      beacon._delegate = w;
     }
 
     return beacon;
@@ -30,17 +46,32 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     required Duration duration,
     String? name,
   }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.filter().buffer(10);
+
+Bad: someBeacon.buffer(10).filter();
+
+If you absolutely need this functionality, it has to be done manually with .wrap.
+eg:
+final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
+''',
+    );
     final beacon = Beacon.bufferedTime<T>(
       duration: duration,
       name: name,
     )..wrap(
         this,
         disposeTogether: true,
-        startNow: false,
+        startNow: !isEmpty,
       );
 
-    if (!isEmpty) {
-      beacon.add(peek());
+    if (this case final WritableBeacon<T> w) {
+      beacon._delegate = w;
     }
 
     return beacon;
@@ -55,7 +86,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// final count = Beacon.writable(10);
   /// final debouncedCount = count.debounce(duration: k10ms);
   ///
-  /// debouncedCount.value = 20;
+  /// debouncedCount.value = 20; //  equivalent to count.value = 20;
   ///
   /// expect(count.value, equals(20));
   ///
@@ -71,6 +102,21 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     required Duration duration,
     String? name,
   }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.filter().buffer(10);
+
+Bad: someBeacon.buffer(10).filter();
+
+If you absolutely need this functionality, it has to be done manually with .wrap.
+eg:
+final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
+''',
+    );
     final beacon = Beacon.lazyDebounced<T>(
       duration: duration,
       name: name,
@@ -97,7 +143,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// final count = Beacon.writable(10);
   /// final throttledCount = count.throttle(duration: k10ms);
   ///
-  /// throttledCount.value = 20;
+  /// throttledCount.value = 20; //  equivalent to count.value = 20;
   ///
   /// expect(count.value, equals(20));
   /// expect(throttledCount.value, equals(10)); // this is 10 because the update was throttled
@@ -108,6 +154,21 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     bool dropBlocked = true,
     String? name,
   }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.filter().buffer(10);
+
+Bad: someBeacon.buffer(10).filter();
+
+If you absolutely need this functionality, it has to be done manually with .wrap.
+eg:
+final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
+''',
+    );
     final beacon = Beacon.lazyThrottled<T>(
       duration: duration,
       dropBlocked: dropBlocked,
@@ -135,7 +196,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// final count = Beacon.writable(10);
   /// final filteredCount = count.filter(filter: (prev, next) => next > 10);
   ///
-  /// filteredCount.value = 20;
+  /// filteredCount.value = 20; //  equivalent to count.value = 20;
   ///
   /// expect(count.value, equals(20));
   /// expect(filteredCount.value, equals(20));
@@ -145,6 +206,21 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
     bool Function(T?, T)? filter,
     String? name,
   }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.filter().buffer(10);
+
+Bad: someBeacon.buffer(10).filter();
+
+If you absolutely need this functionality, it has to be done manually with .wrap.
+eg:
+final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
+''',
+    );
     final beacon = Beacon.lazyFiltered<T>(
       filter: filter,
       name: name,
