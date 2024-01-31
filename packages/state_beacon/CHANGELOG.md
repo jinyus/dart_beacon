@@ -1,3 +1,29 @@
+# 0.33.0
+
+-   [Feat] Chaining beacons is now supported. When the beacon returned from a chain is mutated, the mutation is re-routed to the first beacon in the chain.
+
+```dart
+final query = Beacon.writable('');
+
+const k500ms = Duration(milliseconds: 500);
+
+final debouncedQuery = query
+        .filter(filter: (prev, next) => next.length > 2)
+        .debounce(duration: k500ms);
+```
+
+When `debouncedQuery` is mutated, the mutation is re-routed to `query`, then `filter` and finally `debounce`.
+
+NB: Buffered beacons cannot be mid-chain. If they are used, they must be the last beacon in the chain.
+
+```dart
+// GOOD
+someBeacon.filter().buffer(10);
+
+// BAD
+someBeacon.buffer(10).filter();
+```
+
 # 0.32.2
 
 -   Allow `initialValue` to be passed to `ingest` method
@@ -478,7 +504,3 @@ The core of state_beacon was extracted into a separate package to make it usuabl
 ## 0.1.0
 
 -   Initial version.
-
-```
-
-```
