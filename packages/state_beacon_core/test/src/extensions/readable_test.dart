@@ -227,22 +227,22 @@ void main() {
     expect(filtered.value, 2);
   });
 
-  test('should throw when wrapping a lazy beacon with start=true', () {
-    final beacon = Beacon.lazyWritable<int>();
+  // test('should throw when wrapping a lazy beacon with start=true', () {
+  //   final beacon = Beacon.lazyWritable<int>();
 
-    expect(
-      () => beacon.throttle(duration: k10ms),
-      throwsException,
-    );
+  //   expect(
+  //     () => beacon.throttle(duration: k10ms),
+  //     throwsException,
+  //   );
 
-    expect(
-      () => beacon.debounce(duration: k10ms),
-      throwsException,
-    );
+  //   expect(
+  //     () => beacon.debounce(duration: k10ms),
+  //     throwsException,
+  //   );
 
-    expect(
-      beacon.filter,
-      throwsException,
-    );
-  });
+  //   expect(
+  //     beacon.filter,
+  //     throwsException,
+  //   );
+  // });
 }

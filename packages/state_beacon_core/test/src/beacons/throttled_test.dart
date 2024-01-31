@@ -62,6 +62,7 @@ void main() {
     beacon
       ..dispose()
       ..set(40);
+
     expect(beacon.value, 40);
   });
 
