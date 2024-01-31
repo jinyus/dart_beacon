@@ -11,7 +11,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// final count = Beacon.writable(10);
   /// final bufferedBeacon = count.buffer(2);
   ///
-  /// bufferedBeacon.add(20); //  equivalent to count.value = 20;
+  /// bufferedBeacon.add(20); //  equivalent to count.set(20, force: true);
   ///
   /// expect(count.value, equals(20));
   /// expect(bufferedBeacon.value, equals([]));
@@ -57,7 +57,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// final count = Beacon.writable(10);
   /// final bufferedBeacon = count.bufferTime(duration: k10ms);
   ///
-  /// bufferedBeacon.add(20); //  equivalent to count.value = 20;
+  /// bufferedBeacon.add(20); //  equivalent to count.set(20, force: true);
   ///
   /// expect(count.value, equals(20));
   /// expect(bufferedBeacon.value, equals([]));
@@ -107,7 +107,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// final count = Beacon.writable(10);
   /// final debouncedCount = count.debounce(duration: k10ms);
   ///
-  /// debouncedCount.value = 20; //  equivalent to count.value = 20;
+  /// debouncedCount.value = 20; //  equivalent to count.set(20, force: true);
   ///
   /// expect(count.value, equals(20));
   ///
@@ -158,7 +158,7 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
   /// final count = Beacon.writable(10);
   /// final throttledCount = count.throttle(duration: k10ms);
   ///
-  /// throttledCount.value = 20; //  equivalent to count.value = 20;
+  /// throttledCount.value = 20; //  equivalent to count.set(20, force: true);
   ///
   /// expect(count.value, equals(20));
   /// expect(throttledCount.value, equals(10)); // this is 10 because the update was throttled
@@ -205,7 +205,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   /// final count = Beacon.writable(10);
   /// final filteredCount = count.filter(filter: (prev, next) => next > 10);
   ///
-  /// filteredCount.value = 20; //  equivalent to count.value = 20;
+  /// filteredCount.value = 20; //  equivalent to count.set(20, force: true);
   ///
   /// expect(count.value, equals(20));
   /// expect(filteredCount.value, equals(20));

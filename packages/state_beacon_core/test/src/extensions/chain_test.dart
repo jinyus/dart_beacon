@@ -257,4 +257,42 @@ void main() {
 
     expect(result, [0, 1]);
   });
+
+  test('should force all delegated writes', () {
+    final count = Beacon.writable<int>(10, name: 'count');
+    var called = 0;
+
+    final buff = count
+        .filter(name: 'f1', filter: (p, n) => n > 5)
+        .buffer(2, name: 'buffered');
+
+    count.subscribe((p0) => called++);
+
+    expect(called, 0);
+
+    buff.add(20);
+
+    expect(called, 1);
+
+    expect(buff(), [10, 20]);
+    expect(buff.currentBuffer(), isEmpty);
+
+    buff.add(20);
+
+    expect(called, 2);
+
+    expect(buff.currentBuffer(), [20]);
+
+    buff.add(5);
+
+    expect(called, 3);
+
+    expect(buff.currentBuffer(), [20]);
+
+    buff.add(5);
+
+    expect(called, 4);
+
+    expect(buff.currentBuffer(), [20]);
+  });
 }

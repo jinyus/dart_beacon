@@ -68,7 +68,7 @@ class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
   @override
   void _internalAdd(T newValue, {bool delegated = false}) {
     if (delegated && _delegate != null) {
-      _delegate!.set(newValue);
+      _delegate!.set(newValue, force: true);
       return;
     }
     super._addToBuffer(newValue);
@@ -94,7 +94,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
   @override
   void _internalAdd(T newValue, {bool delegated = false}) {
     if (delegated && _delegate != null) {
-      _delegate!.set(newValue);
+      _delegate!.set(newValue, force: true);
       return;
     }
 
