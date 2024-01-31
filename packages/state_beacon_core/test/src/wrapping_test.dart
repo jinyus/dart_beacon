@@ -275,4 +275,108 @@ void main() {
       completion([0, 2, 4, 6]),
     );
   });
+
+  test('should delegate writes to parent when chained', () {
+    final beacon = Beacon.writable<int>(0);
+    final filtered = beacon.filter(filter: (p, n) => n.isEven);
+
+    filtered.value = 1;
+
+    expect(beacon.value, 1);
+    expect(filtered.value, 0);
+
+    filtered.increment();
+
+    expect(beacon.value, 1);
+    expect(filtered.value, 0);
+
+    filtered.value = 2;
+
+    expect(beacon.value, 2);
+    expect(filtered.value, 2);
+  });
+
+  test('should delegate writes to parent when chained/2', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final filtered = Beacon.lazyDebounced<int>(duration: k10ms)
+        .filter(filter: (p, n) => n.isEven);
+
+    filtered.value = 1;
+
+    await Future<void>.delayed(k10ms * 1.1);
+
+    expect(filtered.value, 1);
+
+    filtered.increment();
+
+    expect(filtered.value, 1); // debouncing so not updated yet
+
+    await Future<void>.delayed(k10ms * 1.1);
+
+    expect(filtered.value, 2);
+  });
+
+  test('should delegate writes to parent when chained/3', () {
+    // BeaconObserver.instance = LoggingObserver();
+
+    final filtered = Beacon.writable(0)
+        .filter(filter: (p, n) => n.isEven, name: 'f1')
+        .filter(filter: (p, n) => n > 0, name: 'f2')
+        .filter(filter: (p, n) => n > 10, name: 'f3');
+
+    filtered.value = 1;
+
+    expect(filtered.value, 0);
+
+    filtered.value = -2; // doesn't pass f2
+
+    expect(filtered.value, 0);
+
+    filtered.value = 6; // doesn't pass f3
+
+    expect(filtered.value, 0);
+
+    filtered.value = 12;
+
+    expect(filtered.value, 12);
+
+    filtered.value = 0;
+
+    expect(filtered.value, 12);
+
+    filtered.reset();
+
+    expect(filtered.value, 0);
+  });
+
+  test('should delegate writes to parent when chained/4', () async {
+    BeaconObserver.instance = LoggingObserver();
+
+    final count = Beacon.writable<int>(10, name: 'count');
+
+    final filtered = count
+        .throttle(duration: k10ms, name: 'throttled')
+        .debounce(duration: k10ms, name: 'debounced')
+        .filter(name: 'f1')
+        .filter(name: 'f2');
+
+    expect(filtered.isEmpty, false);
+    expect(filtered.value, 10);
+
+    filtered.value = 20; // throttled
+
+    expect(filtered.value, 10);
+
+    await Future<void>.delayed(k10ms * 2.1);
+
+    expect(filtered.value, 10);
+
+    filtered.value = 30;
+
+    expect(filtered.value, 10); // debounced
+
+    await Future<void>.delayed(k10ms * 1.1);
+
+    expect(filtered.value, 30);
+  });
 }

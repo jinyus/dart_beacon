@@ -25,12 +25,14 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  set value(T newValue) => set(newValue);
+  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
+    if (delegated && _delegate != null) {
+      _delegate!.set(newValue, force: force);
+      return;
+    }
 
-  @override
-  void set(T newValue, {bool force = false}) {
     if (_isEmpty || (_filter?.call(peek(), newValue) ?? true)) {
-      super.set(newValue, force: force);
+      _setValue(newValue, force: force);
     }
   }
 }

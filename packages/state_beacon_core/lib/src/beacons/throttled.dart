@@ -35,10 +35,12 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   }
 
   @override
-  set value(T newValue) => set(newValue);
+  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
+    if (delegated && _delegate != null) {
+      _delegate!.set(newValue, force: force);
+      return;
+    }
 
-  @override
-  void set(T newValue, {bool force = false}) {
     if (_blocked) {
       if (!dropBlocked) {
         _buffer.add(newValue);
@@ -46,14 +48,14 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
       return;
     }
 
-    super.set(newValue, force: force);
+    _setValue(newValue, force: force);
     _blocked = true;
 
     _timer?.cancel();
     _timer = Timer.periodic(_throttleDuration, (_) {
       if (_buffer.isNotEmpty) {
         final bufferedValue = _buffer.removeAt(0);
-        super.set(bufferedValue, force: force);
+        _setValue(bufferedValue, force: force);
       } else {
         _timer?.cancel();
         _blocked = false;

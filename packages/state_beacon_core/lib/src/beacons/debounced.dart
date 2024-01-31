@@ -15,19 +15,19 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
   Timer? _debounceTimer;
 
   @override
-  set value(T newValue) {
-    set(newValue);
-  }
+  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
+    if (delegated && _delegate != null) {
+      _delegate!.set(newValue, force: force);
+      return;
+    }
 
-  @override
-  void set(T newValue, {bool force = false}) {
     if (_isEmpty) {
-      super.set(newValue, force: force);
+      _setValue(newValue, force: force);
       return;
     }
     _debounceTimer?.cancel();
     _debounceTimer = Timer(debounceDuration, () {
-      super.set(newValue, force: force);
+      _setValue(newValue, force: force);
     });
   }
 
