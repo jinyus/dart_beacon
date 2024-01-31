@@ -12,12 +12,12 @@ extension BoolUtils on WritableBeacon<bool> {
 extension IntUtils<T extends num> on WritableBeacon<T> {
   /// Increments the value of this beacon.
   void increment() {
-    value = value + 1 as T;
+    value = peek() + 1 as T;
   }
 
   /// Decrements the value of this beacon.
   void decrement() {
-    value = value - 1 as T;
+    value = peek() - 1 as T;
   }
 }
 
