@@ -31,7 +31,7 @@ part 'beacons/derived_future.dart';
 part 'beacons/awaited.dart';
 part 'beacons/async.dart';
 part 'extensions/wrap.dart';
-part 'extensions/wrap_utils.dart';
+part 'extensions/chain.dart';
 part 'mixins/beacon_consumer.dart';
 
 /// The base class for all beacons.
