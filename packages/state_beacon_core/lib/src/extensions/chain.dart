@@ -201,7 +201,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   /// NB: All writes to the filtered beacon
   /// will be delegated to the wrapped beacon.
   ///
-  /// ```
+  /// ```dart
   /// final count = Beacon.writable(10);
   /// final filteredCount = count.filter(filter: (prev, next) => next > 10);
   ///
