@@ -107,11 +107,12 @@ NB: Create the file if it doesn't exist.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
-    -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
-    -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
-    -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
-    -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
-    -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+    -   [Chaining Beacons](#chaining-methods):
+        -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
+        -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
+        -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
+        -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+        -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 [Pitfalls](#pitfalls)
 
