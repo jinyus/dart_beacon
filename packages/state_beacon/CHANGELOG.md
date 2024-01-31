@@ -1,3 +1,7 @@
+# 0.33.1
+
+-   [Fix] All delegated writes will be forced to account for the fact that rollback isn't possible.
+
 # 0.33.0
 
 -   [Feat] Chaining beacons is now supported. When the beacon returned from a chain is mutated, the mutation is re-routed to the first beacon in the chain.
