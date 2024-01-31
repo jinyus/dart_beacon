@@ -836,7 +836,9 @@ final query = Beacon.writable('');
 
 const k500ms = Duration(milliseconds: 500);
 
-final debouncedQuery = query.debounce(duration: k500ms);
+final debouncedQuery = query
+        .filter(filter: (prev, next) => next.length > 2)
+        .debounce(duration: k500ms);
 ```
 
 ## Pitfalls
