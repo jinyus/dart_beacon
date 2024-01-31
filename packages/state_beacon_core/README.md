@@ -736,11 +736,45 @@ Timer(Duration(seconds: 1), () => age.value = 21;);
 final nextAge = await age.next(); // returns 21 after 1 second
 ```
 
-## Quick Wrapping:
+## Chaining methods:
 
-This are extension methods that allow you to quickly wrap a beacon with another beacon.
+These are extension methods that allow you to quickly wrap a beacon with another beacon.
 
-NB: These cannot be chained.
+> [!IMPORTANT]  
+> When chaining beacons, all writes made to the returned beacon will be re-routed to the first beacon in the chain.
+
+```dart
+const k500ms = Duration(milliseconds: 500);
+
+final count = Beacon.writable(10);
+
+final filteredCount = count
+        .debounce(duration: k500ms),
+        .filter(filter: (prev, next) => next > 10);
+
+// The mutation will be re-routed to count
+// before being passed to the debounced beacon
+// then to the filtered beacon.
+// This is equivalent to count.value = 20;
+filteredCount.value = 20;
+
+expect(count.value, equals(20));
+
+await Future.delayed(k500ms);
+
+expect(filteredCount.value, equals(20));
+```
+
+> [!WARNING]  
+> `buffer` and `bufferTime` cannot be mid-chain. If they are used, they have to be the last in the chain.
+
+```dart
+// GOOD
+someBeacon.filter().buffer(10);
+
+// BAD
+someBeacon.buffer(10).filter();
+```
 
 ### mybeacon.buffer():
 
@@ -783,7 +817,9 @@ final query = Beacon.writable('');
 
 const k500ms = Duration(milliseconds: 500);
 
-final debouncedQuery = query.debounce(duration: k500ms);
+final debouncedQuery = query
+        .filter(filter: (prev, next) => next.length > 2)
+        .debounce(duration: k500ms);
 ```
 
 ## Pitfalls

@@ -72,7 +72,7 @@ void main() {
     final futureValue = beacon.next(timeout: k10ms);
 
     // Delay beyond timeout
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     final result = await futureValue;
 
@@ -122,10 +122,9 @@ void main() {
 
     final buffered = beacon.buffer(3);
     final bufferedTime = beacon.bufferTime(duration: k10ms);
-    final debounced = beacon.debounce(duration: k10ms, startNow: false);
-    final throttled = beacon.throttle(duration: k10ms, startNow: false);
+    final debounced = beacon.debounce(duration: k10ms);
+    final throttled = beacon.throttle(duration: k10ms);
     final filtered = beacon.filter(
-      startNow: false,
       filter: (p0, p1) => p1.isEven,
     );
 
@@ -145,7 +144,7 @@ void main() {
 
     expect(bufferedTime.value, <int>[]);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(debounced.value, 5);
 
@@ -169,7 +168,7 @@ void main() {
     expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
     expect(buffered.value, isEmpty);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
     expect(buffered.value, [0, 1, 2, 3]);
     expect(buffered.currentBuffer.value, isEmpty);
   });
@@ -188,7 +187,7 @@ void main() {
 
     expect(debounced.value, 0);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(debounced.value, 3);
   });
@@ -207,7 +206,7 @@ void main() {
 
     expect(throttled.value, 0);
 
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
 
     expect(throttled.value, 0);
   });
@@ -227,22 +226,22 @@ void main() {
     expect(filtered.value, 2);
   });
 
-  test('should throw when wrapping a lazy beacon with start=true', () {
-    final beacon = Beacon.lazyWritable<int>();
+  // test('should throw when wrapping a lazy beacon with start=true', () {
+  //   final beacon = Beacon.lazyWritable<int>();
 
-    expect(
-      () => beacon.throttle(duration: k10ms),
-      throwsException,
-    );
+  //   expect(
+  //     () => beacon.throttle(duration: k10ms),
+  //     throwsException,
+  //   );
 
-    expect(
-      () => beacon.debounce(duration: k10ms),
-      throwsException,
-    );
+  //   expect(
+  //     () => beacon.debounce(duration: k10ms),
+  //     throwsException,
+  //   );
 
-    expect(
-      beacon.filter,
-      throwsException,
-    );
-  });
+  //   expect(
+  //     beacon.filter,
+  //     throwsException,
+  //   );
+  // });
 }

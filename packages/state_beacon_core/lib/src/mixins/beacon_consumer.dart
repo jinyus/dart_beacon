@@ -8,6 +8,8 @@ part of '../base_beacon.dart';
 mixin BeaconConsumer<InputT, OutputT> on BaseBeacon<OutputT> {
   final _wrapped = <int, VoidCallback>{};
 
+  WritableBeacon<InputT>? _delegate;
+
   /// Disposes all currently wrapped beacons
   void clearWrapped() {
     for (final unsub in _wrapped.values) {

@@ -26,9 +26,9 @@ void main() {
   test('should be AsyncError when error is added to stream', () async {
     Stream<int> errorStream() async* {
       yield 1;
-      await Future<void>.delayed(k1ms);
+      await delay(k1ms);
       yield 2;
-      await Future<void>.delayed(k1ms);
+      await delay(k1ms);
       yield* Stream.error('error');
     }
 
@@ -76,7 +76,7 @@ void main() {
 
     await expectLater(buffered.next(), completion(equals([null, 1, 2, 3])));
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(done, true);
 

@@ -29,7 +29,7 @@ void main() {
 
     expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k10ms);
+    await delay(k10ms);
 
     expect(futureBeacon.value, isA<AsyncError>());
 
@@ -51,7 +51,7 @@ void main() {
 
     expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(futureBeacon.unwrapValue(), 1);
 
@@ -59,7 +59,7 @@ void main() {
 
     expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(futureBeacon.isData, isTrue);
 
@@ -76,7 +76,7 @@ void main() {
 
     expect(futureBeacon.isIdle, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(counter, 0);
 
@@ -84,7 +84,7 @@ void main() {
 
     expect(futureBeacon.isLoading, true);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(futureBeacon.isData, isTrue);
 
@@ -96,7 +96,7 @@ void main() {
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(futureBeacon.unwrapValue(), 1);
 
@@ -104,7 +104,7 @@ void main() {
 
     expect(futureBeacon.isLoading, isTrue);
 
-    await Future<void>.delayed(k1ms);
+    await delay(k1ms);
 
     expect(futureBeacon.isError, isTrue);
   });

@@ -4,7 +4,7 @@ import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
-import '../common.dart';
+import '../../common.dart';
 
 void main() {
   test('should reflect original beacon value in wrapper beacon', () {
@@ -140,7 +140,7 @@ void main() {
       }
     });
 
-    await Future<void>.delayed(const Duration(milliseconds: 400));
+    await delay(k10ms * 40);
 
     expect(streamCalled, equals(15));
     expect(throttledCalled, equals(1));
@@ -157,7 +157,7 @@ void main() {
     final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
-    final buff = doubledCount.buffer(1).filter();
+    final buff = doubledCount.filter().buffer(1);
 
     expect(wrapper.value, equals(10));
 
@@ -219,27 +219,6 @@ void main() {
     expect(count.listenersCount, 0);
   });
 
-  test('should dispose together when wrapped is disposed(3)', () {
-    // BeaconObserver.instance = LoggingObserver();
-    final count = Beacon.readable<int>(10);
-
-    final beacon = count
-        .buffer(2)
-        .filter()
-        .throttle(duration: k10ms)
-        .debounce(duration: k10ms);
-
-    Beacon.effect(() => beacon.value);
-
-    expect(count.listenersCount, 1);
-    expect(beacon.listenersCount, 1);
-
-    count.dispose();
-
-    expect(count.listenersCount, 0);
-    expect(beacon.listenersCount, 0);
-  });
-
   test('should throw when wrapping empty lazy beacon and startNow=true', () {
     final count = Beacon.lazyWritable<int>();
 
@@ -264,6 +243,7 @@ void main() {
   });
 
   test('should ingest stream and transform values', () async {
+    // BeaconObserver.instance = LoggingObserver();
     final beacon = Beacon.writable<int>(0);
     final myStream = Stream.fromIterable([1, 2, 3]);
     final buffered = beacon.buffer(4);

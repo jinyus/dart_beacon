@@ -4,6 +4,8 @@ import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
+import '../../common.dart';
+
 void main() {
   test('should notify listeners when value changes', () {
     final beacon = Beacon.writable(10);
@@ -90,7 +92,7 @@ void main() {
       throwsA(isA<UninitializeLazyReadException>()),
     );
     dBeacon.set(10);
-    await Future<void>.delayed(k10ms * 2);
+    await delay(k10ms * 2);
     expect(dBeacon.value, equals(10));
 
     final tBeacon = Beacon.lazyThrottled<int>(duration: k10ms);
@@ -159,7 +161,7 @@ void main() {
     undoRedoBeacon.set(10, force: true);
     undoRedoBeacon.set(10, force: true);
 
-    await Future<void>.delayed(const Duration(milliseconds: 6));
+    await delay(const Duration(milliseconds: 6));
 
     throttleBeacon.set(10, force: true);
 
