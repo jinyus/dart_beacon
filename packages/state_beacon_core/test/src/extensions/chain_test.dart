@@ -50,9 +50,7 @@ void main() {
     final filtered = Beacon.lazyDebounced<int>(duration: k10ms)
         .filter(filter: (p, n) => n.isEven);
 
-    filtered.value = 1;
-
-    await delay(k10ms * 1.1);
+    filtered.value = 1; // 1st value so not debounced
 
     expect(filtered.value, 1);
 
@@ -205,5 +203,58 @@ void main() {
           .debounce(duration: k10ms),
       throwsA(isA<AssertionError>()),
     );
+  });
+
+  test('should buffer input beacon', () async {
+    final stream = Stream.periodic(k1ms, (i) => i);
+    final beacon = stream.toRawBeacon(isLazy: true).buffer(5);
+
+    await expectLater(beacon.next(), completion([0, 1, 2, 3, 4]));
+  });
+
+  test('should filter input beacon', () async {
+    final stream = Stream.periodic(k1ms, (i) => i);
+    final beacon = stream
+        .toRawBeacon(isLazy: true)
+        .filter(filter: (p, n) => n.isEven)
+        .buffer(5);
+
+    await expectLater(beacon.next(), completion([0, 2, 4, 6, 8]));
+  });
+
+  test('should debounce input beacon', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final stream = Stream.periodic(k1ms, (i) => i).take(9);
+    final beacon =
+        stream.toRawBeacon(isLazy: true).debounce(duration: k10ms).buffer(5);
+
+    expect(beacon(), <int>[]);
+    await expectLater(beacon.currentBuffer.next(), completion([0]));
+  });
+
+  test('should throttle input beacon', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final stream = Stream.periodic(k1ms, (i) => i).take(15);
+    final beacon =
+        stream.toRawBeacon(isLazy: true).throttle(duration: k10ms).buffer(2);
+
+    final result = await beacon.next();
+
+    // it will have 1 val less than 10 and 1 val more than 10
+    expect(result.reduce((a, b) => a + b), inInclusiveRange(10, 20));
+    expect(beacon.currentBuffer(), isEmpty);
+  });
+
+  test('should throttle input beacon and keep blocked values', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final stream = Stream.periodic(k1ms, (i) => i).take(15);
+    final beacon = stream
+        .toRawBeacon(isLazy: true)
+        .throttle(duration: k10ms, dropBlocked: false)
+        .buffer(2);
+
+    final result = await beacon.next();
+
+    expect(result, [0, 1]);
   });
 }
