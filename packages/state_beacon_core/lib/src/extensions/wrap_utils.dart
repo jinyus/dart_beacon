@@ -69,7 +69,6 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// See: `Beacon.debounced` for more details.
   DebouncedBeacon<T> debounce({
     required Duration duration,
-    bool startNow = true,
     String? name,
   }) {
     final beacon = Beacon.lazyDebounced<T>(
@@ -106,7 +105,6 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// See: `Beacon.throttled` for more details.
   ThrottledBeacon<T> throttle({
     required Duration duration,
-    bool startNow = true,
     bool dropBlocked = true,
     String? name,
   }) {
@@ -144,7 +142,6 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// ```
   /// See: `Beacon.filtered` for more details.
   FilteredBeacon<T> filter({
-    bool startNow = true,
     bool Function(T?, T)? filter,
     String? name,
   }) {

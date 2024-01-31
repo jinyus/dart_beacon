@@ -122,10 +122,9 @@ void main() {
 
     final buffered = beacon.buffer(3);
     final bufferedTime = beacon.bufferTime(duration: k10ms);
-    final debounced = beacon.debounce(duration: k10ms, startNow: false);
-    final throttled = beacon.throttle(duration: k10ms, startNow: false);
+    final debounced = beacon.debounce(duration: k10ms);
+    final throttled = beacon.throttle(duration: k10ms);
     final filtered = beacon.filter(
-      startNow: false,
       filter: (p0, p1) => p1.isEven,
     );
 

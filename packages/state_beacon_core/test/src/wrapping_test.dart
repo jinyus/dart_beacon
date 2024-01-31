@@ -350,7 +350,7 @@ void main() {
   });
 
   test('should delegate writes to parent when chained/4', () async {
-    BeaconObserver.instance = LoggingObserver();
+    // BeaconObserver.instance = LoggingObserver();
 
     final count = Beacon.writable<int>(10, name: 'count');
 
