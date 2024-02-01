@@ -72,7 +72,7 @@ class MyHomePage extends StatelessWidget {
               create: (_) => CounterController(),
               child: CounterPage(),
             ),
-            KonamiPage(),
+            KonamiPage(controller: KonamiController()),
             TodoPage(),
             SearchPage(),
             InfiniteList(),
