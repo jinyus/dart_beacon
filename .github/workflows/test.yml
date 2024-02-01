@@ -49,7 +49,14 @@ jobs:
               run: |
                   flutter pub get
                   flutter analyze
-                  flutter test --coverage
+                  flutter test
+
+            - name: Build and Test Main example
+              working-directory: ./examples/flutter_main
+              run: |
+                  flutter pub get
+                  flutter analyze
+                  flutter test
 
             - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v4
