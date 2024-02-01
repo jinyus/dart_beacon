@@ -77,7 +77,10 @@ class MyHomePage extends StatelessWidget {
               create: (_) => TodoController(),
               child: TodoPage(),
             ),
-            SearchPage(),
+            Provider(
+              create: (_) => WeatherController(WeatherRepository()),
+              child: SearchPage(),
+            ),
             InfiniteList(),
           ],
         ),
