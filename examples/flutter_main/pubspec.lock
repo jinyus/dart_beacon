@@ -267,6 +267,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  mocktail:
+    dependency: "direct dev"
+    description:
+      name: mocktail
+      sha256: c4b5007d91ca4f67256e720cb1b6d704e79a510183a12fa551021f652577dce6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   nested:
     dependency: transitive
     description:
@@ -358,15 +366,15 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.33.0"
+    version: "0.33.1"
   state_beacon_core:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: e45e9fe21a63460c3c887f2ce8f7c9282d58b2d7c1f46a74df995af1b2bbb9e7
+      sha256: "99777ecd401e45bfd7f6e8af5bc31421a3f98ff6fd38b2430440b09c4f9057ed"
       url: "https://pub.dev"
     source: hosted
-    version: "0.33.0"
+    version: "0.33.1"
   state_beacon_lint:
     dependency: "direct dev"
     description:
