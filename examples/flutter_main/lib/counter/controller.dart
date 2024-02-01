@@ -10,11 +10,10 @@ Future<String> counterFuture(int count) async {
   return '$count second has passed.';
 }
 
-class Controller {
+class CounterController {
   final count = Beacon.writable(0);
 
   // the future will be recomputed whenever the counter changes
-  late final derivedFutureCounter = Beacon.derivedFuture(() async {
-    return await counterFuture(count.value);
-  });
+  late final ReadableBeacon<AsyncValue<String>> derivedFutureCounter =
+      Beacon.derivedFuture(() => counterFuture(count.value));
 }
