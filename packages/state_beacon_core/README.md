@@ -12,13 +12,6 @@
 
 A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter.
 
-Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
-<br>All examples: https://github.com/jinyus/dart_beacon/tree/main/examples
-
-<p align="center">
-  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
-</p>
-
 ## Installation
 
 ```bash
@@ -238,7 +231,7 @@ The result is wrapped in an `AsyncValue`, which can be in one of four states: `i
 
 If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
 
-If `cancelRunning` is `true` (default: true), the results of a current execution will be discarded
+If `cancelRunning` is `true` (default), the results of a current execution will be discarded
 if another execution is triggered before the current one finishes.
 
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
@@ -469,7 +462,7 @@ timeBeacon.add(2);
 
 Creates a `StreamBeacon` from a given stream.
 This beacon updates its value based on the stream's emitted values.
-The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: `loading`, `data`, or `error`.
+The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
 This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
@@ -486,7 +479,7 @@ myBeacon.subscribe((value) {
 ### Beacon.streamRaw:
 
 Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
-If you don't supply an initial value, the type has to be nullable.
+If you don't supply an initial value, the type has to be nullable or `isLazy` has to be `true`. When `isLazy` is `true`, the beacon must be set before it's read.
 
 ```dart
 var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
@@ -644,6 +637,8 @@ await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
 await beacon.tryCatch(fetchUserData);
 ```
 
+See it in use in the [shopping cat example](https://github.com/jinyus/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
+
 If you want to do optimistic updates, you can supply an optional `optimisticResult` parameter.
 
 ```dart
@@ -772,11 +767,11 @@ final filteredCount = count
         .debounce(duration: k500ms),
         .filter(filter: (prev, next) => next > 10);
 
+filteredCount.value = 20;
 // The mutation will be re-routed to count
 // before being passed to the debounced beacon
 // then to the filtered beacon.
 // This is equivalent to count.value = 20;
-filteredCount.value = 20;
 
 expect(count.value, equals(20));
 

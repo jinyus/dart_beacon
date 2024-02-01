@@ -98,7 +98,10 @@ NB: Create the file if it doesn't exist.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
 -   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
+-   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
+-   [Beacon.future](#beaconfuture): Initialize beacons from futures.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
@@ -108,10 +111,7 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
 -   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
--   [Beacon.future](#beaconfuture): Initialize beacons from futures.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
--   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
     -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
     -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
@@ -206,28 +206,6 @@ Beacon.effect(() {
 age.value = 20; // Outputs: "You can vote!"
 ```
 
-### Beacon.batch:
-
-This allows multiple updates to be batched into a single update.
-This can be used to optimize performance by reducing the number of update notifications.
-
-```dart
-final age = Beacon.writable<int>(10);
-
-var callCount = 0;
-
-age.subscribe((_) => callCount++);
-
-Beacon.batch(() {
-  age.value = 15;
-  age.value = 16;
-  age.value = 20;
-  age.value = 23;
-});
-
-expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-```
-
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
@@ -260,7 +238,7 @@ The result is wrapped in an `AsyncValue`, which can be in one of four states: `i
 
 If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
 
-If `cancelRunning` is `true` (default: true), the results of a current execution will be discarded
+If `cancelRunning` is `true` (default), the results of a current execution will be discarded
 if another execution is triggered before the current one finishes.
 
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
@@ -324,6 +302,28 @@ var fullName = Beacon.derivedFuture(() async {
 
   return '$fname $lname';
 });
+```
+
+### Beacon.batch:
+
+This allows multiple updates to be batched into a single update.
+This can be used to optimize performance by reducing the number of update notifications.
+
+```dart
+final age = Beacon.writable<int>(10);
+
+var callCount = 0;
+
+age.subscribe((_) => callCount++);
+
+Beacon.batch(() {
+  age.value = 15;
+  age.value = 16;
+  age.value = 20;
+  age.value = 23;
+});
+
+expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### Beacon.debounced:
@@ -469,7 +469,7 @@ timeBeacon.add(2);
 
 Creates a `StreamBeacon` from a given stream.
 This beacon updates its value based on the stream's emitted values.
-The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: `loading`, `data`, or `error`.
+The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
 This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
@@ -486,7 +486,7 @@ myBeacon.subscribe((value) {
 ### Beacon.streamRaw:
 
 Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
-If you don't supply an initial value, the type has to be nullable.
+If you don't supply an initial value, the type has to be nullable or `isLazy` has to be `true`. When `isLazy` is `true`, the beacon must be set before it's read.
 
 ```dart
 var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
@@ -644,6 +644,8 @@ await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
 await beacon.tryCatch(fetchUserData);
 ```
 
+See it in use in the [shopping cat example](https://github.com/jinyus/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
+
 If you want to do optimistic updates, you can supply an optional `optimisticResult` parameter.
 
 ```dart
@@ -772,11 +774,11 @@ final filteredCount = count
         .debounce(duration: k500ms),
         .filter(filter: (prev, next) => next > 10);
 
+filteredCount.value = 20;
 // The mutation will be re-routed to count
 // before being passed to the debounced beacon
 // then to the filtered beacon.
 // This is equivalent to count.value = 20;
-filteredCount.value = 20;
 
 expect(count.value, equals(20));
 
