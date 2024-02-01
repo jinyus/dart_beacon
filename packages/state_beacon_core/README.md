@@ -12,8 +12,12 @@
 
 A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter.
 
-> [!NOTE]  
-> This is the pure dart package. For the flutter package, see [state_beacon](https://pub.dev/packages/state_beacon)
+Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
+<br>All examples: https://github.com/jinyus/dart_beacon/tree/main/examples
+
+<p align="center">
+  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
+</p>
 
 ## Installation
 
@@ -24,34 +28,49 @@ dart pub add state_beacon
 ## Usage
 
 ```dart
-void main() {
-  final name = Beacon.writable("Bob");
-  final age = Beacon.writable(20);
-  final college = Beacon.writable("MIT");
+import 'package:flutter/material.dart';
+import 'package:state_beacon/state_beacon.dart';
 
-  Beacon.effect(() {
-    var msg = '${name.value} is ${age.value} years old';
+final name = Beacon.writable("Bob");
 
-    if (age.value > 21) {
-      msg += ' and can go to ${college.value}';
-    }
-    print(msg);
-  });
+class ProfileCard extends StatelessWidget {
+  const ProfileCard({super.key});
 
-  // prints "Alice is 20 years old"
-  name.value = "Alice";
+  @override
+  Widget build(BuildContext context) {
+    // rebuilds whenever the name changes
+    return Text(name.watch(context));
+  }
+}
+```
 
-  // prints "Alice is 21 years old"
-  age.value = 21;
+#### Using an asynchronous function
 
-  // prints "Alice is 21 years old"
-  college.value = "Stanford";
+```dart
+final counter = Beacon.writable(0);
 
-  // prints "Alice is 22 years old and can go to Stanford"
-  age.value = 22;
+// The future will be recomputed whenever the counter changes
+final derivedFutureCounter = Beacon.derivedFuture(() async {
+  final count = counter.value;
+  return await fetchData(count);
+});
 
-  // prints "Alice is 22 years old and can go to Harvard"
-  college.value = "Harvard";
+Future<String> fetchData(int count) async {
+  await Future.delayed(Duration(seconds: count));
+  return '$count second has passed.';
+}
+
+class FutureCounter extends StatelessWidget {
+  const FutureCounter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (derivedFutureCounter.watch(context)) {
+      AsyncData<String>(value: final v) => Text(v),
+      AsyncError(error: final e) => Text('$e'),
+      _ => const CircularProgressIndicator(),
+    };
+  }
 }
 ```
 
@@ -79,7 +98,10 @@ NB: Create the file if it doesn't exist.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
 -   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
+-   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
+-   [Beacon.future](#beaconfuture): Initialize beacons from futures.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
@@ -89,10 +111,7 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
 -   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
--   [Beacon.future](#beaconfuture): Initialize beacons from futures.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
--   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
     -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
     -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
@@ -187,28 +206,6 @@ Beacon.effect(() {
 age.value = 20; // Outputs: "You can vote!"
 ```
 
-### Beacon.batch:
-
-This allows multiple updates to be batched into a single update.
-This can be used to optimize performance by reducing the number of update notifications.
-
-```dart
-final age = Beacon.writable<int>(10);
-
-var callCount = 0;
-
-age.subscribe((_) => callCount++);
-
-Beacon.batch(() {
-  age.value = 15;
-  age.value = 16;
-  age.value = 20;
-  age.value = 23;
-});
-
-expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-```
-
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
@@ -217,7 +214,7 @@ This beacon will recompute its value every time one of it's dependencies change.
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
 It will resume executing once a listener is added or it's value is accessed.
 
-If `supportConditional` is `true`(default), it will only look dependencies on its first run.
+If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
 This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
 
 Example:
@@ -305,6 +302,28 @@ var fullName = Beacon.derivedFuture(() async {
 
   return '$fname $lname';
 });
+```
+
+### Beacon.batch:
+
+This allows multiple updates to be batched into a single update.
+This can be used to optimize performance by reducing the number of update notifications.
+
+```dart
+final age = Beacon.writable<int>(10);
+
+var callCount = 0;
+
+age.subscribe((_) => callCount++);
+
+Beacon.batch(() {
+  age.value = 15;
+  age.value = 16;
+  age.value = 20;
+  age.value = 23;
+});
+
+expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### Beacon.debounced:

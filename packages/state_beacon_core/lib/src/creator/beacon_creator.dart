@@ -426,8 +426,8 @@ class _BeaconCreator {
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
   /// It will resume executing once a listener is added or it's value is accessed.
   ///
-  /// If `supportConditional` is `true`(default), the effect look for its dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used.
+  /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
   ///
   /// Example:
   /// ```dart

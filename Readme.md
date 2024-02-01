@@ -98,7 +98,10 @@ NB: Create the file if it doesn't exist.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Read-only values.
 -   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
+-   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
+-   [Beacon.future](#beaconfuture): Initialize beacons from futures.
 -   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
 -   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
@@ -108,10 +111,7 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
 -   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
--   [Beacon.future](#beaconfuture): Initialize beacons from futures.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
--   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
 -   [Beacon.list](#beaconlist): Manage lists reactively.
     -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
     -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
@@ -206,28 +206,6 @@ Beacon.effect(() {
 age.value = 20; // Outputs: "You can vote!"
 ```
 
-### Beacon.batch:
-
-This allows multiple updates to be batched into a single update.
-This can be used to optimize performance by reducing the number of update notifications.
-
-```dart
-final age = Beacon.writable<int>(10);
-
-var callCount = 0;
-
-age.subscribe((_) => callCount++);
-
-Beacon.batch(() {
-  age.value = 15;
-  age.value = 16;
-  age.value = 20;
-  age.value = 23;
-});
-
-expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-```
-
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
@@ -236,7 +214,7 @@ This beacon will recompute its value every time one of it's dependencies change.
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
 It will resume executing once a listener is added or it's value is accessed.
 
-If `supportConditional` is `true`(default), it will only look dependencies on its first run.
+If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
 This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
 
 Example:
@@ -324,6 +302,28 @@ var fullName = Beacon.derivedFuture(() async {
 
   return '$fname $lname';
 });
+```
+
+### Beacon.batch:
+
+This allows multiple updates to be batched into a single update.
+This can be used to optimize performance by reducing the number of update notifications.
+
+```dart
+final age = Beacon.writable<int>(10);
+
+var callCount = 0;
+
+age.subscribe((_) => callCount++);
+
+Beacon.batch(() {
+  age.value = 15;
+  age.value = 16;
+  age.value = 20;
+  age.value = 23;
+});
+
+expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### Beacon.debounced:
