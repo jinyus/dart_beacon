@@ -1,18 +1,18 @@
 part of 'konami.dart';
 
 class KonamiPage extends StatefulWidget {
-  const KonamiPage({super.key});
+  const KonamiPage({super.key, required this.controller});
+
+  final KonamiController controller;
 
   @override
   State<KonamiPage> createState() => _KonamiPageState();
 }
 
 class _KonamiPageState extends State<KonamiPage> {
-  late final Controller controller;
-
   late final fNode = FocusNode(
     onKey: (node, e) {
-      controller.keys.set(e.data.logicalKey.keyLabel, force: true);
+      widget.controller.keys.set(e.data.logicalKey.keyLabel, force: true);
       return KeyEventResult.handled;
     },
   );
@@ -21,9 +21,7 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   void initState() {
-    controller = Controller();
-
-    controller.last10.subscribe((codes) {
+    widget.controller.last10.subscribe((codes) {
       if (codes.isEmpty) return;
       final won = checker.equals(codes, konamiCodes);
 
@@ -36,6 +34,7 @@ class _KonamiPageState extends State<KonamiPage> {
               content: const Text('KONAMI! You won!'),
               actions: <Widget>[
                 TextButton(
+                  key: const ValueKey('close'),
                   child: const Text('Close'),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -67,7 +66,7 @@ class _KonamiPageState extends State<KonamiPage> {
   @override
   Widget build(BuildContext context) {
     return Provider.value(
-      value: controller,
+      value: widget.controller,
       child: KeyboardListener(
         autofocus: true,
         focusNode: fNode,
@@ -108,7 +107,7 @@ class LastKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final last10 = context.read<Controller>().last10;
+    final last10 = context.read<KonamiController>().last10;
     final keys = last10.currentBuffer.watch(context);
     final lastKey = keys.lastOrNull;
 
@@ -149,8 +148,8 @@ class ResetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final last10 = context.read<Controller>().last10;
-    final keys = context.read<Controller>().keys;
+    final last10 = context.read<KonamiController>().last10;
+    final keys = context.read<KonamiController>().keys;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.tertiary,

@@ -1,6 +1,6 @@
 part of 'todo.dart';
 
-class Controller {
+class TodoController {
   final todosBeacon = Beacon.list(<Todo>[]);
   final inputTextBeacon = Beacon.writable('');
   final filterBeacon = Beacon.writable(Filter.all);

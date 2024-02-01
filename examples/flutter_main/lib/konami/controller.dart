@@ -13,10 +13,13 @@ const konamiCodes = [
   "A",
 ];
 
-class Controller {
+class KonamiController {
   // this is throttled because FocusNode.onKey can be
   // triggered multiple times for a single key press
-  final keys = Beacon.lazyThrottled<String>(duration: k100ms * 2);
+  // we expose it as a WritableBeacon so that we can
+  // mock it in tests without dealing with throttling
+  final WritableBeacon<String> keys =
+      Beacon.lazyThrottled<String>(duration: k100ms * 2);
 
   late final last10 = keys.buffer(10);
 }

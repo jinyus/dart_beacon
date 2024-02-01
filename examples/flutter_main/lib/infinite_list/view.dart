@@ -1,7 +1,7 @@
 part of 'infinite_list.dart';
 
-class InfiniteList extends StatelessWidget {
-  const InfiniteList({super.key});
+class InfiniteListPage extends StatelessWidget {
+  const InfiniteListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,28 +16,25 @@ class InfiniteList extends StatelessWidget {
               children: [
                 const Text('Infinite List', style: k24Text),
                 Expanded(
-                  child: Provider(
-                      create: (context) => Controller(PostRepository()),
-                      builder: (ctx, __) {
-                        final controller = ctx.read<Controller>();
-                        final count = controller.parsedItems.watch(ctx).length;
-                        return ListView.separated(
-                          itemBuilder: (context, index) {
-                            final item = controller.parsedItems.value[index];
+                  child: Builder(builder: (ctx) {
+                    final controller = ctx.read<InfiniteController>();
+                    final count = controller.parsedItems.watch(ctx).length;
+                    return ListView.separated(
+                      itemBuilder: (context, index) {
+                        final item = controller.parsedItems.value[index];
 
-                            return switch (item) {
-                              ItemData(value: final value) =>
-                                ItemTile(title: value),
-                              ItemLoading() => BottomWidget(controller),
-                              ItemError(error: final err) =>
-                                BottomWidget(controller, error: err),
-                            };
-                          },
-                          itemCount: count,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 5),
-                        );
-                      }),
+                        return switch (item) {
+                          ItemData(value: final value) =>
+                            ItemTile(title: value),
+                          ItemLoading() => BottomWidget(controller),
+                          ItemError(error: final err) =>
+                            BottomWidget(controller, error: err),
+                        };
+                      },
+                      itemCount: count,
+                      separatorBuilder: (_, __) => const SizedBox(height: 5),
+                    );
+                  }),
                 ),
               ],
             ),
@@ -70,7 +67,7 @@ class BottomWidget extends StatefulWidget {
   });
 
   final Object? error;
-  final Controller controller;
+  final InfiniteController controller;
 
   @override
   State<BottomWidget> createState() => _BottomWidgetState();

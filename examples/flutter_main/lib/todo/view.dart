@@ -10,19 +10,16 @@ class TodoPage extends StatelessWidget {
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
-          child: Provider(
-            create: (_) => Controller(),
-            child: const Column(
-              children: [
-                Text('Todo', style: TextStyle(fontSize: 48)),
-                k16SizeBox,
-                FilterButtons(),
-                k16SizeBox,
-                TodoInput(),
-                k16SizeBox,
-                TodoList(),
-              ],
-            ),
+          child: const Column(
+            children: [
+              Text('Todo', style: TextStyle(fontSize: 48)),
+              k16SizeBox,
+              FilterButtons(),
+              k16SizeBox,
+              TodoInput(),
+              k16SizeBox,
+              TodoList(),
+            ],
           ),
         ),
       ],
@@ -38,7 +35,7 @@ class TodoInput extends StatefulWidget {
 }
 
 class _TodoInputState extends State<TodoInput> {
-  late final Controller controller;
+  late final TodoController controller;
   late final textController = TextEditingController(
     text: controller.inputTextBeacon.peek(),
   );
@@ -46,7 +43,7 @@ class _TodoInputState extends State<TodoInput> {
 
   @override
   void initState() {
-    controller = context.read<Controller>();
+    controller = context.read<TodoController>();
     textController.addListener(() {
       controller.inputTextBeacon.value = textController.text;
     });
@@ -84,7 +81,7 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTodos = context.read<Controller>().filteredTodos;
+    final filteredTodos = context.read<TodoController>().filteredTodos;
     final todos = filteredTodos.watch(context);
     return Expanded(
       child: ListView.separated(
@@ -106,11 +103,12 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todosBeacon = context.read<Controller>().todosBeacon;
+    final todosBeacon = context.read<TodoController>().todosBeacon;
     return ListTile(
       tileColor: Theme.of(context).colorScheme.secondaryContainer,
       title: Text(todo.description, style: k24Text),
       trailing: IconButton(
+        key: ValueKey('${todo.id} delete button'),
         icon: const Icon(Icons.delete, color: Colors.red),
         onPressed: () {
           todosBeacon.removeWhere((e) => e.id == todo.id);
@@ -141,7 +139,7 @@ class FilterButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filterBeacon = context.read<Controller>().filterBeacon;
+    final filterBeacon = context.read<TodoController>().filterBeacon;
     final current = filterBeacon.watch(context);
     return Wrap(
       spacing: 5.0,

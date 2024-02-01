@@ -6,6 +6,7 @@ import 'package:example/konami/konami.dart';
 import 'package:example/search/search.dart';
 import 'package:example/todo/todo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 final brightness = Beacon.writable(Brightness.light);
@@ -65,13 +66,25 @@ class MyHomePage extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: <Widget>[
-            CounterPage(),
-            KonamiPage(),
-            TodoPage(),
-            SearchPage(),
-            InfiniteList(),
+            Provider(
+              create: (_) => CounterController(),
+              child: CounterPage(),
+            ),
+            KonamiPage(controller: KonamiController()),
+            Provider(
+              create: (_) => TodoController(),
+              child: TodoPage(),
+            ),
+            Provider(
+              create: (_) => WeatherController(WeatherRepository()),
+              child: SearchPage(),
+            ),
+            Provider(
+              create: (_) => InfiniteController(PostRepository()),
+              child: InfiniteListPage(),
+            ),
           ],
         ),
         floatingActionButton: IconButton(

@@ -5,24 +5,20 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.read<WeatherController>();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
-          child: Provider(
-            create: (_) => Controller(WeatherRepository()),
-            builder: (ctx, _) {
-              final controller = ctx.read<Controller>();
-              return ListView(
-                children: [
-                  const Text('Weather Search', style: TextStyle(fontSize: 48)),
-                  k16SizeBox,
-                  SearchInput(controller),
-                  SearchResults(controller),
-                ],
-              );
-            },
+          child: ListView(
+            children: [
+              const Text('Weather Search', style: TextStyle(fontSize: 48)),
+              k16SizeBox,
+              SearchInput(controller),
+              SearchResults(controller),
+            ],
           ),
         ),
       ],
@@ -33,7 +29,7 @@ class SearchPage extends StatelessWidget {
 class SearchInput extends StatefulWidget {
   const SearchInput(this.controller, {super.key});
 
-  final Controller controller;
+  final WeatherController controller;
 
   @override
   State<SearchInput> createState() => _SearchInputState();
@@ -55,7 +51,7 @@ class _SearchInputState extends State<SearchInput> {
     unsub = searchTextBeacon.subscribe((val) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         // prevents concurrent modification exception
-        widget.controller.searchResults.start();
+        widget.controller.start();
       });
       unsub();
     });
@@ -85,7 +81,7 @@ class _SearchInputState extends State<SearchInput> {
 class SearchResults extends StatelessWidget {
   const SearchResults(this.controller, {super.key});
 
-  final Controller controller;
+  final WeatherController controller;
 
   @override
   Widget build(BuildContext context) {
