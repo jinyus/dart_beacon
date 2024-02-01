@@ -1,6 +1,6 @@
 part of 'infinite_list.dart';
 
-class Controller {
+class InfiniteController {
   static const pageSize = 10;
 
   final PostRepository repo;
@@ -13,9 +13,9 @@ class Controller {
 
   late final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]);
 
-  Controller(this.repo) {
+  InfiniteController(this.repo) {
     // prevent the pageNum from changing when the list is loading
-    pageNum.setFilter((_, __) => rawItems.value is! AsyncLoading);
+    pageNum.setFilter((_, __) => rawItems.isData);
 
     // transform raw items into ListItems
     parsedItems.wrap(

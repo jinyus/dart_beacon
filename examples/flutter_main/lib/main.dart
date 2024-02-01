@@ -81,7 +81,10 @@ class MyHomePage extends StatelessWidget {
               create: (_) => WeatherController(WeatherRepository()),
               child: SearchPage(),
             ),
-            InfiniteList(),
+            Provider(
+              create: (_) => InfiniteController(PostRepository()),
+              child: InfiniteListPage(),
+            ),
           ],
         ),
         floatingActionButton: IconButton(
