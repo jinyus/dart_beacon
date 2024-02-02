@@ -15,7 +15,7 @@ A Beacon is a reactive primitive(`signal`) and simple state management solution 
 ## Installation
 
 ```bash
-dart pub add state_beacon
+dart pub add state_beacon_core
 ```
 
 ## Usage
