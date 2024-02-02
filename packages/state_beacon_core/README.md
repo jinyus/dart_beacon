@@ -87,27 +87,27 @@ NB: Create the file if it doesn't exist.
 
 ## Features
 
--   [Beacon.writable](#beaconwritable): Read and write values.
+-   [Beacon.writable](#beaconwritable): Mutable beacon that allows both reading and writing.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
--   [Beacon.readable](#beaconreadable): Read-only values.
+-   [Beacon.readable](#beaconreadable): Immutable beacon that only emit values, ideal for readonly data.
 -   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
--   [Beacon.derived](#beaconderived): Compute values reactively based on other beacons.
--   [Beacon.derivedFuture](#beaconderivedfuture): Asynchronously compute values with state tracking.
--   [Beacon.batch](#beacondobatchupdate): Batch multiple updates into a single notification.
+-   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
+-   [Beacon.derivedFuture](#beaconderivedfuture): Derive values from asynchronous operations, managing state during computation.
 -   [Beacon.future](#beaconfuture): Initialize beacons from futures.
--   [Beacon.debounced](#beacondebounced): Debounce value changes over a specified duration.
--   [Beacon.throttled](#beaconthrottled): Throttle value changes based on a duration.
+    -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
+-   [Beacon.batch](#beacondobatchupdate): Combine multiple updates into a single notification.
+-   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
+-   [Beacon.throttled](#beaconthrottled): Limit the frequency of value updates, ideal for managing frequent events or user input.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
 -   [Beacon.timestamped](#beacontimestamped): Attach timestamps to each value update.
--   [Beacon.undoRedo](#beaconundoredo): Undo and redo value changes.
--   [Beacon.bufferedCount](#beaconbufferedcount): Create a buffer/list of values based a int limit.
+-   [Beacon.undoRedo](#beaconundoredo): Provides the ability to undo and redo value changes.
+-   [Beacon.bufferedCount](#beaconbufferedcount): Create a buffer/list of values based an `int` limit.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
--   [Beacon.stream](#beaconstream): Create beacons from Dart streams.
--   [Beacon.streamRaw](#beaconstreamraw): Create beacons from Dart streams.
-    -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
--   [Beacon.list](#beaconlist): Manage lists reactively.
-    -   [Beacon.hashSet](#beaconhashset): Manage Sets reactively.
-    -   [Beacon.hashMap](#beaconhashmap): Manage Maps reactively.
+-   [Beacon.stream](#beaconstream): Create beacons from Dart streams. values are wrapped in an `AsyncValue`.
+-   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
+-   [Beacon.list](#beaconlist): Manage reactive lists that automatically update dependent beacons upon changes.
+    -   [Beacon.hashSet](#beaconhashset): Like Beacon.list, but for Sets.
+    -   [Beacon.hashMap](#beaconhashmap): Like Beacon.list, but for Maps.
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
     -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return it's value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
@@ -115,11 +115,11 @@ NB: Create the file if it doesn't exist.
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
-    -   [stream](#mybeaconstream): Returns a stream that emits the beacon's value whenever it changes.
+    -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
-    -   [Chaining Beacons](#chaining-methods):
+    -   [Chaining Beacons](#chaining-methods): Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
         -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
         -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
         -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
@@ -753,7 +753,12 @@ final nextAge = await age.next(); // returns 21 after 1 second
 
 ## Chaining methods:
 
-These are extension methods that allow you to quickly wrap a beacon with another beacon.
+Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
+
+```dart
+// every write to this beacon will be filtered then debounced.
+final searchQuery = Beacon.writable('').filter(filter: (prev, next) => next.length > 2).debounce(duration: k500ms);
+```
 
 > [!IMPORTANT]  
 > When chaining beacons, all writes made to the returned beacon will be re-routed to the first beacon in the chain.
