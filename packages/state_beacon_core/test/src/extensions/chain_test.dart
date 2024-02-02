@@ -259,7 +259,7 @@ void main() {
   });
 
   test('should force all delegated writes', () {
-    final count = Beacon.writable<int>(10, name: 'count');
+    final count = Beacon.writable<int>(10);
     var called = 0;
 
     final buff = count
@@ -294,5 +294,83 @@ void main() {
     expect(called, 4);
 
     expect(buff.currentBuffer(), [20]);
+  });
+
+  test('should force all delegated writes (throttled)', () {
+    final count = Beacon.writable<int>(10);
+
+    final tbeacon = count.throttle(duration: k10ms);
+
+    final buff = count.buffer(5);
+
+    tbeacon
+      ..set(20)
+      ..set(20)
+      ..set(5)
+      ..set(5);
+
+    expect(buff.value, [10, 20, 20, 5, 5]);
+  });
+  test('should force all delegated writes (debounced)', () {
+    final count = Beacon.writable<int>(10);
+
+    final tbeacon = count.debounce(duration: k10ms);
+
+    final buff = count.buffer(5);
+
+    tbeacon
+      ..set(20)
+      ..set(20)
+      ..set(5)
+      ..set(5);
+
+    expect(buff.value, [10, 20, 20, 5, 5]);
+  });
+  test('should force all delegated writes (filtered)', () {
+    final count = Beacon.writable<int>(10);
+
+    final tbeacon = count.filter(filter: (p, n) => n > 5);
+
+    final buff = count.buffer(5);
+
+    tbeacon
+      ..set(20)
+      ..set(20)
+      ..set(5)
+      ..set(5);
+
+    expect(buff.value, [10, 20, 20, 5, 5]);
+  });
+
+  test('should force all delegated writes (buffered)', () {
+    final count = Beacon.writable<int>(10);
+
+    final tbeacon = count.buffer(5);
+
+    final buff = count.buffer(5);
+
+    tbeacon
+      ..add(20)
+      ..add(20)
+      ..add(5)
+      ..add(5);
+
+    expect(buff.value, [10, 20, 20, 5, 5]);
+  });
+
+  test('should force all delegated writes (bufferedTime)', () {
+    final count = Beacon.writable<int>(10);
+
+    final tbeacon = count.bufferTime(duration: k10ms);
+
+    final buff = count.buffer(5);
+
+    tbeacon
+      ..add(20)
+      ..add(20)
+      ..add(5)
+      ..add(5);
+
+    expect(buff.value, [10, 20, 20, 5, 5]);
   });
 }
