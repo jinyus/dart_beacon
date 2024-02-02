@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, avoid_equals_and_hash_code_on_mutable_classes, lines_longer_than_80_chars
 
+// import 'common.dart';
+
 var _globalEffectID = 0;
 
 /// This wrapper makes Set lookups faster
@@ -37,7 +39,7 @@ class EffectClosure {
 //   final callbackSet = <VoidCallback>{};
 //   final effectSet = <EffectClosure>{};
 
-//   final count = 1000000;
+//   const count = 1000000;
 
 //   final sw = Stopwatch()..start();
 

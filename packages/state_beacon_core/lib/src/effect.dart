@@ -2,8 +2,6 @@
 
 part of 'base_beacon.dart';
 
-// final _effectStack = <_Effect>[];
-
 _Effect? _currentEffect;
 
 class _Effect {
