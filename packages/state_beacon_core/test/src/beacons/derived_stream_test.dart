@@ -61,27 +61,21 @@ void main() {
 
     expect(buff.value, isEmpty);
 
-    await delay();
-
-    expect(buff.value, [0, 1, 2, 3, 4]);
+    await expectLater(buff.next(), completion([0, 1, 2, 3, 4]));
 
     counter.increment(); // dep changed, should unsub from old stream
-
-    await delay();
 
     expect(unsubs, 1);
     expect(listens, 2);
 
-    expect(buff.value, [0, 1, 2, 3, 4, 5]);
+    await expectLater(buff.next(), completion([0, 1, 2, 3, 4, 5]));
 
     counter.increment();
-
-    await delay();
 
     expect(unsubs, 2); // dep changed, should unsub from old stream
     expect(listens, 3);
 
-    expect(buff.value, [0, 1, 2, 3, 4, 5, 6]);
+    await expectLater(buff.next(), completion([0, 1, 2, 3, 4, 5, 6]));
 
     beacon.dispose(); // should unsub when disposed
 
