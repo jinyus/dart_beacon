@@ -92,6 +92,7 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.readable](#beaconreadable): Immutable beacon that only emit values, ideal for readonly data.
 -   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
 -   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
+-   [Beacon.derivedStream](#beaconderivedstream): Specialized derived beacon that subscribes to the stream returned from its callback and updates its value based on the emitted values.
 -   [Beacon.derivedFuture](#beaconderivedfuture): Derive values from asynchronous operations, managing state during computation.
 -   [Beacon.future](#beaconfuture): Initialize beacons from futures.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
@@ -109,7 +110,7 @@ NB: Create the file if it doesn't exist.
     -   [Beacon.hashSet](#beaconhashset): Like Beacon.list, but for Sets.
     -   [Beacon.hashMap](#beaconhashmap): Like Beacon.list, but for Maps.
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
-    -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return it's value.
+    -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return its value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
     -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
@@ -205,7 +206,7 @@ Creates a `DerivedBeacon` whose value is derived from a computation function.
 This beacon will recompute its value every time one of it's dependencies change.
 
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-It will resume executing once a listener is added or it's value is accessed.
+It will resume executing once a listener is added or its value is accessed.
 
 If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
 This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
@@ -223,6 +224,25 @@ age.value = 22;
 print(canDrink.value); // Outputs: true
 ```
 
+### Beacon.derivedStream:
+
+Specialized `DerivedBeacon` that subscribes to the stream returned from its callback and updates its value based on the emitted values.
+When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+
+If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+It will cancel the stream subscription and enter a sleep state.
+It will resume executing once a listener is added or its value is accessed.
+
+Example:
+
+```dart
+final userID = Beacon.writable<int>(18235);
+
+final profileBeacon = Beacon.derivedStream(() {
+ return getProfileStreamFromUID(userID.value);
+});
+```
+
 ### Beacon.derivedFuture:
 
 Creates a `DerivedBeacon` whose value is derived from an asynchronous computation.
@@ -235,7 +255,7 @@ If `cancelRunning` is `true` (default), the results of a current execution will 
 if another execution is triggered before the current one finishes.
 
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-It will resume executing once a listener is added or it's value is accessed.
+It will resume executing once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
 
 Example:
@@ -572,7 +592,7 @@ print(myBeacon.value); // Outputs AsyncData('Hello')
 
 #### AsyncValue.unwrap():
 
-Casts this [AsyncValue] to [AsyncData] and return it's value. This will throw an error if the value is not an [AsyncData].
+Casts this [AsyncValue] to [AsyncData] and return its value. This will throw an error if the value is not an [AsyncData].
 
 ```dart
 var name = AsyncData('Bob');
