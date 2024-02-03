@@ -424,7 +424,7 @@ class _BeaconCreator {
   /// This beacon will recompute its value every time one of it's dependencies change.
   ///
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-  /// It will resume executing once a listener is added or it's value is accessed.
+  /// It will resume executing once a listener is added or its value is accessed.
   ///
   /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
@@ -475,7 +475,7 @@ class _BeaconCreator {
   ///
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
   /// It will cancel the stream subscription and enter a sleep state.
-  /// It will resume executing once a listener is added or it's value is accessed.
+  /// It will resume executing once a listener is added or its value is accessed.
   ///
   /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
   /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
@@ -538,7 +538,7 @@ class _BeaconCreator {
   /// if another execution is triggered before the current one finishes.
   ///
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-  /// It will resume executing once a listener is added or it's value is accessed.
+  /// It will resume executing once a listener is added or its value is accessed.
   /// This means that it will enter the `loading` state when woken up.
   ///
   ///
