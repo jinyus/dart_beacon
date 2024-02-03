@@ -427,7 +427,7 @@ class _BeaconCreator {
   /// It will resume executing once a listener is added or it's value is accessed.
   ///
   /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
   ///
   /// Example:
   /// ```dart
@@ -458,6 +458,64 @@ class _BeaconCreator {
         },
         supportConditional: supportConditional,
         name: name ?? 'DerivedBeacon<$T>',
+      );
+
+      beacon.$setInternalEffectUnsubscriber(unsub);
+    }
+
+    beacon.$setInternalEffectRestarter(start);
+
+    start();
+
+    return beacon;
+  }
+
+  /// Specialized `DerivedBeacon` that subscribes to the stream returned from its callback and updates its value based on the emitted values.
+  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+  ///
+  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+  /// It will cancel the stream subscription and enter a sleep state.
+  /// It will resume executing once a listener is added or it's value is accessed.
+  ///
+  /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
+  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
+  ///
+  /// Example:
+  /// ```dart
+  /// final userID = Beacon.writable<int>(18235);
+  ///
+  /// final profileBeacon = Beacon.derivedStream(() {
+  ///  return getProfileStreamFromUID(userID.value);
+  /// });
+  /// ```
+  ReadableBeacon<T> derivedStream<T>(
+    Stream<T> Function() compute, {
+    String? name,
+    bool shouldSleep = true,
+    bool supportConditional = true,
+    bool cancelOnError = false,
+  }) {
+    final beacon = WritableDerivedBeacon<T>(
+      name: name ?? 'DerivedStreamBeacon<$T>',
+      shouldSleep: shouldSleep,
+    );
+
+    StreamSubscription<T>? subscription;
+
+    void start() {
+      final unsub = doEffect(
+        () {
+          subscription = compute().listen(
+            beacon.set,
+            cancelOnError: cancelOnError,
+          );
+
+          return () {
+            subscription?.cancel();
+          };
+        },
+        supportConditional: supportConditional,
+        name: name ?? 'DerivedStreamBeacon<$T>',
       );
 
       beacon.$setInternalEffectUnsubscriber(unsub);

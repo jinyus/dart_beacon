@@ -386,4 +386,23 @@ class BeaconGroup extends _BeaconCreator {
       }
     }
   }
+
+  @override
+  ReadableBeacon<T> derivedStream<T>(
+    Stream<T> Function() compute, {
+    String? name,
+    bool shouldSleep = true,
+    bool supportConditional = true,
+    bool cancelOnError = false,
+  }) {
+    final beacon = super.derivedStream<T>(
+      compute,
+      name: name,
+      shouldSleep: shouldSleep,
+      supportConditional: supportConditional,
+      cancelOnError: cancelOnError,
+    );
+    _beacons.add(beacon);
+    return beacon;
+  }
 }
