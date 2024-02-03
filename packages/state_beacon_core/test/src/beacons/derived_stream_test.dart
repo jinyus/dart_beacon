@@ -35,6 +35,7 @@ void main() {
 
     final counter = Beacon.writable(5);
 
+    // should increment when dependency changes
     var unsubs = 0;
     var listens = 0;
 
