@@ -82,11 +82,11 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     if (value.isError) {
       // If the value is an error, we want to keep the last data
       value.setLastData(lastData);
-    } else {
-      _onSuccessfulRun();
     }
 
     _setValue(value);
+
+    _afterNewValue();
   }
 
   Future<void> _run() async {
@@ -100,7 +100,7 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
   }
 
-  void _onSuccessfulRun() {
+  void _afterNewValue() {
     if (_ttl != null) {
       _timer?.cancel();
       _timer = Timer(_ttl!, reset);
