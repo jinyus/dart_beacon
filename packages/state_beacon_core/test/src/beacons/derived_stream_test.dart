@@ -25,9 +25,7 @@ void main() {
 
     expect(buff.value, isEmpty);
 
-    await delay();
-
-    expect(buff.value, [0, 1, 2, 3, 4]);
+    await expectLater(buff.next(), completion([0, 1, 2, 3, 4]));
   });
 
   test('should unsub from old stream when dependency changes', () async {
@@ -39,10 +37,7 @@ void main() {
     var unsubs = 0;
     var listens = 0;
 
-    controller.onCancel = () {
-      // print('unsub');
-      unsubs++;
-    };
+    controller.onCancel = () => unsubs++;
 
     controller.onListen = () {
       // print('listen');
