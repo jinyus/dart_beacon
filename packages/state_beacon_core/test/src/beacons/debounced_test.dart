@@ -5,7 +5,7 @@ import '../../common.dart';
 
 void main() {
   test('should update value only after specified duration', () async {
-    final beacon = Beacon.debounced('', duration: k10ms);
+    final beacon = Beacon.debounced('', duration: k1ms);
     var called = 0;
 
     beacon
@@ -21,9 +21,8 @@ void main() {
     // Value should still be 0 immediately after setting it
     expect(beacon.value, equals(''));
 
-    await delay(k10ms * 2);
-
-    expect(beacon.value, equals('apple')); // Value should be updated now
+    // Value should be updated now
+    await expectLater(beacon.next(), completion('apple'));
 
     expect(called, equals(1)); // Only one notification should be sent
   });
