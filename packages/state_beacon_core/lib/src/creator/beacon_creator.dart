@@ -410,10 +410,12 @@ class _BeaconCreator {
     Future<T> Function() future, {
     bool manualStart = false,
     bool cancelRunning = true,
+    Duration? ttl,
     String? name,
   }) {
     return DefaultFutureBeacon<T>(
       future,
+      ttl: ttl,
       manualStart: manualStart,
       cancelRunning: cancelRunning,
       name: name ?? 'FutureBeacon<$T>',

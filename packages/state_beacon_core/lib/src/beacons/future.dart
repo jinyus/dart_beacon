@@ -11,9 +11,11 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   FutureBeacon(
     this._operation, {
     bool cancelRunning = true,
+    Duration? ttl,
     super.initialValue,
     super.name,
-  }) : _cancelRunning = cancelRunning;
+  })  : _cancelRunning = cancelRunning,
+        _ttl = ttl;
   var _executionID = 0;
 
   final bool _cancelRunning;
@@ -24,6 +26,13 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   T? get lastData => peek().lastData;
 
   FutureCallback<T> _operation;
+
+  /// The duration to keep the last successful result.
+  /// If the duration is exceeded, the beacon will reset.
+  /// If null, the beacon will keep the last successful result indefinitely.
+  final Duration? _ttl;
+
+  Timer? _timer;
 
   /// Casts its value to [AsyncData] and return
   /// it's value or throws `CastError` if this is not [AsyncData].
@@ -76,6 +85,8 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
 
     _setValue(value);
+
+    _afterNewValue();
   }
 
   Future<void> _run() async {
@@ -89,14 +100,29 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
   }
 
+  void _afterNewValue() {
+    if (_ttl != null) {
+      _timer?.cancel();
+      _timer = Timer(_ttl!, reset);
+    }
+  }
+
   /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
     _operation = compute;
+    _timer?.cancel();
     reset();
   }
 
   /// Resets the beacon by calling the [Future] again
   void reset();
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
+  }
 }
 
 /// A beacon that executes a [Future] and updates its value accordingly.
@@ -107,6 +133,7 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
     bool manualStart = false,
     super.cancelRunning = true,
     super.name,
+    super.ttl,
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     if (!manualStart) _run();
   }
@@ -114,6 +141,7 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
   /// Resets the beacon by calling the [Future] again
   @override
   void reset() {
+    _timer?.cancel();
     _executionID++; // ignore any running futures
     _run();
   }
