@@ -11,9 +11,11 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   FutureBeacon(
     this._operation, {
     bool cancelRunning = true,
+    Duration? ttl,
     super.initialValue,
     super.name,
-  }) : _cancelRunning = cancelRunning;
+  })  : _cancelRunning = cancelRunning,
+        _ttl = ttl;
   var _executionID = 0;
 
   final bool _cancelRunning;
@@ -24,6 +26,13 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
   T? get lastData => peek().lastData;
 
   FutureCallback<T> _operation;
+
+  /// The duration to keep the last successful result.
+  /// If the duration is exceeded, the beacon will reset.
+  /// If null, the beacon will keep the last successful result indefinitely.
+  final Duration? _ttl;
+
+  Timer? _timer;
 
   /// Casts its value to [AsyncData] and return
   /// it's value or throws `CastError` if this is not [AsyncData].
@@ -91,14 +100,17 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
   }
 
-  void _onSuccessfulRun() {}
-
-  void _onOverride() {}
+  void _onSuccessfulRun() {
+    if (_ttl != null) {
+      _timer?.cancel();
+      _timer = Timer(_ttl!, reset);
+    }
+  }
 
   /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
     _operation = compute;
-    _onOverride();
+    _timer?.cancel();
     reset();
   }
 
@@ -114,29 +126,9 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
     bool manualStart = false,
     super.cancelRunning = true,
     super.name,
-    this.ttl,
+    super.ttl,
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     if (!manualStart) _run();
-  }
-
-  /// The duration to keep the last successful result.
-  /// If the duration is exceeded, the beacon will reset.
-  /// If null, the beacon will keep the last successful result indefinitely.
-  Duration? ttl;
-
-  Timer? _timer;
-
-  @override
-  void _onSuccessfulRun() {
-    if (ttl != null) {
-      _timer?.cancel();
-      _timer = Timer(ttl!, reset);
-    }
-  }
-
-  @override
-  void _onOverride() {
-    _timer?.cancel();
   }
 
   /// Resets the beacon by calling the [Future] again
