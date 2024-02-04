@@ -19,7 +19,7 @@ void main() {
   final weatherCtrl = MockWeatherController();
 
   testWidgets('Search Page Test', (WidgetTester tester) async {
-    final searchTextBeacon = Beacon.lazyWritable<String>();
+    final searchTextBeacon = Beacon.lazyDebounced<String>();
 
     late final searchResults =
         Beacon.writable<AsyncValue<Weather>>(AsyncIdle());

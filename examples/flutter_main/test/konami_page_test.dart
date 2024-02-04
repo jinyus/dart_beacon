@@ -18,7 +18,7 @@ void main() {
   final konamiCtrl = MockKonamiController();
 
   testWidgets('Konami Page Test', (WidgetTester tester) async {
-    final keys = Beacon.lazyWritable<String>();
+    final keys = Beacon.lazyThrottled<String>();
     final last10 = keys.buffer(10);
 
     when(() => konamiCtrl.keys).thenReturn(keys);
