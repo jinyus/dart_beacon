@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:state_beacon_core/src/beacons/family.dart';
 import 'package:state_beacon_core/src/untracked.dart';
 
