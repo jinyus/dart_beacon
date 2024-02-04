@@ -15,7 +15,7 @@ A Beacon is a reactive primitive(`signal`) and simple state management solution 
 ## Installation
 
 ```bash
-dart pub add state_beacon_core
+dart pub add state_beacon
 ```
 
 ## Usage
@@ -317,6 +317,42 @@ var fullName = Beacon.derivedFuture(() async {
 });
 ```
 
+### Beacon.future:
+
+Creates a `FutureBeacon` that initializes its value based on a future.
+This can be refreshed by calling the `reset` method.
+
+If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
+
+```dart
+var myBeacon = Beacon.future(() async {
+  return await Future.delayed(Duration(seconds: 1), () => 'Hello');
+});
+
+myBeacon.subscribe((value) {
+  print(value); // Outputs AsyncLoading immediately then AsyncData('Hello') after 1 second
+});
+```
+
+#### FutureBeacon.overrideWith:
+
+Replaces the current callback and resets the beacon by running the new callback.
+This can also be done with [DerivedFutureBeacons](#beaconderivedfuture).
+
+```dart
+var futureBeacon = Beacon.future(() async => 1);
+
+await Future.delayed(k1ms);
+
+expect(futureBeacon.value.unwrap(), 1);
+
+futureBeacon.overrideWith(() async => throw Exception('error'));
+
+await Future.delayed(k1ms);
+
+expect(futureBeacon.value, isA<AsyncError>());
+```
+
 ### Beacon.batch:
 
 This allows multiple updates to be batched into a single update.
@@ -509,42 +545,6 @@ var myBeacon = Beacon.streamRaw(myStream,initialValue: 0);
 myBeacon.subscribe((value) {
   print(value); // Outputs 0,1,2,3,...
 });
-```
-
-### Beacon.future:
-
-Creates a `FutureBeacon` that initializes its value based on a future.
-This can be refreshed by calling the `reset` method.
-
-If `manualStart` is `true`, the future will not execute until [start()] is called.
-
-```dart
-var myBeacon = Beacon.future(() async {
-  return await Future.delayed(Duration(seconds: 1), () => 'Hello');
-});
-
-myBeacon.subscribe((value) {
-  print(value); // Outputs AsyncLoading immediately then AsyncData('Hello') after 1 second
-});
-```
-
-#### FutureBeacon.overrideWith:
-
-Replaces the current callback and resets the beacon by running the new callback.
-This can also be done with [DerivedFutureBeacons](#beaconderivedfuture).
-
-```dart
-var futureBeacon = Beacon.future(() async => 1);
-
-await Future.delayed(k1ms);
-
-expect(futureBeacon.value.unwrap(), 1);
-
-futureBeacon.overrideWith(() async => throw Exception('error'));
-
-await Future.delayed(k1ms);
-
-expect(futureBeacon.value, isA<AsyncError>());
 ```
 
 ### Beacon.list:
