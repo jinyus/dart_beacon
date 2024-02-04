@@ -116,6 +116,13 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
 
   /// Resets the beacon by calling the [Future] again
   void reset();
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+    super.dispose();
+  }
 }
 
 /// A beacon that executes a [Future] and updates its value accordingly.
