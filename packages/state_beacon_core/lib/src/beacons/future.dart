@@ -73,6 +73,8 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     if (value.isError) {
       // If the value is an error, we want to keep the last data
       value.setLastData(lastData);
+    } else {
+      _onSuccessfulRun();
     }
 
     _setValue(value);
@@ -89,9 +91,14 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     }
   }
 
+  void _onSuccessfulRun() {}
+
+  void _onOverride() {}
+
   /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
     _operation = compute;
+    _onOverride();
     reset();
   }
 
@@ -107,13 +114,35 @@ class DefaultFutureBeacon<T> extends FutureBeacon<T> {
     bool manualStart = false,
     super.cancelRunning = true,
     super.name,
+    this.ttl,
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     if (!manualStart) _run();
+  }
+
+  /// The duration to keep the last successful result.
+  /// If the duration is exceeded, the beacon will reset.
+  /// If null, the beacon will keep the last successful result indefinitely.
+  Duration? ttl;
+
+  Timer? _timer;
+
+  @override
+  void _onSuccessfulRun() {
+    if (ttl != null) {
+      _timer?.cancel();
+      _timer = Timer(ttl!, reset);
+    }
+  }
+
+  @override
+  void _onOverride() {
+    _timer?.cancel();
   }
 
   /// Resets the beacon by calling the [Future] again
   @override
   void reset() {
+    _timer?.cancel();
     _executionID++; // ignore any running futures
     _run();
   }
