@@ -100,7 +100,7 @@ class _BeaconCreator {
   /// ```
   DebouncedBeacon<T> debounced<T>(
     T initialValue, {
-    required Duration duration,
+    Duration? duration,
     String? name,
   }) =>
       DebouncedBeacon<T>(
@@ -114,7 +114,7 @@ class _BeaconCreator {
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set..
   DebouncedBeacon<T> lazyDebounced<T>({
-    required Duration duration,
+    Duration? duration,
     T? initialValue,
     String? name,
   }) =>
@@ -150,7 +150,7 @@ class _BeaconCreator {
 
   ThrottledBeacon<T> throttled<T>(
     T initialValue, {
-    required Duration duration,
+    Duration? duration,
     bool dropBlocked = true,
     String? name,
   }) =>
@@ -165,7 +165,7 @@ class _BeaconCreator {
   ///
   /// Throws [UninitializeLazyReadException] if it's read before being set.
   ThrottledBeacon<T> lazyThrottled<T>({
-    required Duration duration,
+    Duration? duration,
     T? initialValue,
     bool dropBlocked = true,
     String? name,

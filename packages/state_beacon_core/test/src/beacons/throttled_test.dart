@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import '../../common.dart';
 
 void main() {
-  test('should set throttle value updates', () async {
+  test('should throttle value updates', () async {
     final beacon = Beacon.throttled(10, duration: k10ms);
 
     // ignore: cascade_invocations
@@ -21,6 +21,25 @@ void main() {
 
     // throttle time passed, update allowed
     expect(beacon.value, 30);
+  });
+
+  test('should not send notifications when blocked', () {
+    final beacon = Beacon.throttled(0, duration: k1ms);
+    var called = 0;
+
+    beacon
+      ..subscribe((_) => called++)
+      ..set(1)
+      ..set(2)
+      ..set(3)
+      ..set(4)
+      ..set(5);
+
+    expect(beacon.value, 1); // should be updated immediately
+
+    expect(called, 1); // 5 notifications should be sent
+
+    expect(beacon.isBlocked, true);
   });
 
   test('should respect newly set throttle duration', () async {
@@ -133,5 +152,41 @@ void main() {
     await delay(k10ms * 4);
 
     expect(values, equals([1, 2, 3, 4, 5]));
+  });
+
+  test('should not send notifications when blocked', () {
+    final beacon = Beacon.throttled(0, duration: k1ms);
+    var called = 0;
+
+    beacon
+      ..subscribe((_) => called++)
+      ..set(1)
+      ..set(2)
+      ..set(3)
+      ..set(4)
+      ..set(5);
+
+    expect(beacon.value, 1); // should be updated immediately
+
+    expect(called, 1); // 5 notifications should be sent
+
+    expect(beacon.isBlocked, true);
+  });
+
+  test('should not throttle when duration is null', () {
+    final beacon = Beacon.throttled(0);
+    var called = 0;
+
+    beacon
+      ..subscribe((_) => called++)
+      ..set(1)
+      ..set(2)
+      ..set(3)
+      ..set(4)
+      ..set(5);
+
+    expect(beacon.value, 5); // should be updated immediately
+
+    expect(called, 5); // 5 notifications should be sent
   });
 }

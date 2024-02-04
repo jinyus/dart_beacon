@@ -14,6 +14,11 @@ class CounterController {
   final count = Beacon.writable(0);
 
   // the future will be recomputed whenever the counter changes
-  late final ReadableBeacon<AsyncValue<String>> derivedFutureCounter =
+  late final _derivedFutureCounter =
       Beacon.derivedFuture(() => counterFuture(count.value));
+
+  // here we expose the future beacon as a readable beacon
+  // so it's easier to mock/test. This is optional.
+  ReadableBeacon<AsyncValue<String>> get derivedFutureCounter =>
+      _derivedFutureCounter;
 }

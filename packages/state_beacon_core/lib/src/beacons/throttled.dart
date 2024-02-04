@@ -4,13 +4,14 @@ part of '../base_beacon.dart';
 class ThrottledBeacon<T> extends WritableBeacon<T> {
   /// @macro [ThrottledBeacon]
   ThrottledBeacon({
-    required Duration duration,
+    Duration? duration,
     super.initialValue,
     this.dropBlocked = true,
     super.name,
-  }) : _throttleDuration = duration;
+  }) : _duration = duration;
 
-  Duration _throttleDuration;
+  /// The duration to throttle updates for.
+  Duration? _duration;
   Timer? _timer;
   bool _blocked = false;
 
@@ -28,7 +29,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   /// If [unblock] is true, the beacon will be unblocked if
   /// it is currently blocked.
   void setDuration(Duration newDuration, {bool unblock = true}) {
-    _throttleDuration = newDuration;
+    _duration = newDuration;
     if (unblock) {
       _blocked = false;
     }
@@ -49,10 +50,12 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
     }
 
     _setValue(newValue, force: force);
-    _blocked = true;
 
+    if (_duration == null) return;
+
+    _blocked = true;
     _timer?.cancel();
-    _timer = Timer.periodic(_throttleDuration, (_) {
+    _timer = Timer.periodic(_duration!, (_) {
       if (_buffer.isNotEmpty) {
         final bufferedValue = _buffer.removeAt(0);
         _setValue(bufferedValue, force: force);
