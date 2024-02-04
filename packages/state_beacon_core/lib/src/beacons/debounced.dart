@@ -4,13 +4,13 @@ part of '../base_beacon.dart';
 class DebouncedBeacon<T> extends WritableBeacon<T> {
   /// @macro [DebouncedBeacon]
   DebouncedBeacon({
-    required Duration duration,
+    this.duration,
     super.initialValue,
     super.name,
-  }) : debounceDuration = duration;
+  });
 
   /// The duration to debounce updates for.
-  final Duration debounceDuration;
+  final Duration? duration;
 
   Timer? _debounceTimer;
 
@@ -21,12 +21,12 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
       return;
     }
 
-    if (_isEmpty) {
+    if (_isEmpty || duration == null) {
       _setValue(newValue, force: force);
       return;
     }
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(debounceDuration, () {
+    _debounceTimer = Timer(duration!, () {
       _setValue(newValue, force: force);
     });
   }

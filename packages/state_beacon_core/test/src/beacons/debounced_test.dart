@@ -27,4 +27,23 @@ void main() {
 
     expect(called, equals(1)); // Only one notification should be sent
   });
+
+  test('should not debounce when duration is null', () {
+    final beacon = Beacon.debounced('');
+    var called = 0;
+
+    beacon
+      ..subscribe((_) => called++)
+
+      // simulate typing
+      ..value = 'a'
+      ..value = 'ap'
+      ..value = 'app'
+      ..value = 'appl'
+      ..value = 'apple';
+
+    expect(beacon.value, equals('apple')); // should be updated immediately
+
+    expect(called, equals(5)); // 5 notifications should be sent
+  });
 }

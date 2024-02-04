@@ -52,7 +52,7 @@ class BeaconGroup extends _BeaconCreator {
   @override
   DebouncedBeacon<T> debounced<T>(
     T initialValue, {
-    required Duration duration,
+    Duration? duration,
     String? name,
   }) {
     final beacon = super.debounced<T>(
@@ -170,7 +170,7 @@ class BeaconGroup extends _BeaconCreator {
 
   @override
   DebouncedBeacon<T> lazyDebounced<T>({
-    required Duration duration,
+    Duration? duration,
     T? initialValue,
     String? name,
   }) {
@@ -201,7 +201,7 @@ class BeaconGroup extends _BeaconCreator {
 
   @override
   ThrottledBeacon<T> lazyThrottled<T>({
-    required Duration duration,
+    Duration? duration,
     T? initialValue,
     bool dropBlocked = true,
     String? name,
@@ -317,7 +317,7 @@ class BeaconGroup extends _BeaconCreator {
   @override
   ThrottledBeacon<T> throttled<T>(
     T initialValue, {
-    required Duration duration,
+    Duration? duration,
     bool dropBlocked = true,
     String? name,
   }) {
