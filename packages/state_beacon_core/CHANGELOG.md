@@ -1,3 +1,19 @@
+# 0.33.2
+
+-   [Feat] Add `Beacon.derivedStream`
+
+Specialized `DerivedBeacon` that subscribes to the stream returned from its callback and updates its value based on the emitted values.
+When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+
+Example:
+
+```dart
+final userID = Beacon.writable<int>(18235);
+final profileBeacon = Beacon.derivedStream(() {
+ return getProfileStreamFromUID(userID.value);
+});
+```
+
 # 0.33.1
 
 -   [Fix] All delegated writes will be forced to account for the fact that rollback isn't possible.
