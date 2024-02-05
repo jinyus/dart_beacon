@@ -18,49 +18,16 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
 
   final bool _cancelRunning;
 
-  /// Alias for peek().lastData.
-  /// Returns the last data that was successfully loaded
-  /// equivalent to `beacon.peek().lastData`
-  T? get lastData => peek().lastData;
-
   FutureCallback<T> _operation;
 
-  /// Casts its value to [AsyncData] and return
-  /// it's value or throws `CastError` if this is not [AsyncData].
-  /// equivalent to `beacon.peek().unwrap()`
-  T unwrapValue() => peek().unwrap();
-
-  /// Returns `true` if this is [AsyncLoading].
-  /// This is equivalent to `beacon.peek().isLoading`.
-  bool get isLoading => peek().isLoading;
-
-  /// Returns `true` if this is [AsyncIdle].
-  /// This is equivalent to `beacon.peek().isIdle`.
-  bool get isIdle => peek().isIdle;
-
-  /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
-  /// This is equivalent to `beacon.peek().isIdleOrLoading`.
-  bool get isIdleOrLoading => peek().isIdleOrLoading;
-
-  /// Returns `true` if this is [AsyncData].
-  /// This is equivalent to `beacon.peek().isData`.
-  bool get isData => peek().isData;
-
-  /// Returns `true` if this is [AsyncError].
-  /// This is equivalent to `beacon.peek().isError`.
-  bool get isError => peek().isError;
-
   /// Starts executing an idle [Future]
-  ///
-  /// NB: Must only be called once
+  /// Calling more than once has no effect
   ///
   /// Use [reset] to restart the [Future]
   void start();
 
   int _startLoading() {
-    _setValue(
-      AsyncLoading()..setLastData(lastData),
-    );
+    _setLoadingWithLastData();
     return ++_executionID;
   }
 
