@@ -358,11 +358,13 @@ class _BeaconCreator {
   StreamBeacon<T> stream<T>(
     Stream<T> stream, {
     bool cancelOnError = false,
+    bool manualStart = false,
     String? name,
   }) {
     return StreamBeacon<T>(
       stream,
       cancelOnError: cancelOnError,
+      manualStart: manualStart,
       name: name ?? 'StreamBeacon<$T>',
     );
   }
