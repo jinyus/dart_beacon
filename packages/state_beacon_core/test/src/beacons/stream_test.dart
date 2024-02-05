@@ -91,4 +91,71 @@ void main() {
 
     expect(myBeacon, equals(myBeacon2));
   });
+
+  test('should not start stream until start() is called', () async {
+    final myStream = Stream.periodic(k10ms, (i) => i + 1);
+    final myBeacon = Beacon.stream(myStream, manualStart: true);
+
+    expect(myBeacon.isIdle, true);
+
+    myBeacon.start();
+
+    expect(myBeacon.isLoading, true);
+
+    final next = await myBeacon.next();
+
+    expect(next.isData, true);
+  });
+
+  test('should pause and resume internal stream', () async {
+    final myStream = Stream.periodic(k10ms, (i) => i + 1);
+    final myBeacon = Beacon.stream(myStream, manualStart: true);
+
+    expect(myBeacon.isIdle, true);
+
+    myBeacon.start();
+
+    expect(myBeacon.isLoading, true);
+
+    final next = await myBeacon.next();
+
+    expect(next.isData, true);
+
+    myBeacon.pause();
+
+    await delay();
+
+    expect(myBeacon.unwrapValue(), next.unwrap()); // should be the same value
+
+    myBeacon.resume();
+
+    final next2 = await myBeacon.next();
+
+    expect(next2.isData, true);
+
+    expect(next2.unwrap(), isNot(next.unwrap())); // should be new value
+  });
+
+  test('should set last data in loading and error states', () async {
+    final controller = StreamController<int>();
+    final myBeacon = Beacon.stream(controller.stream);
+
+    expect(myBeacon.isLoading, true);
+
+    controller.add(1);
+
+    var next = await myBeacon.next();
+
+    expect(next.isData, true);
+
+    expect(next.unwrap(), 1);
+
+    controller.addError('error');
+
+    next = await myBeacon.next();
+
+    expect(next.isError, true);
+
+    expect(next.lastData, 1);
+  });
 }
