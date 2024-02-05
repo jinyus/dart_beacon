@@ -10,8 +10,9 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
     this._stream, {
     this.cancelOnError = false,
     super.name,
-  }) : super(initialValue: AsyncLoading()) {
-    _init();
+    bool manualStart = false,
+  }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
+    if (!manualStart) start();
   }
 
   final Stream<T> _stream;
@@ -24,19 +25,39 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   /// unsubscribes from the internal stream
   void unsubscribe() {
     unawaited(_subscription?.cancel());
+    _subscription = null;
   }
 
-  void _init() {
+  /// Starts listening to the internal stream
+  /// if `manualStart` was set to true.
+  ///
+  /// Calling more than once has no effect
+  void start() {
+    if (_subscription != null) return;
+
+    _setLoadingWithLastData();
+
     _subscription = _stream.listen(
       (value) {
         _setValue(AsyncData(value));
       },
       onError: (Object e, StackTrace s) {
-        _setValue(AsyncError(e, s));
+        _setErrorWithLastData(e, s);
       },
       onDone: dispose,
       cancelOnError: cancelOnError,
     );
+  }
+
+  /// Pauses the internal stream subscription
+  void pause([Future<void>? resumeSignal]) {
+    _subscription?.pause(resumeSignal);
+  }
+
+  /// Resumes the internal stream subscription
+  /// if it was paused.
+  void resume() {
+    _subscription?.resume();
   }
 
   @override
@@ -105,7 +126,6 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   @override
   void dispose() {
     unsubscribe();
-
     super.dispose();
   }
 

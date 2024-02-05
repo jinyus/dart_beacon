@@ -1,5 +1,7 @@
 // ignore_for_file: strict_raw_type
 
+import 'dart:async';
+
 import 'package:state_beacon_core/src/base_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
@@ -539,5 +541,39 @@ void main() {
     await delay(k1ms);
 
     expect(derivedBeacon.unwrapValue(), 12);
+  });
+
+  test('should set last data in loading and error states', () async {
+    final controller = StreamController<int>.broadcast();
+
+    final count = Beacon.writable(10);
+
+    final myBeacon = Beacon.derivedFuture(() async {
+      final a = count.value;
+      final res = await controller.stream.first;
+      return res * a;
+    });
+
+    expect(myBeacon.isLoading, true);
+
+    controller.add(10);
+
+    var next = await myBeacon.next();
+
+    expect(next.unwrap(), 100);
+
+    count.value = 20;
+
+    expect(myBeacon.isLoading, true);
+
+    expect(next.lastData, 100);
+
+    controller.addError(Exception('error'));
+
+    next = await myBeacon.next();
+
+    expect(next.isError, true);
+
+    expect(next.lastData, 100);
   });
 }

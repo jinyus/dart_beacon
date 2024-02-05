@@ -108,4 +108,32 @@ void main() {
 
     expect(futureBeacon.isError, isTrue);
   });
+
+  test('should set last data in loading and error states', () async {
+    final controller = StreamController<int>.broadcast();
+
+    final myBeacon = Beacon.future(() => controller.stream.first);
+
+    expect(myBeacon.isLoading, true);
+
+    controller.add(10);
+
+    var next = await myBeacon.next();
+
+    expect(next.unwrap(), 10);
+
+    myBeacon.overrideWith(() => controller.stream.first);
+
+    expect(myBeacon.isLoading, true);
+
+    expect(next.lastData, 10);
+
+    controller.addError(Exception('error'));
+
+    next = await myBeacon.next();
+
+    expect(next.isError, true);
+
+    expect(next.lastData, 10);
+  });
 }
