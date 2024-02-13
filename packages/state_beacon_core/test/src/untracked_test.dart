@@ -1,4 +1,3 @@
-import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -59,17 +58,7 @@ void main() {
 
     expect(ran, 2);
 
-    if (isSynchronousMode) {
-      // this is because when "a" changes to 20, the effect will run first
-      // which changes the value to 35, then the subscription will run
-      // with a value of 35
-      expect(ran2, 2);
-    } else {
-      // when "a" changes to 20, both the effect and the subscription
-      // will be scheduled and both runs with a value of 20. When the effect
-      // runs, the mutation to 35 will schedule the subscription to run again
-      expect(ran2, 3);
-    }
+    expect(ran2, 3);
   });
 
   test('should not send notification when doing untracked access', () {

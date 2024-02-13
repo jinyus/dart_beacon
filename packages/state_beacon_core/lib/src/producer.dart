@@ -172,16 +172,16 @@ abstract class Producer<T> {
   }
 
   void _notifyListeners() {
-    final lst =
-        isSynchronousMode ? List.of(_observers, growable: false) : _observers;
+    // final lst =
+    //     isSynchronousMode ? List.of(_observers, growable: false) : _observers;
 
     if (isRunningUntracked()) {
-      for (final observer in lst) {
+      for (final observer in _observers) {
         if (observer == untrackedConsumer) return;
         observer.markDirty();
       }
     } else {
-      for (final observer in lst) {
+      for (final observer in _observers) {
         // print('$name is marking ${observer.name} dirty');
         observer.markDirty();
       }

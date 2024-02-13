@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -246,12 +245,7 @@ void main() {
       src.value;
     });
 
-    if (isSynchronousMode) {
-      // flushed immediately
-      expect(effectCalled, 1);
-    } else {
-      expect(effectCalled, 0);
-    }
+    expect(effectCalled, 0);
 
     BeaconScheduler.flush();
 
@@ -259,7 +253,7 @@ void main() {
 
     src.value = 8;
 
-    expect(effectCalled, isSynchronousMode ? 2 : 1);
+    expect(effectCalled, 1);
 
     BeaconScheduler.flush();
 
@@ -303,7 +297,7 @@ void main() {
       s.value;
     });
 
-    expect(effectCalled, isSynchronousMode ? 1 : 0);
+    expect(effectCalled, 0);
 
     BeaconScheduler.flush();
 
@@ -339,7 +333,7 @@ void main() {
 
     // There were 4 updates, but only 1 notification
     // In synchronous mode, there are 4 notifications
-    expect(callCount, isSynchronousMode ? 5 : 1);
+    expect(callCount, 1);
   });
 
   test('toString should work correctly', () {

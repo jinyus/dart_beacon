@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_beacon/src/scheduler.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 import '../common.dart';

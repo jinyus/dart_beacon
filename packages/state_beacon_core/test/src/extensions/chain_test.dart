@@ -1,6 +1,5 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -325,13 +324,13 @@ void main() {
 
     count.subscribe((p0) => called++);
 
-    expect(called, isSynchronousMode ? 1 : 0);
+    expect(called, 0);
 
     buff.add(20);
 
     await BeaconScheduler.settle();
 
-    expect(called, isSynchronousMode ? 2 : 1);
+    expect(called, 1);
 
     expect(buff(), [10, 20]);
     expect(buff.currentBuffer(), isEmpty);
@@ -340,7 +339,7 @@ void main() {
 
     await BeaconScheduler.settle();
 
-    expect(called, isSynchronousMode ? 3 : 2);
+    expect(called, 2);
 
     expect(buff.currentBuffer(), [20]);
 
@@ -348,7 +347,7 @@ void main() {
 
     await BeaconScheduler.settle();
 
-    expect(called, isSynchronousMode ? 4 : 3);
+    expect(called, 3);
 
     expect(buff.currentBuffer(), [20]);
 
@@ -356,7 +355,7 @@ void main() {
 
     await BeaconScheduler.settle();
 
-    expect(called, isSynchronousMode ? 5 : 4);
+    expect(called, 4);
 
     expect(buff.currentBuffer(), [20]);
   });

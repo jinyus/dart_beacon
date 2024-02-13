@@ -1,4 +1,4 @@
-// ignore_for_file: comment_references
+// ignore_for_file: comment_references, lines_longer_than_80_chars
 
 part of '../producer.dart';
 
@@ -83,11 +83,11 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
     // handles diamond depenendencies if we're the parent of a diamond.
     if (_previousValue != _value && _observers.isNotEmpty) {
-      final lst =
-          isSynchronousMode ? List.of(_observers, growable: false) : _observers;
+      // final lst =
+      //     isSynchronousMode ? List.of(_observers, growable: false) : _observers;
       // We've changed value, so mark our children as
       // dirty so they'll reevaluate
-      for (final observer in lst) {
+      for (final observer in _observers) {
         // print('$name is sure ${observer.name} is dirty');
         if (observer == untrackedConsumer) return;
         observer._status = Status.dirty;

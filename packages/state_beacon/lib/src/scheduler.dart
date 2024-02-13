@@ -23,13 +23,13 @@ abstract class FlutterBeacon {
   /// With this scheduler, you aren't protected from stackoverflows when
   /// an effect mutates a beacon that it depends on. This is a infinite loop
   /// with the sync scheduler.
-  static void useSyncScheduler() {
-    BeaconScheduler.useSyncScheduler();
-  }
+  // static void useSyncScheduler() {
+  //   BeaconScheduler.useSyncScheduler();
+  // }
 }
 
 var _flushing = false;
-const _k16ms = Duration(milliseconds: 16);
+const _k16ms = Duration(milliseconds: 500);
 
 void _sixtyfpsScheduler() {
   if (_flushing) return;

@@ -5,7 +5,7 @@ void Function() _stabilizeFn = _asyncScheduler;
 bool _stabilizationQueued = false;
 
 /// Whether the scheduler is in synchronous mode
-bool isSynchronousMode = _stabilizeFn == _syncScheduler;
+// bool isSynchronousMode = _stabilizeFn == _syncScheduler;
 
 /// A class for configuring the scheduler
 abstract class BeaconScheduler {
@@ -23,7 +23,7 @@ abstract class BeaconScheduler {
   /// This is the default scheduler which processes updates asynchronously
   /// as a DartVM microtask. This does automatic batching of updates.
   static void useAsyncScheduler() {
-    isSynchronousMode = false;
+    // isSynchronousMode = false;
     _stabilizeFn = _asyncScheduler;
   }
 
@@ -33,10 +33,10 @@ abstract class BeaconScheduler {
   /// With this scheduler, you aren't protected from stackoverflows when
   /// an effect mutates a beacon that it depends on. This is a infinite loop
   /// with the sync scheduler.
-  static void useSyncScheduler() {
-    isSynchronousMode = true;
-    _stabilizeFn = _syncScheduler;
-  }
+  // static void useSyncScheduler() {
+  //   isSynchronousMode = true;
+  //   _stabilizeFn = _syncScheduler;
+  // }
 }
 
 void _flushEffects() {
@@ -65,10 +65,10 @@ void _asyncScheduler() {
   }
 }
 
-void _syncScheduler() {
-  if (!_stabilizationQueued) {
-    _stabilizationQueued = true;
-    _flushEffects();
-    _stabilizationQueued = false;
-  }
-}
+// void _syncScheduler() {
+//   if (!_stabilizationQueued) {
+//     _stabilizationQueued = true;
+//     _flushEffects();
+//     _stabilizationQueued = false;
+//   }
+// }

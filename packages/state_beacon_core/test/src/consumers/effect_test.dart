@@ -1,4 +1,3 @@
-import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -42,7 +41,7 @@ void main() {
     college.value = 'Yale';
     await BeaconScheduler.settle();
 
-    if (isSynchronousMode) return;
+    // if (isSynchronousMode) return;
 
     expect(buff, [
       'Bob is 20 years old',

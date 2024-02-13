@@ -1,7 +1,6 @@
 // ignore_for_file: cascade_invocations
 
 import 'package:state_beacon_core/src/common/exceptions.dart';
-import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -81,8 +80,8 @@ void main() {
     beacon.value = 21;
 
     await BeaconScheduler.settle();
-    expect(ran1, isSynchronousMode ? 3 : 2);
-    expect(ran2, isSynchronousMode ? 3 : 2);
+    expect(ran1, 2);
+    expect(ran2, 2);
   });
 
   test('should lazily initialize its value', () async {
