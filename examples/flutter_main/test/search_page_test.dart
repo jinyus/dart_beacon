@@ -59,13 +59,13 @@ void main() {
     );
     searchResults.value = AsyncData(testWeather);
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text(testWeather.toString()), findsOneWidget);
 
     searchResults.value = AsyncError('error');
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Nextwork Error'), findsOneWidget);
   });

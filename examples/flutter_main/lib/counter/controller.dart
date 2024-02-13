@@ -15,7 +15,7 @@ class CounterController {
 
   // the future will be recomputed whenever the counter changes
   late final _derivedFutureCounter =
-      Beacon.derivedFuture(() => counterFuture(count.value));
+      Beacon.future(() => counterFuture(count.value));
 
   // here we expose the future beacon as a readable beacon
   // so it's easier to mock/test. This is optional.

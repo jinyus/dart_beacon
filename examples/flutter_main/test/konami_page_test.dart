@@ -14,8 +14,19 @@ import 'package:state_beacon/state_beacon.dart';
 
 class MockKonamiController extends Mock implements KonamiController {}
 
+// var flushing = false;
+// void flutterScheduler() {
+//   if (flushing) return;
+//   flushing = true;
+//   Future.sync(() {
+//     BeaconScheduler.flush();
+//     flushing = false;
+//   });
+// }
+
 void main() {
   final konamiCtrl = MockKonamiController();
+  // BeaconScheduler.setScheduler(flutterScheduler);
 
   testWidgets('Konami Page Test', (WidgetTester tester) async {
     final keys = Beacon.lazyThrottled<String>();
@@ -34,24 +45,32 @@ void main() {
 
     expect(find.text('start typing...'), findsOneWidget);
 
-    keys
-      ..set('A')
-      ..set('B')
-      ..set('C');
+    keys.set('A');
+    BeaconScheduler.flush();
+    keys.set('B');
+    BeaconScheduler.flush();
+    keys.set('C');
+    BeaconScheduler.flush();
 
     await tester.pump();
 
     expect(find.text('C (3)'), findsOneWidget);
 
     // simulate typing the wrong codes
-    keys
-      ..set('D')
-      ..set('E')
-      ..set('F')
-      ..set('G')
-      ..set('H')
-      ..set('I')
-      ..set('J');
+    keys.set('D');
+    BeaconScheduler.flush();
+    keys.set('E');
+    BeaconScheduler.flush();
+    keys.set('F');
+    BeaconScheduler.flush();
+    keys.set('G');
+    BeaconScheduler.flush();
+    keys.set('H');
+    BeaconScheduler.flush();
+    keys.set('I');
+    BeaconScheduler.flush();
+    keys.set('J');
+    BeaconScheduler.flush();
 
     await tester.pumpAndSettle();
 
@@ -62,6 +81,7 @@ void main() {
     // simulate typing the correct codes
     for (var k in konamiCodes) {
       keys.set(k, force: true);
+      BeaconScheduler.flush();
     }
 
     await tester.pumpAndSettle();

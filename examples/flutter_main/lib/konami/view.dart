@@ -21,39 +21,42 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   void initState() {
-    widget.controller.last10.subscribe((codes) {
-      if (codes.isEmpty) return;
-      final won = checker.equals(codes, konamiCodes);
+    widget.controller.last10.subscribe(
+      (codes) {
+        if (codes.isEmpty || !mounted) return;
+        final won = checker.equals(codes, konamiCodes);
 
-      if (won) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Congratulations!'),
-              content: const Text('KONAMI! You won!'),
-              actions: <Widget>[
-                TextButton(
-                  key: const ValueKey('close'),
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Keep trying!'),
-            duration: Duration(seconds: 2),
-            padding: EdgeInsets.all(20),
-          ),
-        );
-      }
-    });
+        if (won) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Congratulations!'),
+                content: const Text('KONAMI! You won!'),
+                actions: <Widget>[
+                  TextButton(
+                    key: const ValueKey('close'),
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Keep trying!'),
+              duration: Duration(seconds: 2),
+              padding: EdgeInsets.all(20),
+            ),
+          );
+        }
+      },
+      startNow: false,
+    );
     super.initState();
   }
 
