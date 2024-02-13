@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A record containing a value and a timestamp.
 typedef TimestampValue<T> = ({T value, DateTime timestamp});

@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that holds a set of values.
 class SetBeacon<E> extends WritableBeacon<Set<E>> {

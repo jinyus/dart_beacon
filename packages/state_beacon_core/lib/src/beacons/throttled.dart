@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that throttles updates to its value.
 class ThrottledBeacon<T> extends WritableBeacon<T> {

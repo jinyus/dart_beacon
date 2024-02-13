@@ -1,14 +1,17 @@
 // ignore_for_file: avoid_print
 
-import 'package:state_beacon_core/src/base_beacon.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
+
+/// The BaseBeacon type. Alias for Producer.
+typedef BaseBeacon<T> = Producer<T>;
 
 /// A class that observes beacons.
 abstract class BeaconObserver {
   /// Called when a beacon is created
-  void onCreate(BaseBeacon<dynamic> beacon, bool lazy);
+  void onCreate(ReadableBeacon<dynamic> beacon, bool lazy);
 
   /// Called when a beacon is updated
-  void onUpdate(BaseBeacon<dynamic> beacon);
+  void onUpdate(ReadableBeacon<dynamic> beacon);
 
   /// Called when a beacon is watched by an effect or derived beacon
   void onWatch(String effectName, BaseBeacon<dynamic> beacon);
@@ -17,7 +20,7 @@ abstract class BeaconObserver {
   void onStopWatch(String effectName, BaseBeacon<dynamic> beacon);
 
   /// Called when a beacon is disposed
-  void onDispose(BaseBeacon<dynamic> beacon);
+  void onDispose(ReadableBeacon<dynamic> beacon);
 
   /// The current instance of the observer
   static BeaconObserver? instance;
@@ -36,30 +39,30 @@ class LoggingObserver implements BeaconObserver {
   // coverage:ignore-start
 
   @override
-  void onUpdate(BaseBeacon<dynamic> beacon) {
+  void onUpdate(ReadableBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.name)) return;
 
     print(
       '''
 "${beacon.name}" was updated:
   old: ${beacon.previousValue}
-  new: ${beacon.peek()}\n\n''',
+  new: ${beacon.peek()}\n''',
     );
   }
 
   @override
-  void onDispose(BaseBeacon<dynamic> beacon) {
+  void onDispose(ReadableBeacon<dynamic> beacon) {
     if (!shouldContinue(beacon.name)) return;
 
-    print('\n"${beacon.name}" was disposed\n\n');
+    print('\n"${beacon.name}" was disposed\n');
   }
 
   @override
-  void onCreate(BaseBeacon<dynamic> beacon, bool lazy) {
+  void onCreate(ReadableBeacon<dynamic> beacon, bool lazy) {
     if (!shouldContinue(beacon.name)) return;
 
     final lazyLabel = lazy ? 'Lazy' : '';
-    print('\n${lazyLabel}Beacon created: ${beacon.name}\n\n');
+    print('\n${lazyLabel}Beacon created: ${beacon.name}\n');
   }
 
   /// Returns whether the beacon with the given [name] should be logged.
@@ -74,7 +77,7 @@ class LoggingObserver implements BeaconObserver {
 
     print(
       '''
-$effectName is watching ${beacon.name}\n\n''',
+$effectName is watching ${beacon.name}\n''',
     );
   }
 
@@ -84,7 +87,7 @@ $effectName is watching ${beacon.name}\n\n''',
 
     print(
       '''
-$effectName stopped watching ${beacon.name}\n\n''',
+$effectName stopped watching ${beacon.name}\n''',
     );
   }
   // coverage:ignore-end

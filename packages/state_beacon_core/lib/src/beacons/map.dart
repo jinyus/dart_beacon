@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that holds a map of values.
 class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {

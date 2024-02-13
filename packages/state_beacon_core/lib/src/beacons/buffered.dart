@@ -1,8 +1,10 @@
-part of '../base_beacon.dart';
+// ignore_for_file: lines_longer_than_80_chars
+
+part of '../producer.dart';
 
 /// Base class for buffered beacons.
 abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
-    with BeaconConsumer<T, List<T>> {
+    with BeaconWrapper<T, List<T>> {
   // ignore: public_member_api_docs
   BufferedBaseBeacon({super.name}) : super(initialValue: []);
 
@@ -33,11 +35,14 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   /// Clears the buffer
   void reset({bool force = false}) {
+    _clearBuffer();
+    _setValue(_initialValue, force: force);
+
+    // we clear the buffer first because the delegate will
+    // add its own initial value back to the buffer
     if (_delegate != null) {
       _delegate!.reset(force: force);
     }
-    _clearBuffer();
-    _setValue(_initialValue, force: force);
   }
 
   @override

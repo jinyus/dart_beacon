@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs
-
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 class _Awaited<T> extends ReadableBeacon<Completer<T>> {
   _Awaited(this._futureBeacon, {super.name})
@@ -17,7 +15,6 @@ class _Awaited<T> extends ReadableBeacon<Completer<T>> {
           super._value.completeError(error, stackTrace);
         }
       },
-      startNow: true,
     );
   }
 
@@ -34,7 +31,7 @@ class _Awaited<T> extends ReadableBeacon<Completer<T>> {
       return existing as _Awaited<T>;
     }
 
-    final newAwaited = _Awaited(beacon);
+    final newAwaited = _Awaited(beacon, name: "${beacon.name}'s future");
 
     _awaitedBeacons[beacon] = newAwaited;
 

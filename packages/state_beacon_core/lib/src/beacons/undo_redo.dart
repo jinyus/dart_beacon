@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that allows undo/redo operations.
 class UndoRedoBeacon<T> extends WritableBeacon<T> {

@@ -1,6 +1,6 @@
 // ignore_for_file: use_setters_to_change_properties, avoid_equals_and_hash_code_on_mutable_classes, lines_longer_than_80_chars
 
-import 'package:state_beacon_core/src/base_beacon.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
 
 /// A class that represents a value that is loaded asynchronously.
 /// It can be in one of the following states:

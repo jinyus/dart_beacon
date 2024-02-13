@@ -1,45 +1,42 @@
-// ignore_for_file: comment_references
-
 part of '../producer.dart';
 
-/// See [Beacon.derived]
-class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
-  /// See [Beacon.derived]
-  DerivedBeacon(this._compute, {super.name});
-
-  final T Function() _compute;
-
-  @override
-  T peek() {
-    if (_status == Status.clean) return super.peek();
-    updateIfNecessary();
-    return super.peek();
+/// A callback keeps track of its dependecies that
+/// re-executes whenever one changes.
+class Effect with Consumer {
+  /// Creates a new [Effect].
+  Effect(this._compute, {String? name}) : _name = name {
+    _schedule();
   }
 
+  final String? _name;
   @override
-  T get value {
-    currentConsumer?.startWatching(this);
-    updateIfNecessary();
-    return _value!;
+  String get name => _name ?? 'Effect';
+
+  final Function _compute;
+
+  Function? _disposeChild;
+
+  void _schedule() {
+    _effectQueue.add(this);
+    _stabilizeFn();
   }
 
   @override
   void stale(Status newStatus) {
+    if (_status == Status.dirty) return;
     if (_status.index < newStatus.index) {
+      final oldStatus = _status;
       _status = newStatus;
 
-      for (final observer in _observers) {
-        if (observer == untrackedConsumer) return;
-        // print('$name is telling ${observer.name} to check');
-        observer.markCheck();
+      if (oldStatus == Status.clean) {
+        _schedule();
       }
     }
   }
 
   @override
   void update() {
-    _previousValue = isEmpty ? null : _value;
-
+    //print('effect start run');
     final prevConsumer = currentConsumer;
     final prevGets = currentGets;
     final prevGetsIndex = currentGetsIndex;
@@ -48,13 +45,17 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     currentGets = [];
     currentGetsIndex = 0;
 
-    _value = _compute();
-    if (_isEmpty) _initialValue = _value;
-    _isEmpty = false;
+    // ignore: avoid_dynamic_calls
+    _disposeChild?.call();
 
-    // if the sources have changed, update source & observer links
+    // ignore: avoid_dynamic_calls
+    final cleanup = _compute();
+
+    if (cleanup is Function) {
+      _disposeChild = cleanup;
+    }
+
     if (currentGets.isNotEmpty) {
-      // remove all old Sources' .observers links to us
       stopWatchingAllAfter(currentGetsIndex);
 
       if (sources.isNotEmpty && currentGetsIndex > 0) {
@@ -72,7 +73,6 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
         source._observers.add(this);
       }
     } else if (sources.isNotEmpty && currentGetsIndex < sources.length) {
-      // remove all old sources' .observers links to us
       stopWatchingAllAfter(currentGetsIndex);
       sources.length = currentGetsIndex;
     }
@@ -81,30 +81,23 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     currentGetsIndex = prevGetsIndex;
     currentConsumer = prevConsumer;
 
-    // handles diamond depenendencies if we're the parent of a diamond.
-    if (_previousValue != _value && _observers.isNotEmpty) {
-      final lst =
-          isSynchronousMode ? List.of(_observers, growable: false) : _observers;
-      // We've changed value, so mark our children as
-      // dirty so they'll reevaluate
-      for (final observer in lst) {
-        // print('$name is sure ${observer.name} is dirty');
-        if (observer == untrackedConsumer) return;
-        observer._status = Status.dirty;
-      }
-    }
-
     // We've rerun with the latest values from all of our sources.
     // This means that we no longer need to update until a signal changes
     _status = Status.clean;
+    //print('effect end run');
   }
 
-  @override
+  /// Disposes the effect.
   void dispose() {
+    // print('disposing $name');
+    // ignore: avoid_dynamic_calls
+    _disposeChild?.call();
+    _effectQueue.remove(this);
+    // remove ourselves from the .observers list of all sources
     for (final source in sources) {
       source!._removeObserver(this);
     }
     sources.length = 0;
-    super.dispose();
+    _disposeChild = null;
   }
 }

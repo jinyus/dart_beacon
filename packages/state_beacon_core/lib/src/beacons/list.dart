@@ -1,6 +1,6 @@
-// ignore_for_file: avoid_setters_without_getters
+part of '../producer.dart';
 
-part of '../base_beacon.dart';
+// ignore_for_file: avoid_setters_without_getters
 
 /// A beacon that holds a list of values.
 class ListBeacon<E> extends WritableBeacon<List<E>> {

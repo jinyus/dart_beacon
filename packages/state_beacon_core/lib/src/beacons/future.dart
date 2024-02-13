@@ -1,30 +1,89 @@
-// ignore_for_file: inference_failure_on_function_invocation
+part of '../producer.dart';
 
-part of '../base_beacon.dart';
-
-// ignore: public_member_api_docs
+/// A callback that returns a [Future].
 typedef FutureCallback<T> = Future<T> Function();
 
-/// A beacon that executes a [Future] and updates its value accordingly.
-abstract class FutureBeacon<T> extends AsyncBeacon<T> {
-  /// @macro [FutureBeacon]
+/// Represents the status of a [FutureBeacon].
+enum FutureStatus {
+  /// The future has not yet started.
+  idle,
+
+  /// The future is currently running.
+  running,
+
+  /// The future has been restarted.
+  restarted,
+}
+
+/// See `Beacon.future`
+class FutureBeacon<T> extends AsyncBeacon<T> {
+  /// See `Beacon.future`
   FutureBeacon(
-    this._operation, {
-    bool cancelRunning = true,
-    super.initialValue,
+    this._compute, {
     super.name,
-  }) : _cancelRunning = cancelRunning;
+    this.shouldSleep = true,
+    bool manualStart = false,
+    bool cancelRunning = true,
+  }) : _cancelRunning = cancelRunning {
+    if (manualStart) {
+      _status.set(FutureStatus.idle);
+      _setValue(AsyncIdle());
+    } else {
+      _status.set(FutureStatus.running);
+      _setValue(AsyncLoading());
+    }
+
+    _isEmpty = false;
+    _wakeUp();
+  }
+
+  late VoidCallback _effectDispose;
   var _executionID = 0;
+  var _sleeping = false;
 
+  /// Whether the future should sleep when there are no observers.
+  final bool shouldSleep;
+  FutureCallback<T> _compute;
   final bool _cancelRunning;
+  late final _status = Beacon.lazyWritable<FutureStatus>(
+    name: "$name's status",
+  );
 
-  FutureCallback<T> _operation;
+  /// The status of the future.
+  ReadableBeacon<FutureStatus> get status => _status;
 
-  /// Starts executing an idle [Future]
-  /// Calling more than once has no effect
-  ///
-  /// Use [reset] to restart the [Future]
-  void start();
+  void _goToSleep() {
+    _sleeping = true;
+    _status.value = FutureStatus.idle;
+    _effectDispose();
+  }
+
+  void _wakeUp() {
+    if (_sleeping) {
+      _sleeping = false;
+      _status.value = FutureStatus.running;
+      _setLoadingWithLastData();
+    }
+
+    _effectDispose = Beacon.effect(
+      () async {
+        // beacon is manually triggered if in idle state
+        if (_status.value == FutureStatus.idle) {
+          return;
+        }
+
+        final currentExeID = _startLoading();
+
+        try {
+          final result = await _compute();
+          return _setAsyncValue(currentExeID, AsyncData(result));
+        } catch (e, s) {
+          return _setAsyncValue(currentExeID, AsyncError(e, s));
+        }
+      },
+      name: name,
+    );
+  }
 
   int _startLoading() {
     _setLoadingWithLastData();
@@ -45,50 +104,60 @@ abstract class FutureBeacon<T> extends AsyncBeacon<T> {
     _setValue(value);
   }
 
-  Future<void> _run() async {
-    final currentExeID = _startLoading();
+  /// Starts executiong the future.
+  void start() {
+    // can only start once
+    if (_status.peek() != FutureStatus.idle) return;
+    _status.value = FutureStatus.running;
+    _value = AsyncLoading();
+  }
 
-    try {
-      final result = await _operation();
-      return _setAsyncValue(currentExeID, AsyncData(result));
-    } catch (e, s) {
-      return _setAsyncValue(currentExeID, AsyncError(e, s));
+  @override
+  AsyncValue<T> peek() {
+    if (_sleeping) {
+      _wakeUp();
     }
+    return super.peek();
   }
 
   /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
-    _operation = compute;
+    _compute = compute;
     reset();
   }
 
-  /// Resets the beacon by calling the [Future] again
-  void reset();
-}
-
-/// A beacon that executes a [Future] and updates its value accordingly.
-class DefaultFutureBeacon<T> extends FutureBeacon<T> {
-  /// @macro [FutureBeacon]
-  DefaultFutureBeacon(
-    super.operation, {
-    bool manualStart = false,
-    super.cancelRunning = true,
-    super.name,
-  }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
-    if (!manualStart) _run();
+  @override
+  AsyncValue<T> get value {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    currentConsumer?.startWatching(this);
+    return _value;
   }
 
-  /// Resets the beacon by calling the [Future] again
   @override
+  void _removeObserver(Consumer observer) {
+    super._removeObserver(observer);
+    if (!shouldSleep) return;
+    if (_observers.isEmpty) {
+      // setting status to idle will short-curcuit the internal effect
+      // print('sleeping $name after removing ${observer.name}');
+      _goToSleep();
+    }
+  }
+
+  /// Resets the beacon by executing the future again.
   void reset() {
-    _executionID++; // ignore any running futures
-    _run();
+    _setLoadingWithLastData();
+    _status.value = _status.peek() == FutureStatus.running
+        ? FutureStatus.restarted
+        : FutureStatus.running;
   }
 
   @override
-  void start() {
-    // can only start once
-    if (peek() is! AsyncIdle) return;
-    _run();
+  void dispose() {
+    _status.dispose();
+    _effectDispose();
+    super.dispose();
   }
 }

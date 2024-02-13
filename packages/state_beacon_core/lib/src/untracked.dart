@@ -1,29 +1,22 @@
-// ignore_for_file: public_member_api_docs
+part of 'producer.dart';
 
-import 'package:state_beacon_core/src/common.dart';
+/// The current untracked effect.
+Effect? untrackedConsumer;
 
-var _untrackedStack = 0;
+/// Whether the current effect is running untracked.
+bool isRunningUntracked() => untrackedConsumer != null;
 
-bool isRunningUntracked() => _untrackedStack > 0;
-
-// when running untracked, we will remove the current effects from the beacon's
-//  listeners so they won't be notified when the value is accessed;
-// therefore, we need to re-add them after the untracked block is done
-VoidCallback? reAddListeners;
-
-void doUntracked(void Function() fn) {
+/// Runs a function untracked.
+void doUntracked(VoidCallback fn) {
   if (isRunningUntracked()) {
     fn();
     return;
   }
 
-  _untrackedStack++;
+  untrackedConsumer =
+      currentConsumer is Effect ? currentConsumer! as Effect : null;
 
-  try {
-    fn();
-  } finally {
-    _untrackedStack--;
-    reAddListeners?.call();
-    reAddListeners = null;
-  }
+  fn();
+
+  untrackedConsumer = null;
 }
