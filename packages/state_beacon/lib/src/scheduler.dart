@@ -29,7 +29,7 @@ abstract class BeaconConfig {
 }
 
 var _flushing = false;
-const _k16ms = Duration(milliseconds: 500);
+const _k16ms = Duration(milliseconds: 16);
 
 void _sixtyfpsScheduler() {
   if (_flushing) return;
