@@ -2,7 +2,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 
 /// Class used to switch between different schedulers.
-abstract class FlutterBeacon {
+abstract class BeaconConfig {
   /// This scheduler uses the Flutter SchedulerBinding to
   /// schedule updates to be processed after the current frame.
   static void useFlutterScheduler() {
