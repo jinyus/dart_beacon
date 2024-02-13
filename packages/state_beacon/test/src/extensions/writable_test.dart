@@ -17,15 +17,21 @@ void main() {
 
     beacon.value = 1;
 
+    BeaconScheduler.flush();
+
     expect(called, 1);
 
     beacon.value = 2;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
     valueNotifier.dispose();
 
     beacon.value = 3;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
   });
@@ -43,15 +49,21 @@ void main() {
 
     beacon.value = 1;
 
+    BeaconScheduler.flush();
+
     expect(called, 1);
 
     beacon.value = 2;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
     beacon
       ..dispose()
       ..value = 3;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
   });
