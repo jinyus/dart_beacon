@@ -1,6 +1,5 @@
-// ignore_for_file: unused_local_variable
-
-import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:state_beacon_core/src/creator/creator.dart';
+import 'package:state_beacon_core/src/extensions/extensions.dart';
 import 'package:test/test.dart';
 
 import '../../common.dart';
@@ -11,7 +10,6 @@ void main() {
 
     final readable = group.readable(0);
     final writable = group.writable(0);
-    final scopedWritable = group.scopedWritable(0);
     final lazyWritable = group.lazyWritable<int>();
     final bufferedCount = group.bufferedCount<int>(1);
     final bufferedTime = group.bufferedTime<int>(duration: k10ms);
@@ -26,21 +24,21 @@ void main() {
     final lazyTimestamp = group.lazyTimestamped<int>();
     final undoRedo = group.undoRedo<int>(0);
     final lazyUndoRedo = group.lazyUndoRedo<int>();
-    final stream = group.stream<int>(readable.stream);
-    final streamRaw = group.streamRaw<int?>(readable.stream);
+    final stream = group.stream<int>(() => readable.stream);
+    final streamRaw = group.streamRaw<int?>(() => readable.stream);
     final future = group.future<int>(() async => 1);
     final list = group.list<int>([0]);
     final hashSet = group.hashSet<int>({0});
     final hashMap = group.hashMap<int, int>({0: 0});
-    final derivedFuture = group.derivedFuture<int>(() async => filtered() + 1);
-    final derivedStream = group.derivedStream(Stream.empty);
+    final derivedFuture = group.future<int>(() async => filtered() + 1);
+    final derivedStream = group.streamRaw(Stream.empty);
 
-    final dispose = group.effect(() {});
+    group.effect(() {});
 
     // ignore: inference_failure_on_function_invocation, unnecessary_lambdas
-    final family = group.family((int i) => group.readable(i));
+    final _ = group.family((int i) => group.readable(i));
 
-    expect(group.beaconCount, 25);
+    expect(group.beaconCount, 24);
 
     writable.increment();
 
@@ -56,7 +54,6 @@ void main() {
 
     expect(readable.isDisposed, true);
     expect(writable.isDisposed, true);
-    expect(scopedWritable.$1.isDisposed, true);
     expect(lazyWritable.isDisposed, true);
     expect(bufferedCount.isDisposed, true);
     expect(bufferedTime.isDisposed, true);

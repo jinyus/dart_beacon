@@ -1,3 +1,4 @@
+import 'package:state_beacon_core/src/producer.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -14,43 +15,61 @@ void main() {
       });
     });
 
+    BeaconScheduler.flush();
+
     expect(callCount, equals(1));
     expect(age.value, 15);
 
     age.value = 20;
+
+    BeaconScheduler.flush();
+
     expect(callCount, equals(2));
   });
 
-  test('should not send notification when doing nested untracked updates', () {
-    final age = Beacon.writable<int>(10, name: 'age');
-    var callCount = 0;
-    var subCallCount = 0;
-
-    age.subscribe((p0) {
-      subCallCount++;
-    });
+  test('should notify other consumers', () {
+    final age = Beacon.writable<int>(10);
+    var ran = 0;
+    var ran2 = 0;
 
     Beacon.effect(() {
       age.value;
-      callCount++;
+      ran++;
       Beacon.untracked(() {
-        age.value = 15;
+        age.value = 30;
         Beacon.untracked(() {
-          age.value = 20;
+          age.value = 35;
         });
       });
     });
 
-    expect(callCount, equals(1));
-    expect(subCallCount, equals(2));
-    expect(age.value, 20);
+    age.subscribe((_) => ran2++);
 
-    age.value = 25;
-    expect(callCount, equals(2));
+    BeaconScheduler.flush();
 
-    // this is 5 and not 3 because the effect runs when 25 is set
-    // so the 2 untracked blocks will execute and change the value to 15 then 20
-    expect(subCallCount, equals(5));
+    expect(ran, 1);
+    expect(ran2, 1);
+    expect(age.value, 35);
+
+    // BeaconObserver.instance = LoggingObserver();
+
+    age.value = 20;
+
+    BeaconScheduler.flush();
+
+    expect(ran, 2);
+
+    if (isSynchronousMode) {
+      // this is because when "a" changes to 20, the effect will run first
+      // which changes the value to 35, then the subscription will run
+      // with a value of 35
+      expect(ran2, 2);
+    } else {
+      // when "a" changes to 20, both the effect and the subscription
+      // will be scheduled and both runs with a value of 20. When the effect
+      // runs, the mutation to 35 will schedule the subscription to run again
+      expect(ran2, 3);
+    }
   });
 
   test('should not send notification when doing untracked access', () {
@@ -62,17 +81,19 @@ void main() {
     Beacon.effect(() {
       age.value;
       callCount++;
-      Beacon.untracked(() {
-        name.value;
-      });
+      name.peek();
     });
+
+    BeaconScheduler.flush();
 
     expect(callCount, equals(1));
 
     age.value = 20;
+    BeaconScheduler.flush();
     expect(callCount, equals(2));
 
     name.value = 'Jane';
+    BeaconScheduler.flush();
     expect(callCount, equals(2));
   });
 }

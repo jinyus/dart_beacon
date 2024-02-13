@@ -3,7 +3,7 @@
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
-import '../async_value_test.dart';
+import '../common/async_value_test.dart';
 
 void main() {
   test('should return immutable beacon', () {
@@ -11,10 +11,13 @@ void main() {
     final immutableBeacon = beacon.freeze();
     expect(immutableBeacon, isA<ReadableBeacon<int>>());
   });
-  test('should toggle boolean beacon', () {
+
+  test('should toggle boolean beacon', () async {
     final beacon = Beacon.writable(true);
 
     beacon.toggle();
+
+    await BeaconScheduler.settle();
 
     expect(beacon.value, false);
 
@@ -23,10 +26,12 @@ void main() {
     expect(beacon.value, true);
   });
 
-  test('should increment/decrement num beacon', () {
+  test('should increment/decrement num beacon', () async {
     final beacon = Beacon.writable(0);
 
     beacon.increment();
+
+    await BeaconScheduler.settle();
 
     expect(beacon.value, 1);
 
@@ -60,11 +65,17 @@ void main() {
       ),
     );
 
+    await BeaconScheduler.settle();
+
     await beacon.tryCatch(() => testFuture(false));
+
+    await BeaconScheduler.settle();
 
     expect(beacon.value, isA<AsyncData<int>>());
 
     await beacon.tryCatch(() => testFuture(true));
+
+    await BeaconScheduler.settle();
 
     expect(beacon.value, isA<AsyncError<int>>());
   });

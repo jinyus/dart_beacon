@@ -56,24 +56,38 @@ void main() {
     _lazyOnCreate = false;
   });
 
-  test('should call relevant methods of observer', () {
-    final beacon = Beacon.writable(10);
-    beacon.value = 20;
-    beacon.increment();
-    beacon.dispose();
+  test('should call relevant methods of observer', () async {
+    final a = Beacon.writable(10);
+    final guard = Beacon.writable(true);
+    a.value = 20;
+    await BeaconScheduler.settle();
+    a.increment();
+    await BeaconScheduler.settle();
+    a.dispose();
+    await BeaconScheduler.settle();
 
     final dispose = Beacon.effect(() {
-      beacon.value;
+      if (guard.value) {
+        a.value;
+      }
     });
+    await BeaconScheduler.settle();
 
-    expect(_onCreateCalled, equals(1));
+    expect(_onCreateCalled, equals(2));
     expect(_onUpdateCalled, equals(2));
     expect(_onDisposeCalled, equals(1));
-    expect(_onWatchCalled, equals(1));
+    expect(_onWatchCalled, equals(2));
     expect(_lazyOnCreate, isFalse);
 
-    dispose();
+    guard.value = false;
+
+    await BeaconScheduler.settle();
+
     expect(_onStopWatchCalled, equals(1));
+
+    dispose();
+    await BeaconScheduler.settle();
+    expect(_onStopWatchCalled, equals(2));
   });
 
   test('should call onCreate with lazy set as true', () {
