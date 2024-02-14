@@ -1,3 +1,5 @@
+// ignore_for_file: use_if_null_to_convert_nulls_to_bools
+
 part of '../producer.dart';
 
 /// A callback that runs when its [Producer] changes.
@@ -7,12 +9,11 @@ class Subscription<T> implements Consumer {
     this.producer,
     this.fn, {
     required this.startNow,
-    this.synchronous = false,
+    required this.synchronous,
   }) {
-    // If startNow is true
-    // derived beacons are lazy so we have to start immediately
-    // to register the subscription as a listener
-    if (startNow || producer is DerivedBeacon) {
+    // derived beacons are lazy so they aren't registered as observers
+    // of their sources until they are actually used
+    if (startNow || _derivedSource?.isEmpty == true) {
       _schedule();
     } else {
       _status = Status.clean;
@@ -89,10 +90,10 @@ class Subscription<T> implements Consumer {
 
   @override
   void update() {
-    if (!_ran && !startNow && _derivedSource != null) {
+    if (!_ran && !startNow && _derivedSource?.isEmpty == true) {
       // special case for derived beacons
       // startNow is set to false but we must still run now to register the
-      // subscription as a listener
+      // the derived as an observer of its sources.
       producer.peek();
       _status = Status.clean;
       _ran = true;
