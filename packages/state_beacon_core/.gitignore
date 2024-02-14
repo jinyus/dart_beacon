@@ -8,3 +8,5 @@ pubspec.lock
 
 coverage/
 build/
+
+demo.dart
