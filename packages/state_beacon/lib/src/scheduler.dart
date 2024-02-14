@@ -1,20 +1,24 @@
 import 'package:flutter/scheduler.dart';
-import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:state_beacon_core/state_beacon_core.dart' as core;
 
 /// Class used to switch between different schedulers.
-abstract class BeaconConfig {
+abstract class BeaconScheduler {
+  /// Runs all queued effects/subscriptions
+  /// This is made available for testing and should not be used in production
+  static void flush() => core.BeaconScheduler.flush();
+
   /// This scheduler uses the Flutter SchedulerBinding to
   /// schedule updates to be processed after the current frame.
   static void useFlutterScheduler() {
     _flushing = false;
-    BeaconScheduler.setScheduler(_flutterScheduler);
+    core.BeaconScheduler.setScheduler(_flutterScheduler);
   }
 
   /// This scheduler limits the frequency that updates
   /// are processed to 60 times per second.
   static void use60fpsScheduler() {
     _flushing = false;
-    BeaconScheduler.setScheduler(_sixtyfpsScheduler);
+    core.BeaconScheduler.setScheduler(_sixtyfpsScheduler);
   }
 
   /// This scheduler processes updates synchronously. This is not recommended
@@ -24,7 +28,7 @@ abstract class BeaconConfig {
   /// an effect mutates a beacon that it depends on. This is a infinite loop
   /// with the sync scheduler.
   // static void useSyncScheduler() {
-  //   BeaconScheduler.useSyncScheduler();
+  //   core.BeaconScheduler.useSyncScheduler();
   // }
 }
 
@@ -35,7 +39,7 @@ void _sixtyfpsScheduler() {
   if (_flushing) return;
   _flushing = true;
   Future.delayed(_k16ms, () {
-    BeaconScheduler.flush();
+    core.BeaconScheduler.flush();
     _flushing = false;
   });
 }
@@ -44,7 +48,7 @@ void _flutterScheduler() {
   if (_flushing) return;
   _flushing = true;
   SchedulerBinding.instance.addPostFrameCallback((_) {
-    BeaconScheduler.flush();
+    core.BeaconScheduler.flush();
     _flushing = false;
   });
 }

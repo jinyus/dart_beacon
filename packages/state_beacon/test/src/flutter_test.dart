@@ -7,7 +7,7 @@ import 'package:state_beacon/state_beacon.dart';
 import '../common.dart';
 
 void main() {
-  BeaconConfig.useFlutterScheduler();
+  BeaconScheduler.useFlutterScheduler();
   testWidgets('should rebuild Counter widget when count changes',
       (WidgetTester tester) async {
     final counter = Beacon.writable(0);
