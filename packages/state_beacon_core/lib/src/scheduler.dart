@@ -1,8 +1,8 @@
 part of 'producer.dart';
 
 final _effectQueue = Queue<Consumer>();
-void Function() _stabilizeFn = _asyncScheduler;
-bool _stabilizationQueued = false;
+void Function() _flushFn = _asyncScheduler;
+bool _flushing = false;
 
 /// Whether the scheduler is in synchronous mode
 // bool isSynchronousMode = _stabilizeFn == _syncScheduler;
@@ -18,13 +18,13 @@ abstract class BeaconScheduler {
   static void flush() => _flushEffects();
 
   /// Sets the scheduler to the provided function
-  static void setScheduler(void Function() fn) => _stabilizeFn = fn;
+  static void setScheduler(void Function() fn) => _flushFn = fn;
 
   /// This is the default scheduler which processes updates asynchronously
   /// as a DartVM microtask. This does automatic batching of updates.
   static void useAsyncScheduler() {
     // isSynchronousMode = false;
-    _stabilizeFn = _asyncScheduler;
+    _flushFn = _asyncScheduler;
   }
 
   /// This scheduler processes updates synchronously. This is not recommended
@@ -56,11 +56,11 @@ void _flushEffects() {
 }
 
 void _asyncScheduler() {
-  if (!_stabilizationQueued) {
-    _stabilizationQueued = true;
+  if (!_flushing) {
+    _flushing = true;
     Future.microtask(() {
       _flushEffects();
-      _stabilizationQueued = false;
+      _flushing = false;
     });
   }
 }

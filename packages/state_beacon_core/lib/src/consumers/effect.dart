@@ -18,7 +18,7 @@ class Effect with Consumer {
 
   void _schedule() {
     _effectQueue.add(this);
-    _stabilizeFn();
+    _flushFn();
   }
 
   @override

@@ -48,7 +48,7 @@ class Subscription<T> implements Consumer {
       return;
     }
     _effectQueue.add(this);
-    _stabilizeFn();
+    _flushFn();
   }
 
   @override
