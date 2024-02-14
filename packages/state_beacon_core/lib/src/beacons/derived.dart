@@ -30,7 +30,6 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
       for (final observer in _observers) {
         if (observer == untrackedConsumer) return;
-        // print('$name is telling ${observer.name} to check');
         observer.markCheck();
       }
     }
@@ -83,12 +82,9 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
     // handles diamond depenendencies if we're the parent of a diamond.
     if (_previousValue != _value && _observers.isNotEmpty) {
-      // final lst =
-      //     isSynchronousMode ? List.of(_observers, growable: false) : _observers;
       // We've changed value, so mark our children as
       // dirty so they'll reevaluate
       for (final observer in _observers) {
-        // print('$name is sure ${observer.name} is dirty');
         if (observer == untrackedConsumer) return;
         observer._status = Status.dirty;
       }
