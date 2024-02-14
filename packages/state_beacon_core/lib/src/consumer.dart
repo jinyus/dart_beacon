@@ -58,6 +58,7 @@ mixin Consumer {
 
   /// Start watching a new source.
   void startWatching(Producer<dynamic> source) {
+    if (currentGets.contains(source)) return;
     BeaconObserver.instance?.onWatch(name, source);
     // we have to check if currentGets is empty because if it's not
     // then we changed sources in the past so we can't just increment
