@@ -53,48 +53,6 @@ void main() {
     ]);
   });
 
-  // test('should never listen to beacons not accessed on first run', () async {
-  //   final name = Beacon.writable('Bob', name: 'name');
-  //   final age = Beacon.writable(20, name: 'age');
-  //   final college = Beacon.writable('MIT', name: 'college');
-
-  //   final buff = Beacon.bufferedTime<String>(duration: k10ms);
-  //   Beacon.effect(
-  //     () {
-  //       // ignore: unused_local_variable
-  //       var msg = '${name.value} is ${age.value} years old';
-
-  //       if (age.value > 21) {
-  //         // a change to college should not trigger this effect
-  //         // as it is not accessed in the first run
-  //         msg += ' and can go to ${college.value}';
-  //       }
-
-  //       buff.add(msg);
-  //     },
-  //     supportConditional: false,
-  //   );
-
-  //   name.value = 'Alice';
-  //   age.value = 21;
-  //   college.value = 'Stanford';
-  //   age.value = 22;
-  //   college.value = 'Harvard';
-  //   age.value = 18;
-
-  //   college.value = 'Yale';
-
-  //   await delay(k10ms * 2);
-
-  //   expect(buff.value, [
-  //     'Bob is 20 years old',
-  //     'Alice is 20 years old',
-  //     'Alice is 21 years old',
-  //     'Alice is 22 years old and can go to Stanford',
-  //     'Alice is 18 years old',
-  //   ]);
-  // });
-
   test('should run when a dependency changes', () async {
     final beacon = Beacon.writable<int>(10);
     var effectCalled = false;
@@ -137,26 +95,28 @@ void main() {
     expect(effectCalled, isFalse);
   });
 
-  test('should run when any of its multiple dependencies change', () async {
+  test('should run when any of its multiple dependencies change', () {
     final beacon1 = Beacon.writable<int>(10);
     final beacon2 = Beacon.writable<int>(20);
-    var effectCalled = false;
+    var ran = 0;
 
     Beacon.effect(() {
-      effectCalled = true;
+      ran++;
       beacon1.value;
-      beacon2(); // Multiple dependencies
+      beacon2();
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
-    beacon1.value = 15; // Changing one of the dependencies
-    expect(effectCalled, isTrue);
+    expect(ran, 1);
 
-    effectCalled = false; // Resetting for the next check
-    beacon2.value = 25; // Changing the other dependency
-    await BeaconScheduler.settle();
-    expect(effectCalled, isTrue);
+    beacon1.value = 15;
+    BeaconScheduler.flush();
+    expect(ran, 2);
+
+    beacon2.value = 25;
+    BeaconScheduler.flush();
+    expect(ran, 3);
   });
 
   test('should run immediately upon creation', () async {
@@ -262,49 +222,11 @@ void main() {
     expect(effectCalled, 2);
     expect(effectCalled2, 2);
     expect(effectCalled3, 2);
+
+    expect(a.listenersCount, 0);
+    expect(b.listenersCount, 0);
+    expect(c.listenersCount, 0);
   });
-
-  // test('should dispose sub effects when supportConditional is false', () {
-  //   final beacon1 = Beacon.writable<int>(10, name: 'beacon1');
-  //   final beacon2 = Beacon.writable<int>(20, name: 'beacon2');
-  //   final beacon3 = Beacon.writable<int>(30, name: 'beacon3');
-  //   var effectCalled = 0;
-  //   var effectCalled2 = 0;
-  //   var effectCalled3 = 0;
-
-  //   final dispose = Beacon.effect(
-  //     () {
-  //       effectCalled++;
-  //       beacon1.value;
-
-  //       return Beacon.effect(
-  //         () {
-  //           effectCalled2++;
-  //           beacon2.value;
-
-  //           return Beacon.effect(() {
-  //             effectCalled3++;
-  //             beacon3.value;
-  //           });
-  //         },
-  //         supportConditional: false,
-  //       );
-  //     },
-  //     supportConditional: false,
-  //   );
-
-  //   beacon1.value = 15;
-  //   expect(effectCalled, 2);
-  //   expect(effectCalled2, 2);
-  //   expect(effectCalled3, 2);
-
-  //   dispose();
-
-  //   beacon2.value = 25;
-  //   expect(effectCalled, 2);
-  //   expect(effectCalled2, 2);
-  //   expect(effectCalled3, 2);
-  // });
 
   test('should not watch beacons accessed in child effects', () async {
     final a = Beacon.writable<int>(10, name: 'a');
@@ -433,5 +355,71 @@ void main() {
 
     expect(a.value, 21);
     expect(called, 2);
+  });
+
+  test('should create single dependency if accessed multiple times', () {
+    final a = Beacon.writable(1);
+    var ran = 0;
+
+    Beacon.effect(() {
+      ran++;
+      a.value;
+      a.value;
+    });
+
+    expect(ran, 0);
+    BeaconScheduler.flush();
+    expect(ran, 1);
+    expect(a.listenersCount, 1);
+  });
+
+  test('should call clean up function when re-executing/disposed', () {
+    final a = Beacon.writable(1);
+    var ran = 0;
+    var cleanUpCalled = 0;
+
+    final dispose = Beacon.effect(() {
+      ran++;
+      a.value;
+      return () {
+        cleanUpCalled++;
+      };
+    });
+
+    expect(ran, 0);
+    BeaconScheduler.flush();
+    expect(ran, 1);
+    expect(a.listenersCount, 1);
+
+    a.value = 2;
+    BeaconScheduler.flush();
+    expect(ran, 2);
+    expect(cleanUpCalled, 1);
+
+    dispose();
+    expect(a.listenersCount, 0);
+    expect(cleanUpCalled, 2);
+  });
+
+  test('should run when derived beacon dependency changes', () {
+    final a = Beacon.writable(1);
+    final b = Beacon.derived(() => a() + 1);
+    var ran = 0;
+
+    Beacon.effect(() {
+      ran++;
+      b.value;
+    });
+
+    BeaconScheduler.flush();
+    expect(ran, 1);
+
+    a.value = 3;
+    BeaconScheduler.flush();
+    expect(ran, 2);
+
+    a.value = 4;
+    BeaconScheduler.flush();
+    expect(ran, 3);
   });
 }

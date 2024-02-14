@@ -254,4 +254,20 @@ void main() {
     expect(ran, 4);
     expect(notified, 4);
   });
+
+  test('should create single dependency if accessed multiple times', () {
+    final a = Beacon.writable(1);
+    var ran = 0;
+    final d = Beacon.derived(() {
+      ran++;
+      a.value;
+      a.value;
+      return a.value;
+    });
+
+    expect(ran, 0);
+    expect(d.value, 1);
+    expect(ran, 1);
+    expect(a.listenersCount, 1);
+  });
 }
