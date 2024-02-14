@@ -28,10 +28,8 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     if (_status.index < newStatus.index) {
       _status = newStatus;
 
-      var i = 0;
-      while (i < _observers.length) {
+      for (var i = 0; i < _observers.length; i++) {
         _observers[i].markCheck();
-        i++;
       }
     }
   }
@@ -85,8 +83,9 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     if (_previousValue != _value && _observers.isNotEmpty) {
       // We've changed value, so mark our children as
       // dirty so they'll reevaluate
-      for (final observer in _observers) {
-        observer._status = Status.dirty;
+
+      for (var i = 0; i < _observers.length; i++) {
+        _observers[i]._status = Status.dirty;
       }
     }
 

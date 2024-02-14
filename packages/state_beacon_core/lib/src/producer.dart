@@ -172,10 +172,8 @@ abstract class Producer<T> {
   }
 
   void _notifyListeners() {
-    var i = 0;
-    while (i < _observers.length) {
+    for (var i = 0; i < _observers.length; i++) {
       _observers[i].markDirty();
-      i++;
     }
   }
 
