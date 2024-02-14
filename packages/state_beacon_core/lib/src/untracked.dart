@@ -1,22 +1,24 @@
 part of 'producer.dart';
 
 /// The current untracked effect.
-Effect? untrackedConsumer;
-
-/// Whether the current effect is running untracked.
-bool isRunningUntracked() => untrackedConsumer != null;
+int untrackedDepth = 0;
 
 /// Runs a function untracked.
 void doUntracked(VoidCallback fn) {
-  if (isRunningUntracked()) {
+  if (untrackedDepth > 0) {
     fn();
     return;
   }
 
-  untrackedConsumer =
-      currentConsumer is Effect ? currentConsumer! as Effect : null;
+  untrackedDepth++;
 
-  fn();
+  final prevConsumer = currentConsumer;
+  currentConsumer = null;
 
-  untrackedConsumer = null;
+  try {
+    fn();
+  } finally {
+    currentConsumer = prevConsumer;
+    untrackedDepth--;
+  }
 }

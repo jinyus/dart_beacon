@@ -172,17 +172,10 @@ abstract class Producer<T> {
   }
 
   void _notifyListeners() {
-    if (isRunningUntracked()) {
-      for (final observer in _observers) {
-        if (observer == untrackedConsumer) return;
-        observer.markDirty();
-      }
-    } else {
-      var i = 0;
-      while (i < _observers.length) {
-        _observers[i].markDirty();
-        i++;
-      }
+    var i = 0;
+    while (i < _observers.length) {
+      _observers[i].markDirty();
+      i++;
     }
   }
 

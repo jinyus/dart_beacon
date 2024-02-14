@@ -28,9 +28,10 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     if (_status.index < newStatus.index) {
       _status = newStatus;
 
-      for (final observer in _observers) {
-        if (observer == untrackedConsumer) return;
-        observer.markCheck();
+      var i = 0;
+      while (i < _observers.length) {
+        _observers[i].markCheck();
+        i++;
       }
     }
   }
@@ -85,7 +86,6 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
       // We've changed value, so mark our children as
       // dirty so they'll reevaluate
       for (final observer in _observers) {
-        if (observer == untrackedConsumer) return;
         observer._status = Status.dirty;
       }
     }

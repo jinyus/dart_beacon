@@ -638,25 +638,7 @@ class _BeaconCreator {
     return effect.dispose;
   }
 
-  /// Runs the function without tracking any changes to the state.
-  /// This is useful when you want to run a function that
-  /// changes the state, but you don't want to notify listeners of those changes.
-  ///
-  /// ```dart
-  /// final age = Beacon.writable<int>(10);
-  /// var callCount = 0;
-  /// age.subscribe((_) => callCount++);
-  ///
-  /// Beacon.effect(() {
-  ///      age.value;
-  ///      Beacon.untracked(() {
-  ///        age.value = 15;
-  ///      });
-  /// });
-  ///
-  /// expect(callCount, equals(0));
-  /// expect(age.value, 15);
-  /// ```
+  /// Runs a function without tracking any beacons accessed within it.
   void untracked(VoidCallback fn) {
     doUntracked(fn);
   }
