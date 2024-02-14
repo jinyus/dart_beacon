@@ -65,7 +65,7 @@ void main() {
 
     myBeacon.start();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
@@ -82,7 +82,7 @@ void main() {
 
     myBeacon.start();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
@@ -154,7 +154,7 @@ void main() {
 
     expect(buff.value, isEmpty);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(listens, 1);
 
@@ -172,7 +172,7 @@ void main() {
 
     counter.increment(); // dep changed, should unsub from old stream
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(unsubs, 1);
     expect(listens, 2);
@@ -192,7 +192,7 @@ void main() {
 
     counter.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(unsubs, 2); // dep changed, should unsub from old stream
     expect(listens, 3);

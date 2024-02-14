@@ -22,7 +22,7 @@ void main() {
       beacon.value;
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.listenersCount, 2);
 

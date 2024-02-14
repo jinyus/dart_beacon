@@ -9,10 +9,6 @@ bool _flushing = false;
 
 /// A class for configuring the scheduler
 abstract class BeaconScheduler {
-  /// Returns a future that completes when all queued effects have been flushed
-  static Future<void> settle([Duration duration = Duration.zero]) =>
-      Future.delayed(duration);
-
   /// Runs all queued effects/subscriptions
   /// This is made available for testing and should not be used in production
   static void flush() => _flushEffects();

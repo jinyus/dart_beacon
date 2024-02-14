@@ -18,7 +18,7 @@ void main() {
 
     Beacon.effect(() => beacon.value);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.listenersCount, 1);
     expect(beacon.listenersCount, 1);
@@ -35,21 +35,21 @@ void main() {
 
     filtered.value = 1;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, 1);
     expect(filtered.value, 0);
 
     filtered.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, 1);
     expect(filtered.value, 0);
 
     filtered.value = 2;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, 2);
     expect(filtered.value, 2);
@@ -62,13 +62,13 @@ void main() {
 
     filtered.value = 1; // 1st value so not debounced
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 1);
 
     filtered.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 1); // debouncing so not updated yet
 
@@ -87,37 +87,37 @@ void main() {
 
     filtered.value = 1;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 0);
 
     filtered.value = -2; // doesn't pass f2
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 0);
 
     filtered.value = 6; // doesn't pass f3
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 0);
 
     filtered.value = 12;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 12);
 
     filtered.value = 0;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 12);
 
     filtered.reset();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 0);
   });
@@ -138,7 +138,7 @@ void main() {
 
     filtered.value = 20; // throttled
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 10);
 
@@ -148,7 +148,7 @@ void main() {
 
     filtered.value = 30;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 10); // debounced
 
@@ -164,14 +164,14 @@ void main() {
         .filter(name: 'f1', filter: (_, n) => n > 5)
         .buffer(2, name: 'buffered');
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buffered.value, <int>[]);
     expect(buffered.currentBuffer(), <int>[10]);
 
     buffered.add(20);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.value, 20);
     expect(buffered.value, <int>[10, 20]);
@@ -179,7 +179,7 @@ void main() {
 
     buffered.add(2); // doesn't pass filter
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.value, 2);
     expect(buffered.value, <int>[10, 20]); // no change
@@ -187,7 +187,7 @@ void main() {
 
     buffered.add(50); // doesn't pass filter
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.value, 50);
     expect(buffered.value, <int>[10, 20]);
@@ -195,7 +195,7 @@ void main() {
 
     buffered.add(70); // doesn't pass filter
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.value, 70);
     expect(buffered.value, <int>[50, 70]);
@@ -205,7 +205,7 @@ void main() {
 
     buffered.reset();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(count.value, 10);
     expect(buffered.value, <int>[]);
@@ -251,7 +251,7 @@ void main() {
     final stream = Stream.periodic(k1ms, (i) => i);
     final beacon = stream.toRawBeacon(isLazy: true).buffer(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     await expectLater(beacon.next(), completion([0, 1, 2, 3, 4]));
   });
@@ -263,7 +263,7 @@ void main() {
         .filter(filter: (p, n) => n.isEven)
         .buffer(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     await expectLater(beacon.next(), completion([0, 2, 4, 6, 8]));
   });
@@ -274,7 +274,7 @@ void main() {
     final beacon =
         stream.toRawBeacon(isLazy: true).debounce(duration: k10ms).buffer(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon(), <int>[]);
     await expectLater(beacon.currentBuffer.next(), completion([0]));
@@ -288,7 +288,7 @@ void main() {
         .throttle(duration: k10ms * 1.3)
         .buffer(2);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     final result = await beacon.next();
 
@@ -305,7 +305,7 @@ void main() {
         .throttle(duration: k10ms, dropBlocked: false)
         .buffer(2);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     final result = await beacon.next();
 
@@ -320,7 +320,7 @@ void main() {
         .filter(name: 'f1', filter: (p, n) => n > 5)
         .buffer(2, name: 'buffered');
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     count.subscribe((p0) => called++);
 
@@ -328,7 +328,7 @@ void main() {
 
     buff.add(20);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 1);
 
@@ -337,7 +337,7 @@ void main() {
 
     buff.add(20);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
@@ -345,7 +345,7 @@ void main() {
 
     buff.add(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 3);
 
@@ -353,7 +353,7 @@ void main() {
 
     buff.add(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 4);
 
@@ -368,13 +368,13 @@ void main() {
     final buff = count.buffer(5, name: 'buff');
 
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
@@ -387,13 +387,13 @@ void main() {
     final buff = count.buffer(5);
 
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
@@ -406,13 +406,13 @@ void main() {
     final buff = count.buffer(5);
 
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
@@ -425,13 +425,13 @@ void main() {
     final buff = count.buffer(5);
 
     tbeacon.add(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
@@ -444,13 +444,13 @@ void main() {
     final buff = count.buffer(5);
 
     tbeacon.add(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(20);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     tbeacon.add(5);
-    await BeaconScheduler.settle(k10ms * 1.1);
+    BeaconScheduler.flush();
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });

@@ -9,15 +9,15 @@ void main() {
     var called = 0;
 
     beacon.subscribe((_) => called++);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     beacon.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     beacon.value = 11;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 3);
   });
 

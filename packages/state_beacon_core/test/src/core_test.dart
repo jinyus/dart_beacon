@@ -329,7 +329,7 @@ void main() {
       ..value = 20
       ..value = 23;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // There were 4 updates, but only 1 notification
     // In synchronous mode, there are 4 notifications
@@ -414,12 +414,12 @@ void main() {
       final count = Beacon.writable(0);
       final beacon = Beacon.derived(() => count.value * 2);
       beacon.subscribe((p0) {});
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
       count.set(1);
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
       expect(beacon.previousValue, equals(0));
       count.set(5);
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
       expect(beacon.previousValue, equals(2));
       expect(beacon.initialValue, 0);
     });
@@ -437,11 +437,9 @@ void main() {
 
       count.set(1);
 
-      await BeaconScheduler.settle();
+      await delay(k1ms);
 
       count.set(5);
-
-      await BeaconScheduler.settle();
 
       await delay(k10ms);
 

@@ -14,12 +14,12 @@ void main() {
     var ran = 0;
     beacon.subscribe((_) => ran++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 1);
 
     beacon.value = 20;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 2);
   });
 
@@ -29,11 +29,11 @@ void main() {
     var ran = 0;
     beacon.subscribe((_) => ran++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 1);
 
     beacon.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 1);
   });
 
@@ -52,15 +52,15 @@ void main() {
     var ran = 0;
 
     final unsubscribe = beacon.subscribe((_) => ran++);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 1);
 
     beacon.value = 20;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 2);
 
     unsubscribe();
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran, 2);
   });
 
@@ -72,14 +72,14 @@ void main() {
     beacon.subscribe((_) => ran1++);
     beacon.subscribe((_) => ran2++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran1, 1);
     expect(ran2, 1);
 
     beacon.value = 20;
     beacon.value = 21;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(ran1, 2);
     expect(ran2, 2);
   });
@@ -167,7 +167,7 @@ void main() {
     filterBeacon.subscribe((_) => fCalled++);
     undoRedoBeacon.subscribe((_) => uCalled++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 1);
     expect(tCalled, 1);
@@ -176,37 +176,37 @@ void main() {
     expect(uCalled, 1);
 
     beacon.value = 20;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(20, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(20, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 4);
 
     throttleBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(tCalled, 2);
 
     debounceBeacon.set(10, force: true);
-    await BeaconScheduler.settle(time * 1.2);
+    await delay(time * 1.2);
     expect(dCalled, 2);
 
     filterBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     filterBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(fCalled, 3);
 
     undoRedoBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     undoRedoBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(uCalled, 3);
 
     await delay(time * 1.2);
 
     throttleBeacon.set(10, force: true);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(tCalled, 3);
   });
 }

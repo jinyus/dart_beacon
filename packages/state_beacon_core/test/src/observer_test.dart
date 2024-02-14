@@ -60,18 +60,18 @@ void main() {
     final a = Beacon.writable(10);
     final guard = Beacon.writable(true);
     a.value = 20;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     a.increment();
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     a.dispose();
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     final dispose = Beacon.effect(() {
       if (guard.value) {
         a.value;
       }
     });
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(_onCreateCalled, equals(2));
     expect(_onUpdateCalled, equals(2));
@@ -81,12 +81,12 @@ void main() {
 
     guard.value = false;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(_onStopWatchCalled, equals(1));
 
     dispose();
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(_onStopWatchCalled, equals(2));
   });
 

@@ -22,24 +22,24 @@ void main() {
       name: 'effect',
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     name.value = 'Alice';
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     age.value = 21;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     college.value = 'Stanford'; // Should not run because age is less than 21
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     age.value = 22;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     college.value = 'Harvard';
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     age.value = 18;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Should stop listening to college beacon because age is less than 21
     college.value = 'Yale';
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // if (isSynchronousMode) return;
 
@@ -62,14 +62,14 @@ void main() {
       beacon(); // Dependency
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Should be true immediately after createEffect
     expect(effectCalled, isTrue);
 
     effectCalled = false; // Resetting for the next check
     beacon.value = 20;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, isTrue);
   });
 
@@ -81,7 +81,7 @@ void main() {
       effectCalled = true;
       beacon.value; // Dependency
     });
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Should be true immediately after createEffect
     expect(effectCalled, isTrue);
@@ -89,7 +89,7 @@ void main() {
     effectCalled = false; // Resetting for the next check
     beacon.value = 10;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Not changing the beacon value
     expect(effectCalled, isFalse);
@@ -128,7 +128,7 @@ void main() {
       beacon.value;
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Should be true immediately after createEffect
     expect(effectCalled, isTrue);
@@ -143,7 +143,7 @@ void main() {
       beacon.value;
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.listenersCount, 1);
     cancel();
@@ -151,7 +151,7 @@ void main() {
     expect(beacon.listenersCount, 0);
 
     beacon.value = 20;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 1);
   });
 
@@ -163,12 +163,12 @@ void main() {
       called++;
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.value = 20;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(a.value, 21);
     expect(called, 2);
   });
@@ -205,11 +205,11 @@ void main() {
       name: 'e1',
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     a.value = 15;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 2);
     expect(effectCalled2, 2);
     expect(effectCalled3, 2);
@@ -218,7 +218,7 @@ void main() {
 
     b.value = 25;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 2);
     expect(effectCalled2, 2);
     expect(effectCalled3, 2);
@@ -251,25 +251,25 @@ void main() {
       });
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     a.value = 15;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 2);
     expect(effectCalled2, 2);
     expect(effectCalled3, 2);
 
     b.value = 25;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 2);
     expect(effectCalled2, 3);
     expect(effectCalled3, 3);
 
     c.value = 35;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(effectCalled, 2);
     expect(effectCalled2, 3);
     expect(effectCalled3, 4);
@@ -296,7 +296,7 @@ void main() {
       name: 'effect',
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 1);
     expect(a.listenersCount, 1);
@@ -305,7 +305,7 @@ void main() {
 
     a.value = 3;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 2);
     expect(a.listenersCount, 1);
@@ -314,7 +314,7 @@ void main() {
 
     guard.value = false;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 3);
     expect(a.listenersCount, 0);
@@ -323,13 +323,13 @@ void main() {
 
     b.value = 4;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 3);
 
     c.value = 5;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 4);
   });

@@ -15,7 +15,7 @@ void main() {
         ..add(2)
         ..add(3); // This should trigger the buffer to be set
 
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
 
       expect(buffer, equals([1, 2, 3]));
     });
@@ -30,7 +30,7 @@ void main() {
         ..add(1)
         ..add(2); // First trigger
 
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
 
       expect(buffer, equals([1, 2]));
 
@@ -42,7 +42,7 @@ void main() {
 
       beacon.add(4); // Second trigger
 
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
 
       expect(buffer, equals([3, 4]));
     });
@@ -57,7 +57,7 @@ void main() {
         ..add(1)
         ..add(2);
 
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
 
       expect(beacon.currentBuffer.value, equals([1, 2]));
 
@@ -67,7 +67,7 @@ void main() {
 
       expect(beacon.currentBuffer.value, equals([4]));
 
-      await BeaconScheduler.settle();
+      BeaconScheduler.flush();
 
       expect(buffer, equals([1, 2, 3]));
     });

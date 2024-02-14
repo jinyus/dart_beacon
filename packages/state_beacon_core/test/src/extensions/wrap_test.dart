@@ -65,7 +65,7 @@ void main() {
     beacon.add(1);
     beacon.add(2);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.currentBuffer.value, [1, 2]);
 

@@ -10,24 +10,24 @@ void main() {
 
     final dispose = a.subscribe((_) => called++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.value = 2;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     a.value = 2; // no change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     a.set(2, force: true); // force change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 3);
 
     dispose();
     a.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 3);
   });
 
@@ -61,24 +61,24 @@ void main() {
 
     final dispose = a.subscribe((_) => called++, startNow: false);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 0);
 
     a.value = 2;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.value = 2; // no change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.set(2, force: true); // force change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     dispose();
     a.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
   });
 
@@ -121,24 +121,24 @@ void main() {
 
     final dispose = c.subscribe((_) => called++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.value = 2;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     a.value = 2; // no change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
 
     // a.set(2, force: true); // force change
-    // await BeaconScheduler.settle();
+    // BeaconScheduler.flush();
     // expect(called, 3);
 
     dispose();
     a.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
   });
 
@@ -180,24 +180,24 @@ void main() {
 
     final dispose = c.subscribe((_) => called++, startNow: false);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 0);
 
     a.value = 2;
-    await BeaconScheduler.settle(k10ms);
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.value = 2; // no change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
 
     a.set(2, force: true); // force change
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1); // propagation won't make it to c
 
     dispose();
     a.value = 10;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
   });
 
@@ -250,7 +250,7 @@ void main() {
 
     c.subscribe((_) => called++, startNow: false);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 0);
 
     // derived isn't empty so its registered as an observer of its sources

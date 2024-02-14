@@ -22,7 +22,7 @@ void main() {
 
     nums.add(4);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 1);
 
@@ -32,7 +32,7 @@ void main() {
 
     expect(nums.value, equals({1, 3, 4}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
@@ -40,7 +40,7 @@ void main() {
 
     expect(nums.value, equals({1, 3, 4, 5, 6, 7}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 3);
 
@@ -48,7 +48,7 @@ void main() {
 
     expect(nums.value, equals(<int>{}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 4);
 
@@ -56,7 +56,7 @@ void main() {
 
     expect(nums.value, equals({1, 2, 3}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 5);
 
@@ -64,7 +64,7 @@ void main() {
 
     expect(nums.value, equals({1, 3}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 6);
 
@@ -72,7 +72,7 @@ void main() {
 
     expect(nums.value, equals({1, 3, 4, 5, 6}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 7);
 
@@ -80,7 +80,7 @@ void main() {
 
     expect(nums.value, equals({1, 3, 5}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 8);
 
@@ -88,7 +88,7 @@ void main() {
 
     expect(nums.value, equals({3, 5}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 9);
 
@@ -100,7 +100,7 @@ void main() {
 
     expect(nums.value, equals(<int>{}));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(called, 10);
   });

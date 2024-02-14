@@ -70,7 +70,7 @@ void main() {
     final myBeacon = Beacon.streamRaw(Stream<int>.empty, initialValue: 0);
     final myBeacon2 = Beacon.streamRaw(Stream<int>.empty, initialValue: 0);
 
-    await BeaconScheduler.settle(k10ms);
+    BeaconScheduler.flush();
 
     expect(myBeacon, myBeacon2);
   });
@@ -102,7 +102,7 @@ void main() {
 
     expect(buff.value, isEmpty);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(listens, 1);
 
@@ -110,7 +110,7 @@ void main() {
 
     counter.increment(); // dep changed, should unsub from old stream
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(unsubs, 1);
     expect(listens, 2);
@@ -119,7 +119,7 @@ void main() {
 
     counter.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(unsubs, 2); // dep changed, should unsub from old stream
     expect(listens, 3);

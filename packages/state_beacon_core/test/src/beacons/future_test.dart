@@ -22,7 +22,7 @@ void main() {
     completer.complete('result');
     await completer.future; // Wait for the future to complete
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(futureBeacon.value, isA<AsyncData<String>>());
 
@@ -121,19 +121,19 @@ void main() {
 
     final myBeacon = Beacon.future(() => controller.stream.first, name: 'f');
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
     controller.add(10);
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(myBeacon.unwrapValue(), 10);
 
     myBeacon.overrideWith(() => controller.stream.first);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
@@ -141,7 +141,7 @@ void main() {
 
     controller.addError(Exception('error'));
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(myBeacon.isError, true);
 
@@ -248,7 +248,7 @@ void main() {
 
     count.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(fullName.isLoading, true);
 
@@ -258,7 +258,7 @@ void main() {
 
     count2.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(fullName.isLoading, true);
 
@@ -293,7 +293,7 @@ void main() {
 
     count.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(greeting.isLoading, true);
 
@@ -445,7 +445,7 @@ void main() {
     ageBeacon.value = 21;
     speedBeacon.value = 11;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(stats.isLoading, isTrue);
 
@@ -457,7 +457,7 @@ void main() {
 
     nameFB.overrideWith(() => throw Exception('error'));
 
-    // await BeaconScheduler.settle();
+    // BeaconScheduler.flush();
 
     await expectLater(
       stats.stream,
@@ -482,7 +482,7 @@ void main() {
 
     final status = derivedBeacon.status;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(num1.listenersCount, 1);
     expect(num2.listenersCount, 1);
@@ -493,7 +493,7 @@ void main() {
       name: 'custom effect',
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(derivedBeacon.listenersCount, 1);
 
@@ -527,7 +527,7 @@ void main() {
 
     final unsub2 = Beacon.effect(() => derivedBeacon.value);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(derivedBeacon.listenersCount, 1);
 
@@ -565,13 +565,13 @@ void main() {
       return num1.value + num2.value;
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 1);
 
     final unsub = Beacon.effect(() => derivedBeacon.value);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 1);
 
@@ -587,19 +587,19 @@ void main() {
     num1.increment();
     num2.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 2);
 
     expect(derivedBeacon.isLoading, true);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 3);
 
     num1.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 4);
 
@@ -624,7 +624,7 @@ void main() {
       shouldSleep: false,
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 1);
 
@@ -643,17 +643,17 @@ void main() {
     // derived should still execute when it has no more watchers
     num1.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     num2.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 4);
 
     num1.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 5);
 
@@ -680,7 +680,7 @@ void main() {
       shouldSleep: false,
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(num1.listenersCount, 1);
     expect(num2.listenersCount, 0);
@@ -702,7 +702,7 @@ void main() {
 
     guard.value = false;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(num1.listenersCount, 0);
     expect(num2.listenersCount, 1);
@@ -714,13 +714,13 @@ void main() {
 
     num1.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(derivedBeacon.unwrapValue(), 20);
 
     num2.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     await delay(k1ms);
 
@@ -728,7 +728,7 @@ void main() {
 
     guard.value = true;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(num1.listenersCount, 1);
     expect(num2.listenersCount, 0);
@@ -753,19 +753,19 @@ void main() {
       name: 'myBeacon',
     );
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(myBeacon.isLoading, true);
 
     controller.add(10);
 
-    await BeaconScheduler.settle(k10ms);
+    await delay(k10ms);
 
     expect(myBeacon.unwrapValue(), 100);
 
     count.value = 20;
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(myBeacon.isLoading, true);
 
@@ -773,7 +773,7 @@ void main() {
 
     controller.addError(Exception('error'));
 
-    await BeaconScheduler.settle();
+    await delay(k10ms);
 
     expect(myBeacon.isError, true);
 

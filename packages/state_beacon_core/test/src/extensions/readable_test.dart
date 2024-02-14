@@ -22,13 +22,13 @@ void main() {
       ]),
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.value = 1;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.value = 2;
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.dispose();
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
   });
 
   test('should cache stream', () {
@@ -59,7 +59,7 @@ void main() {
       k10ms,
       () async {
         beacon.set(3); // Not even, should be ignored
-        await BeaconScheduler.settle();
+        BeaconScheduler.flush();
         beacon.set(42);
       }, // Even, should be completed with this value
     );
@@ -92,7 +92,7 @@ void main() {
 
     beacon.set(42);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     await futureValue; // Ensure the future is completed
 
@@ -101,7 +101,7 @@ void main() {
     // set more values, and the future should not complete again
     beacon.set(99);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // Assert that the future didn't complete again
     expect(futureValue, completes);
@@ -118,11 +118,11 @@ void main() {
     expect(buffered, isA<BufferedCountBeacon<int>>());
 
     beacon.set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buffered.value, [0, 1, 2]);
   });
@@ -140,15 +140,15 @@ void main() {
     );
 
     beacon.set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(4);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(5);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buffered.value, [1, 2, 3]);
 
@@ -177,11 +177,11 @@ void main() {
     expect(buffered, isA<BufferedTimeBeacon<int>>());
 
     buffered.add(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     buffered.add(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     buffered.add(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
     expect(buffered.value, isEmpty);
@@ -199,11 +199,11 @@ void main() {
     expect(debounced, isA<DebouncedBeacon<int>>());
 
     beacon.set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(debounced.value, 0);
 
@@ -220,11 +220,11 @@ void main() {
     expect(throttled, isA<ThrottledBeacon<int>>());
 
     beacon.set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(throttled.value, 0);
 
@@ -241,11 +241,11 @@ void main() {
     expect(filtered, isA<FilteredBeacon<int>>());
 
     beacon.set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(filtered.value, 2);
   });

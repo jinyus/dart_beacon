@@ -17,7 +17,7 @@ void main() {
 
     beacon.toggle();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, false);
 
@@ -31,7 +31,7 @@ void main() {
 
     beacon.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, 1);
 
@@ -65,17 +65,17 @@ void main() {
       ),
     );
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     await beacon.tryCatch(() => testFuture(false));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, isA<AsyncData<int>>());
 
     await beacon.tryCatch(() => testFuture(true));
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(beacon.value, isA<AsyncError<int>>());
   });

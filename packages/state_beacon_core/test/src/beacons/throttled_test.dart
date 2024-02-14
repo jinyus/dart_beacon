@@ -29,7 +29,7 @@ void main() {
 
     beacon.subscribe((_) => ran++);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 1);
 
@@ -43,7 +43,7 @@ void main() {
     expect(beacon.value, 1); // should be updated immediately
     expect(beacon.isBlocked, true);
 
-    await BeaconScheduler.settle(k10ms);
+    BeaconScheduler.flush();
     expect(ran, 2); // 5 notifications should be sent
   });
 
@@ -110,7 +110,7 @@ void main() {
 
     expect(beacon.value, 50);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     // only ran twice even though value was updated 5 times
     expect(called, 2);
@@ -127,7 +127,7 @@ void main() {
       ..subscribe(values.add)
       ..set(1);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(values, [1]); // first update is allowed
 
@@ -169,13 +169,13 @@ void main() {
       ..set(4)
       ..set(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1); // 5 notifications should be sent
 
     expect(beacon.value, 1); // should be updated immediately
     expect(beacon.isBlocked, true);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1); // 5 notifications should be sent
   });
 
@@ -186,20 +186,20 @@ void main() {
     beacon
       ..subscribe((_) => called++)
       ..set(1);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
     beacon.set(2);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
     beacon.set(3);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 3);
     beacon.set(4);
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 4);
     beacon.set(5);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(beacon.value, 5); // should be updated immediately
 
     expect(called, 5); // 5 notifications should be sent

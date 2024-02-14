@@ -14,13 +14,13 @@ void main() {
       return beacon();
     });
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(effectCount, 0);
 
     beacon.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(effectCount, 0);
 
@@ -29,7 +29,7 @@ void main() {
 
     beacon.increment();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(effectCount, 1);
 
@@ -124,7 +124,7 @@ void main() {
 
     final unsub = Beacon.effect(() => derivedBeacon.value);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(derivedBeacon.listenersCount, 1);
     expect(num1.listenersCount, 1);
@@ -149,7 +149,7 @@ void main() {
 
     final unsub2 = Beacon.effect(() => derivedBeacon.value);
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(derivedBeacon.listenersCount, 1);
 
@@ -191,7 +191,7 @@ void main() {
 
     final dispose = d.subscribe((_) => notified++);
 
-    await BeaconScheduler.settle(k10ms);
+    BeaconScheduler.flush();
 
     expect(ran, 1);
     expect(notified, 1);
@@ -202,7 +202,7 @@ void main() {
 
     a.value = 3;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 2);
     expect(notified, 2);
@@ -212,7 +212,7 @@ void main() {
 
     guard.value = false;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 3);
     expect(notified, 3);
@@ -222,21 +222,21 @@ void main() {
 
     b.value = 4;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 3);
     expect(notified, 3);
 
     c.value = 5;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 4);
     expect(notified, 4);
 
     dispose();
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(d.listenersCount, 0);
     expect(a.listenersCount, 0);
@@ -249,7 +249,7 @@ void main() {
     // derived shouldn't run because it's not being listened to
     guard.value = true;
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
 
     expect(ran, 4);
     expect(notified, 4);

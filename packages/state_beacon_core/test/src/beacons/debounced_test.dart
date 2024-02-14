@@ -37,20 +37,20 @@ void main() {
       ..subscribe((_) => called++)
       ..set('a');
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 1);
     beacon.set('ap');
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 2);
     beacon.set('app');
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 3);
     beacon.set('appl');
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(called, 4);
     beacon.set('apple');
 
-    await BeaconScheduler.settle();
+    BeaconScheduler.flush();
     expect(beacon.value, 'apple'); // should be updated immediately
 
     expect(called, 5); // 5 notifications should be sent
