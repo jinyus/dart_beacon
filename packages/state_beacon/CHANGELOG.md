@@ -1,3 +1,7 @@
+# 0.33.4
+
+-   [Fix] Concurrent modification error when notifying listeners.
+
 # 0.33.3
 
 -   Allow a duration to be null in `ThrottledBeacon` and `DebouncedBeacon` to disable the throttle/debouncing. This makes them easier to test.
