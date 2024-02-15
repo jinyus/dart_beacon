@@ -10,9 +10,6 @@ enum FutureStatus {
 
   /// The future is currently running.
   running,
-
-  /// The future has been restarted.
-  restarted,
 }
 
 /// See `Beacon.future`
@@ -23,56 +20,45 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     super.name,
     this.shouldSleep = true,
     bool manualStart = false,
-  }) {
-    if (manualStart) {
-      _status.set(FutureStatus.idle);
-      _setValue(AsyncIdle());
-    } else {
-      _status.set(FutureStatus.running);
-      _setValue(AsyncLoading());
-    }
-
+  }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     _isEmpty = false;
-    _wakeUp();
+
+    if (!manualStart) start();
   }
 
-  late VoidCallback _effectDispose;
+  VoidCallback? _effectDispose;
   var _executionID = 0;
   var _sleeping = false;
 
   /// Whether the future should sleep when there are no observers.
   final bool shouldSleep;
   FutureCallback<T> _compute;
-  late final _status = Beacon.lazyWritable<FutureStatus>(
-    name: "$name's status",
-  );
+  var _status = FutureStatus.idle;
 
-  /// The status of the future.
-  ReadableBeacon<FutureStatus> get status => _status;
+  /// The current status of the future.
+  FutureStatus get status => _status;
 
   void _goToSleep() {
     _sleeping = true;
-    _status.value = FutureStatus.idle;
-    _effectDispose();
+    _effectDispose?.call();
   }
 
   void _wakeUp() {
     if (_sleeping) {
       _sleeping = false;
-      _status.value = FutureStatus.running;
+      _status = FutureStatus.running;
+      // needs to be in loading state instantly when waking up
+      // so beacon.value.isLoading is true
       _setLoadingWithLastData();
     }
 
     _effectDispose = Beacon.effect(
       () async {
-        // beacon is manually triggered if in idle state
-        if (_status.value == FutureStatus.idle) {
-          return;
-        }
-
         final currentExeID = _startLoading();
 
         try {
+          // asStream() isn't used because an exception can
+          // be thrown before the async gap.
           final result = await _compute();
           return _setAsyncValue(currentExeID, AsyncData(result));
         } catch (e, s) {
@@ -88,25 +74,25 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     return ++_executionID;
   }
 
-  void _setAsyncValue(int exeID, AsyncValue<T> value) {
+  void _setAsyncValue(int exeID, AsyncValue<T> newValue) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
     if (exeID != _executionID) return;
 
-    if (value.isError) {
+    if (newValue.isError) {
       // If the value is an error, we want to keep the last data
-      value.setLastData(lastData);
+      newValue.setLastData(lastData);
     }
 
-    _setValue(value);
+    _setValue(newValue);
   }
 
   /// Starts executiong the future.
   void start() {
     // can only start once
-    if (_status.peek() != FutureStatus.idle) return;
-    _status.value = FutureStatus.running;
-    _value = AsyncLoading();
+    if (_status != FutureStatus.idle) return;
+    _status = FutureStatus.running;
+    _wakeUp();
   }
 
   @override
@@ -137,24 +123,20 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     super._removeObserver(observer);
     if (!shouldSleep) return;
     if (_observers.isEmpty) {
-      // setting status to idle will short-curcuit the internal effect
-      // print('sleeping $name after removing ${observer.name}');
       _goToSleep();
     }
   }
 
   /// Resets the beacon by executing the future again.
   void reset() {
-    _setLoadingWithLastData();
-    _status.value = _status.peek() == FutureStatus.running
-        ? FutureStatus.restarted
-        : FutureStatus.running;
+    _effectDispose?.call();
+    _wakeUp();
   }
 
   @override
   void dispose() {
-    _status.dispose();
-    _effectDispose();
+    _effectDispose?.call();
+    _effectDispose = null;
     super.dispose();
   }
 }

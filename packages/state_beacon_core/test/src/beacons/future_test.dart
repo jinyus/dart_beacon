@@ -54,19 +54,27 @@ void main() {
   test('should re-executes the future on reset', () async {
     var counter = 0;
 
-    final futureBeacon = Beacon.future(() async => ++counter, name: 'f');
+    final futureBeacon = Beacon.future(
+      () async {
+        await delay(k1ms);
+        return ++counter;
+      },
+      name: 'f',
+    );
 
     expect(futureBeacon.isLoading, true);
 
-    await delay(k1ms);
+    await delay();
 
     expect(futureBeacon.unwrapValue(), 1);
 
     futureBeacon.reset();
 
+    BeaconScheduler.flush();
+
     expect(futureBeacon.isLoading, true);
 
-    await delay(k1ms);
+    await delay();
 
     expect(futureBeacon.isData, isTrue);
 
@@ -77,7 +85,10 @@ void main() {
     var counter = 0;
 
     final futureBeacon = Beacon.future(
-      () async => ++counter,
+      () async {
+        await delay(k1ms);
+        return ++counter;
+      },
       manualStart: true,
     );
 
@@ -88,6 +99,8 @@ void main() {
     expect(counter, 0);
 
     futureBeacon.start();
+
+    BeaconScheduler.flush();
 
     expect(futureBeacon.isLoading, true);
 
@@ -108,6 +121,8 @@ void main() {
     expect(futureBeacon.unwrapValue(), 1);
 
     futureBeacon.overrideWith(() async => testFuture(true));
+
+    BeaconScheduler.flush();
 
     expect(futureBeacon.value.isLoading, isTrue);
 
@@ -167,32 +182,6 @@ void main() {
     await delay(k1ms);
 
     expect(ran, 2);
-  });
-
-  test('should clean up internal status beacon when disposed', () async {
-    final count = Beacon.writable(0);
-
-    final plus1 = Beacon.future(
-      () async => count.value + 1,
-      manualStart: true,
-    );
-
-    final plus1Status = plus1.status;
-
-    expect(plus1Status.value, FutureStatus.idle);
-
-    plus1.start();
-
-    await delay(k1ms);
-
-    expect(plus1.unwrapValue(), 1);
-
-    expect(plus1Status.value, FutureStatus.running);
-
-    plus1.dispose();
-
-    expect(plus1Status.peek(), FutureStatus.idle);
-    expect(plus1Status.isDisposed, isTrue);
   });
 
   test('should await FutureBeacon exposed a future', () async {
@@ -497,10 +486,7 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(
-      status.value,
-      FutureStatus.running,
-    );
+    expect(status, FutureStatus.running);
 
     unsub();
 
@@ -511,7 +497,7 @@ void main() {
     // should start listening again when value is accessed
     num1.value = 15;
 
-    expect(status.value, FutureStatus.idle);
+    expect(status, FutureStatus.running);
 
     expect(derivedBeacon.isLoading, true);
 
@@ -531,11 +517,11 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(status.value, FutureStatus.running);
+    expect(status, FutureStatus.running);
 
     unsub2();
 
-    expect(status.value, FutureStatus.idle);
+    expect(status, FutureStatus.running);
 
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);
