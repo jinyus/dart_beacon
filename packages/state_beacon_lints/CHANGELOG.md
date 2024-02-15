@@ -1,3 +1,7 @@
+## 0.2.1
+
+-   Bug fix
+
 ## 0.2.0
 
 -   Update to work with v0.34.0 of `state_beacon`
