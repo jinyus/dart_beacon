@@ -764,25 +764,25 @@ void main() {
       return 1 * delayMultiplier;
     }
 
-    final a = Beacon.writable(0);
+    final a = Beacon.writable(true);
     final b = Beacon.future(
       () async {
-        final val = a.value;
+        a.value;
         final res = await sampleFuture();
-        return res + val;
+        return res;
       },
     );
 
     expect(b.isLoading, true);
     BeaconScheduler.flush();
     expect(b.isLoading, true);
-    a.increment();
+    a.toggle();
     delayMultiplier = 2;
     BeaconScheduler.flush();
     expect(b.isLoading, true);
 
     await delay(k10ms * 2);
 
-    expect(b.unwrapValue(), 3);
+    expect(b.unwrapValue(), 2);
   });
 }
