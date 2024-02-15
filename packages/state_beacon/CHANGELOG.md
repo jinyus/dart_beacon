@@ -1,3 +1,70 @@
+# 0.40.0
+
+-   [Breaking] `Beacon.stream` and `Beacon.streamRaw` now takes a function that returns a stream instead of a stream directly. The upside of this change is that they are now derived beacons. All beacons accessed in the function will be tracked as dependencies. This means that if one of their dependencies changes, it will unsubscribe from the old stream and subscribe to the new one. This is a breaking change because it changes the signature of the method.
+
+-   [Feat] Use can now manually start a stream beacon. It will start in the idle state when `manualStart` is true.
+
+-   [Deprecated] `Beacon.derivedStream` is now deprecated. Use `Beacon.streaRaw` instead.
+-   [Deprecated] `Beacon.derivedFuture` is now deprecated. Use `Beacon.future` instead.
+-   [Deprecated] `Beacon.batch` is now deprecated. Batching is automatic with the [new core](#new-core).
+-   [Breaking] `cancelRunning` is now removed from `FutureBeacon`. It is now the default behavior.
+
+## New Core:
+
+This is a major update with many breaking changes. The core of state_beacon was rewritten from scratch to be more efficient and to support more use-cases.
+
+Pros:
+
+-   Automatic batching
+-   Asynchronous by default
+-   Better performance for deep dependency trees/circular dependencies
+-   Scheduler customization
+    A scheduler is just a function that decides when to run all queued effects(flushing). By default, flushing is done with a microtask from DARTVM. This can be customized depending on your use case. For example, the flutter package ships with a scheduler that uses flutter's SchedulerBinding to handle flushing; as well as a 60fps scheduler that limits flushing to 60 times per second. Here is how you'd use them
+
+```dart
+BeaconScheduler.useFlutterScheduler();
+BeaconScheduler.use60fpsScheduler();
+```
+
+For flutter apps, it's recommended to use the flutter scheduler. The method must be called in the main function of your app.
+
+```dart
+void main() {
+ BeaconScheduler.useFlutterScheduler();
+
+ runApp(const MyApp());
+}
+```
+
+Cons:
+
+-   Default asynchrony introduces an inconvenience with testing. Effects are queued and the scheduler decides when to flush the queue. This is ideal for apps but makes testing harder because you have to manually flush the effect queue after updating a beacon to run all effects that depends on it. This can be done by calling `BeaconScheduler.flush()` after updating the beacon.
+
+> [!NOTE]  
+> This only applies to pure dart tests. In widgets tests, calling `tester.pumpAndSettle()` will flush the queue.
+
+```dart
+final a = Beacon.writable(10);
+var called = 0;
+
+// effect is queued for execution. The scheduler decides when to run the effect
+Beacon.effect(() {
+      print("current value: ${a.value}");
+      called++;
+});
+
+// manually flush the queue to run the all effect immediately
+BeaconScheduler.flush();
+
+expect(called, 1);
+
+a.value = 20; // effect will be queued again.
+
+BeaconScheduler.flush();
+
+expect(called, 2);
+```
+
 # 0.33.3
 
 -   Allow a duration to be null in `ThrottledBeacon` and `DebouncedBeacon` to disable the throttle/debouncing. This makes them easier to test.
@@ -81,7 +148,7 @@ someBeacon.buffer(10).filter();
 # 0.31.2
 
 -   [Perf] This is an internal change. Only create 1 `StreamController` per beacon.
--   [Deprecation] The `broadcast` option for `toStream()` is now deprecated as it's not redundant.
+-   [Deprecation] The `broadcast` option for `toStream()` is now deprecated as it's now redundant.
 
     ```dart
     // before
@@ -168,7 +235,7 @@ someBeacon.buffer(10).filter();
 
 # 0.26.0
 
--   [Breaking] beacons **NO** longer implements ValueListenable. Use `mybeacon.toListenable()` as a replacement.
+-   [Breaking] beacons **NO** longer implements ValueListenable. Use `mybeacon.toListenable()` as a replacement. This was done because implementing ValueListenable necessitated importing the flutter package which isn't usable in pure dart projects.
 
 ## Everything below was written before the state_beacon -> state_beacon_core migration
 
