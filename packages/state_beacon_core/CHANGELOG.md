@@ -1,4 +1,4 @@
-# 0.40.0
+# 0.34.0
 
 -   [Breaking] `Beacon.stream` and `Beacon.streamRaw` now takes a function that returns a stream instead of a stream directly. The upside of this change is that they are now derived beacons. All beacons accessed in the function will be tracked as dependencies. This means that if one of their dependencies changes, it will unsubscribe from the old stream and subscribe to the new one. This is a breaking change because it changes the signature of the method.
 

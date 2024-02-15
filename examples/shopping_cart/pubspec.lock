@@ -132,10 +132,10 @@ packages:
     dependency: "direct dev"
     description:
       name: mocktail
-      sha256: f603ebd85a576e5914870b02e5839fc5d0243b867bf710651cf239a28ebb365e
+      sha256: c4b5007d91ca4f67256e720cb1b6d704e79a510183a12fa551021f652577dce6
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   path:
     dependency: transitive
     description:
@@ -171,22 +171,15 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.33.4"
+    version: "0.34.0"
   state_beacon_core:
     dependency: transitive
     description:
-<<<<<<< HEAD
-      path: "../../packages/state_beacon_core"
-      relative: true
-    source: path
-    version: "0.33.3"
-=======
       name: state_beacon_core
-      sha256: bacf19aa852b9fbca20cf2e334c68d8847e897feac764e1346bb4ed96da4e551
+      sha256: d5c41490e962381f08e368c426fe88a0d40518bceea4906a3df0090f2bd3b92a
       url: "https://pub.dev"
     source: hosted
-    version: "0.33.4"
->>>>>>> main
+    version: "0.34.0"
   stream_channel:
     dependency: transitive
     description:

@@ -11,7 +11,7 @@ class CounterController {
   /// automatically recomputes when `count` changes.
   /// imagine count being a pageNumber
   /// and `fetchTripleCount` being `fetchPosts()`
-  late final _tripleCount = Beacon.derivedFuture(
+  late final _tripleCount = Beacon.future(
     () => Repository.fetchTripleCount(count.value),
   );
 
