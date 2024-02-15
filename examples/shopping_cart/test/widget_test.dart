@@ -94,6 +94,8 @@ void main() {
 
     _mockCart.value = AsyncLoading();
 
+    BeaconScheduler.flush();
+
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsExactly(2));
@@ -127,6 +129,8 @@ void main() {
 
     _mockCart.value = AsyncLoading();
 
+    BeaconScheduler.flush();
+
     await tester.pump();
 
     // total and list
@@ -149,6 +153,8 @@ void main() {
     expect(find.text('\$${_sampleCart.totalPrice}'), findsOneWidget);
 
     _mockCart.value = AsyncError('error', StackTrace.empty);
+
+    BeaconScheduler.flush();
 
     await tester.pump();
 

@@ -1,8 +1,6 @@
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
-import '../../common.dart';
-
 //rm: 2 irrelevant tests
 void main() {
   test('should not run until accessed', () async {
