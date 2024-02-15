@@ -11,7 +11,7 @@ class KonamiPage extends StatefulWidget {
 
 class _KonamiPageState extends State<KonamiPage> {
   late final fNode = FocusNode(
-      // onKeyt: (node, e) {
+      // onKey: (node, e) {
       //   widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
       //   return KeyEventResult.handled;
       // },
