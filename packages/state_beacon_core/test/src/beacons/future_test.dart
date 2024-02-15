@@ -444,7 +444,7 @@ void main() {
 
     // override nameFB with error
 
-    nameFB.overrideWith(() => throw Exception('error'));
+    nameFB.overrideWith(() async => throw Exception('error'));
 
     // BeaconScheduler.flush();
 
@@ -469,8 +469,6 @@ void main() {
       name: 'derived',
     );
 
-    final status = derivedBeacon.status;
-
     BeaconScheduler.flush();
 
     expect(num1.listenersCount, 1);
@@ -486,8 +484,6 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(status, FutureStatus.running);
-
     unsub();
 
     expect(derivedBeacon.listenersCount, 0);
@@ -496,8 +492,6 @@ void main() {
 
     // should start listening again when value is accessed
     num1.value = 15;
-
-    expect(status, FutureStatus.running);
 
     expect(derivedBeacon.isLoading, true);
 
@@ -517,11 +511,7 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(status, FutureStatus.running);
-
     unsub2();
-
-    expect(status, FutureStatus.running);
 
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);

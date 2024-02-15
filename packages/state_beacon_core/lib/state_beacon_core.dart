@@ -13,7 +13,6 @@ export 'src/producer.dart'
         DebouncedBeacon,
         FilteredBeacon,
         FutureBeacon,
-        FutureStatus,
         ListBeacon,
         MapBeacon,
         Producer,
