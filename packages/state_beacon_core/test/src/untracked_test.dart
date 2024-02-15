@@ -13,6 +13,9 @@ void main() {
       callCount++;
       Beacon.untracked(() {
         name.value;
+        Beacon.untracked(() {
+          name.value;
+        });
       });
     });
 

@@ -37,6 +37,8 @@ void main() {
   });
 
   test('should not notify after source beacon is disposed', () {
+    BeaconScheduler.use60fpsScheduler(); // just to test it out for coverage
+
     final beacon = Beacon.writable(0);
 
     final valueNotifier = beacon.toValueNotifier();

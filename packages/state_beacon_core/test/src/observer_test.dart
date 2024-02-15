@@ -73,21 +73,24 @@ void main() {
     });
     BeaconScheduler.flush();
 
-    expect(_onCreateCalled, equals(2));
-    expect(_onUpdateCalled, equals(2));
-    expect(_onDisposeCalled, equals(1));
-    expect(_onWatchCalled, equals(2));
+    expect(_onCreateCalled, 2);
+    expect(_onUpdateCalled, 2);
+    expect(_onDisposeCalled, 1);
+    expect(_onWatchCalled, 2);
     expect(_lazyOnCreate, isFalse);
 
     guard.value = false;
 
     BeaconScheduler.flush();
 
-    expect(_onStopWatchCalled, equals(1));
+    expect(_onStopWatchCalled, 1);
 
     dispose();
     BeaconScheduler.flush();
-    expect(_onStopWatchCalled, equals(2));
+    expect(_onStopWatchCalled, 2);
+
+    a.subscribe((p0) {});
+    expect(_onWatchCalled, 4);
   });
 
   test('should call onCreate with lazy set as true', () {

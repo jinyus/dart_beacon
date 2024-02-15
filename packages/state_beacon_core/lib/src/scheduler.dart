@@ -7,6 +7,7 @@ bool _flushing = false;
 /// Whether the scheduler is in synchronous mode
 // bool isSynchronousMode = _stabilizeFn == _syncScheduler;
 
+// coverage:ignore-start
 /// A class for configuring the scheduler
 abstract class BeaconScheduler {
   /// Runs all queued effects/subscriptions
@@ -34,6 +35,7 @@ abstract class BeaconScheduler {
   //   _stabilizeFn = _syncScheduler;
   // }
 }
+// coverage:ignore-end
 
 void _flushEffects() {
   // final len = effectQueue.length;

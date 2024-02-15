@@ -114,8 +114,7 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     if (_sleeping) {
       _wakeUp();
     }
-    currentConsumer?.startWatching(this);
-    return _value;
+    return super.value;
   }
 
   @override
