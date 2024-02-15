@@ -1,8 +1,8 @@
-import 'package:state_beacon_core/src/base_beacon.dart';
+part of '../producer.dart';
 
 /// This returns a beacon that is created using the provided `create` function.
 /// The beacon is cached and returned if the same argument is provided again.
-class BeaconFamily<Arg, BeaconType extends BaseBeacon<dynamic>> {
+class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
   /// @macro [BeaconFamily]
   BeaconFamily(this._create, {this.shouldCache = true}) {
     if (shouldCache) {

@@ -5,7 +5,7 @@ class WeatherController {
 
   final searchTextBeacon = Beacon.lazyDebounced(duration: k100ms * 10);
 
-  late final _searchResults = Beacon.derivedFuture(
+  late final _searchResults = Beacon.future(
     () async {
       final query = searchTextBeacon.value;
       return await repo.fetchWeather(query);

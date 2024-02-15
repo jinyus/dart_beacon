@@ -1,6 +1,6 @@
-// ignore_for_file: cascade_invocations, unnecessary_statements
+// ignore_for_file: cascade_invocations
 
-import 'package:state_beacon_core/src/base_beacon.dart';
+import 'package:state_beacon_core/src/common/exceptions.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -16,13 +16,15 @@ void main() {
   });
 
   test('should remove subscription for all wrapped beacons on dispose', () {
+    // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);
     final doubledCount = Beacon.derived<int>(() => count.value * 2);
 
     final wrapper = Beacon.writable<int>(0);
 
-    wrapper.wrap(count);
-    wrapper.wrap(doubledCount);
+    wrapper
+      ..wrap(count)
+      ..wrap(doubledCount);
 
     expect(wrapper.value, equals(20));
 
@@ -32,7 +34,7 @@ void main() {
     wrapper.dispose();
 
     expect(doubledCount.listenersCount, 0);
-    expect(count.listenersCount, 0);
+    expect(count.listenersCount, 1);
   });
 
   test('should remove subscription for all wrapped beacons', () {
@@ -41,8 +43,9 @@ void main() {
 
     final wrapper = Beacon.bufferedCount<int>(5);
 
-    wrapper.wrap(count, then: wrapper.add);
-    wrapper.wrap(doubledCount);
+    wrapper
+      ..wrap(count, then: wrapper.add)
+      ..wrap(doubledCount);
 
     expect(wrapper.value, equals([]));
     expect(wrapper.currentBuffer.value, [10, 20]);
@@ -53,20 +56,22 @@ void main() {
     wrapper.clearWrapped();
 
     expect(doubledCount.listenersCount, 0);
-    expect(count.listenersCount, 0);
+    expect(count.listenersCount, 1);
   });
 
-  test('should dispose internal currentBuffer on dispose', () {
+  test('should dispose internal currentBuffer on dispose', () async {
     final beacon = Beacon.bufferedCount<int>(5);
 
     beacon.add(1);
     beacon.add(2);
 
+    BeaconScheduler.flush();
+
     expect(beacon.currentBuffer.value, [1, 2]);
 
     beacon.dispose();
 
-    expect(beacon.currentBuffer.value, <int>[]);
+    expect(beacon.currentBuffer.peek(), <int>[]);
     expect(beacon.currentBuffer.isDisposed, true);
   });
 
@@ -108,7 +113,7 @@ void main() {
   test('should throttle wrapped StreamBeacon', () async {
     final stream = Stream.periodic(const Duration(milliseconds: 20), (i) => i);
 
-    final numsFast = Beacon.stream(stream);
+    final numsFast = Beacon.stream(() => stream);
     final numsSlow = Beacon.throttled<AsyncValue<int>>(
       AsyncLoading(),
       duration: const Duration(milliseconds: 200),
@@ -132,13 +137,16 @@ void main() {
       }
     });
 
-    numsSlow.subscribe((value) {
-      if (throttledCalled < maxCalls) {
-        throttledCalled++;
-      } else {
-        throw Exception('Should not have been called');
-      }
-    });
+    numsSlow.subscribe(
+      (value) {
+        if (throttledCalled < maxCalls) {
+          throttledCalled++;
+        } else {
+          throw Exception('Should not have been called');
+        }
+      },
+      startNow: false,
+    );
 
     await delay(k10ms * 40);
 
@@ -219,14 +227,6 @@ void main() {
     expect(count.listenersCount, 0);
   });
 
-  test('should throw when wrapping empty lazy beacon and startNow=true', () {
-    final count = Beacon.lazyWritable<int>();
-
-    final wrapper = Beacon.writable<int>(0);
-
-    expect(() => wrapper.wrap(count), throwsException);
-  });
-
   test('should ingest stream', () async {
     final beacon = Beacon.writable<int>(0);
     final myStream = Stream.fromIterable([1, 2, 3]);
@@ -240,6 +240,8 @@ void main() {
       buffered.next(),
       completion([0, 1, 2, 3]),
     );
+
+    beacon.dispose();
   });
 
   test('should ingest stream and transform values', () async {

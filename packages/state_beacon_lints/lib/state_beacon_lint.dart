@@ -12,7 +12,7 @@ const defaultMessage =
     'Accessing Beacon value after an "await" is discouraged.';
 
 const _beaconBaseChecker = TypeChecker.fromName(
-  'BaseBeacon',
+  'ReadableBeacon',
   packageName: 'state_beacon',
 );
 
@@ -36,7 +36,7 @@ class AvoidValueAccessAfterAwait extends DartLintRule {
   static const _code = LintCode(
     name: 'avoid_value_access_after_await',
     problemMessage:
-        'Accessing .value on Beacon type after await is discouraged.',
+        'Accessing .value on Beacon after await doesn\'t register it as a dependency.',
   );
 
   @override

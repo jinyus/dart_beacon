@@ -1,73 +1,89 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:state_beacon_core/src/base_beacon.dart';
+import 'package:state_beacon_core/src/common/exceptions.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
 import '../../common.dart';
 
+// rm: scoped writable
+
 void main() {
-  test('should notify listeners when value changes', () {
+  test('should notify listeners when value changes', () async {
     final beacon = Beacon.writable(10);
-    var called = false;
-    beacon.subscribe((_) => called = true);
+    var ran = 0;
+    beacon.subscribe((_) => ran++);
+
+    BeaconScheduler.flush();
+    expect(ran, 1);
+
     beacon.value = 20;
-    expect(called, isTrue);
+
+    BeaconScheduler.flush();
+    expect(ran, 2);
   });
 
-  test('should not notify listeners when the value remains unchanged', () {
+  test('should not notify listeners when the value remains unchanged',
+      () async {
     final beacon = Beacon.writable<int>(10);
-    var callCount = 0;
-    beacon.subscribe((_) => callCount++);
+    var ran = 0;
+    beacon.subscribe((_) => ran++);
+
+    BeaconScheduler.flush();
+    expect(ran, 1);
+
     beacon.value = 10;
-    expect(callCount, equals(0));
+    BeaconScheduler.flush();
+    expect(ran, 1);
   });
 
   test('should reset the value to initial state', () {
     final beacon = Beacon.writable<int>(10);
-    beacon.value = 20;
-    beacon.reset();
-    expect(beacon.value, equals(10));
+
+    beacon
+      ..set(20)
+      ..reset();
+
+    expect(beacon.value, 10);
   });
 
-  test('should subscribe and unsubscribe correctly', () {
+  test('should subscribe and unsubscribe correctly', () async {
     final beacon = Beacon.writable<int>(10);
-    var callCount = 0;
+    var ran = 0;
 
-    final unsubscribe = beacon.subscribe((_) => callCount++);
+    final unsubscribe = beacon.subscribe((_) => ran++);
+    BeaconScheduler.flush();
+    expect(ran, 1);
+
     beacon.value = 20;
-    expect(callCount, equals(1));
+    BeaconScheduler.flush();
+    expect(ran, 2);
 
     unsubscribe();
-    beacon.value = 30;
-    expect(callCount, equals(1)); // No additional call after unsubscribing
+    BeaconScheduler.flush();
+    expect(ran, 2);
   });
 
-  test('should notify multiple listeners', () {
+  test('should notify multiple listeners', () async {
     final beacon = Beacon.writable<int>(10);
-    var callCount1 = 0;
-    var callCount2 = 0;
+    var ran1 = 0;
+    var ran2 = 0;
 
-    beacon.subscribe((_) => callCount1++);
-    beacon.subscribe((_) => callCount2++);
+    beacon.subscribe((_) => ran1++);
+    beacon.subscribe((_) => ran2++);
+
+    BeaconScheduler.flush();
+    expect(ran1, 1);
+    expect(ran2, 1);
 
     beacon.value = 20;
     beacon.value = 21;
-    expect(callCount1, equals(2));
-    expect(callCount2, equals(2));
+
+    BeaconScheduler.flush();
+    expect(ran1, 2);
+    expect(ran2, 2);
   });
 
-  test('should return a function that can write to the beacon', () {
-    final (count, setCount) = Beacon.scopedWritable(0);
-    var called = 0;
-    count.subscribe((_) => called++);
-    setCount(10);
-    expect(count.value, equals(10));
-    expect(called, equals(1));
-    setCount(20);
-    expect(count.value, equals(20));
-    expect(called, equals(2));
-  });
   test('should lazily initialize its value', () async {
     final wBeacon = Beacon.lazyWritable<int>();
     expect(
@@ -128,7 +144,7 @@ void main() {
     }
 
     uBeacon.set(10);
-    expect(uBeacon.value, equals(10));
+    expect(uBeacon.value, 10);
   });
 
   test('should notify when same value is set with force option', () async {
@@ -137,7 +153,7 @@ void main() {
     final throttleBeacon = Beacon.throttled(10, duration: time);
     final debounceBeacon = Beacon.debounced(10, duration: time);
     final filterBeacon = Beacon.filtered(10, filter: (prev, next) => next > 5);
-    final undoRedoBeacon = UndoRedoBeacon(initialValue: 10);
+    final undoRedoBeacon = Beacon.undoRedo(10);
 
     var called = 0;
     var tCalled = 0;
@@ -151,24 +167,46 @@ void main() {
     filterBeacon.subscribe((_) => fCalled++);
     undoRedoBeacon.subscribe((_) => uCalled++);
 
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+    expect(tCalled, 1);
+    expect(dCalled, 1);
+    expect(fCalled, 1);
+    expect(uCalled, 1);
+
     beacon.value = 20;
+    BeaconScheduler.flush();
     beacon.set(20, force: true);
+    BeaconScheduler.flush();
     beacon.set(20, force: true);
+    BeaconScheduler.flush();
+    expect(called, 4);
+
     throttleBeacon.set(10, force: true);
+    BeaconScheduler.flush();
+    expect(tCalled, 2);
+
     debounceBeacon.set(10, force: true);
-    filterBeacon.set(10, force: true);
-    filterBeacon.set(10, force: true);
-    undoRedoBeacon.set(10, force: true);
-    undoRedoBeacon.set(10, force: true);
+    await delay(time * 1.2);
+    expect(dCalled, 2);
 
-    await delay(const Duration(milliseconds: 6));
+    filterBeacon.set(10, force: true);
+    BeaconScheduler.flush();
+    filterBeacon.set(10, force: true);
+    BeaconScheduler.flush();
+    expect(fCalled, 3);
+
+    undoRedoBeacon.set(10, force: true);
+    BeaconScheduler.flush();
+    undoRedoBeacon.set(10, force: true);
+    BeaconScheduler.flush();
+    expect(uCalled, 3);
+
+    await delay(time * 1.2);
 
     throttleBeacon.set(10, force: true);
-
-    expect(called, equals(3));
-    expect(tCalled, equals(2));
-    expect(dCalled, equals(1));
-    expect(fCalled, equals(2));
-    expect(uCalled, equals(2));
+    BeaconScheduler.flush();
+    expect(tCalled, 3);
   });
 }

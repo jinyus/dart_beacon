@@ -1,4 +1,4 @@
-// ignore_for_file: invalid_use_of_protected_member, use_if_null_to_convert_nulls_to_bools, lines_longer_than_80_chars
+// ignore_for_file: invalid_use_of_protected_member, use_if_null_to_convert_nulls_to_bools, lines_longer_than_80_chars, deprecated_member_use
 
 part of 'extensions.dart';
 
@@ -103,7 +103,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
       }
     }
 
-    unsub = subscribe(handleNewValue);
+    unsub = subscribe(handleNewValue, startNow: false);
 
     // coverage:ignore-start
     // clean up if the widget is disposed

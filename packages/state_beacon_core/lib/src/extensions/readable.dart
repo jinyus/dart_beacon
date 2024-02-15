@@ -78,11 +78,14 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   }) async {
     final completer = Completer<T>();
 
-    final unsub = subscribe((v) {
-      if (filter?.call(v) ?? true) {
-        completer.complete(v);
-      }
-    });
+    final unsub = subscribe(
+      (v) {
+        if (filter?.call(v) ?? true) {
+          completer.complete(v);
+        }
+      },
+      startNow: false,
+    );
 
     final result = await completer.future.timeout(
       timeout,

@@ -26,7 +26,7 @@ part of 'creator.dart';
 /// print(age.isDisposed); // true
 /// ```
 class BeaconGroup extends _BeaconCreator {
-  final List<BaseBeacon<dynamic>> _beacons = [];
+  final List<ReadableBeacon<dynamic>> _beacons = [];
   final List<VoidCallback> _disposeFns = [];
 
   /// The number of beacons in this group
@@ -82,25 +82,6 @@ class BeaconGroup extends _BeaconCreator {
   }
 
   @override
-  FutureBeacon<T> derivedFuture<T>(
-    FutureCallback<T> compute, {
-    bool manualStart = false,
-    bool cancelRunning = true,
-    bool shouldSleep = true,
-    String? name,
-  }) {
-    final beacon = super.derivedFuture<T>(
-      compute,
-      manualStart: manualStart,
-      cancelRunning: cancelRunning,
-      shouldSleep: shouldSleep,
-      name: name,
-    );
-    _beacons.add(beacon);
-    return beacon;
-  }
-
-  @override
   VoidCallback effect(
     Function fn, {
     bool supportConditional = true,
@@ -114,7 +95,7 @@ class BeaconGroup extends _BeaconCreator {
 
   @override
   BeaconFamily<Arg, BeaconType>
-      family<T, Arg, BeaconType extends BaseBeacon<T>>(
+      family<T, Arg, BeaconType extends ReadableBeacon<T>>(
     BeaconType Function(Arg p1) create, {
     bool cache = true,
   }) {
@@ -141,13 +122,13 @@ class BeaconGroup extends _BeaconCreator {
   FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
-    bool cancelRunning = true,
+    bool shouldSleep = true,
     String? name,
   }) {
     final beacon = super.future<T>(
       future,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
+      shouldSleep: shouldSleep,
       name: name,
     );
     _beacons.add(beacon);
@@ -267,18 +248,8 @@ class BeaconGroup extends _BeaconCreator {
   }
 
   @override
-  (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
-    T initialValue, {
-    String? name,
-  }) {
-    final beacon = super.scopedWritable<T>(initialValue, name: name);
-    _beacons.add(beacon.$1);
-    return beacon;
-  }
-
-  @override
   StreamBeacon<T> stream<T>(
-    Stream<T> stream, {
+    Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool manualStart = false,
     String? name,
@@ -295,7 +266,7 @@ class BeaconGroup extends _BeaconCreator {
 
   @override
   RawStreamBeacon<T> streamRaw<T>(
-    Stream<T> stream, {
+    Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool isLazy = false,
     Function? onError,
@@ -387,24 +358,5 @@ class BeaconGroup extends _BeaconCreator {
         beacon.reset();
       }
     }
-  }
-
-  @override
-  ReadableBeacon<T> derivedStream<T>(
-    Stream<T> Function() compute, {
-    String? name,
-    bool shouldSleep = true,
-    bool supportConditional = true,
-    bool cancelOnError = false,
-  }) {
-    final beacon = super.derivedStream<T>(
-      compute,
-      name: name,
-      shouldSleep: shouldSleep,
-      supportConditional: supportConditional,
-      cancelOnError: cancelOnError,
-    );
-    _beacons.add(beacon);
-    return beacon;
   }
 }

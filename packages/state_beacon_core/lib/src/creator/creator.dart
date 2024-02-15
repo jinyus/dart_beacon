@@ -1,10 +1,6 @@
-import 'dart:async';
+import 'package:state_beacon_core/src/common/types.dart';
 
-import 'package:state_beacon_core/src/beacons/family.dart';
-import 'package:state_beacon_core/src/untracked.dart';
-
-import '../base_beacon.dart';
-import '../common.dart';
+import '../producer.dart';
 
 part 'beacon_creator.dart';
 part 'beacon_group_creator.dart';

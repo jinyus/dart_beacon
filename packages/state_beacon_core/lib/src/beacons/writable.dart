@@ -1,7 +1,7 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that can be written to.
-class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
+class WritableBeacon<T> extends ReadableBeacon<T> with BeaconWrapper<T, T> {
   /// @macro [WritableBeacon]
   WritableBeacon({super.initialValue, super.name});
 
@@ -38,7 +38,7 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconConsumer<T, T> {
     super.dispose();
   }
 
-  // FOR BEACON CONSUMER MIXIN
+  // FOR BEACON WRAPPER MIXIN
 
   @override
   void _onNewValueFromWrapped(T value) {

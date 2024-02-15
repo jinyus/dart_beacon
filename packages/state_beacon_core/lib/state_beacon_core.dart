@@ -1,18 +1,22 @@
 /// reactive primitive and statemanagement for dart
 library;
 
-export 'src/async_value.dart';
-export 'src/base_beacon.dart'
+export 'src/common/async_value.dart';
+export 'src/creator/creator.dart';
+export 'src/extensions/extensions.dart';
+export 'src/observer.dart';
+export 'src/producer.dart'
     show
-        BaseBeacon,
+        BeaconScheduler,
         BufferedCountBeacon,
         BufferedTimeBeacon,
         DebouncedBeacon,
-        DerivedFutureBeacon,
         FilteredBeacon,
         FutureBeacon,
         ListBeacon,
         MapBeacon,
+        Producer,
+        RawStreamBeacon,
         ReadableBeacon,
         ReadableBeaconWrapUtils,
         SetBeacon,
@@ -22,6 +26,3 @@ export 'src/base_beacon.dart'
         UndoRedoBeacon,
         WritableBeacon,
         WritableWrap;
-export 'src/creator/creator.dart';
-export 'src/extensions/extensions.dart';
-export 'src/observer.dart';

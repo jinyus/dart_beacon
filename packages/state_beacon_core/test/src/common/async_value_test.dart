@@ -40,10 +40,14 @@ void main() {
       ),
     );
 
+    BeaconScheduler.flush();
+
     final successResult = await AsyncValue.tryCatch(
       () => testFuture(false),
       beacon: beacon,
     );
+
+    BeaconScheduler.flush();
 
     expect(successResult, isA<AsyncData>());
 
@@ -51,6 +55,8 @@ void main() {
       () => testFuture(true),
       beacon: beacon,
     );
+
+    BeaconScheduler.flush();
 
     expect(errorResult, isA<AsyncError>());
   });
@@ -74,11 +80,15 @@ void main() {
       ),
     );
 
+    BeaconScheduler.flush();
+
     final successResult = await AsyncValue.tryCatch(
       () => testFuture(false),
       beacon: beacon,
       optimisticResult: 1,
     );
+
+    BeaconScheduler.flush();
 
     expect(successResult, isA<AsyncData>());
 
@@ -87,6 +97,8 @@ void main() {
       beacon: beacon,
       optimisticResult: 2,
     );
+
+    BeaconScheduler.flush();
 
     expect(errorResult, isA<AsyncError>());
   });

@@ -30,7 +30,7 @@ ValueNotifier<T> _toValueNotifier<T>(ReadableBeacon<T> beacon) {
 
   _vnCache[key] = notifier;
 
-  final unsub = beacon.subscribe(notifier.set);
+  final unsub = beacon.subscribe(notifier.set, startNow: false);
 
   notifier.addDisposeCallback(() {
     unsub();

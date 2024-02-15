@@ -11,7 +11,7 @@ void main() {
     expect(beacon.peek(), equals(10));
   });
 
-  test('should decrease listenersCount when unsubscribed', () {
+  test('should decrease listenersCount when unsubscribed', () async {
     final beacon = Beacon.readable(10);
 
     final unsub1 = beacon.subscribe((_) {});
@@ -21,6 +21,8 @@ void main() {
     final unsub2 = Beacon.effect(() {
       beacon.value;
     });
+
+    BeaconScheduler.flush();
 
     expect(beacon.listenersCount, 2);
 
@@ -37,7 +39,7 @@ void main() {
     final a = Beacon.readable(1);
     final completer = Completer<int>();
 
-    a.subscribe(completer.complete, startNow: true);
+    a.subscribe(completer.complete);
 
     final result = await completer.future;
 
@@ -57,15 +59,15 @@ void main() {
 
     await delay(k10ms);
 
-    // should only add on first listen
-    expect(called, 1);
+    // all 3 is notified because the internal subscription is deferred
+    expect(called, 3);
 
     a.increment();
 
     await delay(k1ms);
 
     // all subs get notified
-    expect(called, 4);
+    expect(called, 6);
 
     await delay(k1ms);
 
@@ -77,7 +79,7 @@ void main() {
 
     await delay(k1ms);
 
-    expect(called, 5);
+    expect(called, 7);
 
     await sub3.cancel();
 
@@ -87,19 +89,19 @@ void main() {
 
     await delay(k1ms);
 
-    expect(called, 5);
+    expect(called, 7);
 
     final sub4 = stream.listen((v) => called++);
 
     await delay(k1ms);
 
-    expect(called, 6);
+    expect(called, 8);
 
     a.increment();
 
     await delay(k1ms);
 
-    expect(called, 7);
+    expect(called, 9);
 
     await sub4.cancel();
 
@@ -107,6 +109,6 @@ void main() {
 
     a.increment();
 
-    expect(called, 7);
+    expect(called, 9);
   });
 }

@@ -25,7 +25,6 @@ class BeaconValueVisitor extends RecursiveAstVisitor<void> {
           return null;
         }
 
-        ;
         final isAccess = checkAccess(node.name);
 
         if (isAccess != null) {
@@ -140,7 +139,7 @@ class BeaconValueVisitor extends RecursiveAstVisitor<void> {
     // print('visitBlock: ${node.parent?.parent?.parent?.parent} $node ');
     final ancestor = node.thisOrAncestorMatching((p0) {
       // print('ancestor: $p0\n ${p0.runtimeType}\n\n');
-      final isderivedFuture = p0.toSource().startsWith('Beacon.derivedFuture(');
+      final isderivedFuture = p0.toSource().startsWith('Beacon.future(');
       // print('isderivedfuture: ${isderivedFuture}');
       return isderivedFuture;
     });

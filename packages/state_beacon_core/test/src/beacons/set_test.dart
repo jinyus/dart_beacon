@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -11,7 +13,7 @@ void main() {
     expect(beacon.initialValue, <int>{});
   });
 
-  test('should notify listeners when set is modified', () {
+  test('should notify listeners when set is modified', () async {
     final nums = Beacon.hashSet<int>({1, 2, 3});
 
     var called = 0;
@@ -19,6 +21,8 @@ void main() {
     nums.subscribe((_) => called++);
 
     nums.add(4);
+
+    BeaconScheduler.flush();
 
     expect(called, 1);
 
@@ -28,11 +32,15 @@ void main() {
 
     expect(nums.value, equals({1, 3, 4}));
 
+    BeaconScheduler.flush();
+
     expect(called, 2);
 
     nums.addAll({5, 6, 7});
 
     expect(nums.value, equals({1, 3, 4, 5, 6, 7}));
+
+    BeaconScheduler.flush();
 
     expect(called, 3);
 
@@ -40,11 +48,15 @@ void main() {
 
     expect(nums.value, equals(<int>{}));
 
+    BeaconScheduler.flush();
+
     expect(called, 4);
 
     nums.addAll({1, 2, 3});
 
     expect(nums.value, equals({1, 2, 3}));
+
+    BeaconScheduler.flush();
 
     expect(called, 5);
 
@@ -52,11 +64,15 @@ void main() {
 
     expect(nums.value, equals({1, 3}));
 
+    BeaconScheduler.flush();
+
     expect(called, 6);
 
     nums.addAll({4, 5, 6});
 
     expect(nums.value, equals({1, 3, 4, 5, 6}));
+
+    BeaconScheduler.flush();
 
     expect(called, 7);
 
@@ -64,11 +80,15 @@ void main() {
 
     expect(nums.value, equals({1, 3, 5}));
 
+    BeaconScheduler.flush();
+
     expect(called, 8);
 
     nums.retainWhere((e) => e > 2);
 
     expect(nums.value, equals({3, 5}));
+
+    BeaconScheduler.flush();
 
     expect(called, 9);
 
@@ -80,6 +100,8 @@ void main() {
 
     expect(nums.value, equals(<int>{}));
 
-    expect(called, 11);
+    BeaconScheduler.flush();
+
+    expect(called, 10);
   });
 }

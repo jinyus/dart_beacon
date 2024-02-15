@@ -1,9 +1,9 @@
+part of '../producer.dart';
+
 // ignore_for_file: lines_longer_than_80_chars
 
-part of '../base_beacon.dart';
-
 // ignore: public_member_api_docs
-extension WritableWrap<T, U> on BeaconConsumer<T, U> {
+extension WritableWrap<T, U> on BeaconWrapper<T, U> {
   /// Wraps a `ReadableBeacon` and comsume its values
   ///
   /// Supply a (`then`) function to customize how the emitted values are
@@ -35,8 +35,8 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
   void wrap<V>(
     ReadableBeacon<V> target, {
     void Function(V)? then,
-    bool startNow = true,
     bool disposeTogether = false,
+    bool startNow = true,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return;
 
@@ -44,18 +44,15 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
       throw WrapTargetWrongTypeException(name, target.name);
     }
 
-    if (startNow && target.isEmpty) {
-      throw Exception(
-        'target($target) is uninitialized so startNow must be false',
-      );
-    }
+    // if (startNow && target.isEmpty) {
+    //   throw Exception(
+    //     'target($target) is uninitialized so startNow must be false',
+    //   );
+    // }
 
     final fn = then ?? ((val) => _onNewValueFromWrapped(val as T));
 
-    final unsub = target.subscribe(
-      fn,
-      startNow: startNow,
-    );
+    final unsub = target.subscribe(fn, startNow: startNow, synchronous: true);
 
     _wrapped[target.hashCode] = unsub;
 
@@ -93,7 +90,7 @@ extension WritableWrap<T, U> on BeaconConsumer<T, U> {
     T? initialValue,
   }) {
     final internalBeacon = RawStreamBeacon<T>(
-      source,
+      () => source,
       isLazy: true,
       initialValue: initialValue,
     );

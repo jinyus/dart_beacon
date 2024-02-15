@@ -12,7 +12,7 @@ extension ListUtils<T> on List<T> {
 extension StreamUtils<T> on Stream<T> {
   /// Converts a stream to [StreamBeacon].
   StreamBeacon<T> toBeacon({bool cancelOnError = false}) {
-    return StreamBeacon<T>(this, cancelOnError: cancelOnError);
+    return StreamBeacon<T>(() => this, cancelOnError: cancelOnError);
   }
 
   /// Converts a stream to [RawStreamBeacon].
@@ -25,7 +25,7 @@ extension StreamUtils<T> on Stream<T> {
     String? name,
   }) {
     return RawStreamBeacon<T>(
-      this,
+      () => this,
       cancelOnError: cancelOnError,
       isLazy: isLazy,
       onError: onError,

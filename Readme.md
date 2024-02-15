@@ -50,7 +50,7 @@ class ProfileCard extends StatelessWidget {
 final counter = Beacon.writable(0);
 
 // The future will be recomputed whenever the counter changes
-final derivedFutureCounter = Beacon.derivedFuture(() async {
+final futureCounter = Beacon.future(() async {
   final count = counter.value;
   return await fetchData(count);
 });
@@ -65,7 +65,7 @@ class FutureCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (derivedFutureCounter.watch(context)) {
+    return switch (futureCounter.watch(context)) {
       AsyncData<String>(value: final v) => Text(v),
       AsyncError(error: final e) => Text('$e'),
       _ => const CircularProgressIndicator(),
@@ -97,12 +97,13 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.writable](#beaconwritable): Mutable beacon that allows both reading and writing.
     -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Immutable beacon that only emit values, ideal for readonly data.
--   [Beacon.effect](#beaconcreateeffect): React to changes in beacon values.
+-   [Beacon.effect](#beaconeffect): React to changes in beacon values.
+-   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
 -   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
--   [Beacon.derivedStream](#beaconderivedstream): Specialized derived beacon that subscribes to the stream returned from its callback and updates its value based on the emitted values.
--   [Beacon.derivedFuture](#beaconderivedfuture): Derive values from asynchronous operations, managing state during computation.
--   [Beacon.future](#beaconfuture): Initialize beacons from futures.
+-   [Beacon.future](#beaconfuture): Derive values from asynchronous operations, managing state during computation.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
+-   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
+-   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.batch](#beacondobatchupdate): Combine multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
 -   [Beacon.throttled](#beaconthrottled): Limit the frequency of value updates, ideal for managing frequent events or user input.
@@ -111,8 +112,6 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.undoRedo](#beaconundoredo): Provides the ability to undo and redo value changes.
 -   [Beacon.bufferedCount](#beaconbufferedcount): Create a buffer/list of values based an `int` limit.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
--   [Beacon.stream](#beaconstream): Create beacons from Dart streams. values are wrapped in an `AsyncValue`.
--   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.list](#beaconlist): Manage reactive lists that automatically update dependent beacons upon changes.
     -   [Beacon.hashSet](#beaconhashset): Like Beacon.list, but for Sets.
     -   [Beacon.hashMap](#beaconhashmap): Like Beacon.list, but for Maps.
@@ -189,7 +188,7 @@ ReadableBeacon<int> get counter => _internalCounter;
 ### Beacon.effect:
 
 An effect is just a function that will re-run whenever one of its
-dependencies change. An effect runs immediately after creation.
+dependencies change. An effect is scheduled to run immediately after creation.
 
 ```dart
 final age = Beacon.writable(15);
@@ -205,6 +204,47 @@ Beacon.effect(() {
 // Outputs: "You can't vote yet"
 
 age.value = 20; // Outputs: "You can vote!"
+```
+
+### BeaconScheduler:
+
+`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler. Flutter comes with its own scheduler, so it is recommended to use flutter's scheduler when using beacons in a flutter app. This can be done by calling `BeaconScheduler.useFlutterScheduler();` in the `main` function.
+
+```dart
+void main() {
+ BeaconScheduler.useFlutterScheduler();
+
+ runApp(const MyApp());
+}
+```
+
+A 60fps scheduler is also included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
+
+When testing synchronous code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
+
+> [!NOTE]
+> When writing widget tests, manual flushing isn't needed. The queue is automatically flushed when you call `tester.pumpAndSettle()`.
+
+```dart
+final a = Beacon.writable(10);
+var called = 0;
+
+// effect is queued for execution. The scheduler decides when to run the effect
+Beacon.effect(() {
+      print("current value: ${a.value}");
+      called++;
+});
+
+// manually flush the queue to run the all effect immediately
+BeaconScheduler.flush();
+
+expect(called, 1);
+
+a.value = 20; // effect will be queued again.
+
+BeaconScheduler.flush();
+
+expect(called, 2);
 ```
 
 ### Beacon.derived:
@@ -231,39 +271,20 @@ age.value = 22;
 print(canDrink.value); // Outputs: true
 ```
 
-### Beacon.derivedStream:
+### Beacon.future:
 
-Specialized `DerivedBeacon` that subscribes to the stream returned from its callback and updates its value based on the emitted values.
-When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
-
-If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-It will cancel the stream subscription and enter a sleep state.
-It will resume executing once a listener is added or its value is accessed.
-
-Example:
-
-```dart
-final userID = Beacon.writable<int>(18235);
-
-final profileBeacon = Beacon.derivedStream(() {
- return getProfileStreamFromUID(userID.value);
-});
-```
-
-### Beacon.derivedFuture:
-
-Creates a `DerivedBeacon` whose value is derived from an asynchronous computation.
+Creates a `FutureBeacon` whose value is derived from an asynchronous computation.
 This beacon will recompute its value every time one of its dependencies change.
 The result is wrapped in an `AsyncValue`, which can be in one of four states: `idle`, `loading`, `data`, or `error`.
 
 If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
 
-If `cancelRunning` is `true` (default), the results of a current execution will be discarded
-if another execution is triggered before the current one finishes.
-
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
 It will resume executing once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
+
+> [!IMPORTANT]
+> Only beacons accessed before the async gap will be tracked as dependencies. See [pitfalls](#pitfalls) for more details.
 
 Example:
 
@@ -271,7 +292,7 @@ Example:
 final counter = Beacon.writable(0);
 
 // The future will be recomputed whenever the counter changes
-final derivedFutureCounter = Beacon.derivedFuture(() async {
+final futureCounter = Beacon.future(() async {
   final count = counter.value;
   await Future.delayed(Duration(seconds: count));
   return '$count second has passed.';
@@ -282,7 +303,7 @@ const FutureCounter({super.key});
 
 @override
 Widget build(BuildContext context) {
-  return switch (derivedFutureCounter.watch(context)) {
+  return switch (futureCounter.watch(context)) {
     AsyncData<String>(value: final v) => Text(v),
     AsyncError(error: final e) => Text('$e'),
     AsyncLoading() || AsyncIdle() => const CircularProgressIndicator(),
@@ -292,25 +313,25 @@ Widget build(BuildContext context) {
 ```
 
 Can be transformed into a future with `myFutureBeacon.toFuture()`
-This can useful when a DerivedFutureBeacon depends on another DerivedFutureBeacon.
-This functionality is also available to regular FutureBeacons and StreamBeacons.
+This can useful when a FutureBeacon depends on another FutureBeacon.
+This functionality is also available to StreamBeacons.
 
 ```dart
 var count = Beacon.writable(0);
 
-var firstName = Beacon.derivedFuture(() async {
+var firstName = Beacon.future(() async {
   final val = count.value;
   await Future.delayed(k10ms);
   return 'Sally $val';
 });
 
-var lastName = Beacon.derivedFuture(() async {
+var lastName = Beacon.future(() async {
   final val = count.value + 1;
   await Future.delayed(k10ms);
   return 'Smith $val';
 });
 
-var fullName = Beacon.derivedFuture(() async {
+var fullName = Beacon.future(() async {
   // wait for the future to complete
   // we don't have to manually handle all the states
   final [fname, lname] = await Future.wait(
@@ -324,27 +345,10 @@ var fullName = Beacon.derivedFuture(() async {
 });
 ```
 
-### Beacon.future:
-
-Creates a `FutureBeacon` that initializes its value based on a future.
-This can be refreshed by calling the `reset` method.
-
-If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
-
-```dart
-var myBeacon = Beacon.future(() async {
-  return await Future.delayed(Duration(seconds: 1), () => 'Hello');
-});
-
-myBeacon.subscribe((value) {
-  print(value); // Outputs AsyncLoading immediately then AsyncData('Hello') after 1 second
-});
-```
-
 #### FutureBeacon.overrideWith:
 
 Replaces the current callback and resets the beacon by running the new callback.
-This can also be done with [DerivedFutureBeacons](#beaconderivedfuture).
+This can also be done with [FutureBeacons](#beaconfuture).
 
 ```dart
 var futureBeacon = Beacon.future(() async => 1);
@@ -358,6 +362,45 @@ futureBeacon.overrideWith(() async => throw Exception('error'));
 await Future.delayed(k1ms);
 
 expect(futureBeacon.value, isA<AsyncError>());
+```
+
+### Beacon.stream:
+
+Creates a `StreamBeacon` from a given stream.
+When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+This beacon updates its value based on the stream's emitted values.
+The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
+This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
+Can be transformed into a future with `mystreamBeacon.toFuture()`:
+
+```dart
+var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
+
+var myBeacon = Beacon.stream(() => myStream);
+
+myBeacon.subscribe((value) {
+  print(value); // Outputs AsyncLoading(),AsyncData(0),AsyncData(1),AsyncData(2),...
+});
+```
+
+### Beacon.streamRaw:
+
+Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
+When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+
+One of the following must be `true` if an initial value isn't provided:
+
+1. The type is nullable
+2. `isLazy` is true (beacon must be set before it's read from)
+
+```dart
+var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
+
+var myBeacon = Beacon.streamRaw(() => myStream, initialValue: 0);
+
+myBeacon.subscribe((value) {
+  print(value); // Outputs 0,1,2,3,...
+});
 ```
 
 ### Beacon.batch:
@@ -448,7 +491,7 @@ We want to prevent the user from changing `pageNum` while `posts` is loading.
 ```dart
 var pageNum = Beacon.filtered(1); // we will set the filter function later
 
-final posts = Beacon.derivedFuture(() => Repository.getPosts(pageNum.value));
+final posts = Beacon.future(() => Repository.getPosts(pageNum.value));
 
 // can't change pageNum while loading
 pageNum.setFilter((prev, next) => !posts.isLoading);
@@ -521,39 +564,6 @@ timeBeacon.add(2);
 // After 5 seconds, it will output [1, 2]
 ```
 
-### Beacon.stream:
-
-Creates a `StreamBeacon` from a given stream.
-This beacon updates its value based on the stream's emitted values.
-The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
-This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
-Can be transformed into a future with `mystreamBeacon.toFuture()`:
-
-```dart
-var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
-
-var myBeacon = Beacon.stream(myStream);
-
-myBeacon.subscribe((value) {
-  print(value); // Outputs AsyncLoading(),AsyncData(0),AsyncData(1),AsyncData(2),...
-});
-```
-
-### Beacon.streamRaw:
-
-Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
-If you don't supply an initial value, the type has to be nullable or `isLazy` has to be `true`. When `isLazy` is `true`, the beacon must be set before it's read.
-
-```dart
-var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
-
-var myBeacon = Beacon.streamRaw(myStream,initialValue: 0);
-
-myBeacon.subscribe((value) {
-  print(value); // Outputs 0,1,2,3,...
-});
-```
-
 ### Beacon.list:
 
 The `ListBeacon` provides methods to add, remove, and update items in the list and notifies listeners without having to make a copy.
@@ -583,7 +593,7 @@ nums.remove(2); // Outputs: [1, 3, 4]
 ### AsyncValue:
 
 An `AsyncValue` is a wrapper around a value that can be in one of four states:`idle`, `loading`, `data`, or `error`.
-This is the value type of [FutureBeacons](#beaconfuture),[DerivedFutureBeacons](#beaconderivedfuture) and [StreamBeacons](#beaconstream).
+This is the value type of [FutureBeacons](#beaconfuture),[FutureBeacons](#beaconfuture) and [StreamBeacons](#beaconstream).
 
 ```dart
 var myBeacon = Beacon.future(() async {
@@ -871,13 +881,13 @@ final debouncedQuery = query
 
 ## Pitfalls
 
-When using `Beacon.derivedFuture`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
+When using `Beacon.future`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
 
 ```dart
 final counter = Beacon.writable(0);
 final doubledCounter = Beacon.derived(() => counter.value * 2);
 
-final derivedFutureCounter = Beacon.derivedFuture(() async {
+final futureCounter = Beacon.future(() async {
   // This will be tracked as a dependency because it's accessed before the async gap
   final count = counter.value;
 
@@ -890,12 +900,12 @@ final derivedFutureCounter = Beacon.derivedFuture(() async {
 });
 ```
 
-When a derivedFuture depends on multiple future/stream beacons
+When a future depends on multiple future/stream beacons
 
 -   DON'T:
 
 ```dart
-final derivedFutureCounter = Beacon.derivedFuture(() async {
+final futureCounter = Beacon.future(() async {
   // in this instance lastNameStreamBeacon will not be tracked as a dependency
   // because it's accessed after the async gap
   final firstName = await firstNameFutureBeacon.toFuture();
@@ -908,8 +918,8 @@ final derivedFutureCounter = Beacon.derivedFuture(() async {
 -   DO:
 
 ```dart
-final derivedFutureCounter = Beacon.derivedFuture(() async {
-  // acquire the futures before the async gap ie: don't use await
+final futureCounter = Beacon.future(() async {
+  // store the futures before the async gap ie: don't use await
   final firstNameFuture = firstNameFutureBeacon.toFuture();
   final lastNameFuture = lastNameStreamBeacon.toFuture();
 

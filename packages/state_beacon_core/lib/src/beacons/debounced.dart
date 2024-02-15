@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that debounces updates to its value.
 class DebouncedBeacon<T> extends WritableBeacon<T> {

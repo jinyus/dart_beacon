@@ -11,49 +11,52 @@ class KonamiPage extends StatefulWidget {
 
 class _KonamiPageState extends State<KonamiPage> {
   late final fNode = FocusNode(
-    onKey: (node, e) {
-      widget.controller.keys.set(e.data.logicalKey.keyLabel, force: true);
-      return KeyEventResult.handled;
-    },
-  );
+      // onKey: (node, e) {
+      //   widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
+      //   return KeyEventResult.handled;
+      // },
+      );
 
   static const checker = IterableEquality();
 
   @override
   void initState() {
-    widget.controller.last10.subscribe((codes) {
-      if (codes.isEmpty) return;
-      final won = checker.equals(codes, konamiCodes);
+    widget.controller.last10.subscribe(
+      (codes) {
+        if (codes.isEmpty || !mounted) return;
+        final won = checker.equals(codes, konamiCodes);
 
-      if (won) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Congratulations!'),
-              content: const Text('KONAMI! You won!'),
-              actions: <Widget>[
-                TextButton(
-                  key: const ValueKey('close'),
-                  child: const Text('Close'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Keep trying!'),
-            duration: Duration(seconds: 2),
-            padding: EdgeInsets.all(20),
-          ),
-        );
-      }
-    });
+        if (won) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Congratulations!'),
+                content: const Text('KONAMI! You won!'),
+                actions: <Widget>[
+                  TextButton(
+                    key: const ValueKey('close'),
+                    child: const Text('Close'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Keep trying!'),
+              duration: Duration(seconds: 2),
+              padding: EdgeInsets.all(20),
+            ),
+          );
+        }
+      },
+      startNow: false,
+    );
     super.initState();
   }
 
@@ -70,6 +73,9 @@ class _KonamiPageState extends State<KonamiPage> {
       child: KeyboardListener(
         autofocus: true,
         focusNode: fNode,
+        onKeyEvent: (e) {
+          widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
+        },
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [

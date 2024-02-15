@@ -21,7 +21,7 @@ void main() {
   testWidgets('Infinite List Page Test', (WidgetTester tester) async {
     final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]);
     final pageNum = Beacon.filtered(1);
-    final rawItems = Beacon.derivedFuture(
+    final rawItems = Beacon.future(
       () => Future.value(['item1', 'item2']),
     );
 
@@ -49,7 +49,7 @@ void main() {
 
     parsedItems.value = testItems.map(ItemData.new).toList();
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('item1'), findsOneWidget);
 
@@ -57,7 +57,7 @@ void main() {
 
     parsedItems.value = [ItemError('error')];
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('error'), findsOneWidget);
 

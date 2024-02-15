@@ -1,9 +1,18 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// A beacon that exposes an [AsyncValue].
 abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// @macro [AsyncBeacon]
-  AsyncBeacon({super.initialValue, super.name});
+  AsyncBeacon(
+    this._compute, {
+    super.name,
+    this.cancelOnError = false,
+    bool manualStart = false,
+  }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
+    _isEmpty = false;
+
+    if (!manualStart) start();
+  }
 
   /// Exposes this as a [Future] that can be awaited in a derived future beacon.
   /// This will trigger a re-run of the derived beacon when its state changes.
@@ -28,12 +37,6 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     final awaitedBeacon = _Awaited.findOrCreate(this);
 
     return awaitedBeacon.future;
-  }
-
-  @override
-  void dispose() {
-    _Awaited.remove(this);
-    super.dispose();
   }
 
   /// Alias for peek().lastData.
@@ -72,5 +75,56 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   void _setErrorWithLastData(Object error, [StackTrace? stackTrace]) {
     _setValue(AsyncError(error, stackTrace)..setLastData(lastData));
+  }
+
+  Stream<T> Function() _compute;
+
+  /// passed to the internal stream subscription
+  final bool cancelOnError;
+
+  // cancelled in the effect cleanup
+  // ignore: cancel_subscriptions
+  StreamSubscription<T>? _sub;
+  VoidCallback? _effectDispose;
+
+  /// Starts listening to the internal stream
+  /// if `manualStart` was set to true.
+  ///
+  /// Calling more than once has no effect
+  void start() {
+    if (_sub != null) return;
+    _effectDispose = Beacon.effect(
+      () {
+        _setLoadingWithLastData();
+        _sub = _compute().listen(
+          (value) {
+            _setValue(AsyncData(value));
+          },
+          onError: (Object e, StackTrace s) {
+            _setErrorWithLastData(e, s);
+          },
+          cancelOnError: cancelOnError,
+        );
+
+        return () {
+          final oldSub = _sub!;
+          oldSub.cancel();
+        };
+      },
+      name: name,
+    );
+  }
+
+  void _cancel() {
+    _effectDispose?.call();
+    _effectDispose = null;
+    _sub = null;
+  }
+
+  @override
+  void dispose() {
+    _Awaited.remove(this);
+    _cancel();
+    super.dispose();
   }
 }

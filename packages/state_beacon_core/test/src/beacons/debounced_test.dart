@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
@@ -24,25 +26,33 @@ void main() {
     // Value should be updated now
     await expectLater(beacon.next(), completion('apple'));
 
-    expect(called, equals(1)); // Only one notification should be sent
+    expect(called, equals(2)); // Only one notification should be sent
   });
 
-  test('should not debounce when duration is null', () {
+  test('should not debounce when duration is null', () async {
     final beacon = Beacon.debounced('');
     var called = 0;
 
     beacon
       ..subscribe((_) => called++)
+      ..set('a');
 
-      // simulate typing
-      ..value = 'a'
-      ..value = 'ap'
-      ..value = 'app'
-      ..value = 'appl'
-      ..value = 'apple';
+    BeaconScheduler.flush();
+    expect(called, 1);
+    beacon.set('ap');
+    BeaconScheduler.flush();
+    expect(called, 2);
+    beacon.set('app');
+    BeaconScheduler.flush();
+    expect(called, 3);
+    beacon.set('appl');
+    BeaconScheduler.flush();
+    expect(called, 4);
+    beacon.set('apple');
 
-    expect(beacon.value, equals('apple')); // should be updated immediately
+    BeaconScheduler.flush();
+    expect(beacon.value, 'apple'); // should be updated immediately
 
-    expect(called, equals(5)); // 5 notifications should be sent
+    expect(called, 5); // 5 notifications should be sent
   });
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: strict_raw_type
+// ignore_for_file: cascade_invocations
 
 import 'dart:async';
 
@@ -7,15 +7,25 @@ import 'package:test/test.dart';
 
 import '../../common.dart';
 
+Stream<int> sampleStream(int len) {
+  return Stream.fromIterable(List.generate(len, (i) => i));
+}
+
+void addItems(StreamController<int> controller, int len) {
+  for (var i = 0; i < len; i++) {
+    controller.add(i);
+  }
+}
+
 void main() {
   test('should emit values', () async {
     final myStream = Stream.periodic(k10ms, (i) => i);
-    final myBeacon = Beacon.stream(myStream);
+    final myBeacon = Beacon.stream(() => myStream);
 
     expect(
       myBeacon.stream,
       emitsInOrder([
-        isA<AsyncLoading>(),
+        isA<AsyncLoading<int>>(),
         isA<AsyncData<int>>(),
         isA<AsyncData<int>>(),
         isA<AsyncData<int>>(),
@@ -32,73 +42,30 @@ void main() {
       yield* Stream.error('error');
     }
 
-    final myBeacon = Beacon.stream(errorStream());
+    final myBeacon = Beacon.stream(errorStream);
 
     expect(
       myBeacon.stream,
       emitsInOrder(
         [
-          isA<AsyncLoading>(),
+          isA<AsyncLoading<int>>(),
           isA<AsyncData<int>>(),
           isA<AsyncData<int>>(),
-          isA<AsyncError>(),
+          isA<AsyncError<int>>(),
         ],
       ),
     );
   });
 
-  test('should emit raw values', () async {
-    final myStream = Stream.periodic(k1ms, (i) => i + 1);
-    final beacon = Beacon.streamRaw(myStream, initialValue: 0);
-
-    final buffered = beacon.buffer(5);
-
-    await expectLater(buffered.next(), completion(equals([0, 1, 2, 3, 4])));
-  });
-
-  test('should throw if initial value is empty and type is non-nullable',
-      () async {
-    final myStream = Stream.periodic(k1ms, (i) => i + 1);
-    expect(() => Beacon.streamRaw(myStream), throwsA(isA<AssertionError>()));
-  });
-
-  test('should execute onDone callback', () async {
-    final myStream = Stream.periodic(k10ms, (i) => i + 1).take(3);
-
-    var done = false;
-
-    final myBeacon = Beacon.streamRaw<int?>(
-      myStream,
-      onDone: () => done = true,
-    );
-
-    final buffered = myBeacon.buffer(4);
-
-    await expectLater(buffered.next(), completion(equals([null, 1, 2, 3])));
-
-    await delay(k1ms);
-
-    expect(done, true);
-
-    expect(myBeacon.isDisposed, true);
-    expect(buffered.isDisposed, true);
-  });
-
-  test('should be equal to beacon with the same stream', () {
-    final myStream = Stream.periodic(k10ms, (i) => i + 1).asBroadcastStream();
-    final myBeacon = Beacon.streamRaw(myStream, initialValue: 0);
-    final myBeacon2 = Beacon.streamRaw(myStream, initialValue: 0);
-
-    expect(myBeacon, equals(myBeacon2));
-  });
-
   test('should not start stream until start() is called', () async {
     final myStream = Stream.periodic(k10ms, (i) => i + 1);
-    final myBeacon = Beacon.stream(myStream, manualStart: true);
+    final myBeacon = Beacon.stream(() => myStream, manualStart: true);
 
     expect(myBeacon.isIdle, true);
 
     myBeacon.start();
+
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
@@ -109,11 +76,13 @@ void main() {
 
   test('should pause and resume internal stream', () async {
     final myStream = Stream.periodic(k10ms, (i) => i + 1);
-    final myBeacon = Beacon.stream(myStream, manualStart: true);
+    final myBeacon = Beacon.stream(() => myStream, manualStart: true);
 
     expect(myBeacon.isIdle, true);
 
     myBeacon.start();
+
+    BeaconScheduler.flush();
 
     expect(myBeacon.isLoading, true);
 
@@ -138,7 +107,7 @@ void main() {
 
   test('should set last data in loading and error states', () async {
     final controller = StreamController<int>();
-    final myBeacon = Beacon.stream(controller.stream);
+    final myBeacon = Beacon.stream(() => controller.stream);
 
     expect(myBeacon.isLoading, true);
 
@@ -152,10 +121,99 @@ void main() {
 
     controller.addError('error');
 
-    next = await myBeacon.next();
+    next = await myBeacon.next(timeout: k1ms);
 
     expect(next.isError, true);
 
     expect(next.lastData, 1);
+  });
+
+  test('should unsub from old stream when dependency changes', () async {
+    final controller = StreamController<int>.broadcast();
+
+    final counter = Beacon.writable(5);
+
+    // should increment when dependency changes
+    var unsubs = 0;
+    var listens = 0;
+
+    controller.onCancel = () => unsubs++;
+
+    controller.onListen = () {
+      listens++;
+      addItems(controller, counter.value);
+    };
+
+    final beacon = Beacon.stream(
+      () {
+        counter.value;
+        return controller.stream;
+      },
+    );
+    final buff = beacon.bufferTime(duration: k1ms);
+
+    expect(buff.value, isEmpty);
+
+    BeaconScheduler.flush();
+
+    expect(listens, 1);
+
+    await expectLater(
+      buff.next(),
+      completion([
+        isA<AsyncLoading<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+      ]),
+    );
+
+    counter.increment(); // dep changed, should unsub from old stream
+
+    BeaconScheduler.flush();
+
+    expect(unsubs, 1);
+    expect(listens, 2);
+
+    await expectLater(
+      buff.next(),
+      completion([
+        isA<AsyncLoading<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        isA<AsyncData<int>>(),
+        AsyncData<int>(5),
+      ]),
+    );
+
+    counter.increment();
+
+    BeaconScheduler.flush();
+
+    expect(unsubs, 2); // dep changed, should unsub from old stream
+    expect(listens, 3);
+
+    await expectLater(
+      buff.next(),
+      completion([
+        isA<AsyncLoading<int>>(),
+        AsyncData<int>(0),
+        AsyncData<int>(1),
+        AsyncData<int>(2),
+        AsyncData<int>(3),
+        AsyncData<int>(4),
+        AsyncData<int>(5),
+        AsyncData<int>(6),
+      ]),
+    );
+
+    beacon.dispose(); // should unsub when disposed
+
+    expect(unsubs, 3);
+    expect(listens, 3);
   });
 }

@@ -1,4 +1,4 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 // ignore: public_member_api_docs
 extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
@@ -242,7 +242,7 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
   }
 
   void _wrapAndDelegate<InputT, OutputT>(
-    BeaconConsumer<InputT, OutputT> beacon,
+    BeaconWrapper<InputT, OutputT> beacon,
   ) {
     beacon.wrap(
       this,

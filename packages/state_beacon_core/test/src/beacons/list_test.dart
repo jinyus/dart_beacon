@@ -13,16 +13,18 @@ void main() {
     expect(beacon.initialValue, <int>[]);
   });
 
-  test('should notify listeners when list is modified', () {
+  test('should notify listeners when list is modified', () async {
     final nums = Beacon.list<int>([1, 2, 3]);
 
     var called = 0;
 
-    nums
-      ..subscribe((_) => called++)
-      ..add(4);
+    nums.subscribe((_) => called++);
+
+    BeaconScheduler.flush();
 
     expect(called, 1);
+
+    nums.add(4);
 
     expect(nums.value, equals([1, 2, 3, 4]));
 
@@ -30,11 +32,15 @@ void main() {
 
     expect(nums.value, equals([1, 3, 4]));
 
+    BeaconScheduler.flush();
+
     expect(called, 2);
 
     nums[0] = 10;
 
     expect(nums.value, equals([10, 3, 4]));
+
+    BeaconScheduler.flush();
 
     expect(called, 3);
 
@@ -42,11 +48,15 @@ void main() {
 
     expect(nums.value, equals([10, 3, 4, 5, 6, 7]));
 
+    BeaconScheduler.flush();
+
     expect(called, 4);
 
     nums.length = 2;
 
     expect(nums.value, equals([10, 3]));
+
+    BeaconScheduler.flush();
 
     expect(called, 5);
 
@@ -54,11 +64,15 @@ void main() {
 
     expect(nums.value, equals([]));
 
+    BeaconScheduler.flush();
+
     expect(called, 6);
 
     nums.insert(0, 1);
 
     expect(nums.value, equals([1]));
+
+    BeaconScheduler.flush();
 
     expect(called, 7);
 
@@ -66,15 +80,21 @@ void main() {
 
     expect(nums.value, equals([1]));
 
+    BeaconScheduler.flush();
+
     expect(called, 8);
 
     nums.insertAll(1, [2, 3]);
 
     expect(nums.value, equals([1, 2, 3]));
 
+    BeaconScheduler.flush();
+
     expect(called, 9);
 
     nums.mapInPlace((e) => e * 2);
+
+    BeaconScheduler.flush();
 
     expect(called, 10);
 
@@ -142,6 +162,8 @@ void main() {
 
     expect(nums.value, equals([10, 2, 3, 20]));
 
-    expect(called, 26);
+    BeaconScheduler.flush();
+
+    expect(called, 11); // all should be batched
   });
 }

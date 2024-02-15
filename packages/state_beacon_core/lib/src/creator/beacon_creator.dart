@@ -26,7 +26,7 @@ class _BeaconCreator {
   /// Like `Beacon.writable` but behaves like a late variable.
   /// It must be set before it's read.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set.
+  /// Throws `UninitializeLazyReadException` if it's read before being set.
   WritableBeacon<T> lazyWritable<T>({
     T? initialValue,
     String? name,
@@ -58,25 +58,6 @@ class _BeaconCreator {
         initialValue: initialValue,
         name: name ?? 'Readable<$T>',
       );
-
-  /// Returns a `ReadableBeacon` and a function for setting its value.
-  /// This is useful for creating a beacon that's readable by the public,
-  /// but writable only by the owner.
-  ///
-  /// Example:
-  /// ```dart
-  /// var (count,setCount) = Beacon.scopedWritable(15);
-  /// ```
-  (ReadableBeacon<T>, void Function(T)) scopedWritable<T>(
-    T initialValue, {
-    String? name,
-  }) {
-    final beacon = WritableBeacon<T>(
-      initialValue: initialValue,
-      name: name ?? 'ScopedWritable<$T>',
-    );
-    return (beacon, beacon.set);
-  }
 
   /// Creates a `DebouncedBeacon` that will delay updates to its value based on
   /// the duration. This is useful when you want to wait until a user has
@@ -112,7 +93,7 @@ class _BeaconCreator {
   /// Like `Beacon.debounced` but behaves like a late variable.
   /// It must be set before it's read.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set..
+  /// Throws `UninitializeLazyReadException` if it's read before being set..
   DebouncedBeacon<T> lazyDebounced<T>({
     Duration? duration,
     T? initialValue,
@@ -163,7 +144,7 @@ class _BeaconCreator {
 
   /// Like `Beacon.throttled` but behaves like a late variable. It must be set before it's read.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set.
+  /// Throws `UninitializeLazyReadException` if it's read before being set.
   ThrottledBeacon<T> lazyThrottled<T>({
     Duration? duration,
     T? initialValue,
@@ -211,7 +192,7 @@ class _BeaconCreator {
   /// Like `Beacon.filtered` but behaves like a late variable. It must be set before it's read.
   /// The first will not be filtered if the `initialValue` is null.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set.
+  /// Throws `UninitializeLazyReadException` if it's read before being set.
   FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
@@ -304,7 +285,7 @@ class _BeaconCreator {
 
   /// Like `Beacon.undoRedo` but behaves like a late variable. It must be set before it's read.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set.
+  /// Throws `UninitializeLazyReadException` if it's read before being set.
   UndoRedoBeacon<T> lazyUndoRedo<T>({
     T? initialValue,
     int historyLimit = 10,
@@ -333,7 +314,7 @@ class _BeaconCreator {
 
   /// Like `Beacon.timestamped` but behaves like a late variable. It must be set before it's read.
   ///
-  /// Throws [UninitializeLazyReadException] if it's read before being set.
+  /// Throws `UninitializeLazyReadException` if it's read before being set.
   TimestampBeacon<T> lazyTimestamped<T>({
     T? initialValue,
     String? name,
@@ -344,19 +325,23 @@ class _BeaconCreator {
       );
 
   /// Creates a `StreamBeacon` from a given stream.
+  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
   /// This beacon updates its value based on the stream's emitted values.
-  /// The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
-  ///
-  /// Example:
+  /// The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
+  /// This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
+  /// Can be transformed into a future with `mystreamBeacon.toFuture()`:///
+
   /// ```dart
-  /// var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
-  /// var myBeacon = Beacon.stream(myStream);
+  /// var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);///
+
+  /// var myBeacon = Beacon.stream(() => myStream);///
+
   /// myBeacon.subscribe((value) {
-  ///   print(value); // Outputs the stream's emitted values
+  ///   print(value); // Outputs AsyncLoading(),AsyncData(0),AsyncData(1),AsyncData(2),...
   /// });
   /// ```
   StreamBeacon<T> stream<T>(
-    Stream<T> stream, {
+    Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool manualStart = false,
     String? name,
@@ -371,11 +356,13 @@ class _BeaconCreator {
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
   ///
+  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+  ///
   /// One of the following must be `true` if an initial value isn't provided:
   ///   1. The type is nullable
   ///   2. `isLazy` is true (beacon must be set before it's read from)
   RawStreamBeacon<T> streamRaw<T>(
-    Stream<T> stream, {
+    Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool isLazy = false,
     Function? onError,
@@ -394,30 +381,27 @@ class _BeaconCreator {
     );
   }
 
-  /// Creates a `FutureBeacon` that initializes its value based on a future.
-  /// The beacon can optionally depend on another `ReadableBeacon`.
+  /// Creates a `FutureBeacon` whose value is derived from an asynchronous computation.
+  /// This beacon will recompute its value every time one of its dependencies change.
+  /// The result is wrapped in an `AsyncValue`, which can be in one of four states: `idle`, `loading`, `data`, or `error`.
   ///
-  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
+  /// If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
   ///
-  /// Example:
-  /// ```dart
-  /// var myBeacon = Beacon.future(() async {
-  ///   return await Future.delayed(Duration(seconds: 1), () => 'Hello');
-  /// });
-  /// myBeacon.subscribe((value) {
-  ///   print(value); // Outputs 'Hello' after 1 second
-  /// });
-  /// ```
+  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+  /// It will resume executing once a listener is added or its value is accessed.
+  /// This means that it will enter the `loading` state when woken up.
+  ///
+  /// ### NB: Only beacons accessed before the async gap will be tracked as dependencies.
   FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
-    bool cancelRunning = true,
+    bool shouldSleep = true,
     String? name,
   }) {
-    return DefaultFutureBeacon<T>(
+    return FutureBeacon<T>(
       future,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
+      shouldSleep: shouldSleep,
       name: name ?? 'FutureBeacon<$T>',
     );
   }
@@ -427,9 +411,6 @@ class _BeaconCreator {
   ///
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
   /// It will resume executing once a listener is added or its value is accessed.
-  ///
-  /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
   ///
   /// Example:
   /// ```dart
@@ -448,26 +429,10 @@ class _BeaconCreator {
     bool shouldSleep = true,
     bool supportConditional = true,
   }) {
-    final beacon = WritableDerivedBeacon<T>(
+    final beacon = DerivedBeacon<T>(
+      compute,
       name: name ?? 'DerivedBeacon<$T>',
-      shouldSleep: shouldSleep,
     );
-
-    void start() {
-      final unsub = doEffect(
-        () {
-          beacon.set(compute());
-        },
-        supportConditional: supportConditional,
-        name: name ?? 'DerivedBeacon<$T>',
-      );
-
-      beacon.$setInternalEffectUnsubscriber(unsub);
-    }
-
-    beacon.$setInternalEffectRestarter(start);
-
-    start();
 
     return beacon;
   }
@@ -490,6 +455,10 @@ class _BeaconCreator {
   ///  return getProfileStreamFromUID(userID.value);
   /// });
   /// ```
+  // coverage:ignore-start
+  @Deprecated(
+    'Use Beacon.streamRaw instead. This method will be removed in the next major version.',
+  )
   ReadableBeacon<T> derivedStream<T>(
     Stream<T> Function() compute, {
     String? name,
@@ -497,37 +466,12 @@ class _BeaconCreator {
     bool supportConditional = true,
     bool cancelOnError = false,
   }) {
-    final beacon = WritableDerivedBeacon<T>(
-      name: name ?? 'DerivedStreamBeacon<$T>',
-      shouldSleep: shouldSleep,
+    return RawStreamBeacon<T>(
+      compute,
+      cancelOnError: cancelOnError,
+      isLazy: true,
+      name: name ?? 'RawStreamBeacon<$T>',
     );
-
-    StreamSubscription<T>? subscription;
-
-    void start() {
-      final unsub = doEffect(
-        () {
-          subscription = compute().listen(
-            beacon.set,
-            cancelOnError: cancelOnError,
-          );
-
-          return () {
-            subscription?.cancel();
-          };
-        },
-        supportConditional: supportConditional,
-        name: name ?? 'DerivedStreamBeacon<$T>',
-      );
-
-      beacon.$setInternalEffectUnsubscriber(unsub);
-    }
-
-    beacon.$setInternalEffectRestarter(start);
-
-    start();
-
-    return beacon;
   }
 
   /// Creates a `DerivedBeacon` whose value is derived from an asynchronous computation.
@@ -568,6 +512,9 @@ class _BeaconCreator {
   ///   }
   /// }
   /// ```
+  @Deprecated(
+    'Use Beacon.future instead. This method will be removed in the next major version.',
+  )
   FutureBeacon<T> derivedFuture<T>(
     FutureCallback<T> compute, {
     bool manualStart = false,
@@ -575,30 +522,39 @@ class _BeaconCreator {
     bool shouldSleep = true,
     String? name,
   }) {
-    final beacon = DerivedFutureBeacon<T>(
+    return FutureBeacon<T>(
       compute,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
       shouldSleep: shouldSleep,
-      name: name ?? 'DerivedFutureBeacon<$T>',
+      name: name ?? 'FutureBeacon<$T>',
     );
-
-    final dispose = doEffect(
-      () async {
-        // beacon is manually triggered if in idle state
-        if (beacon.status() == DerivedFutureStatus.idle) {
-          return;
-        }
-
-        await beacon.run();
-      },
-      name: name ?? 'DerivedFutureBeacon<$T>',
-    );
-
-    beacon.$setInternalEffectUnsubscriber(dispose);
-
-    return beacon;
   }
+
+  /// Executes a batched update which allows multiple updates to be batched into a single update.
+  /// This can be used to optimize performance by reducing the number of update notifications.
+  ///
+  /// Example:
+  /// ```dart
+  /// final age = Beacon.writable<int>(10);
+  ///
+  /// var callCount = 0;
+  ///
+  /// age.subscribe((_) => callCount++);
+  ///
+  /// Beacon.batch(() {
+  ///   age.value = 15;
+  ///   age.value = 16;
+  ///   age.value = 20;
+  ///   age.value = 23;
+  /// });
+  ///
+  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
+  /// ```
+  @Deprecated(
+    'Batching is now done automatically. This method will be removed in the next major version.',
+  )
+  void batch(VoidCallback callback) {}
+  // coverage:ignore-end
 
   /// Creates a `ListBeacon` with an initial list value.
   /// This beacon manages a list of items, allowing for reactive updates and manipulations of the list.
@@ -675,122 +631,11 @@ class _BeaconCreator {
     bool supportConditional = true,
     String? name,
   }) {
-    return doEffect(
-      fn,
-      supportConditional: supportConditional,
-      name: name,
-    );
+    final effect = Effect(fn, name: name);
+    return effect.dispose;
   }
 
-  /// Creates an effect based on a provided function. The provided function will be called
-  /// whenever one of its dependencies change.
-  ///
-  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
-  /// and any beacon not accessed in the first run will not be tracked.
-  /// Defaults to `true`.
-  ///
-  /// Example:
-  /// ```dart
-  /// final age = Beacon.writable(15);
-  ///
-  /// Beacon.effect(() {
-  ///     if (age.value >= 18) {
-  ///       print("You can vote!");
-  ///     } else {
-  ///        print("You can't vote yet");
-  ///     }
-  ///  });
-  ///
-  /// // Outputs: "You can't vote yet"
-  ///
-  /// age.value = 20; // Outputs: "You can vote!"
-  /// ```
-  // coverage:ignore-start
-  @Deprecated('Use Beacon.effect instead')
-  VoidCallback createEffect(
-    Function fn, {
-    bool supportConditional = true,
-    String? name,
-  }) {
-    return doEffect(
-      fn,
-      supportConditional: supportConditional,
-      name: name,
-    );
-  }
-  // coverage:ignore-end
-
-  /// Executes a batched update which allows multiple updates to be batched into a single update.
-  /// This can be used to optimize performance by reducing the number of update notifications.
-  ///
-  /// Example:
-  /// ```dart
-  /// final age = Beacon.writable<int>(10);
-  ///
-  /// var callCount = 0;
-  ///
-  /// age.subscribe((_) => callCount++);
-  ///
-  /// Beacon.batch(() {
-  ///   age.value = 15;
-  ///   age.value = 16;
-  ///   age.value = 20;
-  ///   age.value = 23;
-  /// });
-  ///
-  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-  /// ```
-  void batch(VoidCallback callback) {
-    doBatch(callback);
-  }
-
-  /// Executes a batched update which allows multiple updates to be batched into a single update.
-  /// This can be used to optimize performance by reducing the number of update notifications.
-  ///
-  /// Example:
-  /// ```dart
-  /// final age = Beacon.writable<int>(10);
-  ///
-  /// var callCount = 0;
-  ///
-  /// age.subscribe((_) => callCount++);
-  ///
-  /// Beacon.batch(() {
-  ///   age.value = 15;
-  ///   age.value = 16;
-  ///   age.value = 20;
-  ///   age.value = 23;
-  /// });
-  ///
-  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-  /// ```
-  // coverage:ignore-start
-  @Deprecated('Use Beacon.batch instead')
-  void doBatchUpdate(VoidCallback callback) {
-    doBatch(callback);
-  }
-  // coverage:ignore-end
-
-  /// Runs the function without tracking any changes to the state.
-  /// This is useful when you want to run a function that
-  /// changes the state, but you don't want to notify listeners of those changes.
-  ///
-  /// ```dart
-  /// final age = Beacon.writable<int>(10);
-  /// var callCount = 0;
-  /// age.subscribe((_) => callCount++);
-  ///
-  /// Beacon.effect(() {
-  ///      age.value;
-  ///      Beacon.untracked(() {
-  ///        age.value = 15;
-  ///      });
-  /// });
-  ///
-  /// expect(callCount, equals(0));
-  /// expect(age.value, 15);
-  /// ```
+  /// Runs a function without tracking any beacons accessed within it.
   void untracked(VoidCallback fn) {
     doUntracked(fn);
   }
@@ -820,7 +665,7 @@ class _BeaconCreator {
   /// final twitterApiClient = apiClientFamily('https://api.twitter.com');
   /// ```
   BeaconFamily<Arg, BeaconType>
-      family<T, Arg, BeaconType extends BaseBeacon<T>>(
+      family<T, Arg, BeaconType extends ReadableBeacon<T>>(
     BeaconType Function(Arg) create, {
     bool cache = true,
   }) {

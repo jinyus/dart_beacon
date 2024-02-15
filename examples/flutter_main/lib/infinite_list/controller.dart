@@ -7,7 +7,7 @@ class InfiniteController {
   final pageNum = Beacon.filtered(1);
 
   // this re-executes the future when the pageNum changes
-  late final rawItems = Beacon.derivedFuture(
+  late final rawItems = Beacon.future(
     () => repo.fetchItems(pageNum.value, limit: pageSize),
   );
 

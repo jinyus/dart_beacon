@@ -1,11 +1,11 @@
-part of '../base_beacon.dart';
-
 // the input type can differ from the output type
 // eg: in the case of buffered beacons,
 // the input type is int then the output type is List<int>
 
+part of '../producer.dart';
+
 /// A utility mixin for beacons that consume other beacons.
-mixin BeaconConsumer<InputT, OutputT> on BaseBeacon<OutputT> {
+mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   final _wrapped = <int, VoidCallback>{};
 
   WritableBeacon<InputT>? _delegate;

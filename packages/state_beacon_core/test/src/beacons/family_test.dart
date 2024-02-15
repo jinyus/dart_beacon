@@ -1,6 +1,4 @@
-// ignore_for_file: inference_failure_on_function_invocation
-// ignore_for_file: avoid_types_on_closure_parameters
-// ignore_for_file: inference_failure_on_instance_creation
+// ignore_for_file: inference_failure_on_function_invocation, cascade_invocations, lines_longer_than_80_chars
 
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
@@ -18,14 +16,13 @@ void main() {
   test('should create a new future beacon', () async {
     final counter = Beacon.writable(10);
 
-    final counterMirror = Beacon.derivedFuture(() async {
+    final counterMirror = Beacon.future(() async {
       final count = counter.value;
-      await delay(k1ms);
       return count;
     });
 
     final family = Beacon.family(
-      (int arg) => Beacon.derivedFuture(() async {
+      (int arg) => Beacon.future(() async {
         final count = await counterMirror.toFuture();
         await delay(k1ms);
         return (count * arg).toString();
@@ -34,7 +31,7 @@ void main() {
 
     final doubled = family(2);
 
-    expect(doubled.value, AsyncLoading());
+    expect(doubled.isLoading, true);
 
     await delay();
 
@@ -42,7 +39,7 @@ void main() {
 
     final tripled = family(3);
 
-    expect(tripled.value, AsyncLoading());
+    expect(tripled.isLoading, true);
 
     await delay();
 
@@ -50,8 +47,10 @@ void main() {
 
     counter.increment();
 
-    expect(doubled.value, AsyncLoading());
-    expect(tripled.value, AsyncLoading());
+    BeaconScheduler.flush();
+
+    expect(doubled.isLoading, true);
+    expect(tripled.isLoading, true);
 
     await delay();
 

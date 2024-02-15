@@ -1,6 +1,6 @@
 // ignore_for_file: use_setters_to_change_properties
 
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 // ignore: public_member_api_docs
 typedef BeaconFilter<T> = bool Function(T?, T);

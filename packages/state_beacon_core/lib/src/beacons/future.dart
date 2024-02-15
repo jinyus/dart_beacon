@@ -1,94 +1,79 @@
-// ignore_for_file: inference_failure_on_function_invocation
+part of '../producer.dart';
 
-part of '../base_beacon.dart';
-
-// ignore: public_member_api_docs
+/// A callback that returns a [Future].
 typedef FutureCallback<T> = Future<T> Function();
 
-/// A beacon that executes a [Future] and updates its value accordingly.
-abstract class FutureBeacon<T> extends AsyncBeacon<T> {
-  /// @macro [FutureBeacon]
+/// See `Beacon.future`
+class FutureBeacon<T> extends AsyncBeacon<T> {
+  /// See `Beacon.future`
   FutureBeacon(
-    this._operation, {
-    bool cancelRunning = true,
-    super.initialValue,
+    FutureCallback<T> compute, {
     super.name,
-  }) : _cancelRunning = cancelRunning;
-  var _executionID = 0;
+    this.shouldSleep = true,
+    super.manualStart,
+  }) : super(() => compute().asStream());
 
-  final bool _cancelRunning;
+  var _sleeping = false;
 
-  FutureCallback<T> _operation;
+  /// Whether the future should sleep when there are no observers.
+  final bool shouldSleep;
 
-  /// Starts executing an idle [Future]
-  /// Calling more than once has no effect
-  ///
-  /// Use [reset] to restart the [Future]
-  void start();
-
-  int _startLoading() {
-    _setLoadingWithLastData();
-    return ++_executionID;
-  }
-
-  void _setAsyncValue(int exeID, AsyncValue<T> value) {
-    // If the execution ID is not the same as the current one,
-    // then this is an old execution and we should ignore it
-    // if cancelRunning is true
-    if (_cancelRunning && exeID != _executionID) return;
-
-    if (value.isError) {
-      // If the value is an error, we want to keep the last data
-      value.setLastData(lastData);
+  void _wakeUp() {
+    if (_sleeping) {
+      _sleeping = false;
+      // needs to be in loading state instantly when waking up
+      // so beacon.value.isLoading is true
+      _setLoadingWithLastData();
     }
 
-    _setValue(value);
+    start();
   }
 
-  Future<void> _run() async {
-    final currentExeID = _startLoading();
-
-    try {
-      final result = await _operation();
-      return _setAsyncValue(currentExeID, AsyncData(result));
-    } catch (e, s) {
-      return _setAsyncValue(currentExeID, AsyncError(e, s));
+  @override
+  AsyncValue<T> peek() {
+    if (_sleeping) {
+      _wakeUp();
     }
+    return super.peek();
   }
 
   /// Replaces the current callback and resets the beacon
   void overrideWith(FutureCallback<T> compute) {
-    _operation = compute;
+    _compute = () => compute().asStream();
     reset();
   }
 
-  /// Resets the beacon by calling the [Future] again
-  void reset();
-}
-
-/// A beacon that executes a [Future] and updates its value accordingly.
-class DefaultFutureBeacon<T> extends FutureBeacon<T> {
-  /// @macro [FutureBeacon]
-  DefaultFutureBeacon(
-    super.operation, {
-    bool manualStart = false,
-    super.cancelRunning = true,
-    super.name,
-  }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
-    if (!manualStart) _run();
+  @override
+  AsyncValue<T> get value {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.value;
   }
 
-  /// Resets the beacon by calling the [Future] again
+  void _goToSleep() {
+    _sleeping = true;
+    _cancel();
+  }
+
   @override
+  void _removeObserver(Consumer observer) {
+    super._removeObserver(observer);
+    if (!shouldSleep) return;
+    if (_observers.isEmpty) {
+      _goToSleep();
+    }
+  }
+
+  /// Resets the beacon by executing the future again.
   void reset() {
-    _executionID++; // ignore any running futures
-    _run();
+    _cancel();
+    _wakeUp();
   }
 
   @override
-  void start() {
-    // can only start once
-    if (peek() is! AsyncIdle) return;
-    _run();
+  void dispose() {
+    _cancel();
+    super.dispose();
   }
 }

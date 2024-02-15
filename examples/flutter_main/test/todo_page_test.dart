@@ -56,13 +56,13 @@ void main() {
       ),
     );
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('new todo'), findsOneWidget);
 
     filterBeacon.value = Filter.done;
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('new todo'), findsNothing);
 
@@ -75,7 +75,7 @@ void main() {
     );
 
     // find checkbox
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(Checkbox), findsOneWidget);
 
@@ -84,27 +84,27 @@ void main() {
 
     filterBeacon.value = Filter.active;
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('new todo'), findsOneWidget);
     expect(find.text('done todo'), findsNothing);
 
     filterBeacon.value = Filter.all;
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.byType(Checkbox), findsNWidgets(2));
 
     await tester.tap(find.byKey(const ValueKey('1 delete button')));
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('new todo'), findsNothing);
     expect(find.text('done todo'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('2 delete button')));
 
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('done todo'), findsNothing);
   });

@@ -17,9 +17,13 @@ void main() {
 
     beacon.value = 1;
 
+    BeaconScheduler.flush();
+
     expect(called, 1);
 
     beacon.value = 2;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
@@ -27,10 +31,14 @@ void main() {
 
     beacon.value = 3;
 
+    BeaconScheduler.flush();
+
     expect(called, 2);
   });
 
   test('should not notify after source beacon is disposed', () {
+    BeaconScheduler.use60fpsScheduler(); // just to test it out for coverage
+
     final beacon = Beacon.writable(0);
 
     final valueNotifier = beacon.toValueNotifier();
@@ -43,15 +51,21 @@ void main() {
 
     beacon.value = 1;
 
+    BeaconScheduler.flush();
+
     expect(called, 1);
 
     beacon.value = 2;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
 
     beacon
       ..dispose()
       ..value = 3;
+
+    BeaconScheduler.flush();
 
     expect(called, 2);
   });

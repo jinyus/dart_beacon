@@ -1,9 +1,11 @@
-part of '../base_beacon.dart';
+part of '../producer.dart';
 
 /// An immutable beacon.
-class ReadableBeacon<T> extends BaseBeacon<T> {
+class ReadableBeacon<T> extends Producer<T> {
   /// @macro [ReadableBeacon]
-  ReadableBeacon({super.initialValue, super.name});
+  ReadableBeacon({super.initialValue, super.name}) {
+    BeaconObserver.instance?.onCreate(this, _isEmpty);
+  }
 
   StreamController<T>? _controller;
   VoidCallback? _unsub;
@@ -13,7 +15,7 @@ class ReadableBeacon<T> extends BaseBeacon<T> {
   Stream<T> get stream {
     _controller ??= StreamController<T>.broadcast(
       onListen: () {
-        if (!isEmpty) _controller!.add(peek());
+        // if (!isEmpty) _controller!.add(peek());
 
         // onListen is only called when sub count goes from 0 to 1.
         // If sub count goes from 1 to 0, onCancel runs and sets _unsub to null.
@@ -30,11 +32,18 @@ class ReadableBeacon<T> extends BaseBeacon<T> {
   }
 
   @override
+  void _notifyListeners() {
+    BeaconObserver.instance?.onUpdate(this);
+    super._notifyListeners();
+  }
+
+  @override
   void dispose() {
     _unsub?.call();
     _controller?.close();
     _controller = null;
     _unsub = null;
+    BeaconObserver.instance?.onDispose(this);
     super.dispose();
   }
 }

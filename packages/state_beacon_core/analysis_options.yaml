@@ -19,6 +19,7 @@ linter:
         avoid_positional_boolean_parameters: false
         always_use_package_imports: false
         cascade_invocations: false
+        flutter_style_todos: false
 # analyzer:
 #     # exclude:
 #     #     - path/to/excluded/files/**

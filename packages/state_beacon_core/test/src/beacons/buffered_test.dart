@@ -5,7 +5,7 @@ import '../../common.dart';
 
 void main() {
   group('BufferedCountBeacon', () {
-    test('should buffer values until count is reached', () {
+    test('should buffer values until count is reached', () async {
       final beacon = Beacon.bufferedCount<int>(3);
       var buffer = <int>[];
 
@@ -15,10 +15,12 @@ void main() {
         ..add(2)
         ..add(3); // This should trigger the buffer to be set
 
+      BeaconScheduler.flush();
+
       expect(buffer, equals([1, 2, 3]));
     });
 
-    test('should clear buffer after reaching count threshold', () {
+    test('should clear buffer after reaching count threshold', () async {
       final beacon = Beacon.bufferedCount<int>(2);
 
       var buffer = <int>[];
@@ -27,6 +29,8 @@ void main() {
         ..subscribe((value) => buffer = value)
         ..add(1)
         ..add(2); // First trigger
+
+      BeaconScheduler.flush();
 
       expect(buffer, equals([1, 2]));
 
@@ -38,10 +42,12 @@ void main() {
 
       beacon.add(4); // Second trigger
 
+      BeaconScheduler.flush();
+
       expect(buffer, equals([3, 4]));
     });
 
-    test('should update currentBuffer', () {
+    test('should update currentBuffer', () async {
       final beacon = Beacon.bufferedCount<int>(3);
 
       var buffer = <int>[];
@@ -51,6 +57,8 @@ void main() {
         ..add(1)
         ..add(2);
 
+      BeaconScheduler.flush();
+
       expect(beacon.currentBuffer.value, equals([1, 2]));
 
       beacon
@@ -58,6 +66,8 @@ void main() {
         ..add(4);
 
       expect(beacon.currentBuffer.value, equals([4]));
+
+      BeaconScheduler.flush();
 
       expect(buffer, equals([1, 2, 3]));
     });
