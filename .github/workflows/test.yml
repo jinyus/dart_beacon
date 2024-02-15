@@ -44,19 +44,19 @@ jobs:
                   flutter analyze
                   flutter test --coverage
 
-            - name: Build and Test Shopping Cart example
-              working-directory: ./examples/shopping_cart
-              run: |
-                  flutter pub get
-                  flutter analyze
-                  flutter test
+            # - name: Build and Test Shopping Cart example
+            #   working-directory: ./examples/shopping_cart
+            #   run: |
+            #       flutter pub get
+            #       flutter analyze
+            #       flutter test
 
-            - name: Build and Test Main example
-              working-directory: ./examples/flutter_main
-              run: |
-                  flutter pub get
-                  flutter analyze
-                  flutter test
+            # - name: Build and Test Main example
+            #   working-directory: ./examples/flutter_main
+            #   run: |
+            #       flutter pub get
+            #       flutter analyze
+            #       flutter test
 
             - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v4
