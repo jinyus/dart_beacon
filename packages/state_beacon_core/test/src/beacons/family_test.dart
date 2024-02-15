@@ -1,7 +1,6 @@
 // ignore_for_file: inference_failure_on_function_invocation, cascade_invocations, lines_longer_than_80_chars
 
-import 'package:state_beacon_core/src/creator/creator.dart';
-import 'package:state_beacon_core/src/extensions/extensions.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
 import '../../common.dart';
@@ -47,6 +46,11 @@ void main() {
     expect(tripled.value.unwrap(), '30');
 
     counter.increment();
+
+    BeaconScheduler.flush();
+
+    expect(doubled.isLoading, true);
+    expect(tripled.isLoading, true);
 
     await delay();
 
