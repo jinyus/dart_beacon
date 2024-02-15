@@ -12,8 +12,8 @@ final nameBeacon = Beacon.writable('Bob');
 final ageBeacon = Beacon.writable(20);
 final speedBeacon = Beacon.writable(10);
 
-final nameFB = Beacon.derivedFuture(() async => nameBeacon.value);
-final ageFB = Beacon.derivedFuture(() async {
+final nameFB = Beacon.future(() async => nameBeacon.value);
+final ageFB = Beacon.future(() async {
   final age = ageBeacon.value; // <-- this is good
   print(ageBeacon.value);
   final dur = Duration(seconds: ageBeacon.value - 1);
@@ -30,7 +30,7 @@ final ageFB = Beacon.derivedFuture(() async {
   return '$name is $age years old  $dur $nameStr';
 });
 
-final speedFB = Beacon.derivedFuture(() async {
+final speedFB = Beacon.future(() async {
   await Future<void>.delayed(k10ms);
   // expect_lint: avoid_value_access_after_await
   return speedBeacon.value; // <-- this is bad! should show a linter warning

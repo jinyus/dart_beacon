@@ -47,7 +47,7 @@ publish_target() {
         dart pub publish
     elif [ "$1" == "lint" ]; then
         echo "publishing lint"
-        cd packages/state_beacon_lint
+        cd packages/state_beacon_lints
         dart pub publish
     else
         echo -e "unknown package \"$1\" \nValid packages are: core, flutter, lint"
@@ -57,7 +57,7 @@ publish_target() {
 # Main logic to decide whether to test or publish based on the first argument
 if [ "$ACTION" == "test" ]; then
     test_target $TARGET
-elif [ "$ACTION" == "publish" ]; then
+elif [ "$ACTION" == "pub" ]; then
     publish_target $TARGET
 else
     echo -e "Unknown action \"$ACTION\" \nValid actions are: test, publish"

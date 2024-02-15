@@ -5,7 +5,7 @@ environment:
     sdk: ">=2.16.0 <4.0.0"
 
 dependencies:
-    state_beacon: ^0.19.0
+    state_beacon: ^0.34.0
 
 dev_dependencies:
     custom_lint:
