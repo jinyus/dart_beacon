@@ -56,7 +56,7 @@ class BeaconValueVisitor extends RecursiveAstVisitor<void> {
     final el = node.function.staticType?.element;
     if (el != null) {
       final isBeacon = _beaconBaseChecker.isAssignableFrom(el);
-      // print('isBeacon : $isBeacon');
+      print('$el isBeacon : $isBeacon');
 
       if (isBeacon) {
         print('${node.toSource()} type: AccessType.call');

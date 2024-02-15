@@ -13,7 +13,7 @@ const defaultMessage =
 
 const _beaconBaseChecker = TypeChecker.fromName(
   'ReadableBeacon',
-  packageName: 'state_beacon',
+  packageName: 'state_beacon_core',
 );
 
 /// Entry point of our plugin.
@@ -51,7 +51,7 @@ class AvoidValueAccessAfterAwait extends DartLintRule {
       var visitor = BeaconValueVisitor();
       node.body.visitChildren(visitor);
 
-      // print(visitor);
+      // print('visitor: ${visitor}');
       var seenAwait = false;
 
       for (final rec in visitor.nodes) {
