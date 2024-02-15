@@ -40,6 +40,7 @@ void main() {
 
   testWidgets('should rebuild FutureCounter on state changes',
       (WidgetTester tester) async {
+    BeaconScheduler.useCustomFpsScheduler(60);
     // BeaconObserver.instance = LoggingObserver();
     final counter = Beacon.writable(0, name: 'counter');
 
@@ -174,7 +175,7 @@ void main() {
 
     testCounter.value = 1;
 
-    BeaconScheduler.flush();
+    await tester.pumpAndSettle();
 
     // Check listeners count after widget is disposed
     expect(testCounter.listenersCount, 0);

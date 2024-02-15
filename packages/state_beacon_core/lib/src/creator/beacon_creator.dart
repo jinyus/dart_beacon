@@ -325,15 +325,19 @@ class _BeaconCreator {
       );
 
   /// Creates a `StreamBeacon` from a given stream.
+  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
   /// This beacon updates its value based on the stream's emitted values.
-  /// The emitted values are wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
-  ///
-  /// Example:
+  /// The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
+  /// This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
+  /// Can be transformed into a future with `mystreamBeacon.toFuture()`:///
+
   /// ```dart
-  /// var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);
-  /// var myBeacon = Beacon.stream(myStream);
+  /// var myStream = Stream.periodic(Duration(seconds: 1), (i) => i);///
+
+  /// var myBeacon = Beacon.stream(() => myStream);///
+
   /// myBeacon.subscribe((value) {
-  ///   print(value); // Outputs the stream's emitted values
+  ///   print(value); // Outputs AsyncLoading(),AsyncData(0),AsyncData(1),AsyncData(2),...
   /// });
   /// ```
   StreamBeacon<T> stream<T>(
@@ -351,6 +355,8 @@ class _BeaconCreator {
   }
 
   /// Like `stream`, but it doesn't wrap the value in an `AsyncValue`.
+  ///
+  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
   ///
   /// One of the following must be `true` if an initial value isn't provided:
   ///   1. The type is nullable
@@ -375,20 +381,17 @@ class _BeaconCreator {
     );
   }
 
-  /// Creates a `FutureBeacon` that initializes its value based on a future.
-  /// The beacon can optionally depend on another `ReadableBeacon`.
+  /// Creates a `FutureBeacon` whose value is derived from an asynchronous computation.
+  /// This beacon will recompute its value every time one of its dependencies change.
+  /// The result is wrapped in an `AsyncValue`, which can be in one of four states: `idle`, `loading`, `data`, or `error`.
   ///
-  /// If `manualStart` is `true`, the future will not execute until [start()] is called.
+  /// If `manualStart` is `true` (default: false), the beacon will be in the `idle` state and the future will not execute until `start()` is called. Calling `start()` on a beacon that's already started will have no effect.
   ///
-  /// Example:
-  /// ```dart
-  /// var myBeacon = Beacon.future(() async {
-  ///   return await Future.delayed(Duration(seconds: 1), () => 'Hello');
-  /// });
-  /// myBeacon.subscribe((value) {
-  ///   print(value); // Outputs 'Hello' after 1 second
-  /// });
-  /// ```
+  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
+  /// It will resume executing once a listener is added or its value is accessed.
+  /// This means that it will enter the `loading` state when woken up.
+  ///
+  /// ### NB: Only beacons accessed before the async gap will be tracked as dependencies.
   FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
@@ -408,9 +411,6 @@ class _BeaconCreator {
   ///
   /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
   /// It will resume executing once a listener is added or its value is accessed.
-  ///
-  /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
   ///
   /// Example:
   /// ```dart

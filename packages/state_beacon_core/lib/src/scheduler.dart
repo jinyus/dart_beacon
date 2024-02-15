@@ -8,7 +8,23 @@ bool _flushing = false;
 // bool isSynchronousMode = _stabilizeFn == _syncScheduler;
 
 // coverage:ignore-start
-/// A class for configuring the scheduler
+/// `Effects` are not synchronous, their execution is controlled by a scheduler.
+/// When a dependency of an `effect` changes, it is added to a queue and
+/// the scheduler decides when is the best time to flush the queue.
+/// By default, the queue is flushed with a DARTVM microtask which runs
+/// on the next loop; this can be changed by setting a custom scheduler.
+/// Flutter comes with its own scheduler, so it is recommended to use
+/// flutter's scheduler when using beacons in a flutter app.
+/// This can be done by calling `BeaconScheduler.useFlutterScheduler();`
+/// in the `main` function.
+///
+/// ```dart
+/// void main() {
+///  BeaconScheduler.useFlutterScheduler();
+///
+///  runApp(const MyApp());
+/// }
+/// ```
 abstract class BeaconScheduler {
   /// Runs all queued effects/subscriptions
   /// This is made available for testing and should not be used in production
@@ -20,8 +36,23 @@ abstract class BeaconScheduler {
   /// This is the default scheduler which processes updates asynchronously
   /// as a DartVM microtask. This does automatic batching of updates.
   static void useAsyncScheduler() {
-    // isSynchronousMode = false;
+    _flushing = false;
     _flushFn = _asyncScheduler;
+  }
+
+  /// This scheduler limits the frequency that updates
+  /// are processed to 60 times per second.
+  static void use60fpsScheduler() {
+    _flushing = false;
+    _flushFn = _sixtyfpsScheduler;
+  }
+
+  /// This scheduler limits the frequency that updates
+  /// are processed to a custom fps.
+  static void useCustomFpsScheduler(int updatesPerSecond) {
+    assert(updatesPerSecond > 0, 'updatesPerSecond must be greater than 0');
+    _flushing = false;
+    _flushFn = _customFPS(updatesPerSecond);
   }
 
   /// This scheduler processes updates synchronously. This is not recommended
@@ -35,7 +66,6 @@ abstract class BeaconScheduler {
   //   _stabilizeFn = _syncScheduler;
   // }
 }
-// coverage:ignore-end
 
 void _flushEffects() {
   // final len = effectQueue.length;
@@ -63,6 +93,29 @@ void _asyncScheduler() {
   }
 }
 
+const _k16ms = Duration(milliseconds: 16);
+
+void Function() _customFPS(int fps) {
+  final duration = Duration(milliseconds: (1000 / fps).round());
+  return () {
+    if (_flushing) return;
+    _flushing = true;
+    Future.delayed(duration, () {
+      _flushEffects();
+      _flushing = false;
+    });
+  };
+}
+
+void _sixtyfpsScheduler() {
+  if (_flushing) return;
+  _flushing = true;
+  Future.delayed(_k16ms, () {
+    _flushEffects();
+    _flushing = false;
+  });
+}
+
 // void _syncScheduler() {
 //   if (!_stabilizationQueued) {
 //     _stabilizationQueued = true;
@@ -70,3 +123,4 @@ void _asyncScheduler() {
 //     _stabilizationQueued = false;
 //   }
 // }
+// coverage:ignore-end

@@ -1,7 +1,23 @@
 import 'package:flutter/scheduler.dart';
 import 'package:state_beacon_core/state_beacon_core.dart' as core;
 
-/// Class used to switch between different schedulers.
+/// `Effects` are not synchronous, their execution is controlled by a scheduler.
+/// When a dependency of an `effect` changes, it is added to a queue and
+/// the scheduler decides when is the best time to flush the queue.
+/// By default, the queue is flushed with a DARTVM microtask which runs
+/// on the next loop; this can be changed by setting a custom scheduler.
+/// Flutter comes with its own scheduler, so it is recommended to use
+/// flutter's scheduler when using beacons in a flutter app.
+/// This can be done by calling `BeaconScheduler.useFlutterScheduler();`
+/// in the `main` function.
+///
+/// ```dart
+/// void main() {
+///  BeaconScheduler.useFlutterScheduler();
+///
+///  runApp(const MyApp());
+/// }
+/// ```
 abstract class BeaconScheduler {
   /// Runs all queued effects/subscriptions
   /// This is made available for testing and should not be used in production
@@ -17,8 +33,13 @@ abstract class BeaconScheduler {
   /// This scheduler limits the frequency that updates
   /// are processed to 60 times per second.
   static void use60fpsScheduler() {
-    _flushing = false;
-    core.BeaconScheduler.setScheduler(_sixtyfpsScheduler);
+    core.BeaconScheduler.use60fpsScheduler();
+  }
+
+  /// This scheduler limits the frequency that updates
+  /// are processed to a custom fps.
+  static void useCustomFpsScheduler(int updatesPerSecond) {
+    core.BeaconScheduler.useCustomFpsScheduler(updatesPerSecond);
   }
 
   /// This scheduler processes updates synchronously. This is not recommended
@@ -33,16 +54,6 @@ abstract class BeaconScheduler {
 }
 
 var _flushing = false;
-const _k16ms = Duration(milliseconds: 16);
-
-void _sixtyfpsScheduler() {
-  if (_flushing) return;
-  _flushing = true;
-  Future.delayed(_k16ms, () {
-    core.BeaconScheduler.flush();
-    _flushing = false;
-  });
-}
 
 void _flutterScheduler() {
   if (_flushing) return;
