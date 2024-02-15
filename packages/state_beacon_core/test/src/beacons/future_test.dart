@@ -755,4 +755,34 @@ void main() {
 
     expect(myBeacon.lastData, 100);
   });
+
+  test('should avoid race condition', () async {
+    var delayMultiplier = 1;
+
+    Future<int> sampleFuture() async {
+      await delay(k10ms * delayMultiplier);
+      return 1 * delayMultiplier;
+    }
+
+    final a = Beacon.writable(0);
+    final b = Beacon.future(
+      () async {
+        final val = a.value;
+        final res = await sampleFuture();
+        return res + val;
+      },
+    );
+
+    expect(b.isLoading, true);
+    BeaconScheduler.flush();
+    expect(b.isLoading, true);
+    a.increment();
+    delayMultiplier = 2;
+    BeaconScheduler.flush();
+    expect(b.isLoading, true);
+
+    await delay(k10ms * 2);
+
+    expect(b.unwrapValue(), 3);
+  });
 }
