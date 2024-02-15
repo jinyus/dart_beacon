@@ -392,14 +392,12 @@ class _BeaconCreator {
   FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
-    bool cancelRunning = true,
     bool shouldSleep = true,
     String? name,
   }) {
     return FutureBeacon<T>(
       future,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
       shouldSleep: shouldSleep,
       name: name ?? 'FutureBeacon<$T>',
     );
@@ -527,7 +525,6 @@ class _BeaconCreator {
     return FutureBeacon<T>(
       compute,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
       shouldSleep: shouldSleep,
       name: name ?? 'FutureBeacon<$T>',
     );

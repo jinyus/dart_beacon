@@ -23,8 +23,7 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     super.name,
     this.shouldSleep = true,
     bool manualStart = false,
-    bool cancelRunning = true,
-  }) : _cancelRunning = cancelRunning {
+  }) {
     if (manualStart) {
       _status.set(FutureStatus.idle);
       _setValue(AsyncIdle());
@@ -44,7 +43,6 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
   /// Whether the future should sleep when there are no observers.
   final bool shouldSleep;
   FutureCallback<T> _compute;
-  final bool _cancelRunning;
   late final _status = Beacon.lazyWritable<FutureStatus>(
     name: "$name's status",
   );
@@ -93,8 +91,7 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
   void _setAsyncValue(int exeID, AsyncValue<T> value) {
     // If the execution ID is not the same as the current one,
     // then this is an old execution and we should ignore it
-    // if cancelRunning is true
-    if (_cancelRunning && exeID != _executionID) return;
+    if (exeID != _executionID) return;
 
     if (value.isError) {
       // If the value is an error, we want to keep the last data

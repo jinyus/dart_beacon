@@ -122,14 +122,12 @@ class BeaconGroup extends _BeaconCreator {
   FutureBeacon<T> future<T>(
     Future<T> Function() future, {
     bool manualStart = false,
-    bool cancelRunning = true,
     bool shouldSleep = true,
     String? name,
   }) {
     final beacon = super.future<T>(
       future,
       manualStart: manualStart,
-      cancelRunning: cancelRunning,
       shouldSleep: shouldSleep,
       name: name,
     );
