@@ -42,6 +42,13 @@ abstract class BeaconScheduler {
     core.BeaconScheduler.useCustomFpsScheduler(updatesPerSecond);
   }
 
+  /// Sets the scheduler to the provided function
+  // coverage:ignore-start
+  static void setCustomScheduler(void Function() scheduler) {
+    core.BeaconScheduler.setScheduler(scheduler);
+  }
+  // coverage:ignore-end
+
   /// This scheduler processes updates synchronously. This is not recommended
   /// for production apps and only provided to make testing easier.
   ///
