@@ -11,11 +11,11 @@ class KonamiPage extends StatefulWidget {
 
 class _KonamiPageState extends State<KonamiPage> {
   late final fNode = FocusNode(
-    onKey: (node, e) {
-      widget.controller.keys.set(e.data.logicalKey.keyLabel, force: true);
-      return KeyEventResult.handled;
-    },
-  );
+      // onKeyt: (node, e) {
+      //   widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
+      //   return KeyEventResult.handled;
+      // },
+      );
 
   static const checker = IterableEquality();
 
@@ -73,6 +73,9 @@ class _KonamiPageState extends State<KonamiPage> {
       child: KeyboardListener(
         autofocus: true,
         focusNode: fNode,
+        onKeyEvent: (e) {
+          widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
+        },
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
