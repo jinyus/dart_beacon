@@ -17,14 +17,14 @@ class Listeners {
   bool add(EffectClosure item) {
     final added = _set.add(item);
     if (added) {
-      _list.add(item);
+      _list = _list.toList()..add(item);
     }
     return added;
   }
 
   void addAll(Iterable<EffectClosure> items) {
     _set.addAll(items);
-    _list.addAll(items);
+    _list = _list.toList()..addAll(items);
   }
 
   bool remove(EffectClosure item) {
