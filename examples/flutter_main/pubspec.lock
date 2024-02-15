@@ -366,14 +366,22 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.33.3"
+    version: "0.33.4"
   state_beacon_core:
     dependency: transitive
     description:
+<<<<<<< HEAD
       path: "/home/david/projects/dart/react"
       relative: false
     source: path
     version: "0.1.0+1"
+=======
+      name: state_beacon_core
+      sha256: bacf19aa852b9fbca20cf2e334c68d8847e897feac764e1346bb4ed96da4e551
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.33.4"
+>>>>>>> main
   state_beacon_lint:
     dependency: "direct dev"
     description:

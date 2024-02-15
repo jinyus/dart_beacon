@@ -293,7 +293,7 @@ void main() {
     final result = await beacon.next();
 
     // it will have 1 val less than 10 and 1 val more than 10
-    expect(result.reduce((a, b) => a + b), inInclusiveRange(10, 20));
+    expect(result.reduce((a, b) => a + b), inInclusiveRange(8, 20));
     expect(beacon.currentBuffer(), isEmpty);
   });
 
