@@ -1,4 +1,4 @@
-import 'package:state_beacon_core/src/creator/creator.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
 void main() {

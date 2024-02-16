@@ -1,6 +1,5 @@
 // ignore_for_file: cascade_invocations, prefer_final_locals
 
-import 'package:state_beacon_core/src/creator/creator.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
