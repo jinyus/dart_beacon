@@ -1,6 +1,5 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:state_beacon_core/src/common/exceptions.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 

@@ -78,18 +78,6 @@ List<Producer<dynamic>?> currentGets = [];
 /// The current index of this producer in the consumer's list of producers.
 int currentGetsIndex = 0;
 
-/// The status of a consumer.
-enum Status {
-  /// The consumer is clean.
-  clean,
-
-  /// The consumer is maybe dirty. Check its sources.
-  check,
-
-  /// The consumer is dirty.
-  dirty;
-}
-
 /// The base class for all beacons.
 abstract class Producer<T> {
   /// Creates a new [Producer].
