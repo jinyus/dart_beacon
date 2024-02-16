@@ -1,6 +1,6 @@
 # 0.34.1
 
--   [Refactor] Internal refactor toand minor improven in performance
+-   [Refactor] Internal refactor and minor improven in performance
 
 # 0.34.0
 

@@ -216,4 +216,14 @@ void main() {
     expect(unsubs, 3);
     expect(listens, 3);
   });
+
+  test('should return future immediately after creating', () async {
+    BeaconObserver.instance = LoggingObserver();
+    final myStream = Stream.periodic(k10ms, (i) => i + 1);
+    final myBeacon = Beacon.stream(() => myStream);
+
+    final res = await myBeacon.toFuture();
+
+    expect(res, 1);
+  });
 }

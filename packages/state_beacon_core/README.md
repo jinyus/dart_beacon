@@ -204,12 +204,13 @@ age.value = 20; // Outputs: "You can vote!"
 
 ### BeaconScheduler:
 
-`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler. Flutter comes with its own scheduler, so it is recommended to use flutter's scheduler when using beacons in a flutter app. This can be done by calling `BeaconScheduler.useFlutterScheduler();` in the `main` function.
+`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler. Flutter comes with its own scheduler, so it is recommended to use flutter's scheduler when using beacons in a flutter app. This can be done by calling `BeaconScheduler.useFlutterScheduler();` in the `main` function right before calling `runApp`.
 
 ```dart
 void main() {
- BeaconScheduler.useFlutterScheduler();
+ // other initializations
 
+ BeaconScheduler.useFlutterScheduler();
  runApp(const MyApp());
 }
 ```
