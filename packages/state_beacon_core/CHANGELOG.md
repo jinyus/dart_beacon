@@ -65,7 +65,7 @@ BeaconScheduler.flush();
 expect(called, 2);
 ```
 
-# 0.33.5+1
+# 0.33.5
 
 -   [Fix] Bug with auto sleeping derivedFuture beacons
 
