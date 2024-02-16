@@ -131,50 +131,58 @@ void main() {
     expect(idle.hashCode, idle2.hashCode);
   });
 
-  test('should set lastData', () {
+  test('should set lastData and correct status', () {
     final loading = AsyncLoading();
 
     expect(loading.lastData, null);
-    expect(loading.valueOrNull, null);
+    expect(loading.unwrapOrNull(), null);
     expect(loading.isIdleOrLoading, true);
+    expect(loading.isLoading, true);
 
     loading.setLastData(1);
 
     expect(loading.lastData, 1);
-    expect(loading.valueOrNull, null);
+    expect(loading.unwrapOrNull(), null);
 
     final idle = AsyncIdle();
 
     expect(idle.lastData, null);
-    expect(idle.valueOrNull, null);
+    expect(idle.unwrapOrNull(), null);
     expect(idle.isIdle, true);
+    expect(idle.unwrap, throwsException);
+    expect(idle.isData, false);
 
     idle.setLastData(1);
 
     expect(idle.lastData, 1);
-    expect(idle.valueOrNull, null);
+    expect(idle.unwrapOrNull(), null);
+    expect(idle.isError, false);
+    expect(idle.isIdleOrLoading, true);
 
     final error = AsyncError('error', StackTrace.current);
 
     expect(error.lastData, null);
-    expect(error.valueOrNull, null);
+    expect(error.unwrapOrNull(), null);
     expect(error.isLoading, false);
+    expect(error.isIdleOrLoading, false);
 
     error.setLastData(1);
 
     expect(error.lastData, 1);
-    expect(error.valueOrNull, null);
+    expect(error.unwrapOrNull(), null);
+    expect(error.isIdle, false);
 
     final data = AsyncData(1);
 
     expect(data.lastData, 1);
-    expect(data.valueOrNull, 1);
+    expect(data.unwrapOrNull(), 1);
     expect(data.isLoading, false);
 
     // can't set lastData on AsyncData
     data.setLastData(2);
 
     expect(data.lastData, 1);
-    expect(data.valueOrNull, 1);
+    expect(data.unwrapOrNull(), 1);
+    expect(data.isLoading, false);
   });
 }

@@ -19,39 +19,49 @@ sealed class AsyncValue<T> {
     _oldData = value;
   }
 
+  // coverage:ignore-start
   /// If this is [AsyncData], returns it's value.
   /// Otherwise returns `null`.
+  @Deprecated('Use `.unwrapOrNull()` instead')
   T? get valueOrNull {
     if (this case AsyncData<T>(:final value)) {
       return value;
     }
     return null;
   }
+  // coverage:ignore-end
 
   /// Returns the last data that was successfully loaded
   /// This is useful when the current state is [AsyncError] or [AsyncLoading]
-  T? get lastData => valueOrNull ?? _oldData;
+  T? get lastData => unwrapOrNull() ?? _oldData;
 
   /// Casts this [AsyncValue] to [AsyncData] and return it's value
   /// or throws `CastError` if this is not [AsyncData].
-  T unwrap() {
-    return (this as AsyncData<T>).value;
-  }
+  T unwrap() => throw Exception(
+        'You tried to unwrap an $this. '
+        'Only AsyncData can be unwrapped. '
+        'Use `.unwrapOrNull()` instead. '
+        'If you want the last successful data, use `.lastData`.',
+      );
+
+  /// If this is [AsyncData], returns it's value.
+  /// Otherwise returns `null`.
+  T? unwrapOrNull() => null;
 
   /// Returns `true` if this is [AsyncLoading].
-  bool get isLoading => this is AsyncLoading;
+  bool get isLoading => false;
 
   /// Returns `true` if this is [AsyncIdle].
-  bool get isIdle => this is AsyncIdle;
+  bool get isIdle => false;
 
   /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
-  bool get isIdleOrLoading => this is AsyncIdle || this is AsyncLoading;
+  bool get isIdleOrLoading => false;
 
   /// Returns `true` if this is [AsyncData].
-  bool get isData => this is AsyncData;
+  bool get isData => false;
 
   /// Returns `true` if this is [AsyncError].
-  bool get isError => this is AsyncError;
+  bool get isError => false;
 
   /// Executes the future provided and returns [AsyncData] with the result
   /// if successful or [AsyncError] if an exception is thrown.
@@ -126,6 +136,15 @@ class AsyncData<T> extends AsyncValue<T> {
   final T value;
 
   @override
+  bool get isData => true;
+
+  @override
+  T unwrap() => value;
+
+  @override
+  T? unwrapOrNull() => value;
+
+  @override
   String toString() {
     return 'AsyncData{value: $value}';
   }
@@ -151,6 +170,9 @@ class AsyncError<T> extends AsyncValue<T> {
   final StackTrace stackTrace;
 
   @override
+  bool get isError => true;
+
+  @override
   bool operator ==(Object other) =>
       other is AsyncError<T> &&
       other.error == error &&
@@ -168,12 +190,24 @@ class AsyncLoading<T> extends AsyncValue<T> {
 
   @override
   int get hashCode => toString().hashCode;
+
+  @override
+  bool get isIdleOrLoading => true;
+
+  @override
+  bool get isLoading => true;
 }
 
 /// A class that represents an idle state.
 class AsyncIdle<T> extends AsyncValue<T> {
   @override
   bool operator ==(Object other) => other is AsyncIdle<T>;
+
+  @override
+  bool get isIdle => true;
+
+  @override
+  bool get isIdleOrLoading => true;
 
   @override
   int get hashCode => toString().hashCode;

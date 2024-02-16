@@ -43,7 +43,6 @@ import 'common/types.dart';
 import 'observer.dart';
 
 part 'beacons/async.dart';
-part 'beacons/awaited.dart';
 part 'beacons/buffered.dart';
 part 'beacons/debounced.dart';
 part 'beacons/derived.dart';

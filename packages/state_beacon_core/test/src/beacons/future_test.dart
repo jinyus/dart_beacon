@@ -785,4 +785,50 @@ void main() {
 
     expect(b.unwrapValue(), 2);
   });
+
+  test(
+    'should run at most once when aync beacon dependency changes',
+    () async {
+      final a = Beacon.writable(0, name: 'a');
+      final b = Beacon.writable(10, name: 'b');
+      final fb1 = Beacon.future(() async => a.value + 10, name: 'fb1');
+      final fb2 = Beacon.future(() async => b.value + 10, name: 'fb2');
+
+      var ran = 0;
+
+      final f3 = Beacon.future(
+        () async {
+          ran++;
+          final f1 = fb1.toFuture();
+          final f2 = fb2.toFuture();
+
+          final (res1, res2) = await (f1, f2).wait;
+
+          return res1 + res2;
+        },
+        name: 'f3',
+      );
+
+      expect(f3.isLoading, true);
+      await delay(k10ms);
+      expect(f3.unwrapValue(), 30);
+      expect(ran, 1);
+
+      // print('\nupdate a\n');
+      a.increment();
+      BeaconScheduler.flush();
+      expect(f3.isLoading, true);
+      await delay();
+      expect(f3.unwrapValue(), 31);
+      expect(ran, 2);
+
+      // print('\nupdate b\n');
+      b.increment();
+      BeaconScheduler.flush();
+      expect(f3.isLoading, true);
+      await delay();
+      expect(f3.unwrapValue(), 32);
+      expect(ran, 3);
+    },
+  );
 }
