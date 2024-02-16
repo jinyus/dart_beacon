@@ -8,6 +8,13 @@ class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
     super.name,
   }) : super(initialValue: initialValue);
 
+  /// The value for the given [key], or `null` if [key] is not in the map.
+  ///
+  /// Some maps allow `null` as a value.
+  /// For those maps, a lookup using this operator cannot distinguish between a
+  /// key not being in the map, and the key being there with a `null` value.
+  V? operator [](Object? key) => peek()[key];
+
   /// Associates the [key] with the given [value].
   ///
   /// If the key was already in the map, its associated value is changed.

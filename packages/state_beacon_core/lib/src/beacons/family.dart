@@ -4,17 +4,18 @@ part of '../producer.dart';
 /// The beacon is cached and returned if the same argument is provided again.
 class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
   /// @macro [BeaconFamily]
-  BeaconFamily(this._create, {this.shouldCache = true}) {
-    if (shouldCache) {
-      _cache = {};
-    }
-  }
+  BeaconFamily(this._create, {this.shouldCache = true});
 
   /// Whether or not to cache the created beacons.
   final bool shouldCache;
 
-  late final Map<Arg, BeaconType> _cache;
+  /// The cache of beacons.This is a MapBeacon that
+  /// will notify its listeners when it's modified.
+  late final cache = Beacon.hashMap<Arg, BeaconType>({});
+
   final BeaconType Function(Arg) _create;
+
+  var _clearing = false;
 
   /// Retrieves a `Beacon` based on the given argument.
   /// If caching is enabled and a beacon for the provided argument
@@ -23,21 +24,26 @@ class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
   BeaconType call(Arg arg) {
     if (!shouldCache) return _create(arg);
 
-    return _cache[arg] ??= _create(arg)
+    return cache[arg] ??= _create(arg)
       ..onDispose(() {
-        _cache.remove(arg);
+        if (_clearing) return;
+        cache.remove(arg);
       });
   }
 
   /// Clears the cache of beacon if caching is enabled.
-  /// Beacons are disposed before thy are removed
+  /// Beacons are disposed before they are removed
   void clear() {
     if (!shouldCache) return;
 
-    for (final beacon in _cache.values.toList()) {
+    _clearing = true;
+
+    for (final beacon in cache.peek().values.toList()) {
       beacon.dispose();
     }
 
-    _cache.clear();
+    _clearing = false;
+
+    cache.clear();
   }
 }
