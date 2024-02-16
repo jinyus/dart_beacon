@@ -333,6 +333,9 @@ void main() {
 
     unsub();
 
+    //goes to sleep after 100ms
+    await delay(k10ms * 12);
+
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);
     expect(num2.listenersCount, 0);
@@ -361,6 +364,9 @@ void main() {
     expect(status.value, DerivedFutureStatus.running);
 
     unsub2();
+
+    //goes to sleep after 100ms
+    await delay(k10ms * 12);
 
     expect(status.value, DerivedFutureStatus.idle);
 
@@ -405,6 +411,9 @@ void main() {
     expect(ran, 2);
 
     unsub();
+
+    //goes to sleep after 100ms
+    await delay(k10ms * 12);
 
     // derived should not execute when it has no more watchers
     num1.increment();

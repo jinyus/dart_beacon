@@ -34,10 +34,12 @@ class DerivedFutureBeacon<T> extends FutureBeacon<T>
     if (!shouldSleep) return;
 
     _listeners.whenEmpty(() {
-      // setting status to idle will dispose the internal effect
-      // and stop listening to dependencies
-      _status.set(DerivedFutureStatus.idle);
-      _sleeping = true;
+      Future.delayed(const Duration(milliseconds: 100), () {
+        // setting status to idle will dispose the internal effect
+        // and stop listening to dependencies
+        _status.set(DerivedFutureStatus.idle);
+        _sleeping = true;
+      });
     });
   }
 
