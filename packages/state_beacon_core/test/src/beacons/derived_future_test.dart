@@ -313,7 +313,7 @@ void main() {
       name: 'derived',
     );
 
-    final status = (derivedBeacon as DerivedFutureBeacon).status;
+    // final status = (derivedBeacon as DerivedFutureBeacon).status;
 
     expect(num1.listenersCount, 1);
     expect(num2.listenersCount, 1);
@@ -326,10 +326,10 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(
-      status.value,
-      DerivedFutureStatus.running,
-    );
+    // expect(
+    //   status.value,
+    //   DerivedFutureStatus.running,
+    // );
 
     unsub();
 
@@ -340,10 +340,8 @@ void main() {
     expect(num1.listenersCount, 0);
     expect(num2.listenersCount, 0);
 
-    // should start listening again when value is accessed
+    // // should start listening again when value is accessed
     num1.value = 15;
-
-    expect(status.value, DerivedFutureStatus.idle);
 
     expect(derivedBeacon.isLoading, true);
 
@@ -361,14 +359,10 @@ void main() {
 
     expect(derivedBeacon.listenersCount, 1);
 
-    expect(status.value, DerivedFutureStatus.running);
-
     unsub2();
 
     //goes to sleep after 100ms
     await delay(k10ms * 12);
-
-    expect(status.value, DerivedFutureStatus.idle);
 
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);

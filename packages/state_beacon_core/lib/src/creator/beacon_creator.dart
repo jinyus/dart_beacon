@@ -583,19 +583,25 @@ class _BeaconCreator {
       name: name ?? 'DerivedFutureBeacon<$T>',
     );
 
-    final dispose = doEffect(
-      () async {
-        // beacon is manually triggered if in idle state
-        if (beacon.status() == DerivedFutureStatus.idle) {
-          return;
-        }
+    void start() {
+      final dispose = doEffect(
+        () async {
+          // beacon is manually triggered if in idle state
+          if (beacon.status() == DerivedFutureStatus.idle) {
+            return;
+          }
 
-        await beacon.run();
-      },
-      name: name ?? 'DerivedFutureBeacon<$T>',
-    );
+          await beacon.run();
+        },
+        name: name ?? 'DerivedFutureBeacon<$T>',
+      );
 
-    beacon.$setInternalEffectUnsubscriber(dispose);
+      beacon.$setInternalEffectUnsubscriber(dispose);
+    }
+
+    beacon.$setInternalEffectRestarter(start);
+
+    start();
 
     return beacon;
   }
