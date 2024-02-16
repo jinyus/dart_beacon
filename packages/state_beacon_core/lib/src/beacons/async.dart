@@ -34,9 +34,9 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   ///   return '$fname $lname';
   /// });
   Future<T> toFuture() {
-    final awaitedBeacon = _Awaited.findOrCreate(this);
+    _completer ??= Beacon.writable(Completer<T>(), name: "$name's future");
 
-    return awaitedBeacon.future;
+    return _completer!.value.future;
   }
 
   /// Alias for peek().lastData.
@@ -87,6 +87,27 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   StreamSubscription<T>? _sub;
   VoidCallback? _effectDispose;
 
+  WritableBeacon<Completer<T>>? _completer;
+
+  @override
+  void _setValue(AsyncValue<T> newValue, {bool force = false}) {
+    if (_completer != null) {
+      final compl = _completer!;
+
+      if (compl.peek().isCompleted) {
+        compl._setValue(Completer<T>());
+      }
+
+      if (newValue case final AsyncData<T> data) {
+        compl.peek().complete(data.value);
+      } else if (newValue case AsyncError(:final error, :final stackTrace)) {
+        compl.peek().completeError(error, stackTrace);
+      }
+    }
+
+    super._setValue(newValue, force: force);
+  }
+
   /// Starts listening to the internal stream
   /// if `manualStart` was set to true.
   ///
@@ -123,8 +144,9 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
 
   @override
   void dispose() {
-    _Awaited.remove(this);
     _cancel();
+    _completer?.dispose();
+    _completer = null;
     super.dispose();
   }
 }
