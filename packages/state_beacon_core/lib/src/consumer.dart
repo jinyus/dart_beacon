@@ -8,29 +8,29 @@ mixin Consumer {
 
   /// The list of [Producer]s that this consumer is currently watching.
   List<Producer<dynamic>?> sources = [];
-  var _status = Status.dirty;
+  var _status = DIRTY;
 
   /// Handles the status of the consumer when a producer changes.
   void stale(Status newStatus);
 
   /// Called by a producer when it updates and it's sure that the consumer
   /// is dirty and needs to be updated.
-  void markDirty() => stale(Status.dirty);
+  void markDirty() => stale(DIRTY);
 
   /// Called by a producer when it updates and it's unsure if the consumer
   /// is dirty and needs to be updated.
-  void markCheck() => stale(Status.check);
+  void markCheck() => stale(CHECK);
 
   /// Called by [Effect]s and [Subscription]s to tell the consumer to update.
   void updateIfNecessary() {
-    if (_status == Status.clean) return;
+    if (_status == CLEAN) return;
 
-    if (_status == Status.check) {
+    if (_status == CHECK) {
       for (final source in sources) {
         if (source is DerivedBeacon) {
           source.updateIfNecessary();
 
-          if (_status == Status.dirty) {
+          if (_status == DIRTY) {
             // No need to check further because we are dirty and must update
             break;
           }
@@ -38,11 +38,11 @@ mixin Consumer {
       }
     }
 
-    if (_status == Status.dirty) {
+    if (_status == DIRTY) {
       update();
     }
 
-    _status = Status.clean;
+    _status = CLEAN;
   }
 
   /// remove all old sources' .observers links to us

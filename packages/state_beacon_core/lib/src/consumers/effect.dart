@@ -23,12 +23,12 @@ class Effect with Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status == Status.dirty) return;
-    if (_status.index < newStatus.index) {
+    if (_status == DIRTY) return;
+    if (_status < newStatus) {
       final oldStatus = _status;
       _status = newStatus;
 
-      if (oldStatus == Status.clean) {
+      if (oldStatus == CLEAN) {
         _schedule();
       }
     }
@@ -83,7 +83,7 @@ class Effect with Consumer {
 
     // We've rerun with the latest values from all of our sources.
     // This means that we no longer need to update until a signal changes
-    _status = Status.clean;
+    _status = CLEAN;
     //print('effect end run');
   }
 

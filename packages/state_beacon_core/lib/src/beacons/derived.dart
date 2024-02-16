@@ -11,7 +11,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   T peek() {
-    if (_status == Status.clean) return super.peek();
+    if (_status == CLEAN) return super.peek();
     updateIfNecessary();
     return super.peek();
   }
@@ -25,7 +25,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status.index < newStatus.index) {
+    if (_status < newStatus) {
       _status = newStatus;
 
       for (var i = 0; i < _observers.length; i++) {
@@ -85,13 +85,13 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
       // dirty so they'll reevaluate
 
       for (var i = 0; i < _observers.length; i++) {
-        _observers[i]._status = Status.dirty;
+        _observers[i]._status = DIRTY;
       }
     }
 
     // We've rerun with the latest values from all of our sources.
     // This means that we no longer need to update until a signal changes
-    _status = Status.clean;
+    _status = CLEAN;
   }
 
   @override

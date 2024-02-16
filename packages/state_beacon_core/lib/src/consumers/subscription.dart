@@ -16,7 +16,7 @@ class Subscription<T> implements Consumer {
     if (startNow || _derivedSource?.isEmpty == true) {
       _schedule();
     } else {
-      _status = Status.clean;
+      _status = CLEAN;
     }
 
     BeaconObserver.instance?.onWatch(name, producer);
@@ -41,7 +41,7 @@ class Subscription<T> implements Consumer {
   List<Producer<dynamic>?> sources = [];
 
   @override
-  var _status = Status.dirty;
+  var _status = DIRTY;
 
   void _schedule() {
     if (synchronous) {
@@ -56,12 +56,12 @@ class Subscription<T> implements Consumer {
   void stale(Status newStatus) {
     // print('$name is stale: $newStatus. current: $_status');
     // If already dirty, no need to update the status
-    if (_status == Status.dirty) return;
-    if (_status.index < newStatus.index) {
+    if (_status == DIRTY) return;
+    if (_status < newStatus) {
       final oldStatus = _status;
       _status = newStatus;
 
-      if (oldStatus == Status.clean) {
+      if (oldStatus == CLEAN) {
         _schedule();
       }
     }
@@ -70,20 +70,20 @@ class Subscription<T> implements Consumer {
   @override
   void updateIfNecessary() {
     // print('$name will update if necessary  current: $_status');
-    if (_status == Status.clean) return;
+    if (_status == CLEAN) return;
 
     // Check dependent sources (only for DerivedBeacon)
-    if (_status == Status.check) {
+    if (_status == CHECK) {
       _derivedSource?.updateIfNecessary();
     }
 
     // Update if still dirty
-    if (_status == Status.dirty) {
+    if (_status == DIRTY) {
       // print('$name is dirty: updating');
       update();
     }
 
-    _status = Status.clean;
+    _status = CLEAN;
   }
 
   var _ran = false;
@@ -95,7 +95,7 @@ class Subscription<T> implements Consumer {
       // startNow is set to false but we must still run now to register the
       // the derived as an observer of its sources.
       producer.peek();
-      _status = Status.clean;
+      _status = CLEAN;
       _ran = true;
       return;
     }
@@ -107,7 +107,7 @@ class Subscription<T> implements Consumer {
 
     // After the update, set the status to
     // clean since we've processed the latest value.
-    _status = Status.clean;
+    _status = CLEAN;
   }
 
   /// Disposes of the subscription.
@@ -118,10 +118,10 @@ class Subscription<T> implements Consumer {
   }
 
   @override
-  void markDirty() => stale(Status.dirty);
+  void markDirty() => stale(DIRTY);
 
   @override
-  void markCheck() => stale(Status.check);
+  void markCheck() => stale(CHECK);
 
   // these should never be called
   // coverage:ignore-start
