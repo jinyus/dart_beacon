@@ -472,6 +472,17 @@ void main() {
     await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
   });
 
+  test('should transform input values when use mid-chain/2', () async {
+    final stream = Stream.periodic(k1ms, (i) => i).take(5);
+    final beacon = stream
+        .toRawBeacon(isLazy: true)
+        .filter(filter: (_, n) => n.isEven)
+        .map((v) => v + 1)
+        .throttle(duration: k1ms);
+
+    await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
+  });
+
   test('should not delegate to map beacon when output type differs', () {
     final count = Beacon.writable<int>(10);
 

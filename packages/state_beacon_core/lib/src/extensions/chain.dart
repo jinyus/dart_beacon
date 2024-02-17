@@ -241,21 +241,22 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
     return beacon;
   }
 
-  /// Returns a [FilteredBeacon] that wraps this Beacon.
+  /// Returns a [ReadableBeacon] that wraps a Beacon and tranforms its values.
   ///
   /// NB: All writes to the filtered beacon
   /// will be delegated to the wrapped beacon.
   ///
   /// ```dart
   /// final count = Beacon.writable(10);
-  /// final filteredCount = count.filter(filter: (prev, next) => next > 10);
+  /// final mapped = count.map((value) => value * 2);
   ///
-  /// filteredCount.value = 20; //  equivalent to count.set(20, force: true);
+  /// expect(mapped.value, 20);
   ///
-  /// expect(count.value, equals(20));
-  /// expect(filteredCount.value, equals(20));
+  /// count.value = 20;
+  ///
+  /// expect(count.value, 20);
+  /// expect(mapped.value, 40);
   /// ```
-  /// See: `Beacon.filtered` for more details.
   ReadableBeacon<O> map<O>(
     MapFilter<T, O> mapFN, {
     String? name,
