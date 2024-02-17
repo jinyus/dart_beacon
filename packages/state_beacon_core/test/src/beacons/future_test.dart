@@ -900,14 +900,3 @@ void main() {
     );
   });
 }
-
-extension AsyncValueListX<T> on AsyncValue<List<T>> {
-  List<T> toList() {
-    return switch (this) {
-      AsyncLoading() => [],
-      AsyncIdle() => [],
-      AsyncError() => [],
-      AsyncData(:final value) => value,
-    };
-  }
-}
