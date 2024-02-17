@@ -203,7 +203,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   ///
   /// ```dart
   /// final count = Beacon.writable(10);
-  /// final filteredCount = count.filter(filter: (prev, next) => next > 10);
+  /// final filteredCount = count.filter((prev, next) => next > 10);
   ///
   /// filteredCount.value = 20; //  equivalent to count.set(20, force: true);
   ///

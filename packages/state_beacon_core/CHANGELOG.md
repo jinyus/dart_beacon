@@ -22,7 +22,7 @@ expect(mapped.value, 40);
 final stream = Stream.periodic(k1ms, (i) => i).take(5);
 final beacon = stream
         .toRawBeacon(isLazy: true)
-        .filter(filter: (_, n) => n.isEven)
+        .filter((_, n) => n.isEven)
         .map((v) => v + 1)
         .throttle(duration: k1ms);
 
@@ -164,7 +164,7 @@ final query = Beacon.writable('');
 const k500ms = Duration(milliseconds: 500);
 
 final debouncedQuery = query
-        .filter(filter: (prev, next) => next.length > 2)
+        .filter((prev, next) => next.length > 2)
         .debounce(duration: k500ms);
 ```
 

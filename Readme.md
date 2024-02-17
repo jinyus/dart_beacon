@@ -745,7 +745,7 @@ Seamlessly chain beacons to create sophisticated reactive pipelines, combining m
 
 ```dart
 // every write to this beacon will be filtered then debounced.
-final searchQuery = Beacon.writable('').filter(filter: (prev, next) => next.length > 2).debounce(duration: k500ms);
+final searchQuery = Beacon.writable('').filter((prev, next) => next.length > 2).debounce(duration: k500ms);
 ```
 
 > [!IMPORTANT]  
@@ -758,7 +758,7 @@ final count = Beacon.writable(10);
 
 final filteredCount = count
         .debounce(duration: k500ms),
-        .filter(filter: (prev, next) => next > 10);
+        .filter((prev, next) => next > 10);
 
 filteredCount.value = 20;
 // The mutation will be re-routed to count
@@ -825,7 +825,7 @@ final stream = Stream.periodic(k1ms, (i) => i).take(5);
 final beacon = stream
     .toRawBeacon(isLazy: true)
     .map((v) => v + 1)
-    .filter(filter: (_, n) => n.isEven);
+    .filter((_, n) => n.isEven);
 
 await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 ```
@@ -835,7 +835,7 @@ await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 
 ```dart
 final count = Beacon.writable(0);
-final filteredBeacon = count.map((v) => '$v').filter(filter: (_, n) => n.length > 1);
+final filteredBeacon = count.map((v) => '$v').filter((_, n) => n.length > 1);
 ```
 
 ### mybeacon.debounce():
@@ -848,7 +848,7 @@ final query = Beacon.writable('');
 const k500ms = Duration(milliseconds: 500);
 
 final debouncedQuery = query
-        .filter(filter: (prev, next) => next.length > 2)
+        .filter((prev, next) => next.length > 2)
         .debounce(duration: k500ms);
 ```
 
