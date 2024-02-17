@@ -1,3 +1,21 @@
+# 0.35.0
+
+-   [Breaking] The filter function is now required when chaining the filtered beacon.
+
+### old:
+
+```dart
+final count = Beacon.writable(10);
+final filtered = count.filter(filter: (prev, next) => next.isEven);
+```
+
+### new:
+
+```dart
+final count = Beacon.writable(10);
+final filtered = count.filter((prev, next) => next.isEven);
+```
+
 # 0.34.4
 
 -   Internal refactor
