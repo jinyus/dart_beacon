@@ -22,13 +22,13 @@ mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   /// so this is should be implemented by the wrapper.
   void _onNewValueFromWrapped(InputT value);
 
+  // coverage:ignore-start
   /// Sets the delegate beacon to listen to.
   void set(InputT value, {bool force = false}) {
     throw UnimplementedError();
   }
+  // coverage:ignore-end
 
   /// Wraps a beacon and listens to its changes.
-  void reset({bool force = false}) {
-    throw UnimplementedError();
-  }
+  void reset({bool force = false});
 }
