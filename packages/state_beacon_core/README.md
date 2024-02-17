@@ -853,6 +853,28 @@ Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
 
 Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
 
+### mybeacon.map():
+
+Returns a [ReadableBeacon] that wraps a Beacon and tranforms its values.
+
+```dart
+final stream = Stream.periodic(k1ms, (i) => i).take(5);
+final beacon = stream
+    .toRawBeacon(isLazy: true)
+    .map((v) => v + 1)
+    .filter(filter: (_, n) => n.isEven);
+
+await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
+```
+
+> [!NOTE]
+> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String` and `count` holds an `int`.
+
+```dart
+final count = Beacon.writable(0);
+final filteredBeacon = count.map((v) => '$v').filter(filter: (_, n) => n.length > 1);
+```
+
 ### mybeacon.debounce():
 
 Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
