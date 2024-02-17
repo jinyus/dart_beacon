@@ -54,11 +54,31 @@ publish_target() {
     fi
 }
 
+deps() {
+    cd $CURRENT_DIR/packages/state_beacon_core &&
+        flutter pub get &&
+        cd $CURRENT_DIR/packages/state_beacon &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/flutter_main &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/shopping_cart &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/vgv_best_practices &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/auth_flow &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/skeleton &&
+        flutter pub get
+
+}
+
 # Main logic to decide whether to test or publish based on the first argument
 if [ "$ACTION" == "test" ]; then
     test_target $TARGET
 elif [ "$ACTION" == "pub" ]; then
     publish_target $TARGET
+elif [ "$ACTION" == "deps" ]; then
+    deps
 else
     echo -e "Unknown action \"$ACTION\" \nValid actions are: test, publish"
 fi
