@@ -499,6 +499,9 @@ void main() {
     buff.add('60');
     BeaconScheduler.flush();
     expect(buff.currentBuffer(), ['40', '60']);
+    // can't delegate to map because the input type is different
+    expect(count.value, 20);
+    expect(mapped.value, '40');
 
     count.value = 30;
     expect(mapped.value, '60');
