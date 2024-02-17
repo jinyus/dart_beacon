@@ -51,7 +51,7 @@ See [docs](https://github.com/jinyus/dart_beacon?tab=readme-ov-file#mybeaconmap)
 
 # 0.34.2
 
--   [Feat] Expose the list of beacons as a Readable<List<BeaconTyoe>> in the family beacon's cache.
+-   [Feat] Expose the list of beacons as a `Readable<List<BeaconType>>` in the family beacon's cache.
 
     ```dart
     final myFamily = Beacon.family((int id) => Beacon.writable(0));
@@ -67,7 +67,7 @@ See [docs](https://github.com/jinyus/dart_beacon?tab=readme-ov-file#mybeaconmap)
 
 # 0.34.1
 
--   [Refactor] Internal refactor and minor improven in performance
+-   [Refactor] Internal refactor and minor improvement in performance
 
 # 0.34.0
 
