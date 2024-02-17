@@ -241,6 +241,45 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
     return beacon;
   }
 
+  /// Returns a [ReadableBeacon] that wraps a Beacon and tranforms its values.
+  ///
+  /// NB: All writes to the filtered beacon
+  /// will be delegated to the wrapped beacon.
+  ///
+  /// ```dart
+  /// final count = Beacon.writable(10);
+  /// final mapped = count.map((value) => value * 2);
+  ///
+  /// expect(mapped.value, 20);
+  ///
+  /// count.value = 20;
+  ///
+  /// expect(count.value, 20);
+  /// expect(mapped.value, 40);
+  /// ```
+  ReadableBeacon<O> map<O>(
+    MapFilter<T, O> mapFN, {
+    String? name,
+  }) {
+    assert(
+      this is! BufferedBaseBeacon,
+      '''
+Chaining of buffered beacons is not supported!
+Buffered beacons has to be the last in the chain.
+
+Good: someBeacon.map().buffer(10);
+
+Bad: someBeacon.buffer(10).map();
+''',
+    );
+
+    final beacon = _MappedBeacon(mapFN, name: name);
+
+    _wrapAndDelegate(beacon);
+
+    return beacon;
+  }
+
   void _wrapAndDelegate<InputT, OutputT>(
     BeaconWrapper<InputT, OutputT> beacon,
   ) {
@@ -251,7 +290,10 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
     );
 
     if (this is WritableBeacon<InputT>) {
-      beacon._delegate = this as WritableBeacon<InputT>;
+      beacon._delegate = this as BeaconWrapper<InputT, dynamic>;
+    } else if (this is _MappedBeacon<InputT, InputT>) {
+      // if map output is the same as the input, then we can delegate
+      beacon._delegate = this as _MappedBeacon<InputT, InputT>;
     }
   }
 }

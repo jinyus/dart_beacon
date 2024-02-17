@@ -48,6 +48,7 @@ part 'beacons/debounced.dart';
 part 'beacons/derived.dart';
 part 'beacons/family.dart';
 part 'beacons/filtered.dart';
+part 'beacons/mapped.dart';
 part 'beacons/future.dart';
 part 'beacons/list.dart';
 part 'beacons/map.dart';

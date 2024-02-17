@@ -11,6 +11,7 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconWrapper<T, T> {
 
   /// Set the beacon to its initial value
   /// and notify all listeners
+  @override
   void reset({bool force = false}) {
     if (_isEmpty) return;
 
@@ -23,6 +24,7 @@ class WritableBeacon<T> extends ReadableBeacon<T> with BeaconWrapper<T, T> {
   }
 
   /// Sets the value of the beacon and allows a force notification
+  @override
   void set(T newValue, {bool force = false}) {
     _internalSet(newValue, force: force, delegated: true);
   }
