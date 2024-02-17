@@ -21,10 +21,11 @@ class _MappedBeacon<I, O> extends ReadableBeacon<O> with BeaconWrapper<I, O> {
   }
 
   void _internalSet(I newValue, {bool force = false, bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
+    // map can never be set publicly because it is a readable beacon.
+    // if (delegated && _delegate != null) {
+    //   _delegate!.set(newValue, force: true);
+    //   return;
+    // }
 
     _setValue(mapFN(newValue), force: force);
   }
@@ -38,10 +39,11 @@ class _MappedBeacon<I, O> extends ReadableBeacon<O> with BeaconWrapper<I, O> {
   void reset({bool force = false}) {
     if (_isEmpty) return;
 
-    if (_delegate != null) {
-      _delegate!.reset(force: force);
-      // return;
-    }
+    // map can never be reset publicly because it is a readable beacon.
+    // if (_delegate != null) {
+    //   _delegate!.reset(force: force);
+    //   // return;
+    // }
 
     _setValue(_initialValue, force: force);
   }

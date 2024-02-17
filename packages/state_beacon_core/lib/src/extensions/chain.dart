@@ -289,11 +289,49 @@ Bad: someBeacon.buffer(10).map();
       startNow: !isEmpty,
     );
 
-    if (this is WritableBeacon<InputT>) {
-      beacon._delegate = this as BeaconWrapper<InputT, dynamic>;
-    } else if (this is _MappedBeacon<InputT, InputT>) {
-      // if map output is the same as the input, then we can delegate
-      beacon._delegate = this as _MappedBeacon<InputT, InputT>;
+    // Example 1:
+    // writable<int> -> filter<int> -> map<int,int> -> buffer
+    // - when writable.filter():
+    // 1. if writable is beaconwrapper<int,dynamic> : true
+    // 2. if writable's delegate is WritableBeacon<int> : false
+    // 3. if writable's delegate is null : true
+    // 4. set writable to be filter's delegate
+
+    // - when writable.filter().map():
+    // 1. if filter is beaconwrapper<int,int> : true
+    // 2. if filter's delegate is WritableBeacon<int> : true
+    // 3. set writable to be map's delegate
+
+    // - when writable.filter().map().buffer():
+    // 1. if map is beaconwrapper<int,dynamic> : true
+    // 2. if map's delegate is WritableBeacon<int> : true
+    // 3. set writable to be buffer's delegate
+
+    // Example 2:
+    // writable<int> -> filter<int> -> map<int,string> -> buffer
+    // - when writable.filter():
+    // 1. if writable is beaconwrapper<int,int> : true
+    // 2. if writable's delegate is WritableBeacon<int> : false
+    // 3. if writable's delegate is null : true
+    // 4. set writable to be filter's delegate
+
+    // - when writable.filter().map():
+    // 1. if filter is beaconwrapper<int,dynamic> : true
+    // 2. if filter's delegate is WritableBeacon<int> : true
+    // 3. set writable to be map's delegate
+
+    // - when writable.filter().map().buffer():
+    // 1. if map is beaconwrapper<String,dynamic> : false
+    // 2. buffer takes a String so we can't delegate the writable<int> to it
+
+    // stream -> map -> filter -> buffer
+    // if this is a BeaconWrapper, then assign this's delegate to the new beacon
+    if (this case final BeaconWrapper<InputT, dynamic> wrapped) {
+      if (wrapped._delegate case final WritableBeacon<InputT> delegate) {
+        beacon._delegate = delegate;
+      } else if (wrapped._delegate == null) {
+        beacon._delegate = wrapped;
+      }
     }
   }
 }

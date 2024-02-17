@@ -481,6 +481,10 @@ void main() {
         .throttle(duration: k1ms);
 
     await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
+
+    await delay();
+    beacon.set(10);
+    expect(beacon.value, 11);
   });
 
   test('should not delegate to map beacon when output type differs', () {
@@ -499,6 +503,9 @@ void main() {
     buff.add('60');
     BeaconScheduler.flush();
     expect(buff.currentBuffer(), ['40', '60']);
+    // can't delegate to map because the input type is different
+    expect(count.value, 20);
+    expect(mapped.value, '40');
 
     count.value = 30;
     expect(mapped.value, '60');
@@ -558,4 +565,28 @@ void main() {
     expect(count.value, 10);
     expect(mapped.value, 20);
   });
+
+  test(
+    "should delegate to map when it's the first writable in the chain",
+    () async {
+      final stream = Stream.periodic(k1ms, (i) => i).take(5);
+      final beacon = stream
+          .toRawBeacon(isLazy: true)
+          .map((v) => v + 1)
+          .filter(filter: (_, n) => n.isEven);
+
+      await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
+
+      beacon.set(10);
+
+      // map added 1 making it 11, filter removed it
+      expect(beacon.value, 4);
+
+      beacon.set(11);
+      expect(beacon.value, 12);
+
+      beacon.reset();
+      expect(beacon.value, 1);
+    },
+  );
 }
