@@ -208,17 +208,9 @@ age.value = 20; // Outputs: "You can vote!"
 
 ### BeaconScheduler:
 
-`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler. Flutter comes with its own scheduler, so it is recommended to use flutter's scheduler when using beacons in a flutter app. This can be done by calling `BeaconScheduler.useFlutterScheduler();` in the `main` function.
+`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler.
 
-```dart
-void main() {
- BeaconScheduler.useFlutterScheduler();
-
- runApp(const MyApp());
-}
-```
-
-A 60fps scheduler is also included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
+A 60fps scheduler is included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
 
 When testing synchronous code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
 

@@ -7,7 +7,7 @@ import '../../common.dart';
 
 void main() {
   test('should create a new beacon', () {
-    final family = Beacon.family((int arg) => Beacon.writable(arg.toString()));
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
     final beacon = family(1);
 
     expect(beacon.value, '1');
@@ -60,29 +60,12 @@ void main() {
 
   // Test for caching behavior
   test('should cache created beacons', () {
-    final family = Beacon.family(
-      (int arg) => Beacon.writable(arg.toString()),
-      cache: true,
-    );
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
     final beacon1 = family(1);
     final beacon2 = family(1);
 
     // Both beacons should be the same instance
     expect(identical(beacon1, beacon2), isTrue);
-  });
-
-  test('should remove from cache when disposed', () {
-    final family = Beacon.family(
-      (int arg) => Beacon.writable(arg.toString()),
-      cache: true,
-    );
-    final beacon1 = family(1);
-
-    beacon1.dispose();
-
-    final beacon2 = family(1);
-
-    expect(identical(beacon1, beacon2), isFalse);
   });
 
   test('should not cache Beacons if cache is false', () {
@@ -99,9 +82,23 @@ void main() {
     family.clear();
   });
 
-  test('should clear the cache', () {
+  test('should remove from cache when disposed', () {
     final family = Beacon.family(
-      (int arg) => Beacon.writable(arg.toString()),
+      (int arg) => Beacon.writable('$arg'),
+      cache: true,
+    );
+    final beacon1 = family(1);
+
+    beacon1.dispose();
+
+    final beacon2 = family(1);
+
+    expect(identical(beacon1, beacon2), isFalse);
+  });
+
+  test('should clear the cache and dispose beacons', () {
+    final family = Beacon.family(
+      (int arg) => Beacon.writable('$arg'),
       cache: true,
     );
 
@@ -112,5 +109,79 @@ void main() {
 
     // Beacons should not be the same instance after cache is cleared
     expect(identical(beacon1, beacon2), isFalse);
+
+    expect(beacon1.isDisposed, true);
+  });
+
+  test('should not clear beacons individually when clearing', () {
+    final family = Beacon.family(
+      (int arg) => Beacon.writable('$arg'),
+      cache: true,
+    );
+
+    var ran = 0;
+
+    family.beacons.subscribe((_) => ran++, synchronous: true, startNow: false);
+
+    final beacon1 = family(1);
+    final beacon2 = family(2);
+
+    expect(ran, 2);
+
+    family.clear();
+
+    expect(ran, 3);
+
+    expect(beacon1.isDisposed, true);
+    expect(beacon2.isDisposed, true);
+  });
+
+  test('should update beacons list correctly', () {
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
+    var ran = 0;
+
+    final beacon1 = family(1);
+    final beacon2 = family(2);
+
+    expect(family.beacons.value, [beacon1, beacon2]);
+
+    family.beacons.subscribe((_) => ran++, synchronous: true, startNow: false);
+
+    final beacon3 = family(3);
+
+    expect(family.beacons.value, [beacon1, beacon2, beacon3]);
+
+    expect(ran, 1);
+
+    family(3);
+
+    expect(ran, 1);
+
+    beacon1.dispose();
+
+    expect(family.beacons.value, [beacon2, beacon3]);
+
+    expect(ran, 2);
+
+    family.remove(2);
+
+    expect(family.beacons.value, [beacon3]);
+
+    expect(ran, 3);
+
+    final beacon4 = family(4);
+
+    expect(family.beacons.value, [beacon3, beacon4]);
+
+    expect(ran, 4);
+
+    expect(family.containsKey(4), true);
+    expect(family.containsKey(2), false);
+
+    family.clear();
+
+    expect(family.beacons.value, isEmpty);
+
+    expect(ran, 5);
   });
 }
