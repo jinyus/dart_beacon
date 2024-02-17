@@ -39,6 +39,22 @@ void main() {
     expect(beacon.value, 6); // Value should update
   });
 
+  test(
+    'should not bypass filter function for first value when lazyBypass=false',
+    () {
+      final beacon = Beacon.lazyFiltered<int>(
+        filter: (prev, next) => next > 5,
+        lazyBypass: false,
+      );
+
+      beacon.value = 4;
+      expect(beacon.call, throwsA(isA<UninitializeLazyReadException>()));
+
+      beacon.value = 6;
+      expect(beacon.value, 6); // Value should update
+    },
+  );
+
   test('should set hasFilter to false if not is provided', () {
     final beacon = Beacon.filtered(0);
     beacon.value = 4;

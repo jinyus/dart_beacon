@@ -5,16 +5,18 @@ import 'package:test/test.dart';
 
 import '../../common.dart';
 
+// ignore: type_annotate_public_apis
+bool neverFilter(p, n) => true;
 void main() {
   test('should dispose together when wrapped is disposed(3)', () async {
     // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);
 
     final beacon = count
-        .filter()
+        .filter(neverFilter)
         .throttle(duration: k10ms)
         .debounce(duration: k10ms)
-        .filter();
+        .filter(neverFilter);
 
     Beacon.effect(() => beacon.value);
 
@@ -31,7 +33,7 @@ void main() {
 
   test('should delegate writes to parent when chained', () async {
     final beacon = Beacon.writable<int>(0);
-    final filtered = beacon.filter(filter: (p, n) => n.isEven);
+    final filtered = beacon.filter((p, n) => n.isEven);
 
     filtered.value = 1;
 
@@ -57,8 +59,8 @@ void main() {
 
   test('should delegate writes to parent when chained/2', () async {
     // BeaconObserver.instance = LoggingObserver();
-    final filtered = Beacon.lazyDebounced<int>(duration: k10ms)
-        .filter(filter: (p, n) => n.isEven);
+    final filtered =
+        Beacon.lazyDebounced<int>(duration: k10ms).filter((p, n) => n.isEven);
 
     filtered.value = 1; // 1st value so not debounced
 
@@ -81,9 +83,9 @@ void main() {
     // BeaconObserver.instance = LoggingObserver();
 
     final filtered = Beacon.writable(0)
-        .filter(filter: (p, n) => n.isEven, name: 'f1')
-        .filter(filter: (p, n) => n > 0, name: 'f2')
-        .filter(filter: (p, n) => n > 10, name: 'f3');
+        .filter((p, n) => n.isEven, name: 'f1')
+        .filter((p, n) => n > 0, name: 'f2')
+        .filter((p, n) => n > 10, name: 'f3');
 
     filtered.value = 1;
 
@@ -130,8 +132,8 @@ void main() {
     final filtered = count
         .throttle(duration: k10ms, name: 'throttled')
         .debounce(duration: k10ms, name: 'debounced')
-        .filter(name: 'f1')
-        .filter(name: 'f2');
+        .filter(neverFilter, name: 'f1')
+        .filter(neverFilter, name: 'f2');
 
     expect(filtered.isEmpty, false);
     expect(filtered.value, 10);
@@ -160,9 +162,8 @@ void main() {
   test('should delegate writes to parent when chained/5', () async {
     final count = Beacon.writable<int>(10, name: 'count');
 
-    final buffered = count
-        .filter(name: 'f1', filter: (_, n) => n > 5)
-        .buffer(2, name: 'buffered');
+    final buffered =
+        count.filter(name: 'f1', (_, n) => n > 5).buffer(2, name: 'buffered');
 
     BeaconScheduler.flush();
 
@@ -219,7 +220,7 @@ void main() {
     final buffTime = Beacon.bufferedTime<int>(duration: k10ms);
 
     expect(
-      buffered.filter,
+      () => buffered.filter(neverFilter),
       throwsA(isA<AssertionError>()),
     );
     expect(
@@ -240,7 +241,7 @@ void main() {
     );
     expect(
       () => count
-          .filter(name: 'f1', filter: (_, n) => n > 5)
+          .filter(name: 'f1', (_, n) => n > 5)
           .buffer(2, name: 'buffered')
           .debounce(duration: k10ms),
       throwsA(isA<AssertionError>()),
@@ -258,10 +259,8 @@ void main() {
 
   test('should filter input beacon', () async {
     final stream = Stream.periodic(k1ms, (i) => i);
-    final beacon = stream
-        .toRawBeacon(isLazy: true)
-        .filter(filter: (p, n) => n.isEven)
-        .buffer(5);
+    final beacon =
+        stream.toRawBeacon(isLazy: true).filter((p, n) => n.isEven).buffer(5);
 
     BeaconScheduler.flush();
 
@@ -316,9 +315,8 @@ void main() {
     final count = Beacon.writable<int>(10);
     var called = 0;
 
-    final buff = count
-        .filter(name: 'f1', filter: (p, n) => n > 5)
-        .buffer(2, name: 'buffered');
+    final buff =
+        count.filter(name: 'f1', (p, n) => n > 5).buffer(2, name: 'buffered');
 
     BeaconScheduler.flush();
 
@@ -401,7 +399,7 @@ void main() {
   test('should force all delegated writes (filtered)', () async {
     final count = Beacon.writable<int>(10);
 
-    final tbeacon = count.filter(filter: (p, n) => n > 5);
+    final tbeacon = count.filter((p, n) => n > 5);
 
     final buff = count.buffer(5);
 
@@ -467,7 +465,7 @@ void main() {
     final beacon = stream
         .toRawBeacon(isLazy: true)
         .map((v) => v + 1)
-        .filter(filter: (_, n) => n.isEven);
+        .filter((_, n) => n.isEven);
 
     await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
   });
@@ -476,7 +474,7 @@ void main() {
     final stream = Stream.periodic(k1ms, (i) => i).take(5);
     final beacon = stream
         .toRawBeacon(isLazy: true)
-        .filter(filter: (_, n) => n.isEven)
+        .filter((_, n) => n.isEven)
         .map((v) => v + 1)
         .throttle(duration: k1ms);
 
@@ -573,7 +571,7 @@ void main() {
       final beacon = stream
           .toRawBeacon(isLazy: true)
           .map((v) => v + 1)
-          .filter(filter: (_, n) => n.isEven);
+          .filter((_, n) => n.isEven);
 
       await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 

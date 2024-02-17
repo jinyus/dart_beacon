@@ -4,6 +4,7 @@ import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
 import '../../common.dart';
+import 'chain_test.dart';
 
 void main() {
   test('should reflect original beacon value in wrapper beacon', () {
@@ -164,7 +165,7 @@ void main() {
     final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
-    final buff = doubledCount.filter().buffer(1);
+    final buff = doubledCount.filter(neverFilter).buffer(1);
 
     expect(wrapper.value, equals(10));
 
@@ -193,7 +194,7 @@ void main() {
 
     wrapper.wrap(count, disposeTogether: true);
 
-    doubledCount.filter().buffer(1).wrap(
+    doubledCount.filter(neverFilter).buffer(1).wrap(
           wrapper,
           disposeTogether: true,
         );

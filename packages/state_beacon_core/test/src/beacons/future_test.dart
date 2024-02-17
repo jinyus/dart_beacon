@@ -568,6 +568,7 @@ void main() {
     expect(ran, 2);
 
     expect(derivedBeacon.isLoading, true);
+    expect(derivedBeacon.unwrapValueOrNull(), null);
 
     BeaconScheduler.flush();
 
@@ -831,4 +832,71 @@ void main() {
       expect(ran, 3);
     },
   );
+
+  test('should emit error when stream throws', () async {
+    Stream<List<int>> getStream() async* {
+      yield [1, 2, 3];
+      await delay(k10ms);
+      yield [4, 5, 6];
+      await delay(k10ms);
+      throw Exception('error');
+    }
+
+    final s = Beacon.stream(getStream, name: 's');
+
+    final f = Beacon.future(
+      () async {
+        final res = await s.toFuture();
+        return res;
+      },
+      name: 'f',
+    );
+
+    await expectLater(
+      f.stream,
+      emitsInOrder([
+        isA<AsyncLoading<List<int>>>(),
+        isA<AsyncData<List<int>>>(),
+        isA<AsyncLoading<List<int>>>(),
+        isA<AsyncData<List<int>>>(),
+        isA<AsyncLoading<List<int>>>(),
+        isA<AsyncError<List<int>>>(),
+      ]),
+    );
+  });
+
+  test('should ignore error when stream throws', () async {
+    Stream<List<int>> getStream() async* {
+      yield [1, 2, 3];
+      await delay(k10ms);
+      yield [4, 5, 6];
+      await delay(k10ms);
+      throw Exception('error');
+    }
+
+    // BeaconObserver.instance = LoggingObserver(includeNames: ['d', 'm']);
+
+    final s = Beacon.stream(getStream, name: 's');
+
+    final sFiltered = s
+        .filter((_, n) => n.isData)
+        .map((v) => v.unwrapOrNull() ?? [], name: 'm');
+
+    final d = Beacon.derived(
+      () {
+        final res = sFiltered.value;
+        return res;
+      },
+      name: 'd',
+    );
+
+    await expectLater(
+      d.stream,
+      emitsInOrder([
+        <int>[],
+        [1, 2, 3],
+        [4, 5, 6],
+      ]),
+    );
+  });
 }
