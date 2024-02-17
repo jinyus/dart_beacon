@@ -409,9 +409,6 @@ class _BeaconCreator {
   /// Creates a `DerivedBeacon` whose value is derived from a computation function.
   /// This beacon will recompute its value every time one of it's dependencies change.
   ///
-  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-  /// It will resume executing once a listener is added or its value is accessed.
-  ///
   /// Example:
   /// ```dart
   /// final age = Beacon.writable<int>(18);
@@ -426,8 +423,6 @@ class _BeaconCreator {
   ReadableBeacon<T> derived<T>(
     T Function() compute, {
     String? name,
-    bool shouldSleep = true,
-    bool supportConditional = true,
   }) {
     final beacon = DerivedBeacon<T>(
       compute,

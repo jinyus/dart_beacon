@@ -18,7 +18,7 @@ Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/exampl
 ## Installation
 
 ```bash
-dart pub add state_beacon
+dart pub add state_beacon_core
 ```
 
 ## Usage
@@ -100,7 +100,6 @@ NB: Create the file if it doesn't exist.
     -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
 -   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
 -   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
--   [Beacon.batch](#beacondobatchupdate): Combine multiple updates into a single notification.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
 -   [Beacon.throttled](#beaconthrottled): Limit the frequency of value updates, ideal for managing frequent events or user input.
 -   [Beacon.filtered](#beaconfiltered): Update values based on filter criteria.
@@ -156,25 +155,11 @@ counter.value = 10;
 print(counter.value); // 10
 ```
 
-### Beacon.scopedWritable:
-
-Returns a `ReadableBeacon` and a function for setting its value.
-This is useful for creating a beacon that's readable by the public,
-but writable only by the owner.
-
-```dart
-var (count,setCount) = Beacon.scopedWritable(15);
-```
-
 ### Beacon.readable:
 
 Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
 
 ```dart
-final counter = Beacon.readable(10);
-counter.value = 10; // Compilation error
-
-
 final _internalCounter = Beacon.writable(10);
 
 // Expose the beacon's value without allowing it to be modified
@@ -208,7 +193,7 @@ age.value = 20; // Outputs: "You can vote!"
 
 A 60fps scheduler is included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
 
-When testing synchronous code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
+When testing **synchronous** code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
 
 > [!NOTE]
 > When writing widget tests, manual flushing isn't needed. The queue is automatically flushed when you call `tester.pumpAndSettle()`.
@@ -240,11 +225,7 @@ expect(called, 2);
 Creates a `DerivedBeacon` whose value is derived from a computation function.
 This beacon will recompute its value every time one of it's dependencies change.
 
-If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-It will resume executing once a listener is added or its value is accessed.
-
-If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
-This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used a performance optimization.
+These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
 
 Example:
 
@@ -336,7 +317,6 @@ var fullName = Beacon.future(() async {
 #### FutureBeacon.overrideWith:
 
 Replaces the current callback and resets the beacon by running the new callback.
-This can also be done with [FutureBeacons](#beaconfuture).
 
 ```dart
 var futureBeacon = Beacon.future(() async => 1);
@@ -358,7 +338,7 @@ Creates a `StreamBeacon` from a given stream.
 When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
 This beacon updates its value based on the stream's emitted values.
 The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
-This can we wrapped in a Throttled or Filtered beacon to control the rate of updates.
+This can we wrapped in a Throttled or Filtered beacon to control the rate of updates(see [method chaining](#chaining-methods)).
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
 ```dart
@@ -389,28 +369,6 @@ var myBeacon = Beacon.streamRaw(() => myStream, initialValue: 0);
 myBeacon.subscribe((value) {
   print(value); // Outputs 0,1,2,3,...
 });
-```
-
-### Beacon.batch:
-
-This allows multiple updates to be batched into a single update.
-This can be used to optimize performance by reducing the number of update notifications.
-
-```dart
-final age = Beacon.writable<int>(10);
-
-var callCount = 0;
-
-age.subscribe((_) => callCount++);
-
-Beacon.batch(() {
-  age.value = 15;
-  age.value = 16;
-  age.value = 20;
-  age.value = 23;
-});
-
-expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
 ```
 
 ### Beacon.debounced:
