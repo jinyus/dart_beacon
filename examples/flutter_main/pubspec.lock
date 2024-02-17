@@ -366,15 +366,15 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.34.1"
+    version: "0.34.2"
   state_beacon_core:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: ccfaeda5ac423b923a51d41c1d3ccbca73d2471c476b2ae0b4d33a254a1c446d
+      sha256: "6ab892741e8b006403277f2f695f66a8ca873dffb6782e648a0a30bad849ae14"
       url: "https://pub.dev"
     source: hosted
-    version: "0.34.1"
+    version: "0.34.2"
   state_beacon_lint:
     dependency: "direct dev"
     description:

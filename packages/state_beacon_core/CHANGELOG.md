@@ -1,3 +1,19 @@
+# 0.34.2
+
+-   [Feat] Expose the list of beacons as a Readable<List<BeaconTyoe>> in the family beacon's cache.
+
+    ```dart
+    final myFamily = Beacon.family((int id) => Beacon.writable(0));
+    final beacons1 = family(1);
+
+    Beacon.effect((){
+        print('cache updated: ${myFamily.beacons.value}');
+    });
+
+    final beacons2 = family(2);
+    // prints: cache updated: [beacons1, beacons2]
+    ```
+
 # 0.34.1
 
 -   [Refactor] Internal refactor and minor improven in performance
@@ -68,6 +84,10 @@ BeaconScheduler.flush();
 
 expect(called, 2);
 ```
+
+# 0.33.6
+
+-   [Fix] Add bug fix from 0.34.0 to flutter package
 
 # 0.33.5
 
