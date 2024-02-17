@@ -121,7 +121,7 @@ void main() {
 
     var ran = 0;
 
-    family.cache.subscribe((_) => ran++, synchronous: true, startNow: false);
+    family.beacons.subscribe((_) => ran++, synchronous: true, startNow: false);
 
     final beacon1 = family(1);
     final beacon2 = family(2);
@@ -134,5 +134,54 @@ void main() {
 
     expect(beacon1.isDisposed, true);
     expect(beacon2.isDisposed, true);
+  });
+
+  test('should update beacons list correctly', () {
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
+    var ran = 0;
+
+    final beacon1 = family(1);
+    final beacon2 = family(2);
+
+    expect(family.beacons.value, [beacon1, beacon2]);
+
+    family.beacons.subscribe((_) => ran++, synchronous: true, startNow: false);
+
+    final beacon3 = family(3);
+
+    expect(family.beacons.value, [beacon1, beacon2, beacon3]);
+
+    expect(ran, 1);
+
+    family(3);
+
+    expect(ran, 1);
+
+    beacon1.dispose();
+
+    expect(family.beacons.value, [beacon2, beacon3]);
+
+    expect(ran, 2);
+
+    family.remove(2);
+
+    expect(family.beacons.value, [beacon3]);
+
+    expect(ran, 3);
+
+    final beacon4 = family(4);
+
+    expect(family.beacons.value, [beacon3, beacon4]);
+
+    expect(ran, 4);
+
+    expect(family.containsKey(4), true);
+    expect(family.containsKey(2), false);
+
+    family.clear();
+
+    expect(family.beacons.value, isEmpty);
+
+    expect(ran, 5);
   });
 }

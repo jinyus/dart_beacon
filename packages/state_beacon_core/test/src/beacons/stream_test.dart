@@ -218,7 +218,7 @@ void main() {
   });
 
   test('should return future immediately after creating', () async {
-    BeaconObserver.instance = LoggingObserver();
+    // BeaconObserver.instance = LoggingObserver();
     final myStream = Stream.periodic(k10ms, (i) => i + 1);
     final myBeacon = Beacon.stream(() => myStream);
 

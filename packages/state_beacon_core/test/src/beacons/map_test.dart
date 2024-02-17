@@ -90,6 +90,8 @@ void main() {
 
     BeaconScheduler.flush();
 
+    expect(data['a'], isNull);
+
     expect(called, 10);
   });
 }
