@@ -44,10 +44,15 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// equivalent to `beacon.peek().lastData`
   T? get lastData => peek().lastData;
 
-  /// Casts its value to [AsyncData] and return
-  /// it's value or throws `CastError` if this is not [AsyncData].
+  /// If this beacon's value is [AsyncData], returns it's value.
+  /// Otherwise throws an exception.
   /// equivalent to `beacon.peek().unwrap()`
   T unwrapValue() => peek().unwrap();
+
+  /// If this beacon's value is [AsyncData], returns it's value.
+  /// Otherwise returns `null`.
+  /// equivalent to `beacon.peek().unwrapOrNull()`
+  T? unwrapValueOrNull() => peek().unwrapOrNull();
 
   /// Returns `true` if this is [AsyncLoading].
   /// This is equivalent to `beacon.peek().isLoading`.
