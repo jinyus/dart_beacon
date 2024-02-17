@@ -1,3 +1,7 @@
+# 0.34.4
+
+-   Internal refactor
+
 # 0.34.3
 
 -   [Feat] App `map` to chaining methods

@@ -18,7 +18,7 @@ Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/exampl
 ## Installation
 
 ```bash
-dart pub add state_beacon_core
+dart pub add state_beacon
 ```
 
 ## Usage
@@ -117,7 +117,6 @@ NB: Create the file if it doesn't exist.
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
-
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
@@ -746,7 +745,7 @@ final searchQuery = Beacon.writable('').filter(filter: (prev, next) => next.leng
 ```
 
 > [!IMPORTANT]  
-> When chaining beacons, all writes made to the returned beacon will be re-routed to the first beacon in the chain.
+> When chaining beacons, all writes made to the returned beacon will be re-routed to the first writable beacon in the chain. It is recommended to mutate the source beacons directly.
 
 ```dart
 const k500ms = Duration(milliseconds: 500);
@@ -828,7 +827,7 @@ await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 ```
 
 > [!NOTE]
-> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String` and `count` holds an `int`.
+> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is FilteredBeacon<String> and `count` holds an `int`.
 
 ```dart
 final count = Beacon.writable(0);

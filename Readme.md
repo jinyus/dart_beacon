@@ -749,7 +749,7 @@ final searchQuery = Beacon.writable('').filter(filter: (prev, next) => next.leng
 ```
 
 > [!IMPORTANT]  
-> When chaining beacons, all writes made to the returned beacon will be re-routed to the first beacon in the chain.
+> When chaining beacons, all writes made to the returned beacon will be re-routed to the first writable beacon in the chain. It is recommended to mutate the source beacons directly.
 
 ```dart
 const k500ms = Duration(milliseconds: 500);
@@ -831,7 +831,7 @@ await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 ```
 
 > [!NOTE]
-> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String` and `count` holds an `int`.
+> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is FilteredBeacon<String> and `count` holds an `int`.
 
 ```dart
 final count = Beacon.writable(0);
