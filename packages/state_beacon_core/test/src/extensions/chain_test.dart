@@ -454,4 +454,97 @@ void main() {
 
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
+
+  test('should transform input values', () async {
+    final stream = Stream.periodic(k1ms, (i) => i).take(5);
+    final beacon = stream.toRawBeacon(isLazy: true).map((v) => v * 10);
+
+    await expectLater(beacon.stream, emitsInOrder([0, 10, 20, 30, 40]));
+  });
+
+  test('should transform input values when use mid-chain', () async {
+    final stream = Stream.periodic(k1ms, (i) => i).take(5);
+    final beacon = stream
+        .toRawBeacon(isLazy: true)
+        .map((v) => v + 1)
+        .filter(filter: (_, n) => n.isEven);
+
+    await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
+  });
+
+  test('should not delegate to map beacon when output type differs', () {
+    final count = Beacon.writable<int>(10);
+
+    final mapped = count.map((v) => '${v * 2}');
+
+    expect(mapped.value, '20');
+
+    count.value = 20;
+
+    expect(mapped.value, '40');
+
+    final buff = mapped.buffer(5);
+
+    buff.add('60');
+    BeaconScheduler.flush();
+    expect(buff.currentBuffer(), ['40', '60']);
+
+    count.value = 30;
+    expect(mapped.value, '60');
+    expect(buff.currentBuffer(), ['40', '60', '60']);
+
+    count.value = 40;
+    expect(mapped.value, '80');
+    expect(buff.currentBuffer(), ['40', '60', '60', '80']);
+
+    count.value = 50;
+    expect(mapped.value, '100');
+    expect(buff(), ['40', '60', '60', '80', '100']);
+    expect(buff.currentBuffer(), <String>[]);
+
+    buff.reset();
+    expect(buff.value, <String>[]);
+    expect(buff.currentBuffer(), <String>[]);
+    // these won't change because the input type is different
+    expect(count.value, 50);
+    expect(mapped.value, '100');
+  });
+
+  test('should delegate to map beacon when output type is the same', () {
+    final count = Beacon.writable<int>(10);
+
+    final mapped = count.map((v) => v * 2);
+
+    expect(mapped.value, 20);
+
+    count.value = 20;
+
+    expect(mapped.value, 40);
+
+    final buff = mapped.buffer(5);
+
+    buff.add(60);
+    BeaconScheduler.flush();
+    expect(buff.currentBuffer(), [40, 120]);
+    expect(count.value, 60);
+    expect(mapped.value, 120);
+
+    count.value = 30;
+    expect(mapped.value, 60);
+    expect(buff.currentBuffer(), [40, 120, 60]);
+
+    buff.add(40);
+    expect(mapped.value, 80);
+    expect(buff.currentBuffer(), [40, 120, 60, 80]);
+
+    buff.add(50);
+    expect(mapped.value, 100);
+    expect(buff(), [40, 120, 60, 80, 100]);
+
+    buff.reset();
+    expect(buff.value, <int>[]);
+    expect(buff.currentBuffer(), <int>[20]);
+    expect(count.value, 10);
+    expect(mapped.value, 20);
+  });
 }

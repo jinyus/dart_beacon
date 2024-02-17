@@ -34,6 +34,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   void _internalAdd(T newValue, {bool delegated = false});
 
   /// Clears the buffer
+  @override
   void reset({bool force = false}) {
     _clearBuffer();
     _setValue(_initialValue, force: force);
