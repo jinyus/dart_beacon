@@ -130,6 +130,7 @@ NB: Create the file if it doesn't exist.
         -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
         -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
         -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+        -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 [Pitfalls](#pitfalls)

@@ -1,3 +1,32 @@
+# 0.34.3
+
+-   [Feat] App `map` to chaining methods
+
+```dart
+final count = Beacon.writable(10);
+final mapped = count.map((value) => value * 2);
+
+expect(mapped.value, 20);
+
+count.value = 20;
+
+expect(count.value, 20);
+expect(mapped.value, 40);
+```
+
+```dart
+final stream = Stream.periodic(k1ms, (i) => i).take(5);
+final beacon = stream
+        .toRawBeacon(isLazy: true)
+        .filter(filter: (_, n) => n.isEven)
+        .map((v) => v + 1)
+        .throttle(duration: k1ms);
+
+await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
+```
+
+See [docs](https://github.com/jinyus/dart_beacon?tab=readme-ov-file#mybeaconmap) for more information.
+
 # 0.34.2
 
 -   [Feat] Expose the list of beacons as a Readable<List<BeaconTyoe>> in the family beacon's cache.

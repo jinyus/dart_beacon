@@ -117,6 +117,7 @@ NB: Create the file if it doesn't exist.
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
+
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
@@ -126,6 +127,7 @@ NB: Create the file if it doesn't exist.
         -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
         -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
         -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
+        -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 
 [Pitfalls](#pitfalls)
