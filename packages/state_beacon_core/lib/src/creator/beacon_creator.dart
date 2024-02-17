@@ -190,17 +190,19 @@ class _BeaconCreator {
   }
 
   /// Like `Beacon.filtered` but behaves like a late variable. It must be set before it's read.
-  /// The first will not be filtered if the `initialValue` is null.
+  /// The first will not be filtered if the `initialValue` is null. You can override this by setting `lazyBypass` to `false`.
   ///
   /// Throws `UninitializeLazyReadException` if it's read before being set.
   FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
+    bool lazyBypass = true,
     String? name,
   }) {
     return FilteredBeacon<T>(
       initialValue: initialValue,
       filter: filter,
+      lazyBypass: lazyBypass,
       name: name ?? 'LazyFilteredBeacon<$T>',
     );
   }

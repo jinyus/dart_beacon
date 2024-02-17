@@ -164,11 +164,13 @@ class BeaconGroup extends _BeaconCreator {
   FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
+    bool lazyBypass = true,
     String? name,
   }) {
     final beacon = super.lazyFiltered<T>(
       initialValue: initialValue,
       filter: filter,
+      lazyBypass: lazyBypass,
       name: name,
     );
 

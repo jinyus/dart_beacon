@@ -136,7 +136,7 @@ void main() {
     final debounced = beacon.debounce(duration: k10ms);
     final throttled = beacon.throttle(duration: k10ms);
     final filtered = beacon.filter(
-      filter: (p0, p1) => p1.isEven,
+      (p0, p1) => p1.isEven,
     );
 
     beacon.set(1);
@@ -236,7 +236,7 @@ void main() {
   test('should return a FilteredBeacon', () async {
     final beacon = Beacon.writable(0);
 
-    final filtered = beacon.filter(filter: (prev, next) => next.isEven);
+    final filtered = beacon.filter((prev, next) => next.isEven);
 
     expect(filtered, isA<FilteredBeacon<int>>());
 

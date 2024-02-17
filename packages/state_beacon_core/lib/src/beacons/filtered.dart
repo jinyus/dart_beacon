@@ -12,12 +12,17 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
     super.initialValue,
     BeaconFilter<T>? filter,
     super.name,
+    this.lazyBypass = true,
   }) : _filter = filter;
 
   BeaconFilter<T>? _filter;
 
   /// Whether or not this beacon has a filter.
   bool get hasFilter => _filter != null;
+
+  /// Whether values should be filtered out if the beacon is empty.
+  ///
+  final bool lazyBypass;
 
   /// Set the function that will be used to filter subsequent values.
   void setFilter(BeaconFilter<T> newFilter) {
@@ -31,7 +36,10 @@ class FilteredBeacon<T> extends WritableBeacon<T> {
       return;
     }
 
-    if (_isEmpty || (_filter?.call(peek(), newValue) ?? true)) {
+    final shouldBypass = isEmpty && lazyBypass;
+
+    if (shouldBypass ||
+        (_filter?.call(isEmpty ? null : peek(), newValue) ?? true)) {
       _setValue(newValue, force: force);
     }
   }

@@ -211,9 +211,10 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   /// expect(filteredCount.value, equals(20));
   /// ```
   /// See: `Beacon.filtered` for more details.
-  FilteredBeacon<T> filter({
-    bool Function(T?, T)? filter,
+  FilteredBeacon<T> filter(
+    bool Function(T?, T) filter, {
     String? name,
+    bool lazyBypass = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -234,6 +235,7 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
     final beacon = Beacon.lazyFiltered<T>(
       filter: filter,
       name: name,
+      lazyBypass: lazyBypass,
     );
 
     _wrapAndDelegate(beacon);
