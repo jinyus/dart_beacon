@@ -1,3 +1,9 @@
+# 0.36.0
+
+-   [Breaking] `Beacon.stream` and `Beacon.streamRaw` will now autosleep when they no longer have listeners. This is a breaking change because it changes the default behavior. If you want to keep the old behavior, set `shouldSleep` to false.
+
+They will unsubscribe from the stream when sleeping and resubscribe when awoken. For `Beacon.stream`, it will enter the loading state when awoken.
+
 # 0.35.0
 
 -   [Breaking] The filter function is now required when chaining the filtered beacon.
