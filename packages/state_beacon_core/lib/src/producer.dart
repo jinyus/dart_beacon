@@ -66,6 +66,7 @@ part 'consumers/subscription.dart';
 part 'extensions/chain.dart';
 part 'extensions/wrap.dart';
 part 'mixins/beacon_wrapper.dart';
+part 'mixins/autosleep.dart';
 part 'scheduler.dart';
 part 'untracked.dart';
 

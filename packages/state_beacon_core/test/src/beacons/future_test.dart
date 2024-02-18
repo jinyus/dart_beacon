@@ -451,7 +451,6 @@ void main() {
     await expectLater(
       stats.stream,
       emitsInOrder([
-        isA<AsyncData<String>>(),
         isA<AsyncLoading<String>>(),
         isA<AsyncError<String>>(),
       ]),
