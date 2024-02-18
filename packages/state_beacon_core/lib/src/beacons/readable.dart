@@ -8,7 +8,7 @@ class ReadableBeacon<T> extends Producer<T> {
   }
 
   StreamController<T>? _controller;
-  VoidCallback? _unsub;
+  VoidCallback? _unsubFromSelf;
 
   /// Returns a broadcast [Stream] that emits the current value
   /// and all subsequent updates to the value of this beacon.
@@ -20,11 +20,11 @@ class ReadableBeacon<T> extends Producer<T> {
         // onListen is only called when sub count goes from 0 to 1.
         // If sub count goes from 1 to 0, onCancel runs and sets _unsub to null.
         // so _unsub will always be null here but checking doesn't hurt
-        _unsub ??= subscribe(_controller!.add);
+        _unsubFromSelf ??= subscribe(_controller!.add);
       },
       onCancel: () {
-        _unsub?.call();
-        _unsub = null;
+        _unsubFromSelf?.call();
+        _unsubFromSelf = null;
       },
     );
 
@@ -39,10 +39,10 @@ class ReadableBeacon<T> extends Producer<T> {
 
   @override
   void dispose() {
-    _unsub?.call();
+    _unsubFromSelf?.call();
     _controller?.close();
     _controller = null;
-    _unsub = null;
+    _unsubFromSelf = null;
     BeaconObserver.instance?.onDispose(this);
     super.dispose();
   }
