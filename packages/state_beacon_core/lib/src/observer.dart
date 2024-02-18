@@ -14,10 +14,10 @@ abstract class BeaconObserver {
   void onUpdate(ReadableBeacon<dynamic> beacon);
 
   /// Called when a beacon is watched by an effect or derived beacon
-  void onWatch(String effectName, BaseBeacon<dynamic> beacon);
+  void onWatch(String consumerName, BaseBeacon<dynamic> beacon);
 
   /// Called when a beacon is no longer watched by an effect or derived beacon
-  void onStopWatch(String effectName, BaseBeacon<dynamic> beacon);
+  void onStopWatch(String consumerName, BaseBeacon<dynamic> beacon);
 
   /// Called when a beacon is disposed
   void onDispose(ReadableBeacon<dynamic> beacon);
