@@ -35,7 +35,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// called when the stream is done
   final void Function()? onDone;
   final Stream<T> Function() _compute;
-  late VoidCallback _effectDispose;
+  VoidCallback? _effectDispose;
 
   /// passed to the internal stream subscription
   final bool cancelOnError;
@@ -53,14 +53,21 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// Calling more than once has no effect
   void _start() {
     if (_sub != null) return;
+    _effectDispose?.call();
     _effectDispose = Beacon.effect(
       () {
-        _sub = _compute().listen(
-          _setValue,
-          onError: onError,
-          onDone: onDone,
-          cancelOnError: cancelOnError,
-        );
+        final stream = _compute();
+
+        // we do this because the streamcontroller can run code onListen
+        // and we don't want to track beacons accessed in that callback.
+        Beacon.untracked(() {
+          _sub = stream.listen(
+            _setValue,
+            onError: onError,
+            onDone: onDone,
+            cancelOnError: cancelOnError,
+          );
+        });
 
         return () {
           final oldSub = _sub!;
@@ -71,9 +78,16 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     );
   }
 
+  void _cancel() {
+    _effectDispose?.call();
+    _effectDispose = null;
+    // effect dispose will cancel the sub so no need to cancel it here
+    _sub = null;
+  }
+
   @override
   void dispose() {
-    _effectDispose();
+    _cancel();
     super.dispose();
   }
 
