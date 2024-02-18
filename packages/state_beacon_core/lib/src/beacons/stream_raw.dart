@@ -44,13 +44,10 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// passed to the internal stream subscription
   final bool cancelOnError;
 
+  // cancelled by the effect dispose
+  // ignore: cancel_subscriptions
   StreamSubscription<T>? _sub;
   var _sleeping = false;
-
-  /// unsubscribes from the internal stream
-  void unsubscribe() {
-    unawaited(_sub?.cancel());
-  }
 
   /// Starts listening to the internal stream
   /// if `manualStart` was set to true.
