@@ -5,6 +5,7 @@ class StreamBeacon<T> extends AsyncBeacon<T> {
   /// @macro stream
   StreamBeacon(
     super._compute, {
+    required super.shouldSleep,
     super.cancelOnError = false,
     super.name,
     super.manualStart,

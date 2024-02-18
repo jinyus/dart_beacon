@@ -40,11 +40,11 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// passed to the internal stream subscription
   final bool cancelOnError;
 
-  StreamSubscription<T>? _subscription;
+  StreamSubscription<T>? _sub;
 
   /// unsubscribes from the internal stream
   void unsubscribe() {
-    unawaited(_subscription?.cancel());
+    unawaited(_sub?.cancel());
   }
 
   /// Starts listening to the internal stream
@@ -52,10 +52,10 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   ///
   /// Calling more than once has no effect
   void _start() {
-    if (_subscription != null) return;
+    if (_sub != null) return;
     _effectDispose = Beacon.effect(
       () {
-        _subscription = _compute().listen(
+        _sub = _compute().listen(
           _setValue,
           onError: onError,
           onDone: onDone,
@@ -63,7 +63,8 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
         );
 
         return () {
-          _subscription!.cancel();
+          final oldSub = _sub!;
+          oldSub.cancel();
         };
       },
       name: name,

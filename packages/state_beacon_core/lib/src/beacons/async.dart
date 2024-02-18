@@ -5,6 +5,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// @macro [AsyncBeacon]
   AsyncBeacon(
     this._compute, {
+    required this.shouldSleep,
     super.name,
     this.cancelOnError = false,
     bool manualStart = false,
@@ -87,12 +88,17 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// passed to the internal stream subscription
   final bool cancelOnError;
 
+  /// Whether the beacon should sleep when there are no observers.
+  final bool shouldSleep;
+
   // cancelled in the effect cleanup
   // ignore: cancel_subscriptions
   StreamSubscription<T>? _sub;
   VoidCallback? _effectDispose;
 
   WritableBeacon<Completer<T>>? _completer;
+
+  var _sleeping = false;
 
   @override
   void _setValue(AsyncValue<T> newValue, {bool force = false}) {
@@ -119,18 +125,23 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// Calling more than once has no effect
   void start() {
     if (_sub != null) return;
+    _effectDispose?.call();
     _effectDispose = Beacon.effect(
       () {
         _setLoadingWithLastData();
-        _sub = _compute().listen(
-          (value) {
-            _setValue(AsyncData(value));
-          },
-          onError: (Object e, StackTrace s) {
-            _setErrorWithLastData(e, s);
-          },
-          cancelOnError: cancelOnError,
-        );
+        final stream = _compute();
+
+        // we do this because the streamcontroller can run code onListen
+        // and we don't want to track beacons accessed in that callback.
+        Beacon.untracked(() {
+          _sub = stream.listen(
+            (v) => _setValue(AsyncData(v)),
+            onError: (Object e, StackTrace s) {
+              _setErrorWithLastData(e, s);
+            },
+            cancelOnError: cancelOnError,
+          );
+        });
 
         return () {
           final oldSub = _sub!;
@@ -141,10 +152,56 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
     );
   }
 
+  @override
+  AsyncValue<T> peek() {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.peek();
+  }
+
+  @override
+  AsyncValue<T> get value {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.value;
+  }
+
+  void _wakeUp() {
+    if (_sleeping) {
+      _sleeping = false;
+      // needs to be in loading state instantly when waking up
+      // so beacon.value.isLoading is true
+      _setLoadingWithLastData();
+    }
+
+    start();
+  }
+
   void _cancel() {
     _effectDispose?.call();
     _effectDispose = null;
+    // effect dispose will cancel the sub so no need to cancel it here
     _sub = null;
+  }
+
+  void _goToSleep() {
+    Future.delayed(Duration.zero, () {
+      if (_observers.isEmpty) {
+        _sleeping = true;
+        _cancel();
+      }
+    });
+  }
+
+  @override
+  void _removeObserver(Consumer observer) {
+    super._removeObserver(observer);
+    if (!shouldSleep) return;
+    if (_observers.isEmpty) {
+      _goToSleep();
+    }
   }
 
   @override

@@ -346,12 +346,14 @@ class _BeaconCreator {
     Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool manualStart = false,
+    bool shouldSleep = true,
     String? name,
   }) {
     return StreamBeacon<T>(
       stream,
       cancelOnError: cancelOnError,
       manualStart: manualStart,
+      shouldSleep: shouldSleep,
       name: name ?? 'StreamBeacon<$T>',
     );
   }

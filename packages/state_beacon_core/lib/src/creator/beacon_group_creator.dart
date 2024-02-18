@@ -250,12 +250,14 @@ class BeaconGroup extends _BeaconCreator {
     Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool manualStart = false,
+    bool shouldSleep = true,
     String? name,
   }) {
     final beacon = super.stream<T>(
       stream,
       cancelOnError: cancelOnError,
       manualStart: manualStart,
+      shouldSleep: shouldSleep,
       name: name,
     );
     _beacons.add(beacon);

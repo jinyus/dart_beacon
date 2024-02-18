@@ -486,6 +486,8 @@ void main() {
 
     unsub();
 
+    await delay();
+
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);
     expect(num2.listenersCount, 0);
@@ -512,6 +514,8 @@ void main() {
     expect(derivedBeacon.listenersCount, 1);
 
     unsub2();
+
+    await delay();
 
     expect(derivedBeacon.listenersCount, 0);
     expect(num1.listenersCount, 0);
@@ -558,6 +562,8 @@ void main() {
     expect(ran, 2);
 
     unsub();
+
+    await delay(k1ms);
 
     // derived should not execute when it has no more watchers
     num1.increment();
