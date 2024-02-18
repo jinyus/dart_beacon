@@ -7,6 +7,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// @macro rawStream
   RawStreamBeacon(
     this._compute, {
+    required this.shouldSleep,
     this.isLazy = false,
     this.cancelOnError = false,
     this.onError,
@@ -29,22 +30,26 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// Whether the beacon has lazy initialization.
   final bool isLazy;
 
+  /// Whether the beacon should sleep when there are no observers.
+  final bool shouldSleep;
+
   /// called when the stream emits an error
   final Function? onError;
 
   /// called when the stream is done
   final void Function()? onDone;
   final Stream<T> Function() _compute;
-  late VoidCallback _effectDispose;
+  VoidCallback? _effectDispose;
 
   /// passed to the internal stream subscription
   final bool cancelOnError;
 
-  StreamSubscription<T>? _subscription;
+  StreamSubscription<T>? _sub;
+  var _sleeping = false;
 
   /// unsubscribes from the internal stream
   void unsubscribe() {
-    unawaited(_subscription?.cancel());
+    unawaited(_sub?.cancel());
   }
 
   /// Starts listening to the internal stream
@@ -52,18 +57,25 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   ///
   /// Calling more than once has no effect
   void _start() {
-    if (_subscription != null) return;
+    if (_sub != null) return;
+    _effectDispose?.call();
     _effectDispose = Beacon.effect(
       () {
-        _subscription = _compute().listen(
-          _setValue,
-          onError: onError,
-          onDone: onDone,
-          cancelOnError: cancelOnError,
-        );
+        final stream = _compute();
+        // we do this because the streamcontroller can run code onListen
+        // and we don't want to track beacons accessed in that callback.
+        Beacon.untracked(() {
+          _sub = stream.listen(
+            _setValue,
+            onError: onError,
+            onDone: onDone,
+            cancelOnError: cancelOnError,
+          );
+        });
 
         return () {
-          _subscription!.cancel();
+          final oldSub = _sub!;
+          oldSub.cancel();
         };
       },
       name: name,
@@ -71,8 +83,56 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   }
 
   @override
+  T peek() {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.peek();
+  }
+
+  @override
+  T get value {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.value;
+  }
+
+  void _wakeUp() {
+    if (_sleeping) {
+      _sleeping = false;
+    }
+    _start();
+  }
+
+  void _goToSleep() {
+    Future.delayed(Duration.zero, () {
+      if (_observers.isEmpty) {
+        _sleeping = true;
+        _cancel();
+      }
+    });
+  }
+
+  @override
+  void _removeObserver(Consumer observer) {
+    super._removeObserver(observer);
+    if (!shouldSleep) return;
+    if (_observers.isEmpty) {
+      _goToSleep();
+    }
+  }
+
+  void _cancel() {
+    _effectDispose?.call();
+    _effectDispose = null;
+    // effect dispose will cancel the sub so no need to cancel it here
+    _sub = null;
+  }
+
+  @override
   void dispose() {
-    _effectDispose();
+    _cancel();
     super.dispose();
   }
 

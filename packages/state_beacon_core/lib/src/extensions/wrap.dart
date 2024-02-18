@@ -93,6 +93,7 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
       () => source,
       isLazy: true,
       initialValue: initialValue,
+      shouldSleep: true,
     );
 
     wrap(

@@ -422,4 +422,30 @@ void main() {
     BeaconScheduler.flush();
     expect(ran, 3);
   });
+
+  test('should watch beacon once', () {
+    // BeaconObserver.instance = LoggingObserver();
+    final a = Beacon.writable(1, name: 'a');
+
+    final dispose = Beacon.effect(
+      () {
+        a.value;
+      },
+      name: 'effect',
+    );
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 1);
+
+    a.increment();
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 1);
+
+    dispose();
+
+    expect(a.listenersCount, 0);
+  });
 }

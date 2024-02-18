@@ -76,7 +76,11 @@ void main() {
 
   test('should pause and resume internal stream', () async {
     final myStream = Stream.periodic(k10ms, (i) => i + 1);
-    final myBeacon = Beacon.stream(() => myStream, manualStart: true);
+    final myBeacon = Beacon.stream(
+      () => myStream,
+      manualStart: true,
+      shouldSleep: false,
+    );
 
     expect(myBeacon.isIdle, true);
 
@@ -107,7 +111,7 @@ void main() {
 
   test('should set last data in loading and error states', () async {
     final controller = StreamController<int>();
-    final myBeacon = Beacon.stream(() => controller.stream);
+    final myBeacon = Beacon.stream(() => controller.stream, shouldSleep: false);
 
     expect(myBeacon.isLoading, true);
 
@@ -225,5 +229,187 @@ void main() {
     final res = await myBeacon.toFuture();
 
     expect(res, 1);
+  });
+
+  test('should sleep when it has no more observers', () async {
+    final controller = StreamController<int>.broadcast();
+
+    final num1 = Beacon.writable(5);
+
+    // should increment when dependency changes
+    var unsubs = 0;
+    var listens = 0;
+
+    controller.onCancel = () => unsubs++;
+
+    controller.onListen = () {
+      listens++;
+      addItems(controller, num1.value);
+    };
+
+    var ran = 0;
+
+    final beacon = Beacon.stream(
+      () {
+        ran++;
+        num1.value;
+        return controller.stream;
+      },
+    );
+
+    final unsub = Beacon.effect(() => beacon.value);
+
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    BeaconScheduler.flush();
+
+    expect(listens, 1);
+    expect(ran, 1);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 1);
+
+    unsub();
+
+    await delay();
+
+    expect(listens, 1);
+    expect(unsubs, 1);
+    expect(ran, 1);
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    num1.increment(); // dep changed, should unsub from old stream
+
+    BeaconScheduler.flush();
+
+    expect(listens, 1);
+    expect(unsubs, 1);
+    expect(ran, 1);
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    final unsub2 = Beacon.effect(() => beacon.value);
+
+    BeaconScheduler.flush();
+
+    expect(listens, 2);
+    expect(unsubs, 1);
+    expect(ran, 2);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 1);
+
+    unsub2();
+
+    await delay();
+
+    expect(listens, 2);
+    expect(unsubs, 2); // should unsub when it has no more listeners
+    expect(ran, 2);
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    final unsub3 = Beacon.effect(() => beacon.value);
+    final unsub4 = Beacon.effect(() => beacon.value);
+
+    BeaconScheduler.flush();
+
+    expect(listens, 3); // should start listen again
+    expect(unsubs, 2);
+    expect(ran, 3);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 2);
+
+    unsub3();
+
+    await delay();
+
+    expect(listens, 3);
+    expect(unsubs, 2); // still has 1 listener, should not unsub
+    expect(ran, 3);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 1);
+
+    unsub4();
+
+    await delay();
+
+    expect(listens, 3);
+    expect(unsubs, 3); // should unsub when it has no more listeners
+    expect(ran, 3);
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    expect(beacon.isLoading, true); // awake and enter loading state when peeked
+
+    await delay();
+
+    expect(listens, 4); // should awake again
+    expect(unsubs, 3);
+    expect(ran, 4);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 0);
+
+    expect(beacon.unwrapValue(), isPositive); // should have value
+  });
+
+  test('should not sleep when shouldSleep=false', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final controller = StreamController<int>.broadcast();
+
+    final num1 = Beacon.writable(5, name: 'num1');
+
+    // should increment when dependency changes
+    var unsubs = 0;
+    var listens = 0;
+
+    controller.onCancel = () => unsubs++;
+
+    controller.onListen = () {
+      listens++;
+      addItems(controller, num1.value);
+    };
+
+    var ran = 0;
+
+    final beacon = Beacon.stream(
+      () {
+        ran++;
+        num1.value;
+        return controller.stream;
+      },
+      shouldSleep: false,
+      name: 's',
+    );
+
+    final unsub = Beacon.effect(() => beacon.value);
+
+    expect(num1.listenersCount, 0);
+    expect(beacon.listenersCount, 0);
+
+    BeaconScheduler.flush();
+
+    expect(listens, 1);
+    expect(ran, 1);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 1);
+
+    unsub();
+
+    expect(listens, 1);
+    expect(unsubs, 0); // should not unsub
+    expect(ran, 1);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 0);
+
+    num1.increment(); // dep changed, should unsub from old stream
+
+    BeaconScheduler.flush();
+
+    expect(listens, 2);
+    expect(unsubs, 1);
+    expect(ran, 2);
+    // expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 0);
   });
 }

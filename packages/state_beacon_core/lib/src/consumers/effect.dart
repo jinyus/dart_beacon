@@ -36,7 +36,6 @@ class Effect with Consumer {
 
   @override
   void update() {
-    //print('effect start run');
     final prevConsumer = currentConsumer;
     final prevGets = currentGets;
     final prevGetsIndex = currentGetsIndex;
@@ -84,7 +83,6 @@ class Effect with Consumer {
     // We've rerun with the latest values from all of our sources.
     // This means that we no longer need to update until a signal changes
     _status = CLEAN;
-    //print('effect end run');
   }
 
   /// Disposes the effect.
