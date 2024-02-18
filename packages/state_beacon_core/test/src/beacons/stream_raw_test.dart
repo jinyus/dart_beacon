@@ -132,7 +132,7 @@ void main() {
     expect(listens, 3);
   });
 
-  test('should ignore error when stream throws', () async {
+  test('should ignore errors when stream throws', () async {
     Stream<List<int>> getStream() async* {
       yield [1, 2, 3];
       await delay(k10ms);
