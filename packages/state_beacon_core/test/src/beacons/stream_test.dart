@@ -349,6 +349,8 @@ void main() {
     expect(ran, 4);
     expect(num1.listenersCount, 1);
     expect(beacon.listenersCount, 0);
+
+    expect(beacon.unwrapValue(), isPositive); // should have value
   });
 
   test('should not sleep when shouldSleep=false', () async {
