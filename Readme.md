@@ -343,6 +343,11 @@ Creates a `StreamBeacon` from a given stream.
 When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
 This beacon updates its value based on the stream's emitted values.
 The emitted values are wrapped in an `AsyncValue`, which can be in one of 4 states:`idle`, `loading`, `data`, or `error`.
+
+If `shouldSleep` is `true`(default), it will unsubscribe from the stream if it's no longer being watched.
+It will resubscribe once a listener is added or its value is accessed.
+This means that it will enter the `loading` state when woken up.
+
 This can we wrapped in a Throttled or Filtered beacon to control the rate of updates(see [method chaining](#chaining-methods)).
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
@@ -360,6 +365,9 @@ myBeacon.subscribe((value) {
 
 Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
+
+If `shouldSleep` is `true`(default), it will unsubscribe from the stream if it's no longer being watched.
+It will resubscribe once a listener is added or its value is accessed.
 
 One of the following must be `true` if an initial value isn't provided:
 

@@ -37,21 +37,23 @@ test_target() {
 
 # Function to handle publishing
 publish_target() {
-    if [ "$1" == "core" ]; then
-        echo "publishing core"
-        cd packages/state_beacon_core
-        dart pub publish
-    elif [ "$1" == "flutter" ]; then
-        echo "publishing flutter"
-        cd packages/state_beacon
-        dart pub publish
-    elif [ "$1" == "lint" ]; then
-        echo "publishing lint"
-        cd packages/state_beacon_lints
-        dart pub publish
-    else
-        echo -e "unknown package \"$1\" \nValid packages are: core, flutter, lint"
-    fi
+    cp Readme.md packages/state_beacon_core/README.md &&
+        cp Readme.md packages/state_beacon/README.md &&
+        if [ "$1" == "core" ]; then
+            echo "publishing core"
+            cd packages/state_beacon_core
+            dart pub publish
+        elif [ "$1" == "flutter" ]; then
+            echo "publishing flutter"
+            cd packages/state_beacon
+            dart pub publish
+        elif [ "$1" == "lint" ]; then
+            echo "publishing lint"
+            cd packages/state_beacon_lints
+            dart pub publish
+        else
+            echo -e "unknown package \"$1\" \nValid packages are: core, flutter, lint"
+        fi
 }
 
 deps() {
