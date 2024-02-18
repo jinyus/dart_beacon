@@ -131,4 +131,33 @@ void main() {
     expect(unsubs, 3);
     expect(listens, 3);
   });
+
+  test('should ignore error when stream throws', () async {
+    Stream<List<int>> getStream() async* {
+      yield [1, 2, 3];
+      await delay(k10ms);
+      yield [4, 5, 6];
+      await delay(k10ms);
+      throw Exception('error');
+    }
+
+    final s = Beacon.streamRaw(getStream, name: 's', initialValue: <int>[]);
+
+    final d = Beacon.derived(
+      () {
+        final res = s.value;
+        return res;
+      },
+      name: 'd',
+    );
+
+    await expectLater(
+      d.stream,
+      emitsInOrder([
+        <int>[],
+        [1, 2, 3],
+        [4, 5, 6],
+      ]),
+    );
+  });
 }
