@@ -269,6 +269,7 @@ class BeaconGroup extends _BeaconCreator {
     Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool isLazy = false,
+    bool shouldSleep = true,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
@@ -280,6 +281,7 @@ class BeaconGroup extends _BeaconCreator {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
+      shouldSleep: shouldSleep,
       isLazy: isLazy,
       name: name,
     );

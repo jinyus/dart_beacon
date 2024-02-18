@@ -339,6 +339,16 @@ void main() {
     expect(ran, 3);
     expect(num1.listenersCount, 0);
     expect(beacon.listenersCount, 0);
+
+    expect(beacon.isLoading, true); // awake and enter loading state when peeked
+
+    await delay();
+
+    expect(listens, 4); // should awake again
+    expect(unsubs, 3);
+    expect(ran, 4);
+    expect(num1.listenersCount, 1);
+    expect(beacon.listenersCount, 0);
   });
 
   test('should not sleep when shouldSleep=false', () async {
@@ -399,50 +409,5 @@ void main() {
     expect(ran, 2);
     // expect(num1.listenersCount, 1);
     expect(beacon.listenersCount, 0);
-
-    // final unsub2 = Beacon.effect(() => beacon.value);
-
-    // BeaconScheduler.flush();
-
-    // expect(listens, 2);
-    // expect(unsubs, 1);
-    // expect(ran, 2);
-    // expect(num1.listenersCount, 1);
-    // expect(beacon.listenersCount, 1);
-
-    // unsub2();
-
-    // expect(listens, 2);
-    // expect(unsubs, 2); // should unsub when it has no more listeners
-    // expect(ran, 2);
-    // expect(num1.listenersCount, 0);
-    // expect(beacon.listenersCount, 0);
-
-    // final unsub3 = Beacon.effect(() => beacon.value);
-    // final unsub4 = Beacon.effect(() => beacon.value);
-
-    // BeaconScheduler.flush();
-
-    // expect(listens, 3); // should start listen again
-    // expect(unsubs, 2);
-    // expect(ran, 3);
-    // expect(num1.listenersCount, 1);
-    // expect(beacon.listenersCount, 2);
-
-    // unsub3();
-
-    // expect(listens, 3);
-    // expect(unsubs, 2); // still has 1 listener, should not unsub
-    // expect(ran, 3);
-    // expect(num1.listenersCount, 1);
-    // expect(beacon.listenersCount, 1);
-
-    // unsub4();
-
-    // expect(listens, 3);
-    // expect(unsubs, 3); // should unsub when it has no more listeners
-    // expect(ran, 3);
-    // expect(num1.listenersCount, 0);
-    // expect(beacon.listenersCount, 0);
   });
 }

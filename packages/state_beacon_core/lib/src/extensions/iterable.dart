@@ -26,6 +26,7 @@ extension StreamUtils<T> on Stream<T> {
   RawStreamBeacon<T> toRawBeacon({
     bool cancelOnError = false,
     bool isLazy = false,
+    bool shouldSleep = true,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
@@ -35,6 +36,7 @@ extension StreamUtils<T> on Stream<T> {
       () => this,
       cancelOnError: cancelOnError,
       isLazy: isLazy,
+      shouldSleep: shouldSleep,
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,

@@ -7,6 +7,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// @macro rawStream
   RawStreamBeacon(
     this._compute, {
+    required this.shouldSleep,
     this.isLazy = false,
     this.cancelOnError = false,
     this.onError,
@@ -29,6 +30,9 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// Whether the beacon has lazy initialization.
   final bool isLazy;
 
+  /// Whether the beacon should sleep when there are no observers.
+  final bool shouldSleep;
+
   /// called when the stream emits an error
   final Function? onError;
 
@@ -41,6 +45,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   final bool cancelOnError;
 
   StreamSubscription<T>? _sub;
+  var _sleeping = false;
 
   /// unsubscribes from the internal stream
   void unsubscribe() {
@@ -57,7 +62,6 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
     _effectDispose = Beacon.effect(
       () {
         final stream = _compute();
-
         // we do this because the streamcontroller can run code onListen
         // and we don't want to track beacons accessed in that callback.
         Beacon.untracked(() {
@@ -76,6 +80,47 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
       },
       name: name,
     );
+  }
+
+  @override
+  T peek() {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.peek();
+  }
+
+  @override
+  T get value {
+    if (_sleeping) {
+      _wakeUp();
+    }
+    return super.value;
+  }
+
+  void _wakeUp() {
+    if (_sleeping) {
+      _sleeping = false;
+    }
+    _start();
+  }
+
+  void _goToSleep() {
+    Future.delayed(Duration.zero, () {
+      if (_observers.isEmpty) {
+        _sleeping = true;
+        _cancel();
+      }
+    });
+  }
+
+  @override
+  void _removeObserver(Consumer observer) {
+    super._removeObserver(observer);
+    if (!shouldSleep) return;
+    if (_observers.isEmpty) {
+      _goToSleep();
+    }
   }
 
   void _cancel() {

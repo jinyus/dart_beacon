@@ -369,6 +369,7 @@ class _BeaconCreator {
     Stream<T> Function() stream, {
     bool cancelOnError = false,
     bool isLazy = false,
+    bool shouldSleep = true,
     Function? onError,
     VoidCallback? onDone,
     T? initialValue,
@@ -380,6 +381,7 @@ class _BeaconCreator {
       onError: onError,
       onDone: onDone,
       initialValue: initialValue,
+      shouldSleep: shouldSleep,
       isLazy: isLazy,
       name: name ?? 'RawStreamBeacon<$T>',
     );
@@ -468,6 +470,7 @@ class _BeaconCreator {
     return RawStreamBeacon<T>(
       compute,
       cancelOnError: cancelOnError,
+      shouldSleep: true,
       isLazy: true,
       name: name ?? 'RawStreamBeacon<$T>',
     );
