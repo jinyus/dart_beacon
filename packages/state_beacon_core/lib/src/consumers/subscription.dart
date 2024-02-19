@@ -19,7 +19,10 @@ class Subscription<T> implements Consumer {
       _status = CLEAN;
     }
 
-    BeaconObserver.instance?.onWatch(name, producer);
+    assert(() {
+      BeaconObserver.instance?.onWatch(name, producer);
+      return true;
+    }());
   }
 
   /// The producer that this subscription is watching.

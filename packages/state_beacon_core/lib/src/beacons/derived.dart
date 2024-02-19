@@ -93,9 +93,12 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     // This means that we no longer need to update until a signal changes
     _status = CLEAN;
 
-    if (didUpdate) {
-      BeaconObserver.instance?.onUpdate(this);
-    }
+    assert(() {
+      if (didUpdate) {
+        BeaconObserver.instance?.onUpdate(this);
+      }
+      return true;
+    }());
   }
 
   @override

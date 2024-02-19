@@ -37,7 +37,6 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
   /// });
   Future<T> toFuture() {
     _completer ??= Beacon.writable(Completer<T>(), name: "$name's future");
-
     return _completer!.value.future;
   }
 

@@ -4,7 +4,10 @@ part of '../producer.dart';
 class ReadableBeacon<T> extends Producer<T> {
   /// @macro [ReadableBeacon]
   ReadableBeacon({super.initialValue, super.name}) {
-    BeaconObserver.instance?.onCreate(this, _isEmpty);
+    assert(() {
+      BeaconObserver.instance?.onCreate(this, _isEmpty);
+      return true;
+    }());
   }
 
   StreamController<T>? _controller;
@@ -33,7 +36,10 @@ class ReadableBeacon<T> extends Producer<T> {
 
   @override
   void _notifyListeners() {
-    BeaconObserver.instance?.onUpdate(this);
+    assert(() {
+      BeaconObserver.instance?.onUpdate(this);
+      return true;
+    }());
     super._notifyListeners();
   }
 
@@ -43,7 +49,10 @@ class ReadableBeacon<T> extends Producer<T> {
     _controller?.close();
     _controller = null;
     _unsubFromSelf = null;
-    BeaconObserver.instance?.onDispose(this);
+    assert(() {
+      BeaconObserver.instance?.onDispose(this);
+      return true;
+    }());
     super.dispose();
   }
 }
