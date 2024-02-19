@@ -187,7 +187,7 @@ void main() {
     expect(tCalled, 2);
 
     debounceBeacon.set(10, force: true);
-    await delay(time * 1.2);
+    await delay();
     expect(dCalled, 2);
 
     filterBeacon.set(10, force: true);
@@ -202,7 +202,7 @@ void main() {
     BeaconScheduler.flush();
     expect(uCalled, 3);
 
-    await delay(time * 1.2);
+    await delay();
 
     throttleBeacon.set(10, force: true);
     BeaconScheduler.flush();
