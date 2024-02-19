@@ -91,6 +91,20 @@ void main() {
 
     a.subscribe((p0) {});
     expect(_onWatchCalled, 4);
+
+    final d = Beacon.derived(() => a() + 1);
+
+    a.value = 30;
+
+    BeaconScheduler.flush();
+
+    expect(_onUpdateCalled, 4);
+    expect(_onWatchCalled, 4);
+
+    expect(d.value, 31);
+
+    expect(_onUpdateCalled, 5);
+    expect(_onWatchCalled, 5);
   });
 
   test('should call onCreate with lazy set as true', () {

@@ -52,14 +52,20 @@ mixin Consumer {
     for (var i = index; i < sources.length; i++) {
       final source = sources[i]!;
       source._observers.remove(this);
-      BeaconObserver.instance?.onStopWatch(name, source);
+      assert(() {
+        BeaconObserver.instance?.onStopWatch(name, source);
+        return true;
+      }());
     }
   }
 
   /// Start watching a new source.
   void startWatching(Producer<dynamic> source) {
     if (currentGets.contains(source)) return;
-    BeaconObserver.instance?.onWatch(name, source);
+    assert(() {
+      BeaconObserver.instance?.onWatch(name, source);
+      return true;
+    }());
     // we have to check if currentGets is empty because if it's not
     // then we changed sources in the past so we can't just increment
     // we can only increment when sources are in the same order

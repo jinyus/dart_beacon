@@ -18,21 +18,6 @@ void main() {
     await expectLater(buffered.next(), completion(equals([0, 1, 2, 3, 4])));
   });
 
-  test('should unsubscribe from internal stream', () async {
-    final myStream = Stream.periodic(k1ms, (i) => i + 1);
-    final beacon = Beacon.streamRaw(() => myStream, initialValue: 0);
-
-    final buffered = beacon.buffer(5);
-
-    await expectLater(buffered.next(), completion(equals([0, 1, 2, 3, 4])));
-
-    beacon.unsubscribe();
-
-    await delay(k10ms);
-
-    expect(buffered.value, [0, 1, 2, 3, 4]);
-  });
-
   test('should throw if initial value is empty and type is non-nullable',
       () async {
     final myStream = Stream.periodic(k1ms, (i) => i + 1);
@@ -345,5 +330,13 @@ void main() {
     expect(ran, 2);
     // expect(num1.listenersCount, 1);
     expect(beacon.listenersCount, 0);
+  });
+
+  test('should mirror values to stream getter', () async {
+    final stream = Stream.fromIterable([1, 2, 3]);
+
+    late final s = Beacon.streamRaw(() => stream, initialValue: 0);
+
+    expect(s.stream, emitsInOrder([0, 1, 2, 3]));
   });
 }

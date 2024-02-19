@@ -168,7 +168,6 @@ void main() {
   });
 
   test('should conditionally stop watching beacons', () async {
-    // BeaconObserver.instance = LoggingObserver();
     final a = Beacon.writable(1, name: 'a');
     final b = Beacon.writable(2, name: 'b');
     final c = Beacon.writable(2, name: 'c');

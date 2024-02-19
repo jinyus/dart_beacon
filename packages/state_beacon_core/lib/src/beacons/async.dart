@@ -1,7 +1,8 @@
 part of '../producer.dart';
 
 /// A beacon that exposes an [AsyncValue].
-abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
+abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
+    with _AutoSleep<AsyncValue<T>, T> {
   /// @macro [AsyncBeacon]
   AsyncBeacon(
     this._compute, {
@@ -12,7 +13,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   }) : super(initialValue: manualStart ? AsyncIdle() : AsyncLoading()) {
     _isEmpty = false;
 
-    if (!manualStart) start();
+    if (!manualStart) _start();
   }
 
   /// Exposes this as a [Future] that can be awaited in a derived future beacon.
@@ -36,7 +37,6 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// });
   Future<T> toFuture() {
     _completer ??= Beacon.writable(Completer<T>(), name: "$name's future");
-
     return _completer!.value.future;
   }
 
@@ -76,6 +76,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   bool get isError => peek().isError;
 
   void _setLoadingWithLastData() {
+    if (isLoading) return;
     _setValue(AsyncLoading()..setLastData(lastData));
   }
 
@@ -89,16 +90,10 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   final bool cancelOnError;
 
   /// Whether the beacon should sleep when there are no observers.
+  @override
   final bool shouldSleep;
 
-  // cancelled in the effect cleanup
-  // ignore: cancel_subscriptions
-  StreamSubscription<T>? _sub;
-  VoidCallback? _effectDispose;
-
   WritableBeacon<Completer<T>>? _completer;
-
-  var _sleeping = false;
 
   @override
   void _setValue(AsyncValue<T> newValue, {bool force = false}) {
@@ -123,9 +118,20 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
   /// if `manualStart` was set to true.
   ///
   /// Calling more than once has no effect
-  void start() {
+  void start() => _start();
+
+  @override
+  void _start() {
     if (_sub != null) return;
+
     _effectDispose?.call();
+
+    // needs to be in loading state instantly when waking up
+    // so beacon.value.isLoading is true
+    // even though this is called in the effect, it's asynchronous
+    // so it doesn't happen instantly
+    _setLoadingWithLastData();
+
     _effectDispose = Beacon.effect(
       () {
         _setLoadingWithLastData();
@@ -143,65 +149,10 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>> {
           );
         });
 
-        return () {
-          final oldSub = _sub!;
-          oldSub.cancel();
-        };
+        return _unsubFromStream;
       },
       name: name,
     );
-  }
-
-  @override
-  AsyncValue<T> peek() {
-    if (_sleeping) {
-      _wakeUp();
-    }
-    return super.peek();
-  }
-
-  @override
-  AsyncValue<T> get value {
-    if (_sleeping) {
-      _wakeUp();
-    }
-    return super.value;
-  }
-
-  void _wakeUp() {
-    if (_sleeping) {
-      _sleeping = false;
-      // needs to be in loading state instantly when waking up
-      // so beacon.value.isLoading is true
-      _setLoadingWithLastData();
-    }
-
-    start();
-  }
-
-  void _cancel() {
-    _effectDispose?.call();
-    _effectDispose = null;
-    // effect dispose will cancel the sub so no need to cancel it here
-    _sub = null;
-  }
-
-  void _goToSleep() {
-    Future.delayed(Duration.zero, () {
-      if (_observers.isEmpty) {
-        _sleeping = true;
-        _cancel();
-      }
-    });
-  }
-
-  @override
-  void _removeObserver(Consumer observer) {
-    super._removeObserver(observer);
-    if (!shouldSleep) return;
-    if (_observers.isEmpty) {
-      _goToSleep();
-    }
   }
 
   @override

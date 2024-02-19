@@ -3,7 +3,7 @@
 part of '../producer.dart';
 
 /// See: Beacon.rawStream()
-class RawStreamBeacon<T> extends ReadableBeacon<T> {
+class RawStreamBeacon<T> extends ReadableBeacon<T> with _AutoSleep<T, T> {
   /// @macro rawStream
   RawStreamBeacon(
     this._compute, {
@@ -31,6 +31,7 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   final bool isLazy;
 
   /// Whether the beacon should sleep when there are no observers.
+  @override
   final bool shouldSleep;
 
   /// called when the stream emits an error
@@ -39,23 +40,15 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
   /// called when the stream is done
   final void Function()? onDone;
   final Stream<T> Function() _compute;
-  VoidCallback? _effectDispose;
 
   /// passed to the internal stream subscription
   final bool cancelOnError;
-
-  StreamSubscription<T>? _sub;
-  var _sleeping = false;
-
-  /// unsubscribes from the internal stream
-  void unsubscribe() {
-    unawaited(_sub?.cancel());
-  }
 
   /// Starts listening to the internal stream
   /// if `manualStart` was set to true.
   ///
   /// Calling more than once has no effect
+  @override
   void _start() {
     if (_sub != null) return;
     _effectDispose?.call();
@@ -73,67 +66,10 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> {
           );
         });
 
-        return () {
-          final oldSub = _sub!;
-          oldSub.cancel();
-        };
+        return _unsubFromStream;
       },
       name: name,
     );
-  }
-
-  @override
-  T peek() {
-    if (_sleeping) {
-      _wakeUp();
-    }
-    return super.peek();
-  }
-
-  @override
-  T get value {
-    if (_sleeping) {
-      _wakeUp();
-    }
-    return super.value;
-  }
-
-  void _wakeUp() {
-    if (_sleeping) {
-      _sleeping = false;
-    }
-    _start();
-  }
-
-  void _goToSleep() {
-    Future.delayed(Duration.zero, () {
-      if (_observers.isEmpty) {
-        _sleeping = true;
-        _cancel();
-      }
-    });
-  }
-
-  @override
-  void _removeObserver(Consumer observer) {
-    super._removeObserver(observer);
-    if (!shouldSleep) return;
-    if (_observers.isEmpty) {
-      _goToSleep();
-    }
-  }
-
-  void _cancel() {
-    _effectDispose?.call();
-    _effectDispose = null;
-    // effect dispose will cancel the sub so no need to cancel it here
-    _sub = null;
-  }
-
-  @override
-  void dispose() {
-    _cancel();
-    super.dispose();
   }
 
   @override
