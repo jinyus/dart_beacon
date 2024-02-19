@@ -1,7 +1,5 @@
 // ignore_for_file: cascade_invocations
 
-import 'dart:ffi';
-
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
