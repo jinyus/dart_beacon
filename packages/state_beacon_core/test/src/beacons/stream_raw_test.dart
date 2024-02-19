@@ -331,4 +331,12 @@ void main() {
     // expect(num1.listenersCount, 1);
     expect(beacon.listenersCount, 0);
   });
+
+  test('should mirror values to stream getter', () async {
+    final stream = Stream.fromIterable([1, 2, 3]);
+
+    late final s = Beacon.streamRaw(() => stream, initialValue: 0);
+
+    expect(s.stream, emitsInOrder([0, 1, 2, 3]));
+  });
 }
