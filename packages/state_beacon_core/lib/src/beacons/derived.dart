@@ -11,7 +11,6 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   T peek() {
-    if (_status == CLEAN) return super.peek();
     updateIfNecessary();
     return super.peek();
   }
@@ -20,7 +19,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
   T get value {
     currentConsumer?.startWatching(this);
     updateIfNecessary();
-    return _value!;
+    return _value;
   }
 
   @override
@@ -79,11 +78,12 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     currentGetsIndex = prevGetsIndex;
     currentConsumer = prevConsumer;
 
+    final didUpdate = _previousValue != _value;
+
     // handles diamond depenendencies if we're the parent of a diamond.
-    if (_previousValue != _value && _observers.isNotEmpty) {
+    if (didUpdate && _observers.isNotEmpty) {
       // We've changed value, so mark our children as
       // dirty so they'll reevaluate
-
       for (var i = 0; i < _observers.length; i++) {
         _observers[i]._status = DIRTY;
       }
@@ -92,6 +92,10 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     // We've rerun with the latest values from all of our sources.
     // This means that we no longer need to update until a signal changes
     _status = CLEAN;
+
+    if (didUpdate) {
+      BeaconObserver.instance?.onUpdate(this);
+    }
   }
 
   @override
