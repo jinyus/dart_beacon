@@ -734,7 +734,7 @@ and want to dispose them together.
  age.value = 21;
  name.value = 'Alice';
 
- myGroup.resetAll(); // does nothing to the effect
+ myGroup.resetAll(); // reset beacons but does nothing to the effect
 
  print(name.value); // Bob
  print(age.value); // 20

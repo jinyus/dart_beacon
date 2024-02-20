@@ -6,24 +6,29 @@ part of 'creator.dart';
 /// controller class and want to dispose them together.
 ///
 ///eg:
-///```dart
-/// final myGroup = BeaconGroup();
+/// ```dart
+///  final myGroup = BeaconGroup();
 ///
-/// final name = myGroup.writable('Bob');
-/// final age = myGroup.writable(20);
+///  final name = myGroup.writable('Bob');
+///  final age = myGroup.writable(20);
 ///
-/// age.value = 21;
-/// name.value = 'Alice';
+///  myGroup.effect(() {
+///    print(name.value); // Outputs: Bob
+///  });
 ///
-/// myGroup.resetAll();
+///  age.value = 21;
+///  name.value = 'Alice';
 ///
-/// print(name.value); // Bob
-/// print(age.value); // 20
+///  myGroup.resetAll(); // reset beacons but does nothing to the effect
 ///
-/// myGroup.disposeAll();
+///  print(name.value); // Bob
+///  print(age.value); // 20
 ///
-/// print(name.isDisposed); // true
-/// print(age.isDisposed); // true
+///  myGroup.disposeAll();
+///
+///  print(name.isDisposed); // true
+///  print(age.isDisposed); // true
+///  // All beacons and effects are disposed
 /// ```
 class BeaconGroup extends _BeaconCreator {
   final List<ReadableBeacon<dynamic>> _beacons = [];
