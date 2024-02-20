@@ -101,7 +101,8 @@ NB: Create the file if it doesn't exist.
 -   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
 -   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
 -   [Beacon.future](#beaconfuture): Derive values from asynchronous operations, managing state during computation.
-    -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
+    -   [Properties](#properties): Properties for `FutureBeacons`.
+    -   [Methods](#methods): Methods available for `FutureBeacons`.
 -   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
 -   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
@@ -120,11 +121,16 @@ NB: Create the file if it doesn't exist.
     -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
--   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
+-   [Methods](#extensions): Additional methods for beacons that can be chained.
+    -   [subscribe](#mybeaconsubscribe): Subscribes to the beacon and listens for changes to its value.
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
+    -   [toListenable](#mybeacontolistenable): Returns a `ValueListenable` that emits the beacon's value whenever it changes.
+    -   [toValueNotifier](#mybeacontovaluenotifier): Returns a `ValueNotifier` that emits the beacon's value whenever it changes.
+    -   [dispose](#mybeacondispose): Disposes the beacon and releases all resources.
+    -   [onDispose](#mybeaconondispose): Registers a callback to be called when the beacon is disposed.
     -   [Chaining Beacons](#chaining-methods): Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
         -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
         -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
@@ -176,9 +182,12 @@ ReadableBeacon<int> get counter => _internalCounter;
 An effect is just a function that will re-run whenever one of its
 dependencies change. An effect is scheduled to run immediately after creation.
 
+Any beacon accessed within the effect will be tracked as a dependency. A change to the value of any of the tracked beacons will trigger the effect to re-run.
+
 ```dart
 final age = Beacon.writable(15);
 
+// this effect runs immediately and whenever age changes
 Beacon.effect(() {
     if (age.value >= 18) {
       print("You can vote!");
@@ -228,14 +237,14 @@ expect(called, 2);
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
-This beacon will recompute its value every time one of it's dependencies change.
+This beacon will recompute its value when one of its dependencies change.
 
 These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
 
 Example:
 
 ```dart
-final age = Beacon.writable<int>(18);
+final age = Beacon.writable(18);
 final canDrink = Beacon.derived(() => age.value >= 21);
 
 print(canDrink.value); // Outputs: false
@@ -256,6 +265,8 @@ If `manualStart` is `true` (default: false), the beacon will be in the `idle` st
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
 It will resume executing once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
+
+NB: You can access the last successful data while the beacon is in the `loading` or `error` state using `myFutureBeacon.lastData`. Calling `lastdata` while in the `data` state will return the current value.
 
 > [!IMPORTANT]
 > Only beacons accessed before the async gap will be tracked as dependencies. See [pitfalls](#pitfalls) for more details.
@@ -328,14 +339,36 @@ var futureBeacon = Beacon.future(() async => 1);
 
 await Future.delayed(k1ms);
 
-expect(futureBeacon.value.unwrap(), 1);
+expect(futureBeacon.unwrapValue(), 1);
 
 futureBeacon.overrideWith(() async => throw Exception('error'));
 
 await Future.delayed(k1ms);
 
-expect(futureBeacon.value, isA<AsyncError>());
+expect(futureBeacon.isError, true);
 ```
+
+#### Properties:
+
+All these methods are also available to `StreamBeacons`.
+
+-   `isIdle`: Returns `true` if the beacon is in the `idle` state.
+-   `isLoading`: Returns `true` if the beacon is in the `loading` state.
+-   `isIdleOrLoading`: Returns `true` if the beacon is in the `loading` or `idle` state.
+-   `isData`: Returns `true` if the beacon is in the `data` state.
+-   `isError`: Returns `true` if the beacon is in the `error` state.
+-   `lastData`: Returns the last successful data value or null. This is useful when you want to display the last valid value while refreshing.
+
+#### Methods:
+
+All these methods with the exception on `reset()` and `overrideWith()` are also available to `StreamBeacons`.
+
+-   `start()`: Starts the future if it's in the `idle` state.
+-   `reset()`: Resets the beacon by running the callback again. This will enter the `loading` state immediately.
+-   `unwrapValue()`: Returns the value if the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `unwrapValueOrNull()`: This is like `unwrapValue()` but it returns null if the beacon is not in the `data` state.
+-   `toFuture()`: Returns a future that completes with the value when the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `overrideWith()`: Replaces the current callback and resets the beacon by running the new callback.
 
 ### Beacon.stream:
 
@@ -348,7 +381,6 @@ If `shouldSleep` is `true`(default), it will unsubscribe from the stream if it's
 It will resubscribe once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
 
-This can we wrapped in a Throttled or Filtered beacon to control the rate of updates(see [method chaining](#chaining-methods)).
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
 ```dart
@@ -681,7 +713,24 @@ final githubApiClient = apiClientFamily('https://api.github.com');
 final twitterApiClient = apiClientFamily('https://api.twitter.com');
 ```
 
-## Extensions:
+## Methods:
+
+### myBeacon.subscribe():
+
+Subscribes to the beacon and listens for changes to its value.
+
+```dart
+
+final age = Beacon.writable(20);
+
+age.subscribe((value) {
+  print(value); // Outputs: 21, 22, 23
+});
+
+age.value = 21;
+age.value = 22;
+age.value = 23;
+```
 
 ### myBeacon.stream:
 
@@ -746,6 +795,22 @@ Timer(Duration(seconds: 1), () => age.value = 21;);
 
 final nextAge = await age.next(); // returns 21 after 1 second
 ```
+
+### mybeacon.toListenable():
+
+Returns a `ValueListenable` that emits the beacon's value whenever it changes.
+
+### mybeacon.toValueNotifier():
+
+Returns a `ValueNotifier` that emits the beacon's value whenever it changes. Any mutations to the `ValueNotifier` will be reflected in the beacon. The `ValueNotifier` will be disposed when the beacon is disposed.
+
+### mybeacon.dispose():
+
+Disposes the beacon and releases all resources.
+
+### mybeacon.onDispose():
+
+Registers a callback to be called when the beacon is disposed. Returrns a function that can be called to unregister the callback.
 
 ## Chaining methods:
 
