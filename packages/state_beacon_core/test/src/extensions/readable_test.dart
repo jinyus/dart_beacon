@@ -69,20 +69,6 @@ void main() {
     expect(result, 42);
   });
 
-  test('next method with timeout completes with peek value on timeout',
-      () async {
-    final beacon = Beacon.writable(0);
-
-    final futureValue = beacon.next(timeout: k10ms);
-
-    // Delay beyond timeout
-    await delay(k10ms * 2);
-
-    final result = await futureValue;
-
-    expect(result, beacon.peek());
-  });
-
   test('next method unsubscribes after value is setted', () async {
     final beacon = Beacon.writable(0);
 
@@ -109,6 +95,60 @@ void main() {
     // should be the same value as before
     await expectLater(await futureValue, 42);
   });
+
+  test(
+    'next should complete with current value if beacon is disposed',
+    () {
+      final beacon = Beacon.writable(0);
+
+      final futureValue = beacon.next();
+
+      beacon.dispose();
+
+      expect(futureValue, completion(0));
+    },
+  );
+
+  test(
+    'next should complete with fallback value if beacon is disposed',
+    () {
+      final beacon = Beacon.lazyWritable<int>();
+
+      final futureValue = beacon.next(fallback: 10);
+
+      beacon.dispose();
+
+      expect(futureValue, completion(10));
+    },
+  );
+
+  test(
+    'next should complete with current value if fallback '
+    'is provided but beacon is not lazy disposed',
+    () {
+      final beacon = Beacon.writable<int>(50);
+
+      final futureValue = beacon.next(fallback: 10);
+
+      beacon.dispose();
+
+      expect(futureValue, completion(50));
+    },
+  );
+
+  test(
+    'next should complete with error if '
+    'lazy beacon is disposed and no fallback is provided',
+    () {
+      final beacon = Beacon.lazyWritable<int>();
+
+      final futureValue = beacon.next();
+
+      beacon.dispose();
+
+      expect(futureValue, throwsException);
+    },
+  );
 
   test('should return a BufferedCountBeacon', () async {
     final beacon = Beacon.writable(0);

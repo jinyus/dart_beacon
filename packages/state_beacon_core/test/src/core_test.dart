@@ -487,4 +487,33 @@ void main() {
       expect(beacon.initialValue, equals([]));
     });
   });
+
+  test('should run dispose callback', () {
+    final a = Beacon.writable(10);
+    var ran = 0;
+
+    a.onDispose(() {
+      ran++;
+    });
+
+    a.dispose();
+    expect(ran, 1);
+    a.dispose(); // should not run again
+    expect(ran, 1);
+  });
+
+  test('should remove dispose callback', () {
+    final a = Beacon.writable(10);
+    var ran = 0;
+
+    final cancel = a.onDispose(() {
+      ran++;
+    });
+
+    cancel();
+
+    a.dispose();
+
+    expect(ran, 0);
+  });
 }

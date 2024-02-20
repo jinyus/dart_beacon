@@ -195,10 +195,15 @@ abstract class Producer<T> {
   }
 
   /// Registers a callback to be called when the beacon is disposed.
-  void onDispose(VoidCallback callback) {
-    if (isDisposed) return;
+  /// Returns a function that can be called to remove the callback.
+  VoidCallback onDispose(VoidCallback callback) {
+    assert(!_isDisposed, 'Cannot add a dispose callback to a disposed beacon.');
 
     _disposeCallbacks.add(callback);
+
+    return () {
+      _disposeCallbacks.remove(callback);
+    };
   }
 
   /// Clears all registered listeners and

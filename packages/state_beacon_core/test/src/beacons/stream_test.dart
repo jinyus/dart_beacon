@@ -125,7 +125,7 @@ void main() {
 
     controller.addError('error');
 
-    next = await myBeacon.next(timeout: k1ms);
+    next = await myBeacon.next();
 
     expect(next.isError, true);
 
