@@ -6,40 +6,6 @@ import 'package:test/test.dart';
 import '../../common.dart';
 
 void main() {
-  test('should convert a beacon to a stream', () async {
-    final beacon = Beacon.writable(0);
-    final stream = beacon.stream;
-
-    expect(stream, isA<Stream<int>>());
-
-    expect(
-      stream,
-      emitsInOrder([
-        0,
-        1,
-        2,
-        emitsDone,
-      ]),
-    );
-
-    BeaconScheduler.flush();
-    beacon.value = 1;
-    BeaconScheduler.flush();
-    beacon.value = 2;
-    BeaconScheduler.flush();
-    beacon.dispose();
-    BeaconScheduler.flush();
-  });
-
-  test('should cache stream', () {
-    final beacon = Beacon.writable(0);
-
-    final stream1 = beacon.stream;
-    final stream2 = beacon.stream;
-
-    expect(stream1.hashCode, stream2.hashCode);
-  });
-
   test('next method completes with the setted value', () async {
     final beacon = Beacon.writable(0);
 
@@ -150,145 +116,136 @@ void main() {
     },
   );
 
-  test('should return a BufferedCountBeacon', () async {
+  test('next method completes with the setted value/derived', () async {
     final beacon = Beacon.writable(0);
 
-    final buffered = beacon.buffer(3);
+    final d = Beacon.derived(() => beacon.value * 2);
 
-    expect(buffered, isA<BufferedCountBeacon<int>>());
+    Timer(k10ms, () => beacon.set(42));
 
-    beacon.set(1);
-    BeaconScheduler.flush();
-    beacon.set(2);
-    BeaconScheduler.flush();
-    beacon.set(3);
-    BeaconScheduler.flush();
+    final result = await d.next();
 
-    expect(buffered.value, [0, 1, 2]);
+    expect(result, 84);
   });
 
-  test('should work properly when wrapping a lazy beacon', () async {
-    // BeaconObserver.instance = LoggingObserver();
-    final beacon = Beacon.lazyWritable<int>();
+  test('next method with filter only completes with matching values/derived',
+      () async {
+    final beacon = Beacon.writable(0);
 
-    final buffered = beacon.buffer(3);
-    final bufferedTime = beacon.bufferTime(duration: k10ms);
-    final debounced = beacon.debounce(duration: k10ms);
-    final throttled = beacon.throttle(duration: k10ms);
-    final filtered = beacon.filter(
-      (p0, p1) => p1.isEven,
+    final d = Beacon.derived(() => beacon.value);
+
+    final futureValue = d.next(filter: (value) => value.isEven);
+
+    Timer(
+      k10ms,
+      () async {
+        beacon.set(3); // Not even, should be ignored
+        BeaconScheduler.flush();
+        beacon.set(42);
+      }, // Even, should be completed with this value
     );
 
-    beacon.set(1);
-    BeaconScheduler.flush();
-    beacon.set(2);
-    BeaconScheduler.flush();
-    beacon.set(3);
-    BeaconScheduler.flush();
-    beacon.set(4);
-    BeaconScheduler.flush();
-    beacon.set(5);
-    BeaconScheduler.flush();
+    final result = await futureValue;
 
-    expect(buffered.value, [1, 2, 3]);
-
-    expect(debounced.value, 1);
-
-    expect(throttled.value, 1);
-
-    expect(filtered.value, 4);
-
-    expect(bufferedTime.value, <int>[]);
-
-    await delay(k10ms * 2);
-
-    expect(debounced.value, 5);
-
-    expect(throttled.value, 1);
-
-    expect(bufferedTime.value, <int>[1, 2, 3, 4, 5]);
+    expect(result, 42);
   });
 
-  test('should return a BufferedTimeBeacon', () async {
-    final beacon = Beacon.writable(0);
+  test('next method unsubscribes after value is setted/derived', () async {
+    final beacon = Beacon.writable(0, name: 'beacon');
 
-    final buffered = beacon.bufferTime(duration: k10ms);
+    final d = Beacon.derived(() => beacon.value, name: 'd');
 
-    expect(buffered, isA<BufferedTimeBeacon<int>>());
+    final futureValue = d.next();
 
-    buffered.add(1);
+    await delay();
+
+    expect(d.listenersCount, 1);
+
+    beacon.set(42);
+
     BeaconScheduler.flush();
-    buffered.add(2);
-    BeaconScheduler.flush();
-    buffered.add(3);
+
+    await futureValue; // Ensure the future is completed
+
+    expect(d.listenersCount, 0);
+
+    // set more values, and the future should not complete again
+    beacon.set(99);
+
     BeaconScheduler.flush();
 
-    expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
-    expect(buffered.value, isEmpty);
+    // Assert that the future didn't complete again
+    expect(futureValue, completes);
 
-    await delay(k10ms * 2);
-    expect(buffered.value, [0, 1, 2, 3]);
-    expect(buffered.currentBuffer.value, isEmpty);
+    // should be the same value as before
+    await expectLater(await futureValue, 42);
   });
 
-  test('should return a DebouncedBeacon', () async {
-    final beacon = Beacon.writable(0);
+  test(
+    'next should complete with current value if beacon is disposed/derived',
+    () async {
+      final beacon = Beacon.writable(0);
 
-    final debounced = beacon.debounce(duration: k10ms);
+      final d = Beacon.derived(() => beacon.value);
 
-    expect(debounced, isA<DebouncedBeacon<int>>());
+      final futureValue = d.next();
 
-    beacon.set(1);
-    BeaconScheduler.flush();
-    beacon.set(2);
-    BeaconScheduler.flush();
-    beacon.set(3);
-    BeaconScheduler.flush();
+      await delay(); // allow derived to run
 
-    expect(debounced.value, 0);
+      d.dispose();
 
-    await delay(k10ms * 2);
+      expect(futureValue, completion(0));
+    },
+  );
 
-    expect(debounced.value, 3);
-  });
+  test(
+    'next should complete with fallback value if beacon is disposed/derived',
+    () {
+      final beacon = Beacon.writable(0);
 
-  test('should return a ThrottledBeacon', () async {
-    final beacon = Beacon.writable(0);
+      final d = Beacon.derived(() => beacon.value);
 
-    final throttled = beacon.throttle(duration: k10ms);
+      final futureValue = d.next(fallback: 10);
 
-    expect(throttled, isA<ThrottledBeacon<int>>());
+      d.dispose(); // dispose the derived before it's initialized
 
-    beacon.set(1);
-    BeaconScheduler.flush();
-    beacon.set(2);
-    BeaconScheduler.flush();
-    beacon.set(3);
-    BeaconScheduler.flush();
+      expect(futureValue, completion(10));
+    },
+  );
 
-    expect(throttled.value, 0);
+  test(
+    'next should complete with current value if fallback '
+    'is provided but beacon is not lazy disposed/derived',
+    () async {
+      final beacon = Beacon.writable<int>(50);
 
-    await delay(k10ms * 2);
+      final d = Beacon.derived(() => beacon.value);
 
-    expect(throttled.value, 0);
-  });
+      final futureValue = d.next(fallback: 10);
 
-  test('should return a FilteredBeacon', () async {
-    final beacon = Beacon.writable(0);
+      await delay();
 
-    final filtered = beacon.filter((prev, next) => next.isEven);
+      d.dispose();
 
-    expect(filtered, isA<FilteredBeacon<int>>());
+      expect(futureValue, completion(50));
+    },
+  );
 
-    beacon.set(1);
-    BeaconScheduler.flush();
-    beacon.set(2);
-    BeaconScheduler.flush();
-    beacon.set(3);
-    BeaconScheduler.flush();
+  test(
+    'next should complete with error if '
+    'lazy beacon is disposed and no fallback is provided',
+    () {
+      final beacon = Beacon.writable(0);
 
-    expect(filtered.value, 2);
-  });
+      final d = Beacon.derived(() => beacon.value);
+
+      final futureValue = d.next();
+
+      d.dispose();
+
+      expect(futureValue, throwsException);
+    },
+  );
 
   // test('should throw when wrapping a lazy beacon with start=true', () {
   //   final beacon = Beacon.lazyWritable<int>();

@@ -8,6 +8,145 @@ import '../../common.dart';
 // ignore: type_annotate_public_apis
 bool neverFilter(p, n) => true;
 void main() {
+  test('should return a BufferedCountBeacon', () async {
+    final beacon = Beacon.writable(0);
+
+    final buffered = beacon.buffer(3);
+
+    expect(buffered, isA<BufferedCountBeacon<int>>());
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    beacon.set(2);
+    BeaconScheduler.flush();
+    beacon.set(3);
+    BeaconScheduler.flush();
+
+    expect(buffered.value, [0, 1, 2]);
+  });
+
+  test('should work properly when wrapping a lazy beacon', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final beacon = Beacon.lazyWritable<int>();
+
+    final buffered = beacon.buffer(3);
+    final bufferedTime = beacon.bufferTime(duration: k10ms);
+    final debounced = beacon.debounce(duration: k10ms);
+    final throttled = beacon.throttle(duration: k10ms);
+    final filtered = beacon.filter(
+      (p0, p1) => p1.isEven,
+    );
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    beacon.set(2);
+    BeaconScheduler.flush();
+    beacon.set(3);
+    BeaconScheduler.flush();
+    beacon.set(4);
+    BeaconScheduler.flush();
+    beacon.set(5);
+    BeaconScheduler.flush();
+
+    expect(buffered.value, [1, 2, 3]);
+
+    expect(debounced.value, 1);
+
+    expect(throttled.value, 1);
+
+    expect(filtered.value, 4);
+
+    expect(bufferedTime.value, <int>[]);
+
+    await delay(k10ms * 2);
+
+    expect(debounced.value, 5);
+
+    expect(throttled.value, 1);
+
+    expect(bufferedTime.value, <int>[1, 2, 3, 4, 5]);
+  });
+
+  test('should return a BufferedTimeBeacon', () async {
+    final beacon = Beacon.writable(0);
+
+    final buffered = beacon.bufferTime(duration: k10ms);
+
+    expect(buffered, isA<BufferedTimeBeacon<int>>());
+
+    buffered.add(1);
+    BeaconScheduler.flush();
+    buffered.add(2);
+    BeaconScheduler.flush();
+    buffered.add(3);
+    BeaconScheduler.flush();
+
+    expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
+    expect(buffered.value, isEmpty);
+
+    await delay(k10ms * 2);
+    expect(buffered.value, [0, 1, 2, 3]);
+    expect(buffered.currentBuffer.value, isEmpty);
+  });
+
+  test('should return a DebouncedBeacon', () async {
+    final beacon = Beacon.writable(0);
+
+    final debounced = beacon.debounce(duration: k10ms);
+
+    expect(debounced, isA<DebouncedBeacon<int>>());
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    beacon.set(2);
+    BeaconScheduler.flush();
+    beacon.set(3);
+    BeaconScheduler.flush();
+
+    expect(debounced.value, 0);
+
+    await delay(k10ms * 2);
+
+    expect(debounced.value, 3);
+  });
+
+  test('should return a ThrottledBeacon', () async {
+    final beacon = Beacon.writable(0);
+
+    final throttled = beacon.throttle(duration: k10ms);
+
+    expect(throttled, isA<ThrottledBeacon<int>>());
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    beacon.set(2);
+    BeaconScheduler.flush();
+    beacon.set(3);
+    BeaconScheduler.flush();
+
+    expect(throttled.value, 0);
+
+    await delay(k10ms * 2);
+
+    expect(throttled.value, 0);
+  });
+
+  test('should return a FilteredBeacon', () async {
+    final beacon = Beacon.writable(0);
+
+    final filtered = beacon.filter((prev, next) => next.isEven);
+
+    expect(filtered, isA<FilteredBeacon<int>>());
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    beacon.set(2);
+    BeaconScheduler.flush();
+    beacon.set(3);
+    BeaconScheduler.flush();
+
+    expect(filtered.value, 2);
+  });
   test('should dispose together when wrapped is disposed(3)', () async {
     // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);

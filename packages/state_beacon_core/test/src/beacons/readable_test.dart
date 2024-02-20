@@ -111,4 +111,38 @@ void main() {
 
     expect(called, 9);
   });
+
+  test('should convert a beacon to a stream', () async {
+    final beacon = Beacon.writable(0);
+    final stream = beacon.stream;
+
+    expect(stream, isA<Stream<int>>());
+
+    expect(
+      stream,
+      emitsInOrder([
+        0,
+        1,
+        2,
+        emitsDone,
+      ]),
+    );
+
+    BeaconScheduler.flush();
+    beacon.value = 1;
+    BeaconScheduler.flush();
+    beacon.value = 2;
+    BeaconScheduler.flush();
+    beacon.dispose();
+    BeaconScheduler.flush();
+  });
+
+  test('should cache stream', () {
+    final beacon = Beacon.writable(0);
+
+    final stream1 = beacon.stream;
+    final stream2 = beacon.stream;
+
+    expect(stream1.hashCode, stream2.hashCode);
+  });
 }
