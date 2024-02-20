@@ -2,50 +2,7 @@
 
 part of 'extensions.dart';
 
-const _k10seconds = Duration(seconds: 10);
-
-// coverage:ignore-start
-final Map<int, Stream<dynamic>> _streamCache = {};
-// coverage:ignore-end
-
 extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
-  // coverage:ignore-start
-  /// Converts a [ReadableBeacon] to [Stream]
-  /// The stream controller can only be canceled by calling [dispose]
-  @Deprecated('Use .stream instead')
-  Stream<T> toStream({
-    FutureOr<void> Function()? onCancel,
-    @Deprecated('No longer needed') bool broadcast = false,
-  }) {
-    final existing = _streamCache[hashCode];
-
-    if (existing != null) {
-      return existing as Stream<T>;
-    }
-
-    final controller = StreamController<T>();
-
-    final stream = controller.stream.asBroadcastStream();
-
-    _streamCache[hashCode] = stream;
-
-    if (!isEmpty) controller.add(peek());
-
-    final unsub = subscribe(controller.add);
-
-    void cancel() {
-      _streamCache.remove(hashCode);
-      unsub();
-      controller.close();
-      onCancel?.call();
-    }
-
-    onDispose(cancel);
-
-    return stream;
-  }
-  // coverage:ignore-end
-
   /// Listens for the next value emitted by this Beacon and returns it as a Future.
   ///
   /// This method subscribes to this Beacon and waits for the next value
@@ -54,8 +11,9 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// next value that matches the filter. If no [filter] is provided,
   /// the method completes with the first value received.
   ///
-  /// If a value is not emitted within the specified [timeout] duration (default
-  /// is 10 seconds), the method times out and returns the current value of the beacon.
+  /// If this is a lazy beacon and it's disposed before a value is emitted,
+  /// the future will be completed with an error if a [fallback] value is not provided.
+  ///
   ///
   /// Example:
   ///
@@ -69,12 +27,12 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   ///
   /// Parameters:
   ///   - [filter]: An optional function that determines whether a value is accepted.
-  ///   - [timeout]: The maximum duration to wait for a value before timing out.
+  ///   - [fallback]: An optional value to complete the future if the beacon is lazy and disposed before a value is emitted.
   ///
   /// Returns a Future that completes with the next emitted value.
   Future<T> next({
     bool Function(T)? filter,
-    Duration timeout = _k10seconds,
+    T? fallback,
   }) async {
     final completer = Completer<T>();
 
@@ -87,12 +45,29 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       startNow: false,
     );
 
-    final result = await completer.future.timeout(
-      timeout,
-      onTimeout: peek,
-    );
+    // if the beacon is disposed before the value is emitted,
+    // complete the future with the current value
+    final rmCallback = onDispose(() {
+      if (completer.isCompleted) return;
+
+      final newValue = isEmpty ? fallback : peek();
+
+      if (newValue != null) {
+        completer.complete(newValue);
+      } else {
+        completer.completeError(
+          Exception(
+            '$name was disposed before a value was emitted. '
+            'Provide a fallback value to avoid this error.',
+          ),
+        );
+      }
+    });
+
+    final result = await completer.future;
 
     unsub();
+    rmCallback(); // allow the completer to be garbage collected
 
     return result;
   }
