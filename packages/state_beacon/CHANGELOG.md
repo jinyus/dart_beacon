@@ -1,3 +1,12 @@
+# 0.38.0
+
+-   [Feat] Add methods to `Beacon.streamRaw` that operates on the internal stream: `unsubscribe` `pause` and `resume`.
+-   [Feat] `onDispose` now returns a function that can be used to unregister the dispose listener.
+-   [Breaking] `anybeacon.next()` no longer takes a timeout parameter. It will also throw an error if called on a lazy beacon and the beacon is disposed before emitting a value; unless a [fallback] value is provided.
+
+Removed Deprecated methods:
+`anybeacon.toStream()` is now removed. Use `anybeacon.stream` instead.
+
 # 0.37.0
 
 -   [Breaking] Remove `unsubscribe` method from `Beacon.streamRaw`
