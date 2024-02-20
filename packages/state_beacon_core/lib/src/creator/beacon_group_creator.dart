@@ -1,8 +1,8 @@
 part of 'creator.dart';
 
 /// An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
-/// keeps track of all beacons and effects created so be disposed/resetted together.
-/// This is useful when you're creating multiple beacons in a
+/// keeps track of all beacons and effects created so they can be disposed/resetted together.
+/// This is useful when you're creating multiple beacons in a stateful widget or
 /// controller class and want to dispose them together.
 ///
 ///eg:

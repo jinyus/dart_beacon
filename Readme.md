@@ -121,6 +121,7 @@ NB: Create the file if it doesn't exist.
     -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
+-   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
 -   [Methods](#extensions): Additional methods for beacons that can be chained.
     -   [subscribe](#mybeaconsubscribe): Subscribes to the beacon and listens for changes to its value.
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
@@ -685,7 +686,7 @@ boilerplate code:
   }
 ```
 
-### Beacon.family:
+## Beacon.family:
 
 Creates and manages a family of related `Beacon`s based on a single creation function.
 
@@ -711,6 +712,38 @@ final apiClientFamily = Beacon.family(
 
 final githubApiClient = apiClientFamily('https://api.github.com');
 final twitterApiClient = apiClientFamily('https://api.twitter.com');
+```
+
+## BeaconGroup:
+
+An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
+keeps track of all beacons and effects created so they can be disposed/resetted together.
+This is useful when you're creating multiple beacons in a stateful widget or controller class
+and want to dispose them together.
+
+```dart
+ final myGroup = BeaconGroup();
+
+ final name = myGroup.writable('Bob');
+ final age = myGroup.writable(20);
+
+ myGroup.effect(() {
+   print(name.value); // Outputs: Bob
+ });
+
+ age.value = 21;
+ name.value = 'Alice';
+
+ myGroup.resetAll(); // does nothing to the effect
+
+ print(name.value); // Bob
+ print(age.value); // 20
+
+ myGroup.disposeAll();
+
+ print(name.isDisposed); // true
+ print(age.isDisposed); // true
+ // All beacons and effects are disposed
 ```
 
 ## Methods:
