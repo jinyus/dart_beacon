@@ -44,6 +44,23 @@ class RawStreamBeacon<T> extends ReadableBeacon<T> with _AutoSleep<T, T> {
   /// passed to the internal stream subscription
   final bool cancelOnError;
 
+  /// unsubscribes from the internal stream
+  void unsubscribe() {
+    unawaited(_sub?.cancel());
+    _sub = null;
+  }
+
+  /// Pauses the internal stream subscription
+  void pause([Future<void>? resumeSignal]) {
+    _sub?.pause(resumeSignal);
+  }
+
+  /// Resumes the internal stream subscription
+  /// if it was paused.
+  void resume() {
+    _sub?.resume();
+  }
+
   /// Starts listening to the internal stream
   /// if `manualStart` was set to true.
   ///
