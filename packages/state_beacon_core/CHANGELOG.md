@@ -1,3 +1,9 @@
+# 0.37.0
+
+-   [Breaking] Remove `unsubscribe` method from `Beacon.streamRaw`
+-   [Fix] Bug when using Flutter scheduler where effects were not running before `runApp` was called.
+-   [Refactor] Internal refactor
+
 # 0.36.0
 
 -   [Breaking] `Beacon.stream` and `Beacon.streamRaw` will now autosleep when they no longer have listeners. This is a breaking change because it changes the default behavior. If you want to keep the old behavior, set `shouldSleep` to false.
