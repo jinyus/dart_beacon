@@ -19,5 +19,7 @@ class WeatherController {
 
   WeatherController(this.repo);
 
-  void start() => _searchResults.start();
+  void start() {
+    _searchResults.start();
+  }
 }

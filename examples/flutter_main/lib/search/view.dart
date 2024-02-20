@@ -46,15 +46,8 @@ class _SearchInputState extends State<SearchInput> {
       searchTextBeacon.value = textController.text;
     });
 
-    late VoidCallback unsub;
-
-    unsub = searchTextBeacon.subscribe((val) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // prevents concurrent modification exception
-        widget.controller.start();
-      });
-      unsub();
-    });
+    // Start searching when beacon is first set
+    searchTextBeacon.next().then((value) => widget.controller.start());
 
     super.initState();
   }
