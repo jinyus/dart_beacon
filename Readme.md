@@ -736,8 +736,8 @@ returns `false` for a emitted value, the method continues waiting for the
 next value that matches the filter. If no [filter] is provided,
 the method completes with the first value received.
 
-If a value is not emitted within the specified [timeout] duration (default
-is 10 seconds), the method times out and returns the current value of the beacon.
+If this is a lazy beacon and it's disposed before a value is emitted,
+the future will be completed with an error if a [fallback] value is not provided.
 
 ```dart
 final age = Beacon.writable(20);
