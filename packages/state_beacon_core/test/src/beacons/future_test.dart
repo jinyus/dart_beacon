@@ -820,7 +820,6 @@ void main() {
       expect(f3.unwrapValue(), 30);
       expect(ran, 1);
 
-      // print('\nupdate a\n');
       a.increment();
       BeaconScheduler.flush();
       expect(f3.isLoading, true);
@@ -828,7 +827,6 @@ void main() {
       expect(f3.unwrapValue(), 31);
       expect(ran, 2);
 
-      // print('\nupdate b\n');
       b.increment();
       BeaconScheduler.flush();
       expect(f3.isLoading, true);

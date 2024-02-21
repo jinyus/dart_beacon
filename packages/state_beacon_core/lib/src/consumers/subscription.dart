@@ -57,7 +57,6 @@ class Subscription<T> implements Consumer {
 
   @override
   void stale(Status newStatus) {
-    // print('$name is stale: $newStatus. current: $_status');
     // If already dirty, no need to update the status
     if (_status == DIRTY) return;
     if (_status < newStatus) {
@@ -72,7 +71,6 @@ class Subscription<T> implements Consumer {
 
   @override
   void updateIfNecessary() {
-    // print('$name will update if necessary  current: $_status');
     if (_status == CLEAN) return;
 
     // Check dependent sources (only for DerivedBeacon)
@@ -82,7 +80,6 @@ class Subscription<T> implements Consumer {
 
     // Update if still dirty
     if (_status == DIRTY) {
-      // print('$name is dirty: updating');
       update();
     }
 

@@ -222,7 +222,6 @@ abstract class Producer<T> {
       callback();
     }
     _disposeCallbacks.clear();
-    // BeaconObserver.instance?.onDispose(this);
   }
 
   @override
