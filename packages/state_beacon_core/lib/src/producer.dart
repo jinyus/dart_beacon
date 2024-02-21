@@ -217,7 +217,6 @@ abstract class Producer<T> {
     _observers.clear();
     // ignore: deprecated_member_use_from_same_package
     widgetSubscribers.clear();
-    if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
     for (final callback in _disposeCallbacks) {
       callback();
