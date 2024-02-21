@@ -57,7 +57,6 @@ class Subscription<T> implements Consumer {
 
   @override
   void stale(Status newStatus) {
-    // print('$name is stale: $newStatus. current: $_status');
     // If already dirty, no need to update the status
     if (_status == DIRTY) return;
     if (_status < newStatus) {
@@ -72,7 +71,6 @@ class Subscription<T> implements Consumer {
 
   @override
   void updateIfNecessary() {
-    // print('$name will update if necessary  current: $_status');
     if (_status == CLEAN) return;
 
     // Check dependent sources (only for DerivedBeacon)
@@ -82,7 +80,6 @@ class Subscription<T> implements Consumer {
 
     // Update if still dirty
     if (_status == DIRTY) {
-      // print('$name is dirty: updating');
       update();
     }
 
@@ -114,6 +111,7 @@ class Subscription<T> implements Consumer {
   }
 
   /// Disposes of the subscription.
+  @override
   void dispose() {
     // Remove this subscription from the producer's observer list.
     producer._removeObserver(this);
@@ -125,6 +123,14 @@ class Subscription<T> implements Consumer {
 
   @override
   void markCheck() => stale(CHECK);
+
+  @override
+  void _sourceDisposed(Producer<dynamic> source) {
+    // if one of our sources is disposed, we should dispose ourselves
+    // this is a bit strict because other sources might still be alive
+    // but I want to enforce this to promote good practices
+    Future.microtask(dispose);
+  }
 
   // these should never be called
   // coverage:ignore-start

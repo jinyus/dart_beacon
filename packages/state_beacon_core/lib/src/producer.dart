@@ -141,11 +141,25 @@ abstract class Producer<T> {
   /// when used within a `Beacon.effect` or `Beacon.derived`.
   T get value {
     if (_isEmpty) throw UninitializeLazyReadException(name);
+    assert(() {
+      if (isDisposed) {
+        // coverage:ignore-start
+        // ignore: avoid_print
+        print(
+          '[WARNING]: You read the value of a disposed beacon($name). '
+          'This is not recommended and is probably a bug in your code. '
+          'If you intend to reuse a beacon, try resetting instead of disposing it.',
+        );
+        // coverage:ignore-end
+      }
+      return true;
+    }());
     currentConsumer?.startWatching(this);
     return _value;
   }
 
   void _setValue(T newValue, {bool force = false}) {
+    assert(!_isDisposed, 'Cannot update the value of a disposed beacon.');
     if (_isEmpty) {
       _isEmpty = false;
       _initialValue = newValue;
@@ -179,6 +193,7 @@ abstract class Producer<T> {
     bool startNow = true,
     bool synchronous = false,
   }) {
+    assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
     final sub = Subscription(
       this,
       callback,
@@ -209,17 +224,19 @@ abstract class Producer<T> {
   /// Clears all registered listeners and
   /// reset the beacon to its initial state.
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
+    for (final observer in _observers) {
+      observer._sourceDisposed(this);
+    }
     _observers.clear();
     // ignore: deprecated_member_use_from_same_package
     widgetSubscribers.clear();
-    if (!_isEmpty) _value = _initialValue;
     _previousValue = null;
     for (final callback in _disposeCallbacks) {
       callback();
     }
     _disposeCallbacks.clear();
-    _isDisposed = true;
-    // BeaconObserver.instance?.onDispose(this);
   }
 
   @override

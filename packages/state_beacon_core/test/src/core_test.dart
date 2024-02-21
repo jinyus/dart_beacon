@@ -516,4 +516,187 @@ void main() {
 
     expect(ran, 0);
   });
+
+  test('should dispose all observers when disposed/1', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final a = Beacon.writable(10, name: 'a');
+    final b = Beacon.writable(10, name: 'b');
+    final c = Beacon.derived(() => a.value * b.value, name: 'c');
+
+    a.subscribe((_) {});
+    b.subscribe((_) {});
+
+    Beacon.effect(
+      () {
+        c.value;
+      },
+      name: 'effect',
+    );
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 2); // sub and derived
+    expect(b.listenersCount, 2); // sub and derived
+    expect(c.listenersCount, 1); // effect
+
+    // this should dispose the sub and derived
+    // when the derived is disposed, it should dispose the effect
+    a.dispose();
+
+    await delay();
+
+    expect(a.listenersCount, 0);
+    expect(b.listenersCount, 1); // sub
+    expect(c.listenersCount, 0);
+    expect(a.isDisposed, true);
+    expect(b.isDisposed, false); // has to be disposed manually
+    expect(c.isDisposed, true);
+  });
+
+  test('should dispose all observers when disposed/2', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final a = Beacon.writable(10, name: 'a');
+    final b = Beacon.writable(10, name: 'b');
+    final c = Beacon.derived(() => a.value * b.value, name: 'c');
+    final d = Beacon.derived(() => c.value + 1, name: 'd');
+    final e = Beacon.derived(() => d.value + b.value, name: 'e');
+
+    a.subscribe((_) {});
+    b.subscribe((_) {});
+    d.subscribe((_) {});
+    e.subscribe((_) {});
+
+    Beacon.effect(
+      () {
+        c.value;
+      },
+      name: 'effect',
+    );
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 2); // sub and c
+    expect(b.listenersCount, 3); // sub, c and e
+    expect(c.listenersCount, 2); // effect and d
+    expect(d.listenersCount, 2); // sub and e
+    expect(e.listenersCount, 1); // sub
+
+    // this should dispose the sub and derived
+    // when the derived is disposed, it should dispose the effect
+    a.dispose();
+
+    await delay();
+
+    expect(a.listenersCount, 0);
+    expect(b.listenersCount, 1); // sub
+    expect(c.listenersCount, 0);
+    expect(d.listenersCount, 0);
+    expect(e.listenersCount, 0);
+    expect(a.isDisposed, true);
+    expect(b.isDisposed, false); // has to be disposed manually
+    expect(c.isDisposed, true);
+    expect(d.isDisposed, true);
+    expect(e.isDisposed, true);
+  });
+
+  test('should dispose all observers when disposed/3', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final a = Beacon.writable(10, name: 'a');
+    final b = Beacon.writable(10, name: 'b');
+    final c = Beacon.derived(() => a.value * b.value, name: 'c');
+    final d = Beacon.derived(() => c.value + 1, name: 'd');
+    final e = Beacon.derived(() => d.value + b.value, name: 'e');
+
+    a.subscribe((_) {});
+    b.subscribe((_) {});
+    d.subscribe((_) {});
+    e.subscribe((_) {});
+
+    Beacon.effect(
+      () {
+        c.value;
+      },
+      name: 'effect',
+    );
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 2); // sub and c
+    expect(b.listenersCount, 3); // sub, c and e
+    expect(c.listenersCount, 2); // effect and d
+    expect(d.listenersCount, 2); // sub and e
+    expect(e.listenersCount, 1); // sub
+
+    d.dispose();
+
+    await delay();
+
+    expect(a.listenersCount, 2);
+    expect(b.listenersCount, 2); // sub and c
+    expect(c.listenersCount, 1); // effect
+    expect(d.listenersCount, 0);
+    expect(e.listenersCount, 0);
+    expect(a.isDisposed, false);
+    expect(b.isDisposed, false);
+    expect(c.isDisposed, false);
+    expect(d.isDisposed, true);
+    expect(e.isDisposed, true);
+  });
+
+  test('should dispose all observers when disposed/4', () async {
+    // BeaconObserver.instance = LoggingObserver();
+    final a = Beacon.writable(10, name: 'a');
+    final b = Beacon.derived(() => a.value * 2, name: 'b');
+    final c = Beacon.derived(() => a.value * 2, name: 'c');
+    final d = Beacon.derived(() => a.value * 2, name: 'd');
+    final e = Beacon.derived(() => a.value * 2, name: 'e');
+
+    a.subscribe((_) {});
+    a.subscribe((_) {});
+    a.subscribe((_) {});
+    a.subscribe((_) {});
+
+    Beacon.effect(
+      () {
+        a.value;
+      },
+      name: 'effect',
+    );
+
+    b.peek();
+    c.peek();
+    d.peek();
+    e.peek();
+
+    BeaconScheduler.flush();
+
+    expect(a.listenersCount, 9);
+    expect(b.listenersCount, 0);
+    expect(c.listenersCount, 0);
+    expect(d.listenersCount, 0);
+    expect(e.listenersCount, 0);
+
+    // this should dispose the sub and derived
+    // when the derived is disposed, it should dispose the effect
+    a.dispose();
+
+    await delay();
+
+    expect(a.listenersCount, 0);
+    expect(b.listenersCount, 0);
+    expect(c.listenersCount, 0);
+    expect(d.listenersCount, 0);
+    expect(e.listenersCount, 0);
+    expect(a.isDisposed, true);
+    expect(b.isDisposed, true);
+    expect(c.isDisposed, true);
+    expect(d.isDisposed, true);
+    expect(e.isDisposed, true);
+  });
+
+  test('should throw when writing to disposed beacon', () {
+    final a = Beacon.writable(10);
+    a.dispose();
+    expect(() => a.value = 20, throwsA(isA<AssertionError>()));
+  });
 }

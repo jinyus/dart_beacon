@@ -63,8 +63,6 @@ void main() {
     BeaconScheduler.flush();
     a.increment();
     BeaconScheduler.flush();
-    a.dispose();
-    BeaconScheduler.flush();
 
     final dispose = Beacon.effect(() {
       if (guard.value) {
@@ -75,7 +73,6 @@ void main() {
 
     expect(_onCreateCalled, 2);
     expect(_onUpdateCalled, 2);
-    expect(_onDisposeCalled, 1);
     expect(_onWatchCalled, 2);
     expect(_lazyOnCreate, isFalse);
 
@@ -105,6 +102,11 @@ void main() {
 
     expect(_onUpdateCalled, 5);
     expect(_onWatchCalled, 5);
+
+    a.dispose();
+    BeaconScheduler.flush();
+
+    expect(_onDisposeCalled, 1);
   });
 
   test('should call onCreate with lazy set as true', () {
