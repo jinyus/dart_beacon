@@ -114,6 +114,7 @@ class Subscription<T> implements Consumer {
   }
 
   /// Disposes of the subscription.
+  @override
   void dispose() {
     // Remove this subscription from the producer's observer list.
     producer._removeObserver(this);
@@ -125,6 +126,14 @@ class Subscription<T> implements Consumer {
 
   @override
   void markCheck() => stale(CHECK);
+
+  @override
+  void _sourceDisposed(Producer<dynamic> source) {
+    // if one of our sources is disposed, we should dispose ourselves
+    // this is a bit strict because other sources might still be alive
+    // but I want to enforce this to promote good practices
+    Future.microtask(dispose);
+  }
 
   // these should never be called
   // coverage:ignore-start

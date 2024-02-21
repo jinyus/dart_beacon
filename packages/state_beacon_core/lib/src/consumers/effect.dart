@@ -86,8 +86,8 @@ class Effect with Consumer {
   }
 
   /// Disposes the effect.
+  @override
   void dispose() {
-    // print('disposing $name');
     // ignore: avoid_dynamic_calls
     _disposeChild?.call();
     _effectQueue.remove(this);
@@ -95,7 +95,7 @@ class Effect with Consumer {
     for (final source in sources) {
       source!._removeObserver(this);
     }
-    sources.length = 0;
+    sources.clear();
     _disposeChild = null;
   }
 }

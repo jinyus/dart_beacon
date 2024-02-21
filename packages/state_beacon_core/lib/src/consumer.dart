@@ -59,6 +59,13 @@ mixin Consumer {
     }
   }
 
+  void _sourceDisposed(Producer<dynamic> source) {
+    // if one of our sources is disposed, we should dispose ourselves
+    // this is a bit strict because other sources might still be alive
+    // but I want to enforce this to promote good practices
+    Future.microtask(dispose);
+  }
+
   /// Start watching a new source.
   void startWatching(Producer<dynamic> source) {
     if (currentGets.contains(source)) return;
@@ -85,4 +92,7 @@ mixin Consumer {
 
   /// Update the consumer.
   void update();
+
+  /// Dispose the consumer.
+  void dispose();
 }

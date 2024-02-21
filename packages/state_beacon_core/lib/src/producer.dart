@@ -209,6 +209,9 @@ abstract class Producer<T> {
   /// Clears all registered listeners and
   /// reset the beacon to its initial state.
   void dispose() {
+    for (final observer in _observers) {
+      observer._sourceDisposed(this);
+    }
     _observers.clear();
     // ignore: deprecated_member_use_from_same_package
     widgetSubscribers.clear();

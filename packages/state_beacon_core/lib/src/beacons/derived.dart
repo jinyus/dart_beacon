@@ -106,7 +106,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     for (final source in sources) {
       source!._removeObserver(this);
     }
-    sources.length = 0;
+    sources.clear();
     super.dispose();
   }
 }
