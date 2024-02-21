@@ -693,4 +693,10 @@ void main() {
     expect(d.isDisposed, true);
     expect(e.isDisposed, true);
   });
+
+  test('should throw when writing to disposed beacon', () {
+    final a = Beacon.writable(10);
+    a.dispose();
+    expect(() => a.value = 20, throwsA(isA<AssertionError>()));
+  });
 }

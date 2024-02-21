@@ -46,6 +46,7 @@ mixin _AutoSleep<T, SubT> on ReadableBeacon<T> {
   void _unsubFromStream() {
     final oldSub = _sub!;
     oldSub.cancel();
+    _sub = null;
   }
 
   @override
@@ -60,8 +61,6 @@ mixin _AutoSleep<T, SubT> on ReadableBeacon<T> {
   void _cancel() {
     _effectDispose?.call();
     _effectDispose = null;
-    // effect dispose will cancel the sub so no need to cancel it here
-    _sub = null;
   }
 
   @override
