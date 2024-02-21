@@ -209,6 +209,8 @@ abstract class Producer<T> {
   /// Clears all registered listeners and
   /// reset the beacon to its initial state.
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
     for (final observer in _observers) {
       observer._sourceDisposed(this);
     }
@@ -221,7 +223,6 @@ abstract class Producer<T> {
       callback();
     }
     _disposeCallbacks.clear();
-    _isDisposed = true;
     // BeaconObserver.instance?.onDispose(this);
   }
 
