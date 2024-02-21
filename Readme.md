@@ -139,6 +139,7 @@ NB: Create the file if it doesn't exist.
         -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
         -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+-   [Debugging](#debugging): Facilities for debugging and observing beacons.
 
 [Pitfalls](#pitfalls)
 
@@ -956,6 +957,83 @@ const k500ms = Duration(milliseconds: 500);
 final debouncedQuery = query
         .filter((prev, next) => next.length > 2)
         .debounce(duration: k500ms);
+```
+
+## Debugging:
+
+Set the global `BeaconObserver` instance to get notified of all beacon creation, updates and disposals. You can also see when a derived beacon or effect starts/stops watching a beacon.
+
+You can create your own observer by extending `BeaconObserver` or use the provided logging observe, which logs to the console. Provide a `name` to your beacons to make it easier to identify them in the logs.
+
+```dart
+BeaconObserver.instance = LoggingObserver();
+
+var a = Beacon.writable(10, name: 'a');
+var b = Beacon.writable(20, name: 'b');
+var c = Beacon.derived(() => a() * b(), name: 'c');
+
+Beacon.effect(
+  () {
+    print('c: ${c.value}');
+  },
+  name: 'printEffect',
+);
+```
+
+This will log:
+
+```
+Beacon created: a
+Beacon created: b
+Beacon created: c
+
+"printEffect" is watching "c"
+
+"c" is watching "a"
+"c" is watching "b"
+
+"c" was updated:
+  old: null
+  new: 200
+```
+
+Updating a beacon:
+
+```dart
+a.value = 15;
+```
+
+This will log:
+
+```
+"a" was updated:
+  old: 10
+  new: 15
+
+"c" is watching "a"
+"c" is watching "b"
+
+"c" was updated:
+  old: 200
+  new: 300
+
+"printEffect" is watching "c"
+```
+
+Disposing a beacon
+
+```dart
+c.dispose();
+```
+
+This will log:
+
+```
+"c" stopped watching "a"
+"c" stopped watching "b"
+
+"c" was disposed
+"printEffect" stopped watching c
 ```
 
 ## Pitfalls
