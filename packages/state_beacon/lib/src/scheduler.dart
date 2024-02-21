@@ -71,9 +71,11 @@ void _flutterScheduler() {
       _flushing = false;
     });
   } else {
+    // coverage:ignore-start
     SchedulerBinding.instance.addPostFrameCallback((_) {
       core.BeaconScheduler.flush();
       _flushing = false;
     });
+    // coverage:ignore-end
   }
 }

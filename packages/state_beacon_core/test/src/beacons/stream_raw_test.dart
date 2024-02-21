@@ -332,6 +332,39 @@ void main() {
     expect(beacon.listenersCount, 0);
   });
 
+  test('should pause and resume internal stream', () async {
+    final myStream = Stream.periodic(k10ms, (i) => i + 1);
+    final myBeacon = Beacon.streamRaw(
+      () => myStream,
+      shouldSleep: false,
+      isLazy: true,
+    );
+
+    final next = await myBeacon.next();
+
+    expect(next, 1);
+
+    myBeacon.pause();
+
+    await delay();
+
+    expect(myBeacon(), next); // should be the same value
+
+    myBeacon.resume();
+
+    final next2 = await myBeacon.next();
+
+    expect(next2, 2);
+
+    myBeacon.unsubscribe();
+
+    await delay();
+
+    final next3 = await myBeacon.next().timeout(k10ms, onTimeout: () => -1);
+
+    expect(next3, -1);
+  });
+
   test('should mirror values to stream getter', () async {
     final stream = Stream.fromIterable([1, 2, 3]);
 
