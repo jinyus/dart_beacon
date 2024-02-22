@@ -45,8 +45,9 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
       startNow: false,
     );
 
-    // if the beacon is disposed before the value is emitted,
-    // complete the future with the current value
+    // if the beacon is disposed before a new value is emitted,
+    // complete the future with the current value.
+    // Without this, the future would hang indefinitely
     final rmCallback = onDispose(() {
       if (completer.isCompleted) return;
 
