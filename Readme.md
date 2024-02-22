@@ -881,7 +881,7 @@ expect(filteredCount.value, equals(20));
 ```
 
 > [!WARNING]  
-> `buffer` and `bufferTime` cannot be mid-chain. If they are used, they have to be the last in the chain.
+> `buffer` and `bufferTime` cannot be mid-chain. If they are used, they **MUST** be the last in the chain.
 
 ```dart
 // GOOD
@@ -938,7 +938,7 @@ await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 ```
 
 > [!NOTE]
-> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is FilteredBeacon<String> and `count` holds an `int`.
+> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is `FilteredBeacon<String>` and `count` holds an `int`.
 
 ```dart
 final count = Beacon.writable(0);
@@ -963,7 +963,7 @@ final debouncedQuery = query
 
 Set the global `BeaconObserver` instance to get notified of all beacon creation, updates and disposals. You can also see when a derived beacon or effect starts/stops watching a beacon.
 
-You can create your own observer by extending `BeaconObserver` or use the provided logging observe, which logs to the console. Provide a `name` to your beacons to make it easier to identify them in the logs.
+You can create your own observer by implementing `BeaconObserver` or use the provided logging observer, which logs to the console. Provide a `name` to your beacons to make it easier to identify them in the logs.
 
 ```dart
 BeaconObserver.instance = LoggingObserver();
