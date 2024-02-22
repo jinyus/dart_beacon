@@ -140,6 +140,7 @@ NB: Create the file if it doesn't exist.
         -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
+-   [Disposal](#disposal): Disposing beacons and effects.
 
 [Pitfalls](#pitfalls)
 
@@ -1034,6 +1035,44 @@ This will log:
 
 "c" was disposed
 "printEffect" stopped watching c
+```
+
+## Disposal
+
+When a beacon is disposed, all downstream derived beacons and effects will be disposed as well.
+A beacon cannot be updated after it's disposed. An assertion error will be thrown if you try to update a disposed beacon.
+A warning will be logged in debug mode if you try to access the value of a disposed beacon.
+A beacon should be disposed when it's no longer needed to free up resources.
+
+In the example below, when `a` is disposed, `c` and `effect` will also be disposed.
+
+```
+  a      b
+   \    /
+    \  /
+     c
+     |
+     |
+   effect
+```
+
+```dart
+final a = Beacon.writable(10);
+final b = Beacon.writable(10);
+final c = Beacon.derived(() => a.value * b.value);
+
+Beacon.effect(
+    () => print(c.value),
+    name: 'effect',
+);
+
+//...//
+
+a.dispose();
+
+expect(a.isDisposed, true);
+expect(c.isDisposed, true);
+// effect is also disposed
 ```
 
 ## Pitfalls

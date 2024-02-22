@@ -1,3 +1,50 @@
+# 0.39.0
+
+-   [Breaking] Beacons will no longer be reset when disposed. It will keep its current value.
+-   [Breaking] Writing to a disposed beacon will throw an error. Reading will print a warning to the console in debug mode. A beacon should only be disposed if you have no more use for it. If you want to reset a beacon, use the `reset` method instead.
+
+    ```dart
+    final a = Beacon.writable(10);
+    a.dispose();
+    a.value = 20; // throws an error
+    print(a.value); // prints 10
+    ```
+
+-   [Breaking] When a beacon is disposed, all downstream derived beacons and effects will be disposed as well.
+
+    ```dart
+    final a = Beacon.writable(10);
+    final b = Beacon.writable(10);
+    final c = Beacon.derived(() => a.value * b.value);
+
+    a.subscribe((_) {});
+
+    Beacon.effect(
+        () {
+        c.value;
+        },
+        name: 'effect',
+    );
+
+    //...//
+
+    a.dispose();
+
+    // "c" is watching "a" so it is disposed
+    // the effect is watching "c" so it is disposed
+    //
+    // a   b
+    // |  /
+    // | /
+    // c
+    // |
+    // effect
+
+    expect(a.isDisposed, true);
+    expect(c.isDisposed, true);
+    // effect is also disposed
+    ```
+
 # 0.38.0
 
 -   [Feat] Add methods to `Beacon.streamRaw` that operates on the internal stream: `unsubscribe` `pause` and `resume`.
