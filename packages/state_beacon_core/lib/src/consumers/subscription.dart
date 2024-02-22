@@ -102,7 +102,8 @@ class Subscription<T> implements Consumer {
 
     _ran = true;
 
-    // Call the provided function with the current value of the producer.
+    // If startNow is true and producer is an empty derived. We need to peek()
+    // to initialize the derived and register it as an observer of its sources.
     if (_derivedSource != null || !producer.isEmpty) fn(producer.peek());
 
     // After the update, set the status to
