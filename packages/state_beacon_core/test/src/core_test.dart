@@ -699,4 +699,11 @@ void main() {
     a.dispose();
     expect(() => a.value = 20, throwsA(isA<AssertionError>()));
   });
+
+  test('should have current value after disposal', () {
+    final a = Beacon.writable(10);
+    a.value = 20;
+    a.dispose();
+    expect(a.peek(), 20);
+  });
 }
