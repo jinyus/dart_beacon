@@ -101,7 +101,8 @@ NB: Create the file if it doesn't exist.
 -   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
 -   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
 -   [Beacon.future](#beaconfuture): Derive values from asynchronous operations, managing state during computation.
-    -   [overrideWith](#futurebeaconoverridewith): Replace the callback.
+    -   [Properties](#properties): Properties for `FutureBeacons`.
+    -   [Methods](#methods): Methods available for `FutureBeacons`.
 -   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
 -   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
@@ -120,11 +121,17 @@ NB: Create the file if it doesn't exist.
     -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
--   [Extension Methods](#extensions): Additional methods for beacons that can be chained.
+-   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
+-   [Methods](#extensions): Additional methods for beacons that can be chained.
+    -   [subscribe](#mybeaconsubscribe): Subscribes to the beacon and listens for changes to its value.
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
     -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
     -   [next](#mybeaconnext): Allows awaiting the next value as a future.
+    -   [toListenable](#mybeacontolistenable): Returns a `ValueListenable` that emits the beacon's value whenever it changes.
+    -   [toValueNotifier](#mybeacontovaluenotifier): Returns a `ValueNotifier` that emits the beacon's value whenever it changes.
+    -   [dispose](#mybeacondispose): Disposes the beacon and releases all resources.
+    -   [onDispose](#mybeaconondispose): Registers a callback to be called when the beacon is disposed.
     -   [Chaining Beacons](#chaining-methods): Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
         -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
         -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
@@ -132,6 +139,8 @@ NB: Create the file if it doesn't exist.
         -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
         -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
+-   [Debugging](#debugging): Facilities for debugging and observing beacons.
+-   [Disposal](#disposal): Disposing beacons and effects.
 
 [Pitfalls](#pitfalls)
 
@@ -176,9 +185,12 @@ ReadableBeacon<int> get counter => _internalCounter;
 An effect is just a function that will re-run whenever one of its
 dependencies change. An effect is scheduled to run immediately after creation.
 
+Any beacon accessed within the effect will be tracked as a dependency. A change to the value of any of the tracked beacons will trigger the effect to re-run.
+
 ```dart
 final age = Beacon.writable(15);
 
+// this effect runs immediately and whenever age changes
 Beacon.effect(() {
     if (age.value >= 18) {
       print("You can vote!");
@@ -228,14 +240,14 @@ expect(called, 2);
 ### Beacon.derived:
 
 Creates a `DerivedBeacon` whose value is derived from a computation function.
-This beacon will recompute its value every time one of it's dependencies change.
+This beacon will recompute its value when one of its dependencies change.
 
 These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
 
 Example:
 
 ```dart
-final age = Beacon.writable<int>(18);
+final age = Beacon.writable(18);
 final canDrink = Beacon.derived(() => age.value >= 21);
 
 print(canDrink.value); // Outputs: false
@@ -256,6 +268,8 @@ If `manualStart` is `true` (default: false), the beacon will be in the `idle` st
 If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
 It will resume executing once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
+
+NB: You can access the last successful data while the beacon is in the `loading` or `error` state using `myFutureBeacon.lastData`. Calling `lastdata` while in the `data` state will return the current value.
 
 > [!IMPORTANT]
 > Only beacons accessed before the async gap will be tracked as dependencies. See [pitfalls](#pitfalls) for more details.
@@ -328,14 +342,36 @@ var futureBeacon = Beacon.future(() async => 1);
 
 await Future.delayed(k1ms);
 
-expect(futureBeacon.value.unwrap(), 1);
+expect(futureBeacon.unwrapValue(), 1);
 
 futureBeacon.overrideWith(() async => throw Exception('error'));
 
 await Future.delayed(k1ms);
 
-expect(futureBeacon.value, isA<AsyncError>());
+expect(futureBeacon.isError, true);
 ```
+
+#### Properties:
+
+All these methods are also available to `StreamBeacons`.
+
+-   `isIdle`: Returns `true` if the beacon is in the `idle` state.
+-   `isLoading`: Returns `true` if the beacon is in the `loading` state.
+-   `isIdleOrLoading`: Returns `true` if the beacon is in the `loading` or `idle` state.
+-   `isData`: Returns `true` if the beacon is in the `data` state.
+-   `isError`: Returns `true` if the beacon is in the `error` state.
+-   `lastData`: Returns the last successful data value or null. This is useful when you want to display the last valid value while refreshing.
+
+#### Methods:
+
+All these methods with the exception on `reset()` and `overrideWith()` are also available to `StreamBeacons`.
+
+-   `start()`: Starts the future if it's in the `idle` state.
+-   `reset()`: Resets the beacon by running the callback again. This will enter the `loading` state immediately.
+-   `unwrapValue()`: Returns the value if the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `unwrapValueOrNull()`: This is like `unwrapValue()` but it returns null if the beacon is not in the `data` state.
+-   `toFuture()`: Returns a future that completes with the value when the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `overrideWith()`: Replaces the current callback and resets the beacon by running the new callback.
 
 ### Beacon.stream:
 
@@ -348,7 +384,6 @@ If `shouldSleep` is `true`(default), it will unsubscribe from the stream if it's
 It will resubscribe once a listener is added or its value is accessed.
 This means that it will enter the `loading` state when woken up.
 
-This can we wrapped in a Throttled or Filtered beacon to control the rate of updates(see [method chaining](#chaining-methods)).
 Can be transformed into a future with `mystreamBeacon.toFuture()`:
 
 ```dart
@@ -653,7 +688,7 @@ boilerplate code:
   }
 ```
 
-### Beacon.family:
+## Beacon.family:
 
 Creates and manages a family of related `Beacon`s based on a single creation function.
 
@@ -681,7 +716,56 @@ final githubApiClient = apiClientFamily('https://api.github.com');
 final twitterApiClient = apiClientFamily('https://api.twitter.com');
 ```
 
-## Extensions:
+## BeaconGroup:
+
+An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
+keeps track of all beacons and effects created so they can be disposed/reset together.
+This is useful when you're creating multiple beacons in a stateful widget or controller class
+and want to dispose them together.
+
+```dart
+ final myGroup = BeaconGroup();
+
+ final name = myGroup.writable('Bob');
+ final age = myGroup.writable(20);
+
+ myGroup.effect(() {
+   print(name.value); // Outputs: Bob
+ });
+
+ age.value = 21;
+ name.value = 'Alice';
+
+ myGroup.resetAll(); // reset beacons but does nothing to the effect
+
+ print(name.value); // Bob
+ print(age.value); // 20
+
+ myGroup.disposeAll();
+
+ print(name.isDisposed); // true
+ print(age.isDisposed); // true
+ // All beacons and effects are disposed
+```
+
+## Methods:
+
+### myBeacon.subscribe():
+
+Subscribes to the beacon and listens for changes to its value.
+
+```dart
+
+final age = Beacon.writable(20);
+
+age.subscribe((value) {
+  print(value); // Outputs: 21, 22, 23
+});
+
+age.value = 21;
+age.value = 22;
+age.value = 23;
+```
 
 ### myBeacon.stream:
 
@@ -747,6 +831,22 @@ Timer(Duration(seconds: 1), () => age.value = 21;);
 final nextAge = await age.next(); // returns 21 after 1 second
 ```
 
+### mybeacon.toListenable():
+
+Returns a `ValueListenable` that emits the beacon's value whenever it changes.
+
+### mybeacon.toValueNotifier():
+
+Returns a `ValueNotifier` that emits the beacon's value whenever it changes. Any mutations to the `ValueNotifier` will be reflected in the beacon. The `ValueNotifier` will be disposed when the beacon is disposed.
+
+### mybeacon.dispose():
+
+Disposes the beacon and releases all resources.
+
+### mybeacon.onDispose():
+
+Registers a callback to be called when the beacon is disposed. Returrns a function that can be called to unregister the callback.
+
 ## Chaining methods:
 
 Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
@@ -782,7 +882,7 @@ expect(filteredCount.value, equals(20));
 ```
 
 > [!WARNING]  
-> `buffer` and `bufferTime` cannot be mid-chain. If they are used, they have to be the last in the chain.
+> `buffer` and `bufferTime` cannot be mid-chain. If they are used, they **MUST** be the last in the chain.
 
 ```dart
 // GOOD
@@ -839,7 +939,7 @@ await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 ```
 
 > [!NOTE]
-> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is FilteredBeacon<String> and `count` holds an `int`.
+> When `map` returns a different type, writes to the returned beacon will not be re-routed to the original beacon. In the example below, writes to `filteredBeacon` will NOT be re-routed to `count` because `map` returns a `String`; which means the type of the returned beacon is `FilteredBeacon<String>` and `count` holds an `int`.
 
 ```dart
 final count = Beacon.writable(0);
@@ -858,6 +958,121 @@ const k500ms = Duration(milliseconds: 500);
 final debouncedQuery = query
         .filter((prev, next) => next.length > 2)
         .debounce(duration: k500ms);
+```
+
+## Debugging:
+
+Set the global `BeaconObserver` instance to get notified of all beacon creation, updates and disposals. You can also see when a derived beacon or effect starts/stops watching a beacon.
+
+You can create your own observer by implementing `BeaconObserver` or use the provided logging observer, which logs to the console. Provide a `name` to your beacons to make it easier to identify them in the logs.
+
+```dart
+BeaconObserver.instance = LoggingObserver();
+
+var a = Beacon.writable(10, name: 'a');
+var b = Beacon.writable(20, name: 'b');
+var c = Beacon.derived(() => a() * b(), name: 'c');
+
+Beacon.effect(
+  () {
+    print('c: ${c.value}');
+  },
+  name: 'printEffect',
+);
+```
+
+This will log:
+
+```
+Beacon created: a
+Beacon created: b
+Beacon created: c
+
+"printEffect" is watching "c"
+
+"c" is watching "a"
+"c" is watching "b"
+
+"c" was updated:
+  old: null
+  new: 200
+```
+
+Updating a beacon:
+
+```dart
+a.value = 15;
+```
+
+This will log:
+
+```
+"a" was updated:
+  old: 10
+  new: 15
+
+"c" is watching "a"
+"c" is watching "b"
+
+"c" was updated:
+  old: 200
+  new: 300
+
+"printEffect" is watching "c"
+```
+
+Disposing a beacon
+
+```dart
+c.dispose();
+```
+
+This will log:
+
+```
+"c" stopped watching "a"
+"c" stopped watching "b"
+
+"c" was disposed
+"printEffect" stopped watching c
+```
+
+## Disposal
+
+When a beacon is disposed, all downstream derived beacons and effects will be disposed as well.
+A beacon cannot be updated after it's disposed. An assertion error will be thrown if you try to update a disposed beacon.
+A warning will be logged in debug mode if you try to access the value of a disposed beacon.
+A beacon should be disposed when it's no longer needed to free up resources.
+
+In the example below, when `a` is disposed, `c` and `effect` will also be disposed.
+
+```
+  a      b
+   \    /
+    \  /
+     c
+     |
+     |
+   effect
+```
+
+```dart
+final a = Beacon.writable(10);
+final b = Beacon.writable(10);
+final c = Beacon.derived(() => a.value * b.value);
+
+Beacon.effect(
+    () => print(c.value),
+    name: 'effect',
+);
+
+//...//
+
+a.dispose();
+
+expect(a.isDisposed, true);
+expect(c.isDisposed, true);
+// effect is also disposed
 ```
 
 ## Pitfalls

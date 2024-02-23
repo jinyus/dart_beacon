@@ -36,7 +36,7 @@ void main() {
     expect(called, 2);
   });
 
-  test('should not notify after source beacon is disposed', () {
+  test('should remove listeners source beacon is disposed', () {
     BeaconScheduler.use60fpsScheduler(); // just to test it out for coverage
 
     final beacon = Beacon.writable(0);
@@ -61,13 +61,10 @@ void main() {
 
     expect(called, 2);
 
-    beacon
-      ..dispose()
-      ..value = 3;
+    beacon.dispose();
 
-    BeaconScheduler.flush();
-
-    expect(called, 2);
+    // ignore: invalid_use_of_protected_member
+    expect(valueNotifier.hasListeners, false);
   });
 
   test('should return the same notifier instance', () {

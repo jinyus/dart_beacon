@@ -37,38 +37,6 @@ void main() {
     expect(called, 2);
   });
 
-  test('should not notify after source beacon is disposed', () {
-    final beacon = Beacon.writable(0);
-
-    final valueNotifier = beacon.toListenable();
-
-    expect(valueNotifier, isA<ValueListenable<int>>());
-
-    var called = 0;
-
-    valueNotifier.addListener(() => called++);
-
-    beacon.value = 1;
-
-    BeaconScheduler.flush();
-
-    expect(called, 1);
-
-    beacon.value = 2;
-
-    BeaconScheduler.flush();
-
-    expect(called, 2);
-
-    beacon
-      ..dispose()
-      ..value = 3;
-
-    BeaconScheduler.flush();
-
-    expect(called, 2);
-  });
-
   test('should return the same listener instance', () {
     final beacon = Beacon.writable(0);
 
