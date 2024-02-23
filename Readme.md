@@ -1061,10 +1061,7 @@ final a = Beacon.writable(10);
 final b = Beacon.writable(10);
 final c = Beacon.derived(() => a.value * b.value);
 
-Beacon.effect(
-    () => print(c.value),
-    name: 'effect',
-);
+Beacon.effect(() => print(c.value));
 
 //...//
 
