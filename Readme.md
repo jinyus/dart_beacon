@@ -122,7 +122,7 @@ NB: Create the file if it doesn't exist.
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
--   [Methods](#extensions): Additional methods for beacons that can be chained.
+-   [Methods](#properties-and-methods): Additional methods for beacons that can be chained.
     -   [subscribe](#mybeaconsubscribe): Subscribes to the beacon and listens for changes to its value.
     -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
     -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
@@ -668,7 +668,7 @@ await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
 await beacon.tryCatch(fetchUserData);
 ```
 
-See it in use in the [shopping cat example](https://github.com/jinyus/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
+See it in use in the [shopping cart example](https://github.com/jinyus/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
 
 If you want to do optimistic updates, you can supply an optional `optimisticResult` parameter.
 
@@ -748,7 +748,54 @@ and want to dispose them together.
  // All beacons and effects are disposed
 ```
 
-## Methods:
+## Properties and Methods:
+
+### myBeacon.value:
+
+The current value of the beacon. This beacon will be registered as a dependency if accessed within a derived beacon or an effect. Aliases: `myBeacon()`, `myBeacon.call()`.
+
+### myBeacon.peek():
+
+Returns the current value of the beacon without registering it as a dependency.
+
+### myBeacon.watch(context):
+
+Returns the current value of the beacon and rebuilds the widgets whenever the beacon is updated.
+
+```dart
+final name = Beacon.writable("Bob");
+
+class ProfileCard extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    // rebuilds whenever the name changes
+    return Text(name.watch(context));
+  }
+}
+```
+
+### myBeacon.observe(context,callback):
+
+Executes the callback (side effect) whenever the beacon is updated. eg: Show a snackbar when the value changes.
+
+```dart
+final name = Beacon.writable("Bob");
+
+class ProfileCard extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    name.observe(context, (prev, next) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('name changed from $prev to $next')),
+      );
+    });
+
+    return Text(name.watch(context));
+  }
+}
+```
 
 ### myBeacon.subscribe():
 
