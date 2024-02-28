@@ -252,19 +252,22 @@ void main() {
     expect(notified, 4);
   });
 
-  test('should create single dependency if accessed multiple times', () {
-    final a = Beacon.writable(1);
-    var ran = 0;
-    final d = Beacon.derived(() {
-      ran++;
-      a.value;
-      a.value;
-      return a.value;
-    });
+  // disabled for performance reasons. This is a rare case and it's not worth
+  // the performance hit. Consumers are marked dirty on the first run so marking
+  // them dirty again is cheap and basically a no-op.
+  // test('should create single dependency if accessed multiple times', () {
+  //   final a = Beacon.writable(1);
+  //   var ran = 0;
+  //   final d = Beacon.derived(() {
+  //     ran++;
+  //     a.value;
+  //     a.value;
+  //     return a.value;
+  //   });
 
-    expect(ran, 0);
-    expect(d.value, 1);
-    expect(ran, 1);
-    expect(a.listenersCount, 1);
-  });
+  //   expect(ran, 0);
+  //   expect(d.value, 1);
+  //   expect(ran, 1);
+  //   expect(a.listenersCount, 1);
+  // });
 }
