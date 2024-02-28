@@ -28,7 +28,7 @@ abstract class BeaconObserver {
   /// Sets the current instance of the observer to the [LoggingObserver].
   /// Alias to BeaconObserver.instance = LoggingObserver();
   // coverage:ignore-start
-  static void useLoggingObserver({
+  static void useLogging({
     List<String>? includeNames,
     List<String>? excludeNames,
   }) {
