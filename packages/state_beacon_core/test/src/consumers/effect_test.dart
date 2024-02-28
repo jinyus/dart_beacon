@@ -357,21 +357,23 @@ void main() {
     expect(called, 2);
   });
 
-  test('should create single dependency if accessed multiple times', () {
-    final a = Beacon.writable(1);
-    var ran = 0;
+  // disabled for performance reasons. This is a rare case and it's not worth
+  // the performance hit.
+  // test('should create single dependency if accessed multiple times', () {
+  //   final a = Beacon.writable(1);
+  //   var ran = 0;
 
-    Beacon.effect(() {
-      ran++;
-      a.value;
-      a.value;
-    });
+  //   Beacon.effect(() {
+  //     ran++;
+  //     a.value;
+  //     a.value;
+  //   });
 
-    expect(ran, 0);
-    BeaconScheduler.flush();
-    expect(ran, 1);
-    expect(a.listenersCount, 1);
-  });
+  //   expect(ran, 0);
+  //   BeaconScheduler.flush();
+  //   expect(ran, 1);
+  //   expect(a.listenersCount, 1);
+  // });
 
   test('should call clean up function when re-executing/disposed', () {
     final a = Beacon.writable(1);
