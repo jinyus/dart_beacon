@@ -1058,9 +1058,6 @@ This will log:
   old: 10
   new: 15
 
-"c" is watching "a"
-"c" is watching "b"
-
 "c" was updated:
   old: 200
   new: 300
