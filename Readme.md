@@ -1061,8 +1061,6 @@ This will log:
 "c" was updated:
   old: 200
   new: 300
-
-"printEffect" is watching "c"
 ```
 
 Disposing a beacon
