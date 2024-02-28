@@ -1,3 +1,9 @@
+# 0.39.1
+
+-   Minor refactor to improve performance.
+-   Add `BeaconObserver.useLogging()` as an alias to `BeaconObserver.instance = LoggingObserver()`.
+-   Reduce sdk constraint to ^3.0.0 from ^3.1.5
+
 # 0.39.0
 
 -   [Breaking] Beacons will no longer be reset when disposed. It will keep its current value.
