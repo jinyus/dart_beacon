@@ -24,15 +24,32 @@ abstract class BeaconObserver {
 
   /// The current instance of the observer
   static BeaconObserver? instance;
+
+  /// Sets the current instance of the observer to the [LoggingObserver].
+  /// Alias to BeaconObserver.instance = LoggingObserver();
+  // coverage:ignore-start
+  static void useLoggingObserver({
+    List<String>? includeNames,
+    List<String>? excludeNames,
+  }) {
+    instance = LoggingObserver(
+      includeNames: includeNames,
+      excludeNames: excludeNames,
+    );
+  }
+  // coverage:ignore-end
 }
 
 /// A beacon observer that logs to the console.
 class LoggingObserver implements BeaconObserver {
   /// @macro [LoggingObserver]
-  LoggingObserver({this.includeNames});
+  LoggingObserver({this.includeNames, this.excludeNames});
 
   /// The names of beacons to include in the logs.
   final List<String>? includeNames;
+
+  /// The names of beacons to exclude from the logs.
+  final List<String>? excludeNames;
 
   // this is tested with mocks
   // don't want to print to console in tests
@@ -67,8 +84,9 @@ class LoggingObserver implements BeaconObserver {
 
   /// Returns whether the beacon with the given [name] should be logged.
   bool shouldContinue(String name) {
-    if (includeNames == null) return true;
-    return includeNames?.contains(name) ?? false;
+    if (includeNames != null && !includeNames!.contains(name)) return false;
+    if (excludeNames != null && excludeNames!.contains(name)) return false;
+    return true;
   }
 
   @override
