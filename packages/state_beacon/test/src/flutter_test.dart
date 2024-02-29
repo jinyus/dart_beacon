@@ -179,6 +179,8 @@ void main() {
 
     // Check listeners count after widget is disposed
     expect(testCounter.listenersCount, 0);
+
+    testCounter.dispose();
   });
 }
 
