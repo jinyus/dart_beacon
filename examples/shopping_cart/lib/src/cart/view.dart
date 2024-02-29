@@ -41,8 +41,9 @@ class CartList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemNameStyle = Theme.of(context).textTheme.titleLarge;
+    final controller = cartControllerRef(context);
 
-    final state = cartController().cart.watch(context);
+    final state = controller.cart.watch(context);
 
     return switch (state) {
       AsyncData() ||
@@ -56,7 +57,7 @@ class CartList extends StatelessWidget {
               return const SizedBox.shrink();
             }
             final isRemoving =
-                cartController().removingIndex.watch(context).contains(item);
+                controller.removingIndex.watch(context).contains(item);
 
             return Material(
               shape: RoundedRectangleBorder(
@@ -78,7 +79,7 @@ class CartList extends StatelessWidget {
                     onPressed: isRemoving
                         ? null
                         : () {
-                            cartController().dispatch(CartItemRemoved(item));
+                            controller.dispatch(CartItemRemoved(item));
                           },
                   ),
                 ),
@@ -103,7 +104,7 @@ class CartTotal extends StatelessWidget {
         ?.copyWith(fontSize: 48)
         .copyWith(color: Colors.white);
 
-    final state = cartController().cart.watch(context);
+    final state = cartControllerRef(context).cart.watch(context);
 
     return SizedBox(
       height: 200,

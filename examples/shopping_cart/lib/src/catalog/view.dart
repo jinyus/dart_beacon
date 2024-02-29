@@ -14,7 +14,7 @@ class CatalogView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = catalogController.instance;
+    final controller = catalogControllerRef(context);
     final state = controller.catalog.watch(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final cols = _getCrossAxisCount(screenWidth);
@@ -105,7 +105,8 @@ class AddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final state = cartController().cart.watch(context);
+    final controller = cartControllerRef(context);
+    final state = controller.cart.watch(context);
 
     return switch (state) {
       AsyncError() => const Text('Something went wrong!'),
@@ -114,9 +115,8 @@ class AddButton extends StatelessWidget {
             final cart = state.lastData!;
             final isInCart = cart.items.contains(item);
 
-            final isAdding = cartController.instance.addingItem
-                .watch(context)
-                .contains(item);
+            final isAdding =
+                controller.addingItem.watch(context).contains(item);
 
             final btnChild = isAdding
                 ? const CircularProgressIndicator()
@@ -131,7 +131,7 @@ class AddButton extends StatelessWidget {
                   minimumSize: const Size(100, 50)),
               onPressed: isInCart || isAdding
                   ? null
-                  : () => cartController.instance.dispatch(CartItemAdded(item)),
+                  : () => controller.dispatch(CartItemAdded(item)),
               child: isInCart
                   ? const Icon(Icons.check, semanticLabel: 'ADDED')
                   : btnChild,
@@ -148,7 +148,7 @@ class CatalogAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cart = cartController().cart.watch(context);
+    final cart = cartControllerRef(context).cart.watch(context);
     final count = cart.lastData?.items.length ?? 0;
 
     return SliverAppBar(

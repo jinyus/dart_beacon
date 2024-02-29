@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lite_ref/lite_ref.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shopping_cart/deps.dart';
 import 'package:shopping_cart/src/app.dart';
@@ -38,16 +39,19 @@ void main() {
   final cartC = MockCartController();
   final catalogC = MockCatalogController();
 
-  catalogController.overrideWith(() => catalogC);
-  cartController.overrideWith(() => cartC);
-
   testWidgets('Full app test', (WidgetTester tester) async {
     when(() => cartC.cart).thenReturn(_mockCart);
     when(() => cartC.addingItem).thenReturn(_addingItem);
     when(() => cartC.removingIndex).thenReturn(_removingItem);
     when(() => catalogC.catalog).thenReturn(_mockCatalog);
 
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(LiteRefScope(
+      overrides: [
+        cartControllerRef.overrideWith((_) => cartC),
+        catalogControllerRef.overrideWith((_) => catalogC),
+      ],
+      child: const MyApp(),
+    ));
 
     // catalog loading
     expect(find.byType(CircularProgressIndicator), findsOneWidget);

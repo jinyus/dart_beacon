@@ -100,10 +100,10 @@ packages:
     dependency: "direct main"
     description:
       name: lite_ref
-      sha256: "1bb779491e895fdfd649355a6e0a933af7caf88065de118778f1afec4a93f90a"
+      sha256: f9feb0eeea72d4ddbca183b92c4718ae17a3c67a7620431404083bb647a1f9d4
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.4.0"
   matcher:
     dependency: transitive
     description:
@@ -230,4 +230,4 @@ packages:
     version: "0.3.0"
 sdks:
   dart: ">=3.2.3 <4.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=3.10.0"
