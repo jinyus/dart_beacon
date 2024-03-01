@@ -1,0 +1,23 @@
+name: counter
+description: A Very Good Project created by Very Good CLI.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+    sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+    flutter:
+        sdk: flutter
+    lite_ref: ^0.4.1
+    state_beacon:
+        path: ../../packages/state_beacon
+
+dev_dependencies:
+    flutter_test:
+        sdk: flutter
+    mocktail: ^1.0.0
+    very_good_analysis: ^5.1.0
+
+flutter:
+    uses-material-design: true
