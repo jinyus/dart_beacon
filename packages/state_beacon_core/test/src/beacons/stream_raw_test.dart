@@ -372,4 +372,40 @@ void main() {
 
     expect(s.stream, emitsInOrder([0, 1, 2, 3]));
   });
+
+  test('should cancel subscription to old stream', () async {
+    // BeaconObserver.useLogging(includeNames: ['b']);
+    Stream<int> getStream(int limit) async* {
+      for (var i = 0; i < limit; i++) {
+        yield i;
+        await delay(k10ms);
+      }
+    }
+
+    final count = Beacon.writable(10);
+
+    final s = Beacon.streamRaw(() => getStream(count.value), isLazy: true);
+
+    final buffered = s.bufferTime(duration: k10ms * 10);
+
+    await delay(k1ms * 16); // only 0 and 1 in the first 16 ms
+
+    expect(buffered.currentBuffer(), [0, 1]);
+
+    // change dependency so it should unsub from old stream
+    // new stream should emit 0,1,2,3
+    count.value = 4;
+
+    await expectLater(
+      buffered.next(),
+      completion([
+        0,
+        1,
+        0,
+        1,
+        2,
+        3,
+      ]),
+    );
+  });
 }

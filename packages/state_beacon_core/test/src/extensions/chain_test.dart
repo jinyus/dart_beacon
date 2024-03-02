@@ -620,6 +620,8 @@ void main() {
     await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
 
     await delay();
+
+    // rerouted to filtered beacon first
     beacon.set(10);
     expect(beacon.value, 11);
   });
@@ -726,4 +728,18 @@ void main() {
       expect(beacon.value, 1);
     },
   );
+
+  test('should work when next is paired with buffer', () async {
+    // BeaconObserver.useLogging();
+    Stream<int> getStream(int limit) async* {
+      for (var i = 0; i < limit; i++) {
+        yield i;
+        await delay(k1ms);
+      }
+    }
+
+    final s = Beacon.streamRaw(() => getStream(3), isLazy: true);
+
+    await expectLater(s.buffer(3).next(), completion([0, 1, 2]));
+  });
 }
