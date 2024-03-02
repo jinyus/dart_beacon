@@ -24,8 +24,6 @@ class ReadableBeacon<T> extends Producer<T> {
   Stream<T> toStream({bool synchronous = false}) {
     _controller ??= StreamController<T>.broadcast(
       onListen: () {
-        // if (!isEmpty) _controller!.add(peek());
-
         // onListen is only called when sub count goes from 0 to 1.
         // If sub count goes from 1 to 0, onCancel runs and sets _unsub to null.
         // so _unsub will always be null here but checking doesn't hurt
