@@ -145,4 +145,26 @@ void main() {
 
     expect(stream1.hashCode, stream2.hashCode);
   });
+
+  test('should autobatch when synchronous=false', () {
+    final beacon = Beacon.writable(0);
+
+    final stream1 = beacon.toStream();
+
+    expectLater(stream1, emitsInOrder([2]));
+
+    beacon.value = 1;
+    beacon.value = 2;
+  });
+
+  test('should disable autobatching when synchronous=true', () {
+    final beacon = Beacon.writable(0);
+
+    final stream1 = beacon.toStream(synchronous: true);
+
+    expectLater(stream1, emitsInOrder([0, 1, 2]));
+
+    beacon.value = 1;
+    beacon.value = 2;
+  });
 }
