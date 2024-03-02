@@ -1,3 +1,43 @@
+# 0.34.0
+
+-   [Docs] Add section on `testing` to the README.
+-   [Feat] Add `synchronous` option to wrap and chaining methods. This defaults to `true` which means that wrapper beacons will get all updates.
+-   [Breaking] Duration is now a positional argument for chaining methods `yourBeacon.debounce()`, `yourBeacon.throttle()`, `yourBeacon.bufferTime()`. This was done to make the code more concise.
+
+    -   Old:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.debounce(duration: k10ms);
+    myBeacon.throttle(duration: k10ms);
+    myBeacon.bufferTime(duration: k10ms);
+    ```
+
+    -   New:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.debounce(k10ms);
+    myBeacon.throttle(k10ms);
+    myBeacon.bufferTime(k10ms);
+    ```
+
+-   [Deprecation] `yourBeacon.stream` is now `yourBeacon.toStream()`. This was done to allow auto-batching configuration. By default, auto-batching is enabled. You can disable it by setting `synchronous` to `true`.
+
+    -   Old:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.stream;
+    ```
+
+    -   New:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.toStream();
+    ```
+
 # 0.39.1
 
 -   Minor refactor to improve performance.

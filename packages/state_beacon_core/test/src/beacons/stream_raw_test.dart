@@ -83,7 +83,7 @@ void main() {
       },
       isLazy: true,
     );
-    final buff = beacon.bufferTime(duration: k1ms);
+    final buff = beacon.bufferTime(k1ms);
 
     expect(buff.value, isEmpty);
 
@@ -386,7 +386,7 @@ void main() {
 
     final s = Beacon.streamRaw(() => getStream(count.value), isLazy: true);
 
-    final buffered = s.bufferTime(duration: k10ms * 10);
+    final buffered = s.bufferTime(k10ms * 10);
 
     await delay(k1ms * 16); // only 0 and 1 in the first 16 ms
 

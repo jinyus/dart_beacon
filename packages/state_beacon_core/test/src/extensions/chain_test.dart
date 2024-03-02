@@ -30,9 +30,9 @@ void main() {
     final beacon = Beacon.lazyWritable<int>();
 
     final buffered = beacon.buffer(3);
-    final bufferedTime = beacon.bufferTime(duration: k10ms);
-    final debounced = beacon.debounce(duration: k10ms);
-    final throttled = beacon.throttle(duration: k10ms);
+    final bufferedTime = beacon.bufferTime(k10ms);
+    final debounced = beacon.debounce(k10ms);
+    final throttled = beacon.throttle(k10ms);
     final filtered = beacon.filter(
       (p0, p1) => p1.isEven,
     );
@@ -70,7 +70,7 @@ void main() {
   test('should return a BufferedTimeBeacon', () async {
     final beacon = Beacon.writable(0);
 
-    final buffered = beacon.bufferTime(duration: k10ms);
+    final buffered = beacon.bufferTime(k10ms);
 
     expect(buffered, isA<BufferedTimeBeacon<int>>());
 
@@ -92,7 +92,7 @@ void main() {
   test('should return a DebouncedBeacon', () async {
     final beacon = Beacon.writable(0);
 
-    final debounced = beacon.debounce(duration: k10ms);
+    final debounced = beacon.debounce(k10ms);
 
     expect(debounced, isA<DebouncedBeacon<int>>());
 
@@ -113,7 +113,7 @@ void main() {
   test('should return a ThrottledBeacon', () async {
     final beacon = Beacon.writable(0);
 
-    final throttled = beacon.throttle(duration: k10ms);
+    final throttled = beacon.throttle(k10ms);
 
     expect(throttled, isA<ThrottledBeacon<int>>());
 
@@ -153,8 +153,8 @@ void main() {
 
     final beacon = count
         .filter(neverFilter)
-        .throttle(duration: k10ms)
-        .debounce(duration: k10ms)
+        .throttle(k10ms)
+        .debounce(k10ms)
         .filter(neverFilter);
 
     Beacon.effect(() => beacon.value);
@@ -269,8 +269,8 @@ void main() {
     final count = Beacon.writable<int>(10, name: 'count');
 
     final filtered = count
-        .throttle(duration: k10ms, name: 'throttled')
-        .debounce(duration: k10ms, name: 'debounced')
+        .throttle(k10ms, name: 'throttled')
+        .debounce(k10ms, name: 'debounced')
         .filter(neverFilter, name: 'f1')
         .filter(neverFilter, name: 'f2');
 
@@ -367,22 +367,22 @@ void main() {
       throwsA(isA<AssertionError>()),
     );
     expect(
-      () => buffered.debounce(duration: k1ms),
+      () => buffered.debounce(k1ms),
       throwsA(isA<AssertionError>()),
     );
     expect(
-      () => buffered.throttle(duration: k1ms),
+      () => buffered.throttle(k1ms),
       throwsA(isA<AssertionError>()),
     );
     expect(
-      () => buffered.bufferTime(duration: k1ms),
+      () => buffered.bufferTime(k1ms),
       throwsA(isA<AssertionError>()),
     );
     expect(
       () => count
           .filter(name: 'f1', (_, n) => n > 5)
           .buffer(2, name: 'buffered')
-          .debounce(duration: k10ms),
+          .debounce(k10ms),
       throwsA(isA<AssertionError>()),
     );
   });
@@ -409,8 +409,7 @@ void main() {
   test('should debounce input beacon', () async {
     // BeaconObserver.instance = LoggingObserver();
     final stream = Stream.periodic(k1ms, (i) => i).take(9);
-    final beacon =
-        stream.toRawBeacon(isLazy: true).debounce(duration: k10ms).buffer(5);
+    final beacon = stream.toRawBeacon(isLazy: true).debounce(k10ms).buffer(5);
 
     BeaconScheduler.flush();
 
@@ -421,10 +420,8 @@ void main() {
   test('should throttle input beacon', () async {
     // BeaconObserver.instance = LoggingObserver();
     final stream = Stream.periodic(k1ms, (i) => i).take(15);
-    final beacon = stream
-        .toRawBeacon(isLazy: true)
-        .throttle(duration: k10ms * 1.3)
-        .buffer(2);
+    final beacon =
+        stream.toRawBeacon(isLazy: true).throttle(k10ms * 1.3).buffer(2);
 
     BeaconScheduler.flush();
 
@@ -440,7 +437,7 @@ void main() {
     final stream = Stream.periodic(k1ms, (i) => i).take(15);
     final beacon = stream
         .toRawBeacon(isLazy: true)
-        .throttle(duration: k10ms, dropBlocked: false)
+        .throttle(k10ms, dropBlocked: false)
         .buffer(2);
 
     BeaconScheduler.flush();
@@ -500,7 +497,7 @@ void main() {
   test('should force all delegated writes (throttled)', () async {
     final count = Beacon.writable<int>(10, name: 'count');
 
-    final tbeacon = count.throttle(duration: k10ms, name: 'throttled');
+    final tbeacon = count.throttle(k10ms, name: 'throttled');
 
     final buff = count.buffer(5, name: 'buff');
 
@@ -519,7 +516,7 @@ void main() {
   test('should force all delegated writes (debounced)', () async {
     final count = Beacon.writable<int>(10);
 
-    final tbeacon = count.debounce(duration: k10ms);
+    final tbeacon = count.debounce(k10ms);
 
     final buff = count.buffer(5);
 
@@ -576,7 +573,7 @@ void main() {
   test('should force all delegated writes (bufferedTime)', () async {
     final count = Beacon.writable<int>(10);
 
-    final tbeacon = count.bufferTime(duration: k10ms);
+    final tbeacon = count.bufferTime(k10ms);
 
     final buff = count.buffer(5);
 
@@ -615,7 +612,7 @@ void main() {
         .toRawBeacon(isLazy: true)
         .filter((_, n) => n.isEven)
         .map((v) => v + 1)
-        .throttle(duration: k1ms);
+        .throttle(k1ms);
 
     await expectLater(beacon.toStream(), emitsInOrder([1, 3, 5]));
 

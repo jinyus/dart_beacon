@@ -69,8 +69,8 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// expect(bufferedBeacon.value, equals([20]));
   /// ```
   /// See: `Beacon.bufferedTime` for more details.
-  BufferedTimeBeacon<T> bufferTime({
-    required Duration duration,
+  BufferedTimeBeacon<T> bufferTime(
+    Duration duration, {
     String? name,
     bool synchronous = true,
   }) {
@@ -121,8 +121,8 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// ```
   ///
   /// See: `Beacon.debounced` for more details.
-  DebouncedBeacon<T> debounce({
-    required Duration duration,
+  DebouncedBeacon<T> debounce(
+    Duration duration, {
     String? name,
     bool synchronous = true,
   }) {
@@ -167,8 +167,8 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
   /// expect(throttledCount.value, equals(10)); // this is 10 because the update was throttled
   /// ```
   /// See: `Beacon.throttled` for more details.
-  ThrottledBeacon<T> throttle({
-    required Duration duration,
+  ThrottledBeacon<T> throttle(
+    Duration duration, {
     bool dropBlocked = true,
     bool synchronous = true,
     String? name,

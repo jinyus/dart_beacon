@@ -433,7 +433,7 @@ void main() {
       await delay(k1ms);
       expect(beacon.value.unwrap(), equals(0));
 
-      final buff = beacon.bufferTime(duration: k10ms);
+      final buff = beacon.bufferTime(k10ms);
 
       count.set(1);
 

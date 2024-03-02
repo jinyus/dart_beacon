@@ -13,10 +13,12 @@ class ReadableBeacon<T> extends Producer<T> {
   StreamController<T>? _controller;
   VoidCallback? _unsubFromSelf;
 
+  // coverage:ignore-start
   /// Returns a broadcast [Stream] that emits the current value
   /// and all subsequent updates to the value of this beacon.
   @Deprecated('Use toStream() instead')
   Stream<T> get stream => toStream();
+  // coverage:ignore-end
 
   /// Returns a broadcast [Stream] that emits the current value
   /// and all subsequent updates to the value of this beacon.
