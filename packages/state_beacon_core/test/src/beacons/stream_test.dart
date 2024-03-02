@@ -154,7 +154,7 @@ void main() {
         return controller.stream;
       },
     );
-    final buff = beacon.bufferTime(duration: k1ms);
+    final buff = beacon.bufferTime(k1ms);
 
     expect(buff.value, isEmpty);
 
