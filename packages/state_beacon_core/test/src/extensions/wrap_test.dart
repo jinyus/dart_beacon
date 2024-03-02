@@ -258,7 +258,7 @@ void main() {
     );
   });
 
-  test('should not autobatch when synchronous=true', () {
+  test('should NOT autobatch when synchronous=true', () {
     final original = Beacon.writable(10);
     final wrapper = Beacon.writable(0);
 
