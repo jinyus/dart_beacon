@@ -141,6 +141,7 @@ NB: Create the file if it doesn't exist.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
 -   [Disposal](#disposal): Disposing beacons and effects.
+-   [Testing](#testing): How to test beacons.
 
 [Pitfalls](#pitfalls)
 
@@ -1112,6 +1113,60 @@ a.dispose();
 expect(a.isDisposed, true);
 expect(c.isDisposed, true);
 // effect is also disposed
+```
+
+## Testing
+
+Beacons can expose a `Stream` with the `.stream` getter. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
+
+```dart
+final count = Beacon.writable(10);
+
+final stream = count.stream;
+
+Future.delayed(Duration(milliseconds: 1), () => count.value = 20);
+
+expect(stream, emitsInOrder([10, 20]));
+```
+
+### Testing beacons with chaining methods
+
+[Chaining](#chaining-methods) methods (`buffer`, `bufferTime`, `next`) can be used to make testing easier.
+
+##### anyBeacon.buffer()
+
+```dart
+final count = Beacon.writable(10);
+
+final buff = count.buffer(2);
+
+count.value = 20;
+
+expect(buff.value, equals([10, 20]));
+```
+
+##### anyBeacon.next()
+
+```dart
+final count = Beacon.writable(10);
+
+expectLater(count.next(), completion(30));
+
+count.value = 30;
+```
+
+##### anyBeacon.bufferTime().next()
+
+```dart
+final count = Beacon.writable(10);
+
+final buffTime = count.bufferTime(duration: Duration(milliseconds: 10));
+
+expectLater(buffTime.next(), completion([10, 20, 30, 40]));
+
+count.value = 20;
+count.value = 30;
+count.value = 40;
 ```
 
 ## Pitfalls
