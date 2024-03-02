@@ -257,4 +257,34 @@ void main() {
       completion([0, 2, 4, 6]),
     );
   });
+
+  test('should not autobatch when synchronous=true', () {
+    final original = Beacon.writable(10);
+    final wrapper = Beacon.writable(0);
+
+    wrapper.wrap(original);
+    expect(wrapper.value, 10);
+
+    original.value = 20;
+    expect(wrapper.value, 20);
+
+    original.value = 30;
+    expect(wrapper.value, 30);
+  });
+
+  test('should autobatch when synchronous=false', () async {
+    final original = Beacon.writable(10);
+    final wrapper = Beacon.writable(0);
+
+    wrapper.wrap(original, synchronous: false);
+    expect(wrapper.value, 0);
+    await expectLater(wrapper.next(), completion(10));
+
+    original.value = 20;
+    original.value = 30;
+    original.value = 40;
+    original.value = 50;
+    expect(wrapper.value, 10); // should not update immediately
+    await expectLater(wrapper.next(), completion(50));
+  });
 }
