@@ -129,7 +129,7 @@ abstract class Producer<T> {
   /// The hashcode of all widgets subscribed to this beacon.
   /// This should not be used directly.
   @Deprecated('This is an internal property. DO NOT USE IT DIRECTLY.')
-  final widgetSubscribers = <int>{};
+  final $$widgetSubscribers$$ = <int>{};
 
   /// Return the current value of the beacon without subscribing to it.
   T peek() => _value;
@@ -231,7 +231,7 @@ abstract class Producer<T> {
     }
     _observers.clear();
     // ignore: deprecated_member_use_from_same_package
-    widgetSubscribers.clear();
+    $$widgetSubscribers$$.clear();
     _previousValue = null;
     for (final callback in _disposeCallbacks) {
       callback();
