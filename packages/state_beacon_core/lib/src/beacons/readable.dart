@@ -15,6 +15,7 @@ class ReadableBeacon<T> extends Producer<T> {
 
   /// Returns a broadcast [Stream] that emits the current value
   /// and all subsequent updates to the value of this beacon.
+  /// Alias for [toStream(synchronous: false)]
   Stream<T> get stream => toStream();
 
   /// Returns a broadcast [Stream] that emits the current value
