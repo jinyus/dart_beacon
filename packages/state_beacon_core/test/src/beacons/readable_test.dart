@@ -49,7 +49,7 @@ void main() {
   test('should return a stream', () async {
     final a = Beacon.writable(1);
 
-    final stream = a.stream;
+    final stream = a.toStream();
 
     var called = 0;
 
@@ -114,7 +114,7 @@ void main() {
 
   test('should convert a beacon to a stream', () async {
     final beacon = Beacon.writable(0);
-    final stream = beacon.stream;
+    final stream = beacon.toStream();
 
     expect(stream, isA<Stream<int>>());
 
@@ -140,8 +140,8 @@ void main() {
   test('should cache stream', () {
     final beacon = Beacon.writable(0);
 
-    final stream1 = beacon.stream;
-    final stream2 = beacon.stream;
+    final stream1 = beacon.toStream();
+    final stream2 = beacon.toStream();
 
     expect(stream1.hashCode, stream2.hashCode);
   });

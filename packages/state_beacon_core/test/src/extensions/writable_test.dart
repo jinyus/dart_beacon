@@ -52,7 +52,7 @@ void main() {
     final beacon = Beacon.writable<AsyncValue<int>>(AsyncData(0));
 
     expect(
-      beacon.stream,
+      beacon.toStream(),
       emitsInOrder(
         [
           AsyncData(0),

@@ -23,8 +23,8 @@ void main() {
     final lazyTimestamp = group.lazyTimestamped<int>();
     final undoRedo = group.undoRedo<int>(0);
     final lazyUndoRedo = group.lazyUndoRedo<int>();
-    final stream = group.stream<int>(() => readable.stream);
-    final streamRaw = group.streamRaw<int?>(() => readable.stream);
+    final stream = group.stream<int>(readable.toStream);
+    final streamRaw = group.streamRaw<int?>(readable.toStream);
     final future = group.future<int>(() async => 1);
     final list = group.list<int>([0]);
     final hashSet = group.hashSet<int>({0});

@@ -449,7 +449,7 @@ void main() {
     // BeaconScheduler.flush();
 
     await expectLater(
-      stats.stream,
+      stats.toStream(),
       emitsInOrder([
         isA<AsyncLoading<String>>(),
         isA<AsyncError<String>>(),
@@ -675,7 +675,7 @@ void main() {
     num1.increment();
 
     await expectLater(
-      derivedBeacon.stream,
+      derivedBeacon.toStream(),
       emitsInOrder([
         isA<AsyncLoading<int>>(),
         AsyncData<int>(11),
@@ -856,7 +856,7 @@ void main() {
     );
 
     await expectLater(
-      f.stream,
+      f.toStream(),
       emitsInOrder([
         isA<AsyncLoading<List<int>>>(),
         isA<AsyncData<List<int>>>(),
@@ -894,7 +894,7 @@ void main() {
     );
 
     await expectLater(
-      d.stream,
+      d.toStream(),
       emitsInOrder([
         <int>[],
         [1, 2, 3],
