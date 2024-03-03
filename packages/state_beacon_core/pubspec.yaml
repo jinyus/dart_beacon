@@ -6,6 +6,9 @@ repository: https://github.com/jinyus/dart_beacon
 environment:
     sdk: ^3.0.0
 
+dependencies:
+    basic_interfaces: ^1.0.2
+
 dev_dependencies:
     test: ^1.24.0
     very_good_analysis: ^5.1.0
