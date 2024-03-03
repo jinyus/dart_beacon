@@ -35,6 +35,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:basic_interfaces/basic_interfaces.dart';
 import 'package:state_beacon_core/src/common/exceptions.dart';
 import 'package:state_beacon_core/src/creator/creator.dart';
 
@@ -80,7 +81,7 @@ List<Producer<dynamic>?> currentGets = [];
 int currentGetsIndex = 0;
 
 /// The base class for all beacons.
-abstract class Producer<T> {
+abstract class Producer<T> implements Disposable {
   /// Creates a new [Producer].
   Producer({T? initialValue, String? name})
       : _name = name,
@@ -223,6 +224,7 @@ abstract class Producer<T> {
 
   /// Clears all registered listeners and
   /// reset the beacon to its initial state.
+  @override
   void dispose() {
     if (_isDisposed) return;
     _isDisposed = true;

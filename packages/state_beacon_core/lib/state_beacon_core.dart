@@ -1,6 +1,8 @@
 /// reactive primitive and statemanagement for dart
 library;
 
+export 'package:basic_interfaces/basic_interfaces.dart';
+
 export 'src/common/async_value.dart';
 export 'src/common/exceptions.dart';
 export 'src/creator/creator.dart';
