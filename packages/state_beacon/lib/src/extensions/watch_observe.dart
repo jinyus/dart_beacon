@@ -85,11 +85,11 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     BuildContext context, {
     VoidCallback? callback,
   }) {
-    if (widgetSubscribers.contains(key)) {
+    if ($$widgetSubscribers$$.contains(key)) {
       return peek();
     }
 
-    widgetSubscribers.add(key);
+    $$widgetSubscribers$$.add(key);
 
     final elementRef = WeakReference(context as Element);
     late VoidCallback unsub;
@@ -109,7 +109,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
         run();
       } else {
         unsub();
-        widgetSubscribers.remove(key);
+        $$widgetSubscribers$$.remove(key);
         cancel();
       }
     }
@@ -122,7 +122,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     _finalizer.attach(
       context,
       () {
-        widgetSubscribers.remove(key);
+        $$widgetSubscribers$$.remove(key);
         unsub();
         cancel();
       },
