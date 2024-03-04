@@ -7,7 +7,7 @@ environment:
     sdk: ^3.0.0
 
 dependencies:
-    basic_interfaces: ^1.0.2
+    basic_interfaces: ^1.0.4
 
 dev_dependencies:
     test: ^1.24.0
