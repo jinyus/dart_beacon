@@ -1,5 +1,6 @@
-# 0.34.0
+# 0.40.0
 
+-   [Feat] Implement `Disposable` from [basic_interfaces](https://pub.dev/packages/basic_interfaces) package which makes it autodispsable when used with the [lite_ref](https://pub.dev/packages/lite_ref) package.
 -   [Docs] Add section on `testing` to the README.
 -   [Feat] Add `synchronous` option to wrap and chaining methods. This defaults to `true` which means that wrapper beacons will get all updates.
 -   [Breaking] Duration is now a positional argument for chaining methods `yourBeacon.debounce()`, `yourBeacon.throttle()`, `yourBeacon.bufferTime()`. This was done to make the code more concise.
