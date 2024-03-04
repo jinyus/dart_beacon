@@ -604,6 +604,23 @@ class _BeaconCreator {
         name: name ?? 'MapBeacon<$K,$V>',
       );
 
+  /// Creates a [PeriodicBeacon] that emits values periodically.
+  ///
+  /// Example:
+  /// ```dart
+  /// final myBeacon = Beacon.periodic(Duration(seconds: 1), (i) => i + 1);
+  ///
+  /// final nextFive = await myBeacon.buffer(5).next();
+  ///
+  /// expect(nextFive, [1, 2, 3, 4, 5]);
+  /// ```
+  PeriodicBeacon<T> periodic<T>(
+    Duration duration,
+    T Function(int) compute, {
+    String? name,
+  }) =>
+      PeriodicBeacon<T>(duration, compute, name: name);
+
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///
