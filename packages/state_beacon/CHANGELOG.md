@@ -1,3 +1,45 @@
+# 0.40.0
+
+-   [Feat] Add `BeaconController` for use in Flutter. see [docs](https://github.com/jinyus/dart_beacon/blob/main/packages/state_beacon/README.md#beaconcontroller)
+-   [Feat] Implement `Disposable` from [basic_interfaces](https://pub.dev/packages/basic_interfaces) package which makes it autodispsable when used with the [lite_ref](https://pub.dev/packages/lite_ref) package.
+-   [Docs] Add section on `testing` to the README.
+-   [Feat] Add `synchronous` option to wrap and chaining methods. This defaults to `true` which means that wrapper beacons will get all updates.
+-   [Breaking] Duration is now a positional argument for chaining methods `yourBeacon.debounce()`, `yourBeacon.throttle()`, `yourBeacon.bufferTime()`. This was done to make the code more concise.
+
+    -   Old:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.debounce(duration: k10ms);
+    myBeacon.throttle(duration: k10ms);
+    myBeacon.bufferTime(duration: k10ms);
+    ```
+
+    -   New:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.debounce(k10ms);
+    myBeacon.throttle(k10ms);
+    myBeacon.bufferTime(k10ms);
+    ```
+
+-   [Deprecation] `yourBeacon.stream` is now `yourBeacon.toStream()`. This was done to allow auto-batching configuration. By default, auto-batching is enabled. You can disable it by setting `synchronous` to `true`.
+
+    -   Old:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.stream;
+    ```
+
+    -   New:
+
+    ```dart
+    final myBeacon = Beacon.writable(0);
+    myBeacon.toStream();
+    ```
+
 # 0.39.1
 
 -   Minor refactor to improve performance.
@@ -7,7 +49,7 @@
 # 0.39.0
 
 -   [Breaking] Beacons will no longer be reset when disposed. It will keep its current value.
--   [Breaking] Writing to a disposed beacon will throw an error. Reading will print a warning to the console in debug mode. A beacon should only be disposed if you have no more use for it. If you want to reset a beacon, use the `reset` method instead.
+-   [Breaking] Writing to a disposed beacon will throw an error. Reading will print a warning to the console in debug mode. A beacon should only be disposed if you have no more use for it. If you want to reuse a beacon, use the `reset` method instead.
 
     ```dart
     final a = Beacon.writable(10);
@@ -68,9 +110,9 @@ Removed Deprecated methods:
 
 # 0.36.0
 
--   [Breaking] `Beacon.stream` and `Beacon.streamRaw` will now autosleep when they no longer have listeners. This is a breaking change because it changes the default behavior. If you want to keep the old behavior, set `shouldSleep` to false.
+-   [Breaking] `Beacon.stream` and `Beacon.streamRaw` will now autosleep when they have no more listeners. This is a breaking change because it changes the default behavior. If you want to keep the old behavior, set `shouldSleep` to false.
 
-They will unsubscribe from the stream when sleeping and resubscribe when awoken. For `Beacon.stream`, it will enter the loading state when awoken.
+They will unsubscribe from the stream when sleeping and resubscribe when awoken. For `Beacon.stream`, it will enter the loading state when awoken. It is recommended to use the default when using services like Firebase to prevent cost overruns.
 
 # 0.35.0
 
@@ -96,7 +138,7 @@ final filtered = count.filter((prev, next) => next.isEven);
 
 # 0.34.3
 
--   [Feat] App `map` to chaining methods
+-   [Feat] Add `map` to chaining methods
 
 ```dart
 final count = Beacon.writable(10);

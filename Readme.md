@@ -142,6 +142,7 @@ NB: Create the file if it doesn't exist.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
 -   [Disposal](#disposal): Disposing beacons and effects.
 -   [Testing](#testing): How to test beacons.
+-   [BeaconController](#beaconcontroller):
 
 [Pitfalls](#pitfalls)
 

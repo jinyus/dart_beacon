@@ -142,6 +142,7 @@ NB: Create the file if it doesn't exist.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
 -   [Disposal](#disposal): Disposing beacons and effects.
 -   [Testing](#testing): How to test beacons.
+-   [BeaconController](#beaconcontroller):
 
 [Pitfalls](#pitfalls)
 
@@ -1167,6 +1168,65 @@ expectLater(buffTime.next(), completion([10, 20, 30, 40]));
 count.value = 20;
 count.value = 30;
 count.value = 40;
+```
+
+## BeaconController
+
+An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons.
+
+NB: All beacons must be created with as a `late` variable and with the local BeaconCreator `B` instead of `Beacon`.
+
+```dart
+class CountController extends BeaconController {
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+}
+```
+
+This can be used with the [lite_ref](https://pub.dev/packages/lite_ref) or Provider package to provide the controller to widgets. lite_ref will dispose the controller when all widgets that use it are disposed.
+
+In the example below, the controller will be disposed when the `CounterText` is unmounted:
+
+```dart
+final countControllerRef = Ref.scoped((ctx) => CountController());
+
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = countControllerRef.of(context);
+    final count = controller.count.watch(context);
+    return Text('$count');
+  }
+}
+```
+
+See the full example [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+
+### BeaconControllerMixin
+
+A mixin for `StatefulWidget`'s `State` class that automatically disposes all beacons and effects created within it.
+
+```dart
+class MyController extends StatefulWidget {
+  const MyController({super.key});
+
+  @override
+  State<MyController> createState() => _MyControllerState();
+}
+
+class _MyControllerState extends State<MyController>
+    with BeaconControllerMixin {
+  // NO need to dispose these manually
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
 ```
 
 ## Pitfalls
