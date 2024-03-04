@@ -4,6 +4,11 @@ import 'package:test/test.dart';
 import '../../common.dart';
 
 void main() {
+  test('should have initial value', () {
+    final myBeacon = Beacon.periodic(k10ms, (i) => i + 1);
+    expect(myBeacon.peek(), 1);
+  });
+
   test('should emit values periodically', () async {
     final myBeacon = Beacon.periodic(k10ms, (i) => i + 1);
 
