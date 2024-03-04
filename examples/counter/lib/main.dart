@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lite_ref/lite_ref.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-class Controller {
-  late final _count = Beacon.writable(0);
+class Controller extends BeaconController {
+  late final _count = B.writable(0);
 
   // we expose it as a readable beacon
   // so it cannot be changed from outside the controller.

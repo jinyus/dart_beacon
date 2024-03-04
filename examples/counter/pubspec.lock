@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  basic_interfaces:
+    dependency: transitive
+    description:
+      name: basic_interfaces
+      sha256: c37c8c4ddbc594430eb3817a4edfcc9a0cadbc7ea4c51a5b48785e351f1ba479
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   boolean_selector:
     dependency: transitive
     description:
@@ -163,10 +171,10 @@ packages:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: "6c3a36e15c4be2e3c21a07b38b1647869b28b84920b80bdc2f34f782dcb0cbf4"
+      sha256: "774b9ba884fa2a56be7e705fc3ba4ce0d6e391078e4c8c5213ce4fda9fed8df9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.39.1"
+    version: "0.40.0"
   stream_channel:
     dependency: transitive
     description:
