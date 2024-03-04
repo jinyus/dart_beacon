@@ -723,7 +723,7 @@ final twitterApiClient = apiClientFamily('https://api.twitter.com');
 An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
 keeps track of all beacons and effects created so they can be disposed/reset together.
 This is useful when you're creating multiple beacons in a stateful widget or controller class
-and want to dispose them together.
+and want to dispose them together. See [BeaconController](#beaconcontroller).
 
 ```dart
  final myGroup = BeaconGroup();
@@ -1172,9 +1172,9 @@ count.value = 40;
 
 ## BeaconController
 
-An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons.
+An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons. use the included [BeaconGroup](#beacongroup)(`B.writable()`) instead of `Beacon.writable()` to create beacons and effects.
 
-NB: All beacons must be created with as a `late` variable and with the local BeaconCreator `B` instead of `Beacon`.
+NB: All beacons must be created with as a `late` variable.
 
 ```dart
 class CountController extends BeaconController {
