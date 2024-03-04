@@ -22,9 +22,12 @@ test_target() {
     elif [ "$1" == "example" ]; then
         echo "testing flutter_main example"
         cd examples/flutter_main &&
-            flutter test
-        echo "testing shopping_cart example"
-        cd ../shopping_cart &&
+            flutter test &&
+            echo "testing shopping_cart example" &&
+            cd ../shopping_cart &&
+            flutter test &&
+            echo "testing counter example" &&
+            cd ../counter &&
             flutter test
     elif [ "$1" == "all" ]; then
         test_target "core" &&
