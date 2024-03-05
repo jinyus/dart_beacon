@@ -340,6 +340,21 @@ class BeaconGroup extends _BeaconCreator {
     return beacon;
   }
 
+  @override
+  PeriodicBeacon<T> periodic<T>(
+    Duration duration,
+    T Function(int) compute, {
+    String? name,
+  }) {
+    final beacon = super.periodic<T>(
+      duration,
+      compute,
+      name: name,
+    );
+    _beacons.add(beacon);
+    return beacon;
+  }
+
   /// Dispose all beacons and effects in this group
   void disposeAll() {
     for (final fn in _disposeFns) {

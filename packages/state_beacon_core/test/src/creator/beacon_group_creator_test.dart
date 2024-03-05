@@ -31,13 +31,14 @@ void main() {
     final hashMap = group.hashMap<int, int>({0: 0});
     final derivedFuture = group.future<int>(() async => filtered() + 1);
     final derivedStream = group.streamRaw(Stream.empty);
+    final periodic = group.periodic(k10ms, (i) => i + 1);
 
     group.effect(() {});
 
     // ignore: inference_failure_on_function_invocation, unnecessary_lambdas
     final _ = group.family((int i) => group.readable(i));
 
-    expect(group.beaconCount, 24);
+    expect(group.beaconCount, 25);
 
     writable.increment();
 
@@ -76,6 +77,7 @@ void main() {
     expect(hashMap.isDisposed, true);
     expect(derivedFuture.isDisposed, true);
     expect(derivedStream.isDisposed, true);
+    expect(periodic.isDisposed, true);
 
     expect(group.beaconCount, 0);
   });
