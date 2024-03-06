@@ -1,3 +1,18 @@
+# 0.41.0
+
+-   [Feat] Add `Beacon.periodic` that emits values periodically.
+
+    ```dart
+    final myBeacon = Beacon.periodic(Duration(seconds: 1), (i) => i + 1);
+
+    final nextFive = await myBeacon.buffer(5).next();
+
+    expect(nextFive, [1, 2, 3, 4, 5]);
+    ```
+
+-   [Breaking] `FutureBeacon.toFuture()` now returns immediately when it's not in the loading state. This is breaking because in previous versions, it would wait for the next update before returning the value. This was a bug! To get the next state you can use `.next()`.
+-   [Feat] `FutureBeacon.toFuture()` now has a `resetIfError` option that will reset the beacon if the current state is `AsyncError`.
+
 # 0.40.0
 
 -   [Feat] Add `BeaconController` for use in Flutter. see [docs](https://github.com/jinyus/dart_beacon/blob/main/packages/state_beacon/README.md#beaconcontroller)
