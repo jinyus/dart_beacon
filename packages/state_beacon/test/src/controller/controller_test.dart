@@ -2,23 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-class MyController extends BeaconController {
-  late final count = B.writable(0);
-  late final doubledCount = B.derived(() => count.value * 2);
-}
-
 void main() {
-  test('should dispose all beacons created in controller', () {
-    final controller = MyController();
-    expect(controller.count.isDisposed, false);
-    expect(controller.doubledCount.isDisposed, false);
-
-    controller.dispose();
-
-    expect(controller.count.isDisposed, true);
-    expect(controller.doubledCount.isDisposed, true);
-  });
-
   testWidgets('should dispose all beacons in State class', (tester) async {
     await tester.pumpWidget(const CoounterView());
     final state = tester.state<_CoounterViewState>(find.byType(CoounterView));

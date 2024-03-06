@@ -1,3 +1,7 @@
+# 0.41.1
+
+-   [Refactor] Move `BeaconController` to `state_beacon_core` package
+
 # 0.41.0
 
 -   [Feat] Add `Beacon.periodic` that emits values periodically.

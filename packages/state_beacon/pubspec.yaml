@@ -10,7 +10,7 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    state_beacon_core: ^0.41.0
+    state_beacon_core: ^0.41.1
 
 dev_dependencies:
     flutter_lints: ^3.0.0
