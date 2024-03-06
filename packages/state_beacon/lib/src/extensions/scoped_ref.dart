@@ -97,7 +97,7 @@ extension LiteRefBeaconControllerExt<C extends BeaconController>
 
 /// Extensions for [ScopedRef] that provide a more convenient way to watch
 /// a [ReadableBeacon].
-extension LiteRefBeaconExt<T, B extends ReadableBeacon<T>> on ScopedRef<B> {
+extension LiteRefBeaconExt<T> on ScopedRef<ReadableBeacon<T>> {
   /// Watch the beacon inside the ScopedRef and return its value.
   T watch(BuildContext context) {
     final beacon = of(context);
