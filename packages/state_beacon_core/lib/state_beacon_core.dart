@@ -5,6 +5,7 @@ export 'package:basic_interfaces/basic_interfaces.dart';
 
 export 'src/common/async_value.dart';
 export 'src/common/exceptions.dart';
+export 'src/controller/controller.dart';
 export 'src/creator/creator.dart';
 export 'src/extensions/extensions.dart';
 export 'src/observer.dart';
