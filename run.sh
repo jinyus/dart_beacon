@@ -67,6 +67,8 @@ deps() {
         flutter pub get &&
         cd $CURRENT_DIR/examples/flutter_main &&
         flutter pub get &&
+        cd $CURRENT_DIR/examples/counter &&
+        flutter pub get &&
         cd $CURRENT_DIR/examples/shopping_cart &&
         flutter pub get &&
         cd $CURRENT_DIR/examples/vgv_best_practices &&

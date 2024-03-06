@@ -1,7 +1,6 @@
 import 'package:counter/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lite_ref/lite_ref.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:state_beacon/state_beacon.dart';
 

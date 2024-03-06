@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lite_ref/lite_ref.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 class Controller extends BeaconController {
@@ -43,8 +42,7 @@ class CounterText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = countControllerRef.of(context);
-    final count = controller.count.watch(context);
+    final count = countControllerRef.select(context, (c) => c.count);
     final theme = Theme.of(context);
     return Text('$count', style: theme.textTheme.displayLarge);
   }

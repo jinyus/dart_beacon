@@ -129,13 +129,13 @@ packages:
     source: hosted
     version: "2.1.1"
   lite_ref:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: lite_ref
-      sha256: f9feb0eeea72d4ddbca183b92c4718ae17a3c67a7620431404083bb647a1f9d4
+      sha256: "67f0b0be959531f11b3ccd4d38e8b3cc87dd00a5591153e3bd292e2bc48e7ba3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.1"
   matcher:
     dependency: transitive
     description:
@@ -203,7 +203,7 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.41.0"
+    version: "0.41.1"
   state_beacon_core:
     dependency: transitive
     description:
