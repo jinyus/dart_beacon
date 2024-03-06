@@ -70,8 +70,6 @@ void main() {
 
     futureBeacon.reset();
 
-    BeaconScheduler.flush();
-
     expect(futureBeacon.isLoading, true);
 
     await delay();
@@ -901,5 +899,104 @@ void main() {
         [4, 5, 6],
       ]),
     );
+  });
+
+  test('toFuture() should reset when in error state', () async {
+    var called = 0;
+
+    final f1 = Beacon.future(() async {
+      called++;
+
+      await delay(k10ms);
+
+      if (called == 1) {
+        throw Exception('error');
+      }
+
+      return called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.isError, true);
+    expect(called, 1);
+
+    final val = await f1.toFuture(resetIfError: true);
+
+    expect(val, 2);
+    expect(called, 2);
+  });
+
+  test('toFuture() should NOT reset when in data state', () async {
+    // BeaconObserver.useLogging();
+    var called = 0;
+
+    final f1 = Beacon.future(() async {
+      called++;
+
+      await delay(k10ms);
+
+      return called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.unwrap(), 1);
+    expect(called, 1);
+
+    final val = await f1.toFuture(resetIfError: true);
+
+    expect(val, 1);
+    expect(called, 1);
+  });
+
+  test('toFuture() should return data instantly', () async {
+    // BeaconObserver.useLogging();
+    var called = 0;
+
+    final f1 = Beacon.future(() async {
+      called++;
+
+      await delay(k10ms);
+
+      return called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.isData, true);
+
+    expect(called, 1);
+
+    await expectLater(f1.toFuture(), completion(1));
+
+    expect(called, 1);
+  });
+
+  test('toFuture() should return error instantly', () async {
+    // BeaconObserver.useLogging();
+    var called = 0;
+
+    final f1 = Beacon.future(() async {
+      called++;
+
+      await delay(k10ms);
+
+      if (called == 1) {
+        throw Exception('error');
+      }
+
+      return called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.isError, true);
+
+    expect(called, 1);
+
+    await expectLater(f1.toFuture(), throwsException);
+
+    expect(called, 1);
   });
 }

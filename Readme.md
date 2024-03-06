@@ -1016,7 +1016,7 @@ Set the global `BeaconObserver` instance to get notified of all beacon creation,
 You can create your own observer by implementing `BeaconObserver` or use the provided logging observer, which logs to the console. Provide a `name` to your beacons to make it easier to identify them in the logs.
 
 ```dart
-BeaconObserver.instance = LoggingObserver();
+BeaconObserver.instance = LoggingObserver(); // or BeaconObserver.useLogging()
 
 var a = Beacon.writable(10, name: 'a');
 var b = Beacon.writable(20, name: 'b');

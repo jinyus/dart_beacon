@@ -412,4 +412,54 @@ void main() {
     // expect(num1.listenersCount, 1);
     expect(beacon.listenersCount, 0);
   });
+
+  test('toFuture() should return data instantly', () async {
+    // BeaconObserver.useLogging();
+    var called = 0;
+
+    final f1 = Beacon.stream(() async* {
+      called++;
+
+      await delay(k10ms);
+
+      yield called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.isData, true);
+
+    expect(called, 1);
+
+    await expectLater(f1.toFuture(), completion(1));
+
+    expect(called, 1);
+  });
+
+  test('toFuture() should return error instantly', () async {
+    // BeaconObserver.useLogging();
+    var called = 0;
+
+    final f1 = Beacon.stream(() async* {
+      called++;
+
+      await delay(k10ms);
+
+      if (called == 1) {
+        throw Exception('error');
+      }
+
+      yield called;
+    });
+
+    final next = await f1.next();
+
+    expect(next.isError, true);
+
+    expect(called, 1);
+
+    await expectLater(f1.toFuture(), throwsException);
+
+    expect(called, 1);
+  });
 }

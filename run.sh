@@ -14,7 +14,7 @@ test_target() {
     if [ "$1" == "core" ]; then
         echo "testing core"
         cd packages/state_beacon_core &&
-            flutter test --coverage
+            flutter test --coverage --timeout 5s
     elif [ "$1" == "flutter" ]; then
         echo "testing flutter"
         cd packages/state_beacon &&

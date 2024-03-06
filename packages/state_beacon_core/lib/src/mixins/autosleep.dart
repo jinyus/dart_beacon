@@ -51,9 +51,16 @@ mixin _AutoSleep<T, SubT> on ReadableBeacon<T> {
 
   @override
   void _removeObserver(Consumer observer) {
+    // we don't want to sleep on temporary subscriptions
+    // such as .next() calls
+    // we want to include widget subscriptions so if it's not empty
+    // we have widgets subs and sleep if it get unmounted
+    final canSleep =
+        // ignore: deprecated_member_use_from_same_package
+        shouldSleep && ($$widgetSubscribers$$.isNotEmpty || observer is Effect);
     super._removeObserver(observer);
     if (!shouldSleep) return;
-    if (_observers.isEmpty) {
+    if (canSleep && _observers.isEmpty) {
       _goToSleep();
     }
   }
