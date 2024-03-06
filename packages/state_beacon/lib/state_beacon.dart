@@ -1,6 +1,7 @@
 /// reactive primitive and statemanagement for flutter
 library;
 
+export 'package:lite_ref/lite_ref.dart';
 export 'package:state_beacon_core/state_beacon_core.dart' hide BeaconScheduler;
 
 export 'src/controller/controller.dart';
