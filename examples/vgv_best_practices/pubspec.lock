@@ -192,10 +192,10 @@ packages:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: c912134aa7317a6344a1e7e99af02706d50d1c3cbda7f0fd15065c7d4f0f29cf
+      sha256: b5a36a34ff7b215d26caaba1cd90e316a310094537b5a7af1f050ed675d3650a
       url: "https://pub.dev"
     source: hosted
-    version: "0.41.0"
+    version: "0.41.1"
   stream_channel:
     dependency: transitive
     description:
