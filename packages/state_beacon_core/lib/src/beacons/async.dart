@@ -16,32 +16,9 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
     if (!manualStart) _start();
   }
 
-  /// Exposes this as a [Future] that can be awaited in a derived future beacon.
-  /// This will trigger a re-run of the derived beacon when its state changes.
-  ///
-  /// var count = Beacon.writable(0);
-  /// var firstName = Beacon.derivedFuture(() async => 'Sally ${count.value}');
-  ///
-  /// var lastName = Beacon.derivedFuture(() async => 'Smith ${count.value}');
-  ///
-  /// var fullName = Beacon.derivedFuture(() async {
-  ///
-  ///    // no need for a manual switch expression
-  ///   final fnameFuture = firstName.toFuture();
-  ///   final lnameFuture = lastName.toFuture();
-
-  ///   final fname = await fnameFuture;
-  ///   final lname = await lnameFuture;
-  ///
-  ///   return '$fname $lname';
-  /// });
-  Future<T> toFuture() {
-    _completer ??= Beacon.writable(Completer<T>(), name: "$name's future");
-    return _completer!.value.future;
-  }
-
-  /// Alias for peek().lastData.
   /// Returns the last data that was successfully loaded
+  /// This is useful when you want to display old data when
+  /// in [AsyncError] or [AsyncLoading] state.
   /// equivalent to `beacon.peek().lastData`
   T? get lastData => peek().lastData;
 
@@ -142,9 +119,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
         Beacon.untracked(() {
           _sub = stream.listen(
             (v) => _setValue(AsyncData(v)),
-            onError: (Object e, StackTrace s) {
-              _setErrorWithLastData(e, s);
-            },
+            onError: _setErrorWithLastData,
             cancelOnError: cancelOnError,
           );
         });
