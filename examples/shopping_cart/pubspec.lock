@@ -132,10 +132,18 @@ packages:
     dependency: transitive
     description:
       name: lite_ref
-      sha256: "67f0b0be959531f11b3ccd4d38e8b3cc87dd00a5591153e3bd292e2bc48e7ba3"
+      sha256: f89e7f9de2fbaf88c4fabf094d389f327ca3dc690931dc1c0cb2f9789412ddca
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.5.2"
+  lite_ref_core:
+    dependency: transitive
+    description:
+      name: lite_ref_core
+      sha256: c0c0c2da4153c7fb2722fbc5d1b37ace4bcfb76d84147a8a8509438226a569b8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   matcher:
     dependency: transitive
     description:
