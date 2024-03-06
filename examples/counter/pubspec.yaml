@@ -9,7 +9,6 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    lite_ref: ^0.4.1
     state_beacon:
         path: ../../packages/state_beacon
 

@@ -15,7 +15,6 @@ dependencies:
         sdk: flutter
     flutter_localizations:
         sdk: flutter
-    lite_ref: 0.4.0
     state_beacon:
         path: ../../packages/state_beacon
 
