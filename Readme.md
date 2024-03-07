@@ -1213,7 +1213,7 @@ class _MyControllerState extends State<MyController>
 
 Dependency injection refers to the process of providing an instance of a beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
 
-NB: You can use another DI library such as [Provider](https://pub.dev/packages/provider).
+NB: You can use another DI library such as `Provider`.
 
 In the example below, the controller will be disposed when the `CounterText` is unmounted:
 
