@@ -1,3 +1,27 @@
+# 0.41.2
+
+-   [Feat] Export `lite_ref` as the recommended dependency injection mechanism for state_beacon. Added convenience methods to `ScopedRef` for `BeaconController`s and `Beacon`s
+
+    ```dart
+    class CountController extends BeaconController {
+        late final count = B.writable(0);
+        late final doubledCount = B.derived(() => count.value * 2);
+    }
+
+    final countControllerRef = Ref.scoped((ctx) => CountController());
+
+    class CounterText extends StatelessWidget {
+        const CounterText({super.key});
+
+        @override
+        Widget build(BuildContext context) {
+            // watch the count beacon and return its value
+            final count = countControllerRef.select(context, (c) => c.count);
+            return Text('$count');
+        }
+    }
+    ```
+
 # 0.41.1
 
 -   [Refactor] Move `BeaconController` to `state_beacon_core` package

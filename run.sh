@@ -49,7 +49,6 @@ publish_target() {
         elif [ "$1" == "flutter" ]; then
             echo "publishing flutter"
             cd packages/state_beacon &&
-                cp ../state_beacon_core/CHANGELOG.md . &&
                 dart pub publish
         elif [ "$1" == "lint" ]; then
             echo "publishing lint"

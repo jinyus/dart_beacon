@@ -141,8 +141,9 @@ NB: Create the file if it doesn't exist.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
 -   [Disposal](#disposal): Disposing beacons and effects.
--   [Testing](#testing): How to test beacons.
--   [BeaconController](#beaconcontroller):
+-   [Testing](#testing)
+-   [BeaconController](#beaconcontroller)
+-   [Dependency Injection](#dependency-injection)
 
 [Pitfalls](#pitfalls)
 
@@ -1251,7 +1252,7 @@ final (count, doubledCount) = countControllerRef.select2(
 );
 ```
 
-See the full example [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
 
 You can also use `Ref.scoped` if you wish to provide a top level beacon without putting it in a controller. The beacon will be properly disposed when all widgets that use it are unmounted.
 
