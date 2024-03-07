@@ -1246,10 +1246,12 @@ final count = controller.count.watch(context);
 You can also use `select2` and `select3` to watch multiple beacons at once.
 
 ```dart
-final (count, doubledCount) = countControllerRef.select2(
-  context,
-  (c) => (c.count, c.doubledCount),
-);
+final (count, doubledCount) = countControllerRef.select2(context, (c) => (c.count, c.doubledCount));
+
+// is equivalent to
+final controller = countControllerRef.of(context);
+final count = controller.count.watch(context);
+final doubledCount = controller.doubledCount.watch(context);
 ```
 
 See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
