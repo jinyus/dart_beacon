@@ -58,14 +58,16 @@ class Buttons extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        FloatingActionButton(
+        IconButton.filled(
           onPressed: controller.increment,
-          child: const Icon(Icons.add),
+          icon: const Icon(Icons.add),
+          iconSize: 32,
         ),
         const SizedBox(height: 8),
-        FloatingActionButton(
+        IconButton.filled(
           onPressed: controller.decrement,
-          child: const Icon(Icons.remove),
+          icon: const Icon(Icons.remove),
+          iconSize: 32,
         ),
       ],
     );
