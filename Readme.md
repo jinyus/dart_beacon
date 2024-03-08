@@ -184,7 +184,7 @@ ReadableBeacon<int> get counter => _internalCounter;
 
 ### Beacon.derived:
 
-A `DerivedBeacon` is composed of other beacons. It automatically tracks any beacons accessed within it's closure and will recompute its value when one of them changes.
+A `DerivedBeacon` is composed of other beacons. It automatically tracks any beacons accessed within its closure and will recompute its value when one of them changes.
 
 These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
 
@@ -1131,12 +1131,12 @@ expect(c.isDisposed, true);
 
 ## Testing
 
-Beacons can expose a `Stream` with the `.stream` getter. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
+Beacons can expose a `Stream` with the `.toStream()` method. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
 
 ```dart
 final count = Beacon.writable(10);
 
-final stream = count.stream;
+final stream = count.toStream();
 
 Future.delayed(Duration(milliseconds: 1), () => count.value = 20);
 
@@ -1198,7 +1198,7 @@ class CountController extends BeaconController {
 
 ## Dependency Injection
 
-Dependency injection refers to the process of providing an instance of a beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
+Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
 
 NB: You can use another DI library such as `Provider`.
 
