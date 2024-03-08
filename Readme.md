@@ -1184,31 +1184,6 @@ class CountController extends BeaconController {
 }
 ```
 
-### BeaconControllerMixin
-
-A mixin for `StatefulWidget`'s `State` class that automatically disposes all beacons and effects created within it.
-
-```dart
-class MyController extends StatefulWidget {
-  const MyController({super.key});
-
-  @override
-  State<MyController> createState() => _MyControllerState();
-}
-
-class _MyControllerState extends State<MyController>
-    with BeaconControllerMixin {
-  // NO need to dispose these manually
-  late final count = B.writable(0);
-  late final doubledCount = B.derived(() => count.value * 2);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-```
-
 ## Dependency Injection
 
 Dependency injection refers to the process of providing an instance of a beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
@@ -1278,6 +1253,31 @@ class CounterText extends StatelessWidget {
 
 > [!NOTE]
 > Even though this is possible, it is recommended to use `BeaconController`s whenever possible. In cases where you only need a single beacon, this can be a convenient way to provide it to a widget.
+
+### BeaconControllerMixin
+
+A mixin for `StatefulWidget`'s `State` class that automatically disposes all beacons and effects created within it.
+
+```dart
+class MyController extends StatefulWidget {
+  const MyController({super.key});
+
+  @override
+  State<MyController> createState() => _MyControllerState();
+}
+
+class _MyControllerState extends State<MyController>
+    with BeaconControllerMixin {
+  // NO need to dispose these manually
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+```
 
 ## Pitfalls
 
