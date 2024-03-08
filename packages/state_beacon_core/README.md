@@ -141,8 +141,9 @@ NB: Create the file if it doesn't exist.
         -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
 -   [Debugging](#debugging): Facilities for debugging and observing beacons.
 -   [Disposal](#disposal): Disposing beacons and effects.
--   [Testing](#testing): How to test beacons.
--   [BeaconController](#beaconcontroller):
+-   [Testing](#testing)
+-   [BeaconController](#beaconcontroller)
+-   [Dependency Injection](#dependency-injection)
 
 [Pitfalls](#pitfalls)
 
@@ -1183,11 +1184,20 @@ class CountController extends BeaconController {
 }
 ```
 
-This can be used with the [lite_ref](https://pub.dev/packages/lite_ref) or Provider package to provide the controller to widgets. lite_ref will dispose the controller when all widgets that use it are disposed.
+## Dependency Injection
+
+Dependency injection refers to the process of providing an instance of a beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
+
+NB: You can use another DI library such as `Provider`.
 
 In the example below, the controller will be disposed when the `CounterText` is unmounted:
 
 ```dart
+class CountController extends BeaconController {
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+}
+
 final countControllerRef = Ref.scoped((ctx) => CountController());
 
 class CounterText extends StatelessWidget {
@@ -1195,14 +1205,54 @@ class CounterText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = countControllerRef.of(context);
-    final count = controller.count.watch(context);
+    // watch the count beacon and return its value
+    final count = countControllerRef.select(context, (c) => c.count);
     return Text('$count');
   }
 }
 ```
 
-See the full example [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+```dart
+final count = countControllerRef.select(context, (c) => c.count);
+
+// is equivalent to
+final controller = countControllerRef.of(context);
+final count = controller.count.watch(context);
+```
+
+You can also use `select2` and `select3` to watch multiple beacons at once.
+
+```dart
+final (count, doubledCount) = countControllerRef.select2(context, (c) => (c.count, c.doubledCount));
+
+// is equivalent to
+final controller = countControllerRef.of(context);
+final count = controller.count.watch(context);
+final doubledCount = controller.doubledCount.watch(context);
+```
+
+See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+
+You can also use `Ref.scoped` if you wish to provide a top level beacon without putting it in a controller. The beacon will be properly disposed when all widgets that use it are unmounted.
+
+```dart
+final countRef = Ref.scoped((ctx) => Beacon.writable(0));
+final doubledCountRef = Ref.scoped((ctx) => Beacon.derived(() => countRef(ctx).value * 2));
+
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = countRef(context);
+    final doubledCount = doubledCountRef(context);
+    return Text('$count x 2 = $doubledCount');
+  }
+}
+```
+
+> [!NOTE]
+> Even though this is possible, it is recommended to use `BeaconController`s whenever possible. In cases where you only need a single beacon, this can be a convenient way to provide it to a widget.
 
 ### BeaconControllerMixin
 
