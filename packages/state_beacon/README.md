@@ -149,7 +149,7 @@ NB: Create the file if it doesn't exist.
 
 ### Beacon.writable:
 
-Creates a `WritableBeacon` from a value that can be read and written to.
+A `WritableBeacon` is a mutable reactive value that notifies listeners when its value changes. You might think it's just a `ValueNotifier`, but the power in beacons/signals is their composability.
 
 ```dart
 final counter = Beacon.writable(0);
@@ -174,7 +174,7 @@ print(counter.value); // 10
 
 ### Beacon.readable:
 
-Creates an immutable `ReadableBeacon` from a value. This is useful for exposing a beacon's value to consumers without allowing them to modify it.
+This is useful for exposing a `WritableBeacon`'s value to consumers without allowing them to modify it. This is the superclass of all beacons.
 
 ```dart
 final _internalCounter = Beacon.writable(10);
@@ -183,12 +183,38 @@ final _internalCounter = Beacon.writable(10);
 ReadableBeacon<int> get counter => _internalCounter;
 ```
 
+### Beacon.derived:
+
+A `DerivedBeacon` is composed of other beacons. It automatically tracks any beacons accessed within it's closure and will recompute its value when one of them changes.
+
+These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
+
+Example:
+
+```dart
+final age = Beacon.writable(18);
+final canDrink = Beacon.derived(() => age.value >= 21);
+
+canDrink.subscribe((value) {
+  print(value); // Outputs: false
+});
+
+// Outputs: false
+
+age.value = 22;
+// the derived beacon will be updated and the subscribers are notified
+
+// Outputs: true
+```
+
 ### Beacon.effect:
 
 An effect is just a function that will re-run whenever one of its
-dependencies change. An effect is scheduled to run immediately after creation.
+dependencies change.
 
 Any beacon accessed within the effect will be tracked as a dependency. A change to the value of any of the tracked beacons will trigger the effect to re-run.
+
+An effect is scheduled to run immediately after creation.
 
 ```dart
 final age = Beacon.writable(15);
@@ -238,26 +264,6 @@ a.value = 20; // effect will be queued again.
 BeaconScheduler.flush();
 
 expect(called, 2);
-```
-
-### Beacon.derived:
-
-Creates a `DerivedBeacon` whose value is derived from a computation function.
-This beacon will recompute its value when one of its dependencies change.
-
-These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
-
-Example:
-
-```dart
-final age = Beacon.writable(18);
-final canDrink = Beacon.derived(() => age.value >= 21);
-
-print(canDrink.value); // Outputs: false
-
-age.value = 22;
-
-print(canDrink.value); // Outputs: true
 ```
 
 ### Beacon.future:
@@ -358,11 +364,11 @@ expect(futureBeacon.isError, true);
 
 All these methods are also available to `StreamBeacons`.
 
--   `isIdle`: Returns `true` if the beacon is in the `idle` state.
--   `isLoading`: Returns `true` if the beacon is in the `loading` state.
--   `isIdleOrLoading`: Returns `true` if the beacon is in the `loading` or `idle` state.
--   `isData`: Returns `true` if the beacon is in the `data` state.
--   `isError`: Returns `true` if the beacon is in the `error` state.
+-   `isIdle`
+-   `isLoading`
+-   `isIdleOrLoading`
+-   `isData`
+-   `isError`
 -   `lastData`: Returns the last successful data value or null. This is useful when you want to display the last valid value while refreshing.
 
 #### Methods:
@@ -709,14 +715,21 @@ If `cache` is `true`, created beacons are cached. Default is `false`.
 Example:
 
 ```dart
-final apiClientFamily = Beacon.family(
- (String baseUrl) {
-   return Beacon.readable(ApiClient(baseUrl));
+final postContentFamily = Beacon.family(
+ (String id) {
+   return Beacon.future(() async {
+     return await Repository.getPostContent(id);
+   });
  },
 );
 
-final githubApiClient = apiClientFamily('https://api.github.com');
-final twitterApiClient = apiClientFamily('https://api.twitter.com');
+
+final postContent = postContentFamily('post-1');
+final postContent = postContentFamily('post-2');
+
+postContent.subscribe((value) {
+  print(value); // Outputs: post content
+});
 ```
 
 ## BeaconGroup:
@@ -817,7 +830,7 @@ age.value = 22;
 age.value = 23;
 ```
 
-### myBeacon.stream:
+### myBeacon.toStream():
 
 This returns a stream that emits the beacon's value whenever it changes.
 

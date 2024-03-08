@@ -1,3 +1,7 @@
+# 0.41.3
+
+-   [Docs] Update README
+
 # 0.41.2
 
 -   [Feat] Export `lite_ref` as the recommended dependency injection mechanism for state_beacon. Added convenience methods to `ScopedRef` for `BeaconController`s and `Beacon`s

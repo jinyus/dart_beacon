@@ -211,15 +211,15 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.41.1"
+    version: "0.41.3"
   state_beacon_core:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: b5a36a34ff7b215d26caaba1cd90e316a310094537b5a7af1f050ed675d3650a
+      sha256: "820d92d2eb1d958fb19bbbf067400be658eb449b299965ea3a7b8f4eff216f93"
       url: "https://pub.dev"
     source: hosted
-    version: "0.41.1"
+    version: "0.41.2"
   stream_channel:
     dependency: transitive
     description:

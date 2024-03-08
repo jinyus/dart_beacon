@@ -1,3 +1,7 @@
+# 0.41.2
+
+-   [Docs] Update README
+
 # 0.41.1
 
 -   [Refactor] Move `BeaconController` to `state_beacon_core` package
