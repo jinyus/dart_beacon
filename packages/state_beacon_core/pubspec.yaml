@@ -22,7 +22,7 @@ platforms:
     windows:
 
 topics:
-    - state
+    - state-management
     - signal
     - reactive
     - beacon
