@@ -1,3 +1,7 @@
+# 0.42.0
+
+-   [Breaking] `resetIfError` option for `toFuture()` is now `true` by default. This was done because there's rarely a case where you'd want it to throw instantly. If you want to keep the previous value, set `resetIfError` to `false`.
+
 # 0.41.2
 
 -   [Docs] Update README

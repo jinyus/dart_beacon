@@ -51,7 +51,7 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
   ///
   ///   return '$fname $lname';
   /// });
-  Future<T> toFuture({bool resetIfError = false}) {
+  Future<T> toFuture({bool resetIfError = true}) {
     if (_completer == null) {
       // first time
       final completer = Completer<T>();

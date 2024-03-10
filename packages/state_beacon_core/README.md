@@ -96,14 +96,13 @@ NB: Create the file if it doesn't exist.
 ## Features
 
 -   [Beacon.writable](#beaconwritable): Mutable beacon that allows both reading and writing.
-    -   [Beacon.scopedWritable](#beaconscopedwritable): Returns a `ReadableBeacon` and a function for setting its value.
 -   [Beacon.readable](#beaconreadable): Immutable beacon that only emit values, ideal for readonly data.
+-   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
 -   [Beacon.effect](#beaconeffect): React to changes in beacon values.
 -   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
--   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
 -   [Beacon.future](#beaconfuture): Derive values from asynchronous operations, managing state during computation.
-    -   [Properties](#properties): Properties for `FutureBeacons`.
-    -   [Methods](#methods): Methods available for `FutureBeacons`.
+    -   [Properties](#properties)
+    -   [Methods](#methods)
 -   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
 -   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
@@ -114,8 +113,8 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.bufferedCount](#beaconbufferedcount): Create a buffer/list of values based an `int` limit.
 -   [Beacon.bufferedTime](#beaconbufferedtime): Create a buffer/list of values based on a time limit.
 -   [Beacon.list](#beaconlist): Manage reactive lists that automatically update dependent beacons upon changes.
-    -   [Beacon.hashSet](#beaconhashset): Like Beacon.list, but for Sets.
-    -   [Beacon.hashMap](#beaconhashmap): Like Beacon.list, but for Maps.
+    -   [Beacon.hashSet](#beaconhashset)
+    -   [Beacon.hashMap](#beaconhashmap)
 -   [AsyncValue](#asyncvalue): A wrapper around a value that can be in one of four states: `idle`, `loading`, `data`, or `error`.
     -   [unwrap](#asyncvalueunwrap): Casts this [AsyncValue] to [AsyncData] and return its value.
     -   [lastData](#asyncvaluelastdata): Returns the latest valid data value or null.
@@ -124,24 +123,24 @@ NB: Create the file if it doesn't exist.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
 -   [Methods](#properties-and-methods): Additional methods for beacons that can be chained.
-    -   [subscribe](#mybeaconsubscribe): Subscribes to the beacon and listens for changes to its value.
-    -   [stream](#mybeaconstream): Obtain a stream from a beacon, enabling integration with stream-based APIs and libraries.
-    -   [wrap](#mywritablewrapanybeacon): Wraps an existing beacon and consumes its values
-    -   [ingest](#mywritableingestanystream): Wraps any stream and consumes its values
-    -   [next](#mybeaconnext): Allows awaiting the next value as a future.
-    -   [toListenable](#mybeacontolistenable): Returns a `ValueListenable` that emits the beacon's value whenever it changes.
-    -   [toValueNotifier](#mybeacontovaluenotifier): Returns a `ValueNotifier` that emits the beacon's value whenever it changes.
-    -   [dispose](#mybeacondispose): Disposes the beacon and releases all resources.
-    -   [onDispose](#mybeaconondispose): Registers a callback to be called when the beacon is disposed.
-    -   [Chaining Beacons](#chaining-methods): Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
-        -   [buffer](#mybeaconbuffer): Returns a [Beacon.bufferedCount](#beaconbufferedcount) that wraps this beacon.
-        -   [bufferTime](#mybeaconbuffertime): Returns a [Beacon.bufferedTime](#beaconbufferedtime) that wraps this beacon.
-        -   [throttle](#mybeaconthrottle): Returns a [Beacon.throttled](#beaconthrottled) that wraps this beacon.
-        -   [filter](#mybeaconfilter): Returns a [Beacon.filtered](#beaconfiltered) that wraps this beacon.
-        -   [map](#mybeaconmap): Returns a [Beacon.readable] that wraps a beacon and transform its values.
-        -   [debounce](#mybeacondebounce): Returns a [Beacon.debounced](#beacondebounced) that wraps this beacon.
--   [Debugging](#debugging): Facilities for debugging and observing beacons.
--   [Disposal](#disposal): Disposing beacons and effects.
+    -   [subscribe()](#mybeaconsubscribe)
+    -   [tostream()](#mybeacontostream)
+    -   [wrap()](#mywritablewrapanybeacon)
+    -   [ingest()](#mywritableingestanystream)
+    -   [next()](#mybeaconnext)
+    -   [toListenable()](#mybeacontolistenable)
+    -   [toValueNotifier()](#mybeacontovaluenotifier)
+    -   [dispose()](#mybeacondispose)
+    -   [onDispose()](#mybeaconondispose)
+-   [Chaining Beacons](#chaining-methods): Seamlessly chain beacons to create sophisticated reactive pipelines, combining multiple functionalities for advanced value manipulation and control.
+    -   [buffer](#mybeaconbuffer)
+    -   [bufferTime](#mybeaconbuffertime)
+    -   [throttle](#mybeaconthrottle)
+    -   [filter](#mybeaconfilter)
+    -   [map](#mybeaconmap)
+    -   [debounce](#mybeacondebounce)
+-   [Debugging](#debugging)
+-   [Disposal](#disposal)
 -   [Testing](#testing)
 -   [BeaconController](#beaconcontroller)
 -   [Dependency Injection](#dependency-injection)
@@ -186,7 +185,7 @@ ReadableBeacon<int> get counter => _internalCounter;
 
 ### Beacon.derived:
 
-A `DerivedBeacon` is composed of other beacons. It automatically tracks any beacons accessed within it's closure and will recompute its value when one of them changes.
+A `DerivedBeacon` is composed of other beacons. It automatically tracks any beacons accessed within its closure and will recompute its value when one of them changes.
 
 These beacons are lazy and will only compute their value when accessed, subscribed to or being watched by a widget or an [effect](#beaconeffect).
 
@@ -1133,12 +1132,12 @@ expect(c.isDisposed, true);
 
 ## Testing
 
-Beacons can expose a `Stream` with the `.stream` getter. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
+Beacons can expose a `Stream` with the `.toStream()` method. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
 
 ```dart
 final count = Beacon.writable(10);
 
-final stream = count.stream;
+final stream = count.toStream();
 
 Future.delayed(Duration(milliseconds: 1), () => count.value = 20);
 
@@ -1200,7 +1199,7 @@ class CountController extends BeaconController {
 
 ## Dependency Injection
 
-Dependency injection refers to the process of providing an instance of a beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
+Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
 
 NB: You can use another DI library such as `Provider`.
 

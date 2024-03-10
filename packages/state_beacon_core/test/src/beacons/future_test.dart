@@ -921,7 +921,7 @@ void main() {
     expect(next.isError, true);
     expect(called, 1);
 
-    final val = await f1.toFuture(resetIfError: true);
+    final val = await f1.toFuture();
 
     expect(val, 2);
     expect(called, 2);
@@ -944,7 +944,7 @@ void main() {
     expect(next.unwrap(), 1);
     expect(called, 1);
 
-    final val = await f1.toFuture(resetIfError: true);
+    final val = await f1.toFuture();
 
     expect(val, 1);
     expect(called, 1);
@@ -995,7 +995,7 @@ void main() {
 
     expect(called, 1);
 
-    await expectLater(f1.toFuture(), throwsException);
+    await expectLater(f1.toFuture(resetIfError: false), throwsException);
 
     expect(called, 1);
   });
