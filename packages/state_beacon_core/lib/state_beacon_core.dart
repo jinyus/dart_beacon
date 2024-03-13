@@ -11,6 +11,7 @@ export 'src/extensions/extensions.dart';
 export 'src/observer.dart';
 export 'src/producer.dart'
     show
+        BeaconFamily,
         BeaconScheduler,
         BufferedCountBeacon,
         BufferedTimeBeacon,
@@ -19,6 +20,7 @@ export 'src/producer.dart'
         FutureBeacon,
         ListBeacon,
         MapBeacon,
+        PeriodicBeacon,
         Producer,
         RawStreamBeacon,
         ReadableBeacon,
