@@ -38,7 +38,7 @@ test_target() {
     fi
 }
 
-# Function to handle publishing and updating .pubignore file
+# dont publish tests
 publish_and_update_pubignore() {
     cp .gitignore .pubignore &&
         echo test/ | tee -a .pubignore &&
