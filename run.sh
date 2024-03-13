@@ -38,18 +38,27 @@ test_target() {
     fi
 }
 
+# Function to handle publishing and updating .pubignore file
+publish_and_update_pubignore() {
+    cp .gitignore .pubignore &&
+        echo test/ | tee -a .pubignore &&
+        dart pub publish
+    rm .pubignore
+}
+
 # Function to handle publishing
 publish_target() {
     cp Readme.md packages/state_beacon_core/README.md &&
         cp Readme.md packages/state_beacon/README.md &&
         if [ "$1" == "core" ]; then
             echo "publishing core"
-            cd packages/state_beacon_core
-            dart pub publish
+            cd packages/state_beacon_core &&
+                publish_and_update_pubignore
+
         elif [ "$1" == "flutter" ]; then
             echo "publishing flutter"
             cd packages/state_beacon &&
-                dart pub publish
+                publish_and_update_pubignore
         elif [ "$1" == "lint" ]; then
             echo "publishing lint"
             cd packages/state_beacon_lints
