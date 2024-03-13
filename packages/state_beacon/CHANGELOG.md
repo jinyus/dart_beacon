@@ -1,3 +1,7 @@
+# 0.43.0
+
+-   [Fix] Update lite_ref dependency and add flutter dependency constraint
+
 # 0.42.1
 
 -   [Fix] Export PeriodicBeacon and BeaconFamily classes
