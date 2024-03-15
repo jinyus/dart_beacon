@@ -1188,7 +1188,7 @@ count.value = 40;
 
 An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons. use the included [BeaconGroup](#beacongroup)(`B.writable()`) instead of `Beacon.writable()` to create beacons and effects.
 
-NB: All beacons must be created with as a `late` variable.
+NB: All beacons must be created as a `late` variable.
 
 ```dart
 class CountController extends BeaconController {

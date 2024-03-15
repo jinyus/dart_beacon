@@ -11,19 +11,19 @@ class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
 
   late final _cache = <Arg, BeaconType>{};
 
-  late final _beacons = Beacon.list<BeaconType>(
+  late final _entries = Beacon.list<MapEntry<Arg, BeaconType>>(
     [],
-    name: 'family beacons list',
+    name: 'family entries',
   );
 
   /// All beacons in the cache
-  ReadableBeacon<List<BeaconType>> get beacons {
+  ReadableBeacon<List<MapEntry<Arg, BeaconType>>> get entries {
     if (!_beaconsAccessed && _cache.isNotEmpty) {
       // populate the list on first access
-      _beacons.value = _cache.values.toList();
+      _entries.value = _cache.entries.toList();
     }
     _beaconsAccessed = true;
-    return _beacons;
+    return _entries;
   }
 
   final BeaconType Function(Arg) _create;
@@ -47,13 +47,13 @@ class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
 
     beacon = _create(arg);
     _cache[arg] = beacon;
-    if (_beaconsAccessed) _beacons.add(beacon);
+    if (_beaconsAccessed) _entries.add(MapEntry(arg, beacon));
 
     beacon.onDispose(() {
       if (_clearing) return;
       final removed = _cache.remove(arg);
       if (!_beaconsAccessed || removed == null) return;
-      _beacons.remove(removed);
+      _entries.removeWhere((e) => e.value == removed);
     });
 
     return beacon;
@@ -64,9 +64,11 @@ class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
 
   /// Removes a beacon from the cache if it exists.
   BeaconType? remove(Arg arg) {
-    final beacon = _cache.remove(arg);
-    if (beacon != null && _beaconsAccessed) _beacons.remove(beacon);
-    return beacon;
+    final removed = _cache.remove(arg);
+    if (removed != null && _beaconsAccessed) {
+      _entries.removeWhere((e) => e.value == removed);
+    }
+    return removed;
   }
 
   /// Clears the cache of beacon if caching is enabled.
@@ -83,7 +85,7 @@ class BeaconFamily<Arg, BeaconType extends ReadableBeacon<dynamic>> {
     _clearing = false;
 
     _cache.clear();
-    if (_beaconsAccessed) _beacons.clear();
+    if (_beaconsAccessed) _entries.clear();
     _beaconsAccessed = false;
   }
 }
