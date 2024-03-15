@@ -143,16 +143,23 @@ void main() {
     final beacon1 = family(1);
     final beacon2 = family(2);
 
-    List<WritableBeacon<String>> getBeacons() =>
-        family.entries.value.map((e) => e.value).toList();
+    List<WritableBeacon<String>> getBeacons() {
+      return family.entries.value.map((e) => e.value).toList();
+    }
+
+    List<int> getKeys() {
+      return family.entries.value.map((e) => e.key).toList();
+    }
 
     expect(getBeacons(), [beacon1, beacon2]);
+    expect(getKeys(), [1, 2]);
 
     family.entries.subscribe((_) => ran++, synchronous: true, startNow: false);
 
     final beacon3 = family(3);
 
     expect(getBeacons(), [beacon1, beacon2, beacon3]);
+    expect(getKeys(), [1, 2, 3]);
 
     expect(ran, 1);
 
@@ -163,18 +170,21 @@ void main() {
     beacon1.dispose();
 
     expect(getBeacons(), [beacon2, beacon3]);
+    expect(getKeys(), [2, 3]);
 
     expect(ran, 2);
 
     family.remove(2);
 
     expect(getBeacons(), [beacon3]);
+    expect(getKeys(), [3]);
 
     expect(ran, 3);
 
     final beacon4 = family(4);
 
     expect(getBeacons(), [beacon3, beacon4]);
+    expect(getKeys(), [3, 4]);
 
     expect(ran, 4);
 
@@ -184,6 +194,7 @@ void main() {
     family.clear();
 
     expect(getBeacons(), isEmpty);
+    expect(getKeys(), isEmpty);
 
     expect(ran, 5);
   });
