@@ -1,3 +1,9 @@
+# 0.44.0
+
+-   [Breaking] The `beacons` getter for `Beacon.family` has been replaced with `entries`. This is a breaking change because it returns a `MapEntry<Key,Beacon>` instead of a `Beacon`.
+
+-   [Dependency] Updated `lite_ref` to `0.6.1`
+
 # 0.43.0
 
 -   [Fix] Update lite_ref dependency and add flutter dependency constraint
