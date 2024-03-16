@@ -224,7 +224,9 @@ abstract class Producer<T> implements Disposable {
   }
 
   /// Clears all registered listeners and
-  /// reset the beacon to its initial state.
+  /// resouces used by the beacon. You will
+  /// not be able to update or subscribe to
+  /// the beacon after it has been disposed.
   @override
   void dispose() {
     if (_isDisposed) return;
