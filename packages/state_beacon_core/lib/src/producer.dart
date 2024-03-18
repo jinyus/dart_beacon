@@ -41,6 +41,7 @@ import 'package:state_beacon_core/src/creator/creator.dart';
 
 import 'common/async_value.dart';
 import 'common/types.dart';
+import 'extensions/extensions.dart';
 import 'observer.dart';
 
 part 'beacons/async.dart';
