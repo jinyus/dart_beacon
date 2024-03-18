@@ -73,3 +73,41 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
     return result;
   }
 }
+
+extension ReadableAsyncBeaconUtils<T> on ReadableBeacon<AsyncValue<T>> {
+  /// Returns the last data that was successfully loaded
+  /// This is useful when you want to display old data when
+  /// in [AsyncError] or [AsyncLoading] state.
+  /// equivalent to `beacon.peek().lastData`
+  T? get lastData => peek().lastData;
+
+  /// If this beacon's value is [AsyncData], returns it's value.
+  /// Otherwise throws an exception.
+  /// equivalent to `beacon.peek().unwrap()`
+  T unwrapValue() => peek().unwrap();
+
+  /// If this beacon's value is [AsyncData], returns it's value.
+  /// Otherwise returns `null`.
+  /// equivalent to `beacon.peek().unwrapOrNull()`
+  T? unwrapValueOrNull() => peek().unwrapOrNull();
+
+  /// Returns `true` if this is [AsyncLoading].
+  /// This is equivalent to `beacon.peek().isLoading`.
+  bool get isLoading => peek().isLoading;
+
+  /// Returns `true` if this is [AsyncIdle].
+  /// This is equivalent to `beacon.peek().isIdle`.
+  bool get isIdle => peek().isIdle;
+
+  /// Returns `true` if this is [AsyncIdle] or [AsyncLoading].
+  /// This is equivalent to `beacon.peek().isIdleOrLoading`.
+  bool get isIdleOrLoading => peek().isIdleOrLoading;
+
+  /// Returns `true` if this is [AsyncData].
+  /// This is equivalent to `beacon.peek().isData`.
+  bool get isData => peek().isData;
+
+  /// Returns `true` if this is [AsyncError].
+  /// This is equivalent to `beacon.peek().isError`.
+  bool get isError => peek().isError;
+}
