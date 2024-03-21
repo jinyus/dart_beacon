@@ -1,3 +1,7 @@
+# 0.43.1
+
+-   [Refactor] Internal refactor
+
 # 0.43.0
 
 -   [Breaking] The `beacons` getter for `Beacon.family` has been replaced with `entries`. This is a breaking change because it returns a `MapEntry<Key,Beacon>` instead of a `Beacon`.
