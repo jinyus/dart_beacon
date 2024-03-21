@@ -2,12 +2,6 @@
 
 part of 'extensions.dart';
 
-class _DetachKey {
-  _DetachKey(this.key);
-
-  final int key;
-}
-
 // ignore: public_member_api_docs
 typedef ObserverCallback<T> = void Function(T prev, T next);
 
@@ -100,17 +94,12 @@ extension WidgetUtils<T> on BaseBeacon<T> {
 
     final run = callback ?? rebuildWidget;
 
-    final detachObj = _DetachKey(key);
-
-    final cancel = onDispose(() => _finalizer.detach(detachObj));
-
     void handleNewValue(T value) {
       if (elementRef.target?.mounted == true) {
         run();
       } else {
         unsub();
         $$widgetSubscribers$$.remove(key);
-        cancel();
       }
     }
 
@@ -124,9 +113,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
       () {
         $$widgetSubscribers$$.remove(key);
         unsub();
-        cancel();
       },
-      detach: detachObj,
     );
     // coverage:ignore-end
 
