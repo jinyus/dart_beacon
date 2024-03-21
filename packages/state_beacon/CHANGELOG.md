@@ -1,3 +1,8 @@
+# 0.44.1
+
+-   [Refactor] Internal refactor
+-   [Dependency] Updated `lite_ref` to `0.6.2`
+
 # 0.44.0
 
 -   [Breaking] The `beacons` getter for `Beacon.family` has been replaced with `entries`. This is a breaking change because it returns a `MapEntry<Key,Beacon>` instead of a `Beacon`.
