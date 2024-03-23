@@ -210,6 +210,7 @@ class CounterColumn extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class Counter extends StatelessWidget {
   Counter({required this.counter, super.key});
 
