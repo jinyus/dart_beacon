@@ -99,10 +99,11 @@ void main() {
       (WidgetTester tester) async {
     // Build the Counter widget
     final counter = Beacon.writable(0);
+    final widget = Counter(counter: counter);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Counter(counter: counter),
+          body: widget,
         ),
       ),
     );
@@ -114,6 +115,35 @@ void main() {
     // Verify snackbar visibility
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.text('Count cannot be greater than 3'), findsOneWidget);
+    expect(widget.observedCount, 1);
+  });
+
+  testWidgets('should batch calls observe ', (WidgetTester tester) async {
+    final counter = Beacon.writable(0);
+    final widget = Counter(counter: counter);
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: widget)));
+
+    counter.increment();
+    counter.increment();
+    counter.increment();
+
+    await tester.pumpAndSettle();
+
+    expect(widget.observedCount, 1);
+  });
+
+  testWidgets('should call observe synchronously', (WidgetTester tester) async {
+    final counter = Beacon.writable(0);
+    final widget = Counter(counter: counter, synchronous: true);
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: widget)));
+
+    counter.increment();
+    counter.increment();
+    counter.increment();
+
+    await tester.pumpAndSettle();
+
+    expect(widget.observedCount, 3);
   });
 
   testWidgets('should show snackbar for going negative',
@@ -212,32 +242,39 @@ class CounterColumn extends StatelessWidget {
 
 // ignore: must_be_immutable
 class Counter extends StatelessWidget {
-  Counter({required this.counter, super.key});
+  Counter({required this.counter, super.key, this.synchronous = false});
 
+  final bool synchronous;
   final WritableBeacon<int> counter;
 
   int builtCount = 0;
+  int observedCount = 0;
 
   @override
   Widget build(BuildContext context) {
     builtCount++;
-    counter.observe(context, (prev, next) {
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.clearSnackBars();
-      if (next > prev && next > 3) {
-        messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Count cannot be greater than 3'),
-          ),
-        );
-      } else if (next < prev && next < 0) {
-        messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Count cannot be negative'),
-          ),
-        );
-      }
-    });
+    counter.observe(
+      context,
+      (prev, next) {
+        observedCount++;
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        if (next > prev && next > 3) {
+          messenger.showSnackBar(
+            const SnackBar(
+              content: Text('Count cannot be greater than 3'),
+            ),
+          );
+        } else if (next < prev && next < 0) {
+          messenger.showSnackBar(
+            const SnackBar(
+              content: Text('Count cannot be negative'),
+            ),
+          );
+        }
+      },
+      synchronous: synchronous,
+    );
     return Text(
       counter.watch(context).toString(),
       style: Theme.of(context).textTheme.headlineMedium,
