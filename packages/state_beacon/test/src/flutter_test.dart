@@ -12,10 +12,12 @@ void main() {
       (WidgetTester tester) async {
     final counter = Beacon.writable(0);
 
+    final widget = Counter(counter: counter);
+
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Counter(counter: counter),
+          body: widget,
         ),
       ),
     );
@@ -24,18 +26,11 @@ void main() {
 
     counter.increment();
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Counter(counter: counter),
-        ),
-      ),
-    );
-
     await tester.pumpAndSettle();
 
     // Verify updated state
     expect(find.text('1'), findsOneWidget);
+    expect(widget.builtCount, 2);
   });
 
   testWidgets('should rebuild FutureCounter on state changes',
@@ -216,12 +211,15 @@ class CounterColumn extends StatelessWidget {
 }
 
 class Counter extends StatelessWidget {
-  const Counter({required this.counter, super.key});
+  Counter({required this.counter, super.key});
 
   final WritableBeacon<int> counter;
 
+  int builtCount = 0;
+
   @override
   Widget build(BuildContext context) {
+    builtCount++;
     counter.observe(context, (prev, next) {
       final messenger = ScaffoldMessenger.of(context);
       messenger.clearSnackBars();
