@@ -1,3 +1,12 @@
+# 0.44.2
+
+-   [Feat] Add the ability for widgets to observe beacons synchronously. When `synchronous` is true, `autobatching` will be disabled and all updates will be emitted immediately.
+    ```dart
+    final beacon = Beacon.writable(10);
+    beacon.observe(context, (prev, next) {}, synchronous: true);
+    ```
+-   [Dependency] Updated `lite_ref` to `0.6.3`
+
 # 0.44.1
 
 -   [Refactor] Internal refactor
