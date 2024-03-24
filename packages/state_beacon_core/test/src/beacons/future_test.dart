@@ -999,4 +999,19 @@ void main() {
 
     expect(called, 1);
   });
+
+  test('idle() should set the beacon to the idle state', () async {
+    final f1 = Beacon.future(() async {
+      await delay(k10ms);
+      return 1;
+    });
+
+    expect(f1.isIdle, false);
+
+    await expectLater(f1.next(), completion(AsyncData(1)));
+
+    f1.idle();
+
+    expect(f1.isIdle, true);
+  });
 }

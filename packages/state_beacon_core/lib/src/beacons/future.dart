@@ -25,6 +25,12 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     _wakeUp();
   }
 
+  /// Sets the beacon to the [AsyncIdle] state.
+  /// The `lastData` will be set to the current value.
+  void idle() {
+    _setValue(AsyncIdle()..setLastData(lastData));
+  }
+
   /// Exposes this as a [Future] that can be awaited in a future beacon.
   /// This will trigger a re-run of the derived beacon when its state changes.
   ///
