@@ -6,12 +6,11 @@ import 'package:example/konami/konami.dart';
 import 'package:example/search/search.dart';
 import 'package:example/todo/todo.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 final brightness = Beacon.writable(Brightness.light);
 
-void main() => runApp(const MyApp());
+void main() => runApp(LiteRefScope(child: const MyApp()));
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -68,23 +67,11 @@ class MyHomePage extends StatelessWidget {
         ),
         body: TabBarView(
           children: <Widget>[
-            Provider(
-              create: (_) => CounterController(),
-              child: CounterPage(),
-            ),
-            KonamiPage(controller: KonamiController()),
-            Provider(
-              create: (_) => TodoController(),
-              child: TodoPage(),
-            ),
-            Provider(
-              create: (_) => WeatherController(WeatherRepository()),
-              child: SearchPage(),
-            ),
-            Provider(
-              create: (_) => InfiniteController(PostRepository()),
-              child: InfiniteListPage(),
-            ),
+            CounterPage(),
+            KonamiPage(),
+            TodoPage(),
+            SearchPage(),
+            InfiniteListPage(),
           ],
         ),
         floatingActionButton: IconButton(

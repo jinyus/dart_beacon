@@ -1,5 +1,7 @@
 part of 'todo.dart';
 
+final todoControllerRef = Ref.scoped((ctx) => TodoController());
+
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
 
@@ -43,7 +45,7 @@ class _TodoInputState extends State<TodoInput> {
 
   @override
   void initState() {
-    controller = context.read<TodoController>();
+    controller = todoControllerRef.read(context);
     textController.addListener(() {
       controller.inputTextBeacon.value = textController.text;
     });
@@ -81,8 +83,7 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTodos = context.read<TodoController>().filteredTodos;
-    final todos = filteredTodos.watch(context);
+    final todos = todoControllerRef.select(context, (c) => c.filteredTodos);
     return Expanded(
       child: ListView.separated(
         itemCount: todos.length,
@@ -103,7 +104,7 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todosBeacon = context.read<TodoController>().todosBeacon;
+    final todosBeacon = todoControllerRef(context).todosBeacon;
     return ListTile(
       tileColor: Theme.of(context).colorScheme.secondaryContainer,
       title: Text(todo.description, style: k24Text),
@@ -139,7 +140,7 @@ class FilterButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filterBeacon = context.read<TodoController>().filterBeacon;
+    final filterBeacon = todoControllerRef(context).filterBeacon;
     final current = filterBeacon.watch(context);
     return Wrap(
       spacing: 5.0,

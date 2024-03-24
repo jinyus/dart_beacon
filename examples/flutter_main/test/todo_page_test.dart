@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 class MockTodoController extends Mock implements TodoController {}
@@ -41,8 +40,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Provider<TodoController>(
-            create: (_) => todoCtrl,
+          body: LiteRefScope(
+            overrides: [
+              todoControllerRef.overrideWith((_) => todoCtrl),
+            ],
             child: const TodoPage(),
           ),
         ),

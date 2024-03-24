@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 class MockCounterController extends Mock implements CounterController {}
@@ -23,13 +22,15 @@ void main() {
     final derived = Beacon.writable<AsyncValue<String>>(AsyncIdle<String>());
 
     when(() => counterCtrl.count).thenReturn(count);
-    when(() => counterCtrl.derivedFutureCounter).thenReturn(derived);
+    when(() => counterCtrl.futureCount).thenReturn(derived);
     // Build our app and trigger a frame.
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Provider<CounterController>(
-            create: (_) => counterCtrl,
+          body: LiteRefScope(
+            overrides: [
+              counterControllerRef.overrideWith((_) => counterCtrl),
+            ],
             child: const CounterPage(),
           ),
         ),

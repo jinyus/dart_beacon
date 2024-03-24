@@ -1,11 +1,11 @@
 part of 'search.dart';
 
-class WeatherController {
+class WeatherController extends BeaconController {
   final WeatherRepository repo;
 
-  final searchTextBeacon = Beacon.lazyDebounced(duration: k100ms * 10);
+  late final searchTextBeacon = B.lazyDebounced(duration: k100ms * 10);
 
-  late final _searchResults = Beacon.future(
+  late final _searchResults = B.future(
     () async {
       final query = searchTextBeacon.value;
       return await repo.fetchWeather(query);

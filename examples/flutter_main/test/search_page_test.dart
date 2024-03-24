@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 class MockWeatherController extends Mock implements WeatherController {}
@@ -33,8 +32,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Provider<WeatherController>(
-            create: (_) => weatherCtrl,
+          body: LiteRefScope(
+            overrides: [
+              weatherControllerRef.overrideWith((_) => weatherCtrl),
+            ],
             child: const SearchPage(),
           ),
         ),

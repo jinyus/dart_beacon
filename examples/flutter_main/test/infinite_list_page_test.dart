@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 class MockInfiniteController extends Mock implements InfiniteController {}
@@ -32,8 +31,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: Provider<InfiniteController>(
-            create: (_) => infiniteCtrl,
+          body: LiteRefScope(
+            overrides: [
+              infiniteControllerRef.overrideWith((_) => infiniteCtrl),
+            ],
             child: const InfiniteListPage(),
           ),
         ),

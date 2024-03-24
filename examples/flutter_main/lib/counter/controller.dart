@@ -10,15 +10,13 @@ Future<String> counterFuture(int count) async {
   return '$count second has passed.';
 }
 
-class CounterController {
-  final count = Beacon.writable(0);
+class CounterController extends BeaconController {
+  late final count = B.writable(0);
 
   // the future will be recomputed whenever the counter changes
-  late final _derivedFutureCounter =
-      Beacon.future(() => counterFuture(count.value));
+  late final _derivedFutureCounter = B.future(() => counterFuture(count.value));
 
   // here we expose the future beacon as a readable beacon
   // so it's easier to mock/test. This is optional.
-  ReadableBeacon<AsyncValue<String>> get derivedFutureCounter =>
-      _derivedFutureCounter;
+  ReadableBeacon<AsyncValue<String>> get futureCount => _derivedFutureCounter;
 }

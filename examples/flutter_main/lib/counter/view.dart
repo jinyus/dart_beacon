@@ -1,5 +1,7 @@
 part of 'counter.dart';
 
+final counterControllerRef = Ref.scoped((ctx) => CounterController());
+
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
@@ -14,7 +16,7 @@ class CounterPage extends StatelessWidget {
       ),
     );
 
-    final controller = context.read<CounterController>();
+    final controller = counterControllerRef(context);
     final count = controller.count;
 
     count.observe(context, (prev, next) {
@@ -68,9 +70,9 @@ class Counter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count = context.read<CounterController>().count;
+    final count = counterControllerRef.select(context, (c) => c.count);
     return Text(
-      count.watch(context).toString(),
+      count.toString(),
       style: k40Text,
     );
   }
@@ -81,11 +83,11 @@ class FutureCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final derivedFutureCounter =
-        context.read<CounterController>().derivedFutureCounter;
+    final futureCount =
+        counterControllerRef.select(context, (c) => c.futureCount);
 
     final textTheme = Theme.of(context).textTheme.headlineSmall;
-    return switch (derivedFutureCounter.watch(context)) {
+    return switch (futureCount) {
       AsyncData<String>(value: final v) => Text(v, style: textTheme),
       AsyncError(error: final e) => Text('$e', style: textTheme),
       _ => const CircularProgressIndicator(),

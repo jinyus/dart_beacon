@@ -1,11 +1,11 @@
 part of 'todo.dart';
 
-class TodoController {
-  final todosBeacon = Beacon.list(<Todo>[]);
-  final inputTextBeacon = Beacon.writable('');
-  final filterBeacon = Beacon.writable(Filter.all);
+class TodoController extends BeaconController {
+  late final todosBeacon = B.list(<Todo>[]);
+  late final inputTextBeacon = B.writable('');
+  late final filterBeacon = B.writable(Filter.all);
 
-  late final filteredTodos = Beacon.derived(() {
+  late final filteredTodos = B.derived(() {
     final todos = todosBeacon.value;
 
     return switch (filterBeacon.value) {

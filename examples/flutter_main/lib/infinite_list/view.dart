@@ -1,5 +1,9 @@
 part of 'infinite_list.dart';
 
+final infiniteControllerRef = Ref.scoped(
+  (ctx) => InfiniteController(PostRepository()),
+);
+
 class InfiniteListPage extends StatelessWidget {
   const InfiniteListPage({super.key});
 
@@ -17,21 +21,21 @@ class InfiniteListPage extends StatelessWidget {
                 const Text('Infinite List', style: k24Text),
                 Expanded(
                   child: Builder(builder: (ctx) {
-                    final controller = ctx.read<InfiniteController>();
-                    final count = controller.parsedItems.watch(ctx).length;
+                    final items = infiniteControllerRef.select(
+                        context, (c) => c.parsedItems);
                     return ListView.separated(
                       itemBuilder: (context, index) {
-                        final item = controller.parsedItems.value[index];
+                        final item = items[index];
 
                         return switch (item) {
                           ItemData(value: final value) =>
                             ItemTile(title: value),
-                          ItemLoading() => BottomWidget(controller),
+                          ItemLoading() => const BottomWidget(),
                           ItemError(error: final err) =>
-                            BottomWidget(controller, error: err),
+                            BottomWidget(error: err),
                         };
                       },
-                      itemCount: count,
+                      itemCount: items.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 5),
                     );
                   }),
@@ -60,14 +64,12 @@ class ItemTile extends StatelessWidget {
 }
 
 class BottomWidget extends StatefulWidget {
-  const BottomWidget(
-    this.controller, {
+  const BottomWidget({
     super.key,
     this.error,
   });
 
   final Object? error;
-  final InfiniteController controller;
 
   @override
   State<BottomWidget> createState() => _BottomWidgetState();
@@ -80,7 +82,7 @@ class _BottomWidgetState extends State<BottomWidget> {
       // this widgets gets built when we reach the end of the list,
       // therefore, we should load more items
       if (widget.error == null) {
-        widget.controller.pageNum.increment();
+        infiniteControllerRef.read(context).pageNum.increment();
       }
     });
     super.initState();
@@ -111,7 +113,7 @@ class _BottomWidgetState extends State<BottomWidget> {
         const SizedBox(height: 5),
         ElevatedButton(
           style: btnStyle,
-          onPressed: widget.controller.rawItems.reset,
+          onPressed: () => infiniteControllerRef.read(context).rawItems.reset(),
           child: const Text('retry'),
         )
       ],

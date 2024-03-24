@@ -1,23 +1,25 @@
 part of 'search.dart';
 
+final weatherControllerRef = Ref.scoped(
+  (ctx) => WeatherController(WeatherRepository()),
+);
+
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<WeatherController>();
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
           width: math.min(500, MediaQuery.of(context).size.width * 0.8),
           child: ListView(
-            children: [
-              const Text('Weather Search', style: TextStyle(fontSize: 48)),
+            children: const [
+              Text('Weather Search', style: TextStyle(fontSize: 48)),
               k16SizeBox,
-              SearchInput(controller),
-              SearchResults(controller),
+              SearchInput(),
+              SearchResults(),
             ],
           ),
         ),
@@ -27,9 +29,7 @@ class SearchPage extends StatelessWidget {
 }
 
 class SearchInput extends StatefulWidget {
-  const SearchInput(this.controller, {super.key});
-
-  final WeatherController controller;
+  const SearchInput({super.key});
 
   @override
   State<SearchInput> createState() => _SearchInputState();
@@ -40,14 +40,15 @@ class _SearchInputState extends State<SearchInput> {
 
   @override
   void initState() {
-    final searchTextBeacon = widget.controller.searchTextBeacon;
+    final controller = weatherControllerRef.read(context);
+    final searchTextBeacon = controller.searchTextBeacon;
     textController.addListener(() {
       if (textController.text.isEmpty) return;
       searchTextBeacon.value = textController.text;
     });
 
     // Start searching when beacon is first set
-    searchTextBeacon.next().then((value) => widget.controller.start());
+    searchTextBeacon.next().then((value) => controller.start());
 
     super.initState();
   }
@@ -72,19 +73,21 @@ class _SearchInputState extends State<SearchInput> {
 }
 
 class SearchResults extends StatelessWidget {
-  const SearchResults(this.controller, {super.key});
-
-  final WeatherController controller;
+  const SearchResults({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final searchResults = weatherControllerRef.select(
+      context,
+      (c) => c.searchResults,
+    );
     return SizedBox(
       height: 500,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           k16SizeBox,
-          switch (controller.searchResults.watch(context)) {
+          switch (searchResults) {
             AsyncData<Weather>(value: final v) => Text(
                 '$v',
                 style: k32Text,

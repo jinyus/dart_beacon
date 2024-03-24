@@ -14,16 +14,6 @@ import 'package:state_beacon/state_beacon.dart';
 
 class MockKonamiController extends Mock implements KonamiController {}
 
-// var flushing = false;
-// void flutterScheduler() {
-//   if (flushing) return;
-//   flushing = true;
-//   Future.sync(() {
-//     BeaconScheduler.flush();
-//     flushing = false;
-//   });
-// }
-
 void main() {
   final konamiCtrl = MockKonamiController();
   // BeaconScheduler.setScheduler(flutterScheduler);
@@ -38,7 +28,12 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: KonamiPage(controller: konamiCtrl),
+          body: LiteRefScope(
+            overrides: [
+              konamiControllerRef.overrideWith((_) => konamiCtrl),
+            ],
+            child: const KonamiPage(),
+          ),
         ),
       ),
     );

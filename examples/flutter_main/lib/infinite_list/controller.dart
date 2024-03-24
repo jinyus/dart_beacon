@@ -1,17 +1,17 @@
 part of 'infinite_list.dart';
 
-class InfiniteController {
+class InfiniteController extends BeaconController {
   static const pageSize = 10;
 
   final PostRepository repo;
-  final pageNum = Beacon.filtered(1);
+  late final pageNum = B.filtered(1);
 
   // this re-executes the future when the pageNum changes
-  late final rawItems = Beacon.future(
+  late final rawItems = B.future(
     () => repo.fetchItems(pageNum.value, limit: pageSize),
   );
 
-  late final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]);
+  late final parsedItems = B.writable(<ListItem>[ItemLoading()]);
 
   InfiniteController(this.repo) {
     // prevent the pageNum from changing when the list is loading

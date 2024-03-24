@@ -1,9 +1,9 @@
 part of 'konami.dart';
 
-class KonamiPage extends StatefulWidget {
-  const KonamiPage({super.key, required this.controller});
+final konamiControllerRef = Ref.scoped((ctx) => KonamiController());
 
-  final KonamiController controller;
+class KonamiPage extends StatefulWidget {
+  const KonamiPage({super.key});
 
   @override
   State<KonamiPage> createState() => _KonamiPageState();
@@ -21,7 +21,7 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   void initState() {
-    widget.controller.last10.subscribe(
+    konamiControllerRef.read(context).last10.subscribe(
       (codes) {
         if (codes.isEmpty || !mounted) return;
         final won = checker.equals(codes, konamiCodes);
@@ -68,41 +68,40 @@ class _KonamiPageState extends State<KonamiPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider.value(
-      value: widget.controller,
-      child: KeyboardListener(
-        autofocus: true,
-        focusNode: fNode,
-        onKeyEvent: (e) {
-          widget.controller.keys.set(e.logicalKey.keyLabel, force: true);
-        },
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
-              children: [
-                Text('Enter the Konamic Codes', style: k32Text),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    KeyText('^'),
-                    KeyText('^'),
-                    KeyText('v'),
-                    KeyText('v'),
-                    KeyText('<'),
-                    KeyText('>'),
-                    KeyText('<'),
-                    KeyText('>'),
-                    KeyText('B'),
-                    KeyText('A'),
-                  ],
-                ),
-              ],
-            ),
-            ResetButton(),
-            LastKey(),
-          ],
-        ),
+    return KeyboardListener(
+      autofocus: true,
+      focusNode: fNode,
+      onKeyEvent: (e) {
+        konamiControllerRef(context)
+            .keys
+            .set(e.logicalKey.keyLabel, force: true);
+      },
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            children: [
+              Text('Enter the Konamic Codes', style: k32Text),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  KeyText('^'),
+                  KeyText('^'),
+                  KeyText('v'),
+                  KeyText('v'),
+                  KeyText('<'),
+                  KeyText('>'),
+                  KeyText('<'),
+                  KeyText('>'),
+                  KeyText('B'),
+                  KeyText('A'),
+                ],
+              ),
+            ],
+          ),
+          ResetButton(),
+          LastKey(),
+        ],
       ),
     );
   }
@@ -113,8 +112,10 @@ class LastKey extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final last10 = context.read<KonamiController>().last10;
-    final keys = last10.currentBuffer.watch(context);
+    final keys = konamiControllerRef.select(
+      context,
+      (c) => c.last10.currentBuffer,
+    );
     final lastKey = keys.lastOrNull;
 
     if (lastKey != null) {
@@ -154,8 +155,6 @@ class ResetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final last10 = context.read<KonamiController>().last10;
-    final keys = context.read<KonamiController>().keys;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.tertiary,
@@ -163,8 +162,9 @@ class ResetButton extends StatelessWidget {
           textStyle: k24Text,
           minimumSize: const Size(100, 100)),
       onPressed: () {
-        keys.reset();
-        last10.reset();
+        final controller = konamiControllerRef.read(context);
+        controller.last10.reset();
+        controller.keys.reset();
       },
       child: const Text('Reset'),
     );
