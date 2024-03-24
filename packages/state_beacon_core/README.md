@@ -1257,8 +1257,8 @@ class CounterText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count = countRef(context);
-    final doubledCount = doubledCountRef(context);
+    final count = countRef.watch(context);
+    final doubledCount = doubledCountRef.watch(context);
     return Text('$count x 2 = $doubledCount');
   }
 }

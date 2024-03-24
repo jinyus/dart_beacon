@@ -27,8 +27,10 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
 
   /// Sets the beacon to the [AsyncIdle] state.
   /// The `lastData` will be set to the current value.
+  /// The beacon will have to be started manually to resume.
   void idle() {
     _setValue(AsyncIdle()..setLastData(lastData));
+    _cancel();
   }
 
   /// Exposes this as a [Future] that can be awaited in a future beacon.

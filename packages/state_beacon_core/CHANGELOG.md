@@ -1,3 +1,7 @@
+# 0.43.2
+
+-   [Feat] Add `FutureBeacon.idle()` to set a beacon to the `AsyncIdle` state.
+
 # 0.43.1
 
 -   [Refactor] Internal refactor
