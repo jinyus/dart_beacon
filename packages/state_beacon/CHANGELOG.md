@@ -1,3 +1,7 @@
+# 0.44.3
+
+-   [Feat] Add `FutureBeacon.idle()` to set a beacon to the `AsyncIdle` state.
+
 # 0.44.2
 
 -   [Feat] Add the ability for widgets to observe beacons synchronously. When `synchronous` is true, `autobatching` will be disabled and all updates will be emitted immediately.

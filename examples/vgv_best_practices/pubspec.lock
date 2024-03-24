@@ -208,10 +208,10 @@ packages:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: "4ea4e285dc74b8ebfe9b534fb14aca458e3b33daca406005f24327f293fc77c0"
+      sha256: "21c3e0ba5c8385839e6a03d6efa2e6f4b38e2d07f6775aa66c6920224932cf48"
       url: "https://pub.dev"
     source: hosted
-    version: "0.43.1"
+    version: "0.43.2"
   stream_channel:
     dependency: transitive
     description:
