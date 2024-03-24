@@ -1,3 +1,7 @@
+# 0.43.3
+
+-   [Fix] Rare bug in FutureBeacon when start is called multiple times synchronously.
+
 # 0.43.2
 
 -   [Feat] Add `FutureBeacon.idle()` to set a beacon to the `AsyncIdle` state.
