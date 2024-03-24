@@ -63,9 +63,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
 
   @override
   void _start() {
-    if (_sub != null) return;
-
-    _effectDispose?.call();
+    if (_effectDispose != null) return;
 
     // needs to be in loading state instantly when waking up
     // so beacon.value.isLoading is true
