@@ -34,5 +34,11 @@
             "request": "launch",
             "type": "dart"
         },
+        {
+            "name": "github search example",
+            "cwd": "examples/github_search",
+            "request": "launch",
+            "type": "dart"
+        },
     ]
 }
