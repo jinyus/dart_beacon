@@ -110,11 +110,3 @@ app.*.map.json
 !.idea/codeStyles/
 !.idea/dictionaries/
 !.idea/runConfigurations/
-
-# platform specific folders
-linux
-macos
-windows
-web
-android
-ios
