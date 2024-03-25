@@ -1,0 +1,24 @@
+name: github_search
+description: A simple app to search for github repositories.
+version: 1.0.0+1
+publish_to: none
+
+environment:
+    sdk: "^3.3.0"
+
+dependencies:
+    flutter:
+        sdk: flutter
+    http: ^1.2.1
+    state_beacon:
+        path: ../../packages/state_beacon
+    url_launcher: ^6.2.5
+
+dev_dependencies:
+    flutter_test:
+        sdk: flutter
+    mocktail: ^1.0.3
+    very_good_analysis: ^5.1.0
+
+flutter:
+    uses-material-design: true
