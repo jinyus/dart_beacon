@@ -35,6 +35,9 @@ class BeaconGroup extends _BeaconCreator {
   final List<VoidCallback> _disposeFns = [];
   late final _creationHooks = <void Function(ReadableBeacon<dynamic>)>[];
 
+  /// The list of beacons created in this group
+  List<ReadableBeacon<dynamic>> get beacons => _beacons;
+
   /// The number of beacons in this group
   int get beaconCount => _beacons.length;
 
