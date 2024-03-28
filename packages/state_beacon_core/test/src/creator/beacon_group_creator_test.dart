@@ -7,6 +7,9 @@ void main() {
   test('should group beacons', () {
     final group = BeaconGroup();
 
+    var created = 0;
+    final cancel = group.onCreate((_) => created++);
+
     final readable = group.readable(0);
     final writable = group.writable(0);
     final lazyWritable = group.lazyWritable<int>();
@@ -39,6 +42,14 @@ void main() {
     final _ = group.family((int i) => group.readable(i));
 
     expect(group.beaconCount, 25);
+    expect(created, 25);
+
+    cancel();
+
+    group.writable(0);
+
+    expect(group.beaconCount, 26);
+    expect(created, 25);
 
     writable.increment();
 
