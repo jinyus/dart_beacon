@@ -11,14 +11,14 @@ import 'package:state_beacon/state_beacon.dart';
 final cartServiceRef = Ref.scoped((_) => CartService());
 
 final cartControllerRef = Ref.scoped(
-  (ctx) => CartController(cartServiceRef(ctx))..dispatch(CartStarted()),
+  (ctx) => CartController(cartServiceRef.read(ctx))..dispatch(CartStarted()),
 );
 
 final catalogServiceRef = Ref.scoped((_) => CatalogService());
 
 final catalogControllerRef = Ref.scoped(
   (ctx) {
-    return CatalogController(catalogServiceRef(ctx))
+    return CatalogController(catalogServiceRef.read(ctx))
       ..dispatch(CatalogEvent.started);
   },
 );
