@@ -121,8 +121,8 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     _finalizer.attach(
       context,
       () {
-        $$widgetSubscribers$$.remove(key);
         unsub();
+        $$widgetSubscribers$$.remove(key);
       },
     );
     // coverage:ignore-end
