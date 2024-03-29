@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:github_search/core/errors.dart';
 import 'package:github_search/features/search/models/github_repo.dart';
 import 'package:github_search/features/search/models/search_result.dart';
 import 'package:github_search/features/search/repo/github_search.dart';
@@ -6,7 +7,8 @@ import 'package:github_search/features/search/ui/controller/github_controller.da
 import 'package:state_beacon/state_beacon.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-part 'search_form.dart';
+part 'search_bar.dart';
+part 'search_body.dart';
 
 final searchRepoRef = Ref.scoped((_) => GithubSearchRepository());
 final searchControllerRef = Ref.scoped(
@@ -20,7 +22,12 @@ class SearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Github Search')),
-      body: const _SearchForm(),
+      body: Column(
+        children: <Widget>[
+          _SearchBar(),
+          _SearchBody(),
+        ],
+      ),
     );
   }
 }

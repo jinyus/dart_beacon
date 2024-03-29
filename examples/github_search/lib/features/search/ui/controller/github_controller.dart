@@ -18,6 +18,8 @@ class GithubController with BeaconController {
 
   void onTextChanged(String text) => _searchTerm.set(text);
 
+  void retry() => results.reset();
+
   // this listens to the search term beacon and starts the future beacon
   // if the search term is valid, otherwise, it will set the future beacon
   // to idle
