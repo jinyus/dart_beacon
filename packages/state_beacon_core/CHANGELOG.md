@@ -1,3 +1,9 @@
+# 0.43.4
+
+-   [Fix] Fix bug with `FutureBeacon`s not autosleeping
+-   [Feat] Expose list of beacons created in a BeaconGroup wuth `BeaconGroup.beacons`
+-   [Feat] Add `BeaconGroup.onCreate` to allow adding a callback to be run when a beacon is created
+
 # 0.43.3
 
 -   [Fix] Rare bug in FutureBeacon when start is called multiple times synchronously.
