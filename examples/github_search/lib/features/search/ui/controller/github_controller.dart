@@ -16,20 +16,18 @@ class GithubController with BeaconController {
     manualStart: true,
   );
 
-  void onTextChanged(String text) {
-    if (text.isEmpty) {
-      results.idle();
-      _startSearchingOnValidQuery();
-    }
-
-    _searchTerm.set(text);
-  }
+  void onTextChanged(String text) => _searchTerm.set(text);
 
   // this listens to the search term beacon and starts the future beacon
-  // if the search term is valid
+  // if the search term is valid, otherwise, it will set the future beacon
+  // to idle
   void _startSearchingOnValidQuery() {
-    _searchTerm
-        .next(filter: (s) => s.trim().isNotEmpty)
-        .then((_) => results.start());
+    _searchTerm.subscribe((val) {
+      if (val.trim().isEmpty) {
+        results.idle();
+      } else if (results.isIdle) {
+        results.start();
+      }
+    });
   }
 }
