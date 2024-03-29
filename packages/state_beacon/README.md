@@ -1199,7 +1199,7 @@ class CountController extends BeaconController {
 
 ## Dependency Injection
 
-Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to provide Beacons and BeaconControllers to your widgets. It also manages disposal of both.
+Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to do this while also managing disposal of both.
 
 NB: You can use another DI library such as `Provider`.
 
