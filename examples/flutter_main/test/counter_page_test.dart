@@ -28,9 +28,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
-            overrides: [
+            overrides: {
               counterControllerRef.overrideWith((_) => counterCtrl),
-            ],
+            },
             child: const CounterPage(),
           ),
         ),

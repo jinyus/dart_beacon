@@ -41,9 +41,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
-            overrides: [
+            overrides: {
               todoControllerRef.overrideWith((_) => todoCtrl),
-            ],
+            },
             child: const TodoPage(),
           ),
         ),

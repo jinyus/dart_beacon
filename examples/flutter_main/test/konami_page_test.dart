@@ -29,9 +29,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
-            overrides: [
+            overrides: {
               konamiControllerRef.overrideWith((_) => konamiCtrl),
-            ],
+            },
             child: const KonamiPage(),
           ),
         ),

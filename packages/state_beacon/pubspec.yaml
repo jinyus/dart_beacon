@@ -10,7 +10,7 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    lite_ref: ^0.6.3
+    lite_ref: ^0.7.0
     state_beacon_core: ^0.43.5
 
 dev_dependencies:

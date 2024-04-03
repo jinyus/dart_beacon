@@ -33,9 +33,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
-            overrides: [
+            overrides: {
               weatherControllerRef.overrideWith((_) => weatherCtrl),
-            ],
+            },
             child: const SearchPage(),
           ),
         ),

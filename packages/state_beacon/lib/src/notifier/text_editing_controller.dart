@@ -27,6 +27,7 @@ class TextEditingBeacon extends WritableBeacon<TextEditingValue> {
         ) {
     group?.add(this);
     var syncing = false;
+
     void safeWrite(VoidCallback fn) {
       if (syncing) return;
       syncing = true;

@@ -45,10 +45,10 @@ void main() {
     when(() => catalogC.catalog).thenReturn(_mockCatalog);
 
     await tester.pumpWidget(LiteRefScope(
-      overrides: [
+      overrides: {
         cartControllerRef.overrideWith((_) => cartC),
         catalogControllerRef.overrideWith((_) => catalogC),
-      ],
+      },
       child: const MyApp(),
     ));
 

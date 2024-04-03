@@ -32,9 +32,9 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
-            overrides: [
+            overrides: {
               infiniteControllerRef.overrideWith((_) => infiniteCtrl),
-            ],
+            },
             child: const InfiniteListPage(),
           ),
         ),
