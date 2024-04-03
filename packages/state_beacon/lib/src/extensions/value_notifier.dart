@@ -3,7 +3,7 @@ import 'package:state_beacon/state_beacon.dart';
 
 /// Extensions for [ValueNotifier].
 extension ValueNotifierUtils<T> on ValueNotifier<T> {
-  /// Converts this to a [ReadableBeacon].
+  /// Converts this to a [WritableBeacon].
   WritableBeacon<T> toBeacon({BeaconGroup? group, String? name}) {
     final beaconCreator = group ?? Beacon;
 
