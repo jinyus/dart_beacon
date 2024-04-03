@@ -41,7 +41,8 @@ class BeaconGroup extends _BeaconCreator {
   /// The number of beacons in this group
   int get beaconCount => _beacons.length;
 
-  void _add(ReadableBeacon<dynamic> beacon) {
+  /// Adds a beacon to the group
+  void add(ReadableBeacon<dynamic> beacon) {
     _beacons.add(beacon);
     for (final fn in _creationHooks) {
       fn(beacon);
@@ -61,7 +62,7 @@ class BeaconGroup extends _BeaconCreator {
   @override
   BufferedCountBeacon<T> bufferedCount<T>(int count, {String? name}) {
     final beacon = super.bufferedCount<T>(count, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -71,7 +72,7 @@ class BeaconGroup extends _BeaconCreator {
     String? name,
   }) {
     final beacon = super.bufferedTime<T>(duration: duration, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -86,7 +87,7 @@ class BeaconGroup extends _BeaconCreator {
       duration: duration,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -99,7 +100,7 @@ class BeaconGroup extends _BeaconCreator {
       compute,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -136,7 +137,7 @@ class BeaconGroup extends _BeaconCreator {
     String? name,
   }) {
     final beacon = super.filtered<T>(initialValue, filter: filter, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -153,21 +154,21 @@ class BeaconGroup extends _BeaconCreator {
       shouldSleep: shouldSleep,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   MapBeacon<K, V> hashMap<K, V>(Map<K, V> initialValue, {String? name}) {
     final beacon = super.hashMap<K, V>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   SetBeacon<T> hashSet<T>(Set<T> initialValue, {String? name}) {
     final beacon = super.hashSet<T>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -182,7 +183,7 @@ class BeaconGroup extends _BeaconCreator {
       initialValue: initialValue,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -200,7 +201,7 @@ class BeaconGroup extends _BeaconCreator {
       name: name,
     );
 
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -217,7 +218,7 @@ class BeaconGroup extends _BeaconCreator {
       dropBlocked: dropBlocked,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -227,7 +228,7 @@ class BeaconGroup extends _BeaconCreator {
       initialValue: initialValue,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -243,7 +244,7 @@ class BeaconGroup extends _BeaconCreator {
       name: name,
     );
 
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -253,21 +254,21 @@ class BeaconGroup extends _BeaconCreator {
       initialValue: initialValue,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   ListBeacon<T> list<T>(List<T> initialValue, {String? name}) {
     final beacon = super.list<T>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   ReadableBeacon<T> readable<T>(T initialValue, {String? name}) {
     final beacon = super.readable<T>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -286,7 +287,7 @@ class BeaconGroup extends _BeaconCreator {
       shouldSleep: shouldSleep,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -311,7 +312,7 @@ class BeaconGroup extends _BeaconCreator {
       isLazy: isLazy,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -328,14 +329,14 @@ class BeaconGroup extends _BeaconCreator {
       dropBlocked: dropBlocked,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   TimestampBeacon<T> timestamped<T>(T initialValue, {String? name}) {
     final beacon = super.timestamped<T>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -350,14 +351,14 @@ class BeaconGroup extends _BeaconCreator {
       historyLimit: historyLimit,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
   @override
   WritableBeacon<T> writable<T>(T initialValue, {String? name}) {
     final beacon = super.writable<T>(initialValue, name: name);
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 
@@ -372,7 +373,7 @@ class BeaconGroup extends _BeaconCreator {
       compute,
       name: name,
     );
-    _add(beacon);
+    add(beacon);
     return beacon;
   }
 

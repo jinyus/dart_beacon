@@ -1,3 +1,7 @@
+# 0.43.5
+
+-   BeaconGroup.add(anybeacon) to add a beacon a group
+
 # 0.43.4
 
 -   [Fix] Fix bug with `FutureBeacon`s not autosleeping
