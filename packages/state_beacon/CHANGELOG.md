@@ -1,3 +1,12 @@
+# 0.45.0
+
+-   [Feat] Add `ValueNotifier.toBeacon()` which converts a `ValueNotifier` to a `WritableBeacon`. All changes to the notifier are reflected in the beacon and vice versa.
+-   [Feat] Add `TextEditingBeacon` which is a beacon that wraps a `TextEditingController`. All changes to the controller are reflected in the beacon and vice versa.
+
+    ## lite_ref (0.7.0):
+
+    -   [Breaking] The `overrides` property of `LiteRefScope` is now a `Set<ScopedRef>` instead of a `List<ScopedRef>`.
+
 # 0.44.5
 
 -   [Fix] Fix bug with `FutureBeacon`s not autosleeping

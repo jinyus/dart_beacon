@@ -1292,6 +1292,18 @@ class _MyControllerState extends State<MyController>
 }
 ```
 
+## TextEditingBeacon
+
+A beacon that wraps a `TextEditingController`. All changes to the controller are reflected in the beacon and vice versa.
+
+```dart
+final beacon = TextEditingBeacon();
+final controller = beacon.controller;
+
+controller.text = 'Hello World';
+print(beacon.value.text); // Outputs: Hello World
+```
+
 ## Pitfalls
 
 When using `Beacon.future`, only beacons accessed before the async gap(`await`) will be tracked as dependencies.
