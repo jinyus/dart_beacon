@@ -11,12 +11,13 @@ extension ValueNotifierUtils<T> on ValueNotifier<T> {
 
     var syncing = false;
     void safeWrite(VoidCallback fn) {
-      if (syncing) {
-        return;
-      }
+      if (syncing) return;
       syncing = true;
-      fn();
-      syncing = false;
+      try {
+        fn();
+      } finally {
+        syncing = false;
+      }
     }
 
     void update() => safeWrite(() => beacon.set(value));
