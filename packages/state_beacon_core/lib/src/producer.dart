@@ -190,7 +190,8 @@ abstract class Producer<T> implements Disposable {
   /// with the current value of the beacon.
   ///
   /// If [synchronous] is true, the callback will be ran synchronously.
-  /// This also means automatic batching of updates will be disabled.
+  /// This also means automatic batching of updates will be disabled
+  /// and any Scheduler will be ignored.
   VoidCallback subscribe(
     void Function(T) callback, {
     bool startNow = true,
