@@ -1,3 +1,7 @@
+# 0.45.1
+
+-   [Dependency] Updated `lite_ref` to `0.8.1`
+
 # 0.45.0
 
 -   [Feat] Add `ValueNotifier.toBeacon()` which converts a `ValueNotifier` to a `WritableBeacon`. All changes to the notifier are reflected in the beacon and vice versa.
