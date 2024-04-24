@@ -1,3 +1,7 @@
+# 0.43.6
+
+-   [Fix] Edge case for Subscriptions
+
 # 0.43.5
 
 -   BeaconGroup.add(anybeacon) to add a beacon a group

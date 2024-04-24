@@ -1,3 +1,7 @@
+# 0.45.2
+
+-   [Fix] Edge case for Subscriptions
+
 # 0.45.1
 
 -   [Dependency] Updated `lite_ref` to `0.8.1`
