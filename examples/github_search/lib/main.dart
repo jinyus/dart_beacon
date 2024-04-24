@@ -9,7 +9,7 @@ void main() {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
-  runApp(LiteRefScope(child: const App()));
+  runApp(const LiteRefScope(child: App()));
 }
 
 class App extends StatelessWidget {
