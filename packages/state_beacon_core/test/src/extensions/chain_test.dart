@@ -607,9 +607,7 @@ void main() {
   });
 
   test('should transform input values when use mid-chain/2', () async {
-    final stream = Stream.periodic(k1ms, (i) => i).take(5);
-    final beacon = stream
-        .toRawBeacon(isLazy: true)
+    final beacon = Beacon.periodic(k10ms, (i) => i)
         .filter((_, n) => n.isEven)
         .map((v) => v + 1)
         .throttle(k1ms);
