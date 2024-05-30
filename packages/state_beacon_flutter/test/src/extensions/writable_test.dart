@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_beacon/src/extensions/extensions.dart';
-import 'package:state_beacon/state_beacon.dart';
+import 'package:state_beacon_flutter/src/extensions/extensions.dart';
+import 'package:state_beacon_flutter/state_beacon_flutter.dart';
 
 void main() {
   test('should convert to a value notifier', () {

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:state_beacon/state_beacon.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
 
 /// Extensions for [ValueNotifier].
 extension ValueNotifierUtils<T> on ValueNotifier<T> {

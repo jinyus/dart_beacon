@@ -1,36 +1,61 @@
 # 1.0.0
 
--   Stable release
+-   [Breaking] Extracted the flutter specific code into a separate package `state_beacon_flutter`
 
-# 0.43.6
+# 0.45.2
 
 -   [Fix] Edge case for Subscriptions
 
-# 0.43.5
+# 0.45.1
 
--   BeaconGroup.add(anybeacon) to add a beacon a group
+-   [Dependency] Updated `lite_ref` to `0.8.1`
 
-# 0.43.4
+# 0.45.0
+
+-   [Feat] Add `ValueNotifier.toBeacon()` which converts a `ValueNotifier` to a `WritableBeacon`. All changes to the notifier are reflected in the beacon and vice versa.
+-   [Feat] Add `TextEditingBeacon` which is a beacon that wraps a `TextEditingController`. All changes to the controller are reflected in the beacon and vice versa.
+
+    ## lite_ref (0.7.0):
+
+    -   [Breaking] The `overrides` property of `LiteRefScope` is now a `Set<ScopedRef>` instead of a `List<ScopedRef>`.
+
+# 0.44.5
 
 -   [Fix] Fix bug with `FutureBeacon`s not autosleeping
 -   [Feat] Expose list of beacons created in a BeaconGroup wuth `BeaconGroup.beacons`
 -   [Feat] Add `BeaconGroup.onCreate` to allow adding a callback to be run when a beacon is created
 
-# 0.43.3
+# 0.44.4
 
 -   [Fix] Rare bug in FutureBeacon when start is called multiple times synchronously.
 
-# 0.43.2
+# 0.44.3
 
 -   [Feat] Add `FutureBeacon.idle()` to set a beacon to the `AsyncIdle` state.
 
-# 0.43.1
+# 0.44.2
+
+-   [Feat] Add the ability for widgets to observe beacons synchronously. When `synchronous` is true, `autobatching` will be disabled and all updates will be emitted immediately.
+    ```dart
+    final beacon = Beacon.writable(10);
+    beacon.observe(context, (prev, next) {}, synchronous: true);
+    ```
+-   [Dependency] Updated `lite_ref` to `0.6.3`
+
+# 0.44.1
 
 -   [Refactor] Internal refactor
+-   [Dependency] Updated `lite_ref` to `0.6.2`
+
+# 0.44.0
+
+-   [Breaking] The `beacons` getter for `Beacon.family` has been replaced with `entries`. This is a breaking change because it returns a `MapEntry<Key,Beacon>` instead of a `Beacon`.
+
+-   [Dependency] Updated `lite_ref` to `0.6.1`
 
 # 0.43.0
 
--   [Breaking] The `beacons` getter for `Beacon.family` has been replaced with `entries`. This is a breaking change because it returns a `MapEntry<Key,Beacon>` instead of a `Beacon`.
+-   [Fix] Update lite_ref dependency and add flutter dependency constraint
 
 # 0.42.1
 
@@ -40,9 +65,33 @@
 
 -   [Breaking] `resetIfError` option for `toFuture()` is now `true` by default. This was done because there's rarely a case where you'd want it to throw instantly. If you want to keep the previous value, set `resetIfError` to `false`.
 
-# 0.41.2
+# 0.41.3
 
 -   [Docs] Update README
+
+# 0.41.2
+
+-   [Feat] Export `lite_ref` as the recommended dependency injection mechanism for state_beacon. Added convenience methods to `ScopedRef` for `BeaconController`s and `Beacon`s
+
+    ```dart
+    class CountController extends BeaconController {
+        late final count = B.writable(0);
+        late final doubledCount = B.derived(() => count.value * 2);
+    }
+
+    final countControllerRef = Ref.scoped((ctx) => CountController());
+
+    class CounterText extends StatelessWidget {
+        const CounterText({super.key});
+
+        @override
+        Widget build(BuildContext context) {
+            // watch the count beacon and return its value
+            final count = countControllerRef.select(context, (c) => c.count);
+            return Text('$count');
+        }
+    }
+    ```
 
 # 0.41.1
 

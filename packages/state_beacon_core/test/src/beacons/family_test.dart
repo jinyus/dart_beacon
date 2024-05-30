@@ -83,10 +83,7 @@ void main() {
   });
 
   test('should remove from cache when disposed', () {
-    final family = Beacon.family(
-      (int arg) => Beacon.writable('$arg'),
-      cache: true,
-    );
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
     final beacon1 = family(1);
 
     beacon1.dispose();
@@ -97,10 +94,7 @@ void main() {
   });
 
   test('should clear the cache and dispose beacons', () {
-    final family = Beacon.family(
-      (int arg) => Beacon.writable('$arg'),
-      cache: true,
-    );
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
 
     final beacon1 = family(1);
 
@@ -114,10 +108,7 @@ void main() {
   });
 
   test('should not clear beacons individually when clearing', () {
-    final family = Beacon.family(
-      (int arg) => Beacon.writable('$arg'),
-      cache: true,
-    );
+    final family = Beacon.family((int arg) => Beacon.writable('$arg'));
 
     var ran = 0;
 

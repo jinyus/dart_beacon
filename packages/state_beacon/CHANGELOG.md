@@ -1,3 +1,7 @@
+# 1.0.0
+
+-   Stable release
+
 # 0.45.2
 
 -   [Fix] Edge case for Subscriptions

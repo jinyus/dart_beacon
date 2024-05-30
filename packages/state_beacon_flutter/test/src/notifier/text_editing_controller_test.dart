@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_beacon/state_beacon.dart';
+import 'package:state_beacon_flutter/state_beacon_flutter.dart';
 
 void main() {
   test('should be synced with internal TextEditingController', () async {

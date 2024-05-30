@@ -1,7 +1,7 @@
 // ignore_for_file: invalid_use_of_protected_member
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_beacon/src/value_notifier_beacon.dart';
+import 'package:state_beacon_flutter/src/value_notifier_beacon.dart';
 
 void main() {
   test('should notify listener and call dispose callbacks', () {

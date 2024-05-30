@@ -1,4 +1,5 @@
-part of 'extensions.dart';
+import 'package:flutter/widgets.dart';
+import 'package:state_beacon/state_beacon.dart';
 
 /// A function that takes a [BeaconController] and returns 1 of its beacon.
 typedef BeaconSelector<T, C> = ReadableBeacon<T> Function(C);

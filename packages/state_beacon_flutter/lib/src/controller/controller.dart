@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/widgets.dart';
-import 'package:state_beacon/state_beacon.dart';
+import 'package:state_beacon_core/state_beacon_core.dart';
 
 /// A mixin that automatically disposes all beacons created by this Widget.
 mixin BeaconControllerMixin<T extends StatefulWidget> on State<T> {

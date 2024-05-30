@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_beacon/state_beacon.dart';
+import 'package:state_beacon_flutter/state_beacon_flutter.dart';
 
 typedef Themes = ({ThemeData lightTheme});
 

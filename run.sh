@@ -15,10 +15,17 @@ test_target() {
         echo "testing core"
         cd packages/state_beacon_core &&
             flutter test --coverage --timeout 5s
+
     elif [ "$1" == "flutter" ]; then
         echo "testing flutter"
+        cd packages/state_beacon_flutter &&
+            flutter test --coverage
+
+    elif [ "$1" == "main" ]; then
+        echo "testing main"
         cd packages/state_beacon &&
             flutter test --coverage
+
     elif [ "$1" == "example" ]; then
         echo "testing flutter_main example"
         cd examples/flutter_main &&
@@ -57,8 +64,14 @@ publish_target() {
 
         elif [ "$1" == "flutter" ]; then
             echo "publishing flutter"
+            cd packages/state_beacon_flutter &&
+                publish_and_update_pubignore
+
+        elif [ "$1" == "main" ]; then
+            echo "publishing main"
             cd packages/state_beacon &&
                 publish_and_update_pubignore
+
         elif [ "$1" == "lint" ]; then
             echo "publishing lint"
             cd packages/state_beacon_lints
@@ -73,6 +86,8 @@ deps() {
         flutter pub get &&
         cd $CURRENT_DIR/packages/state_beacon &&
         flutter pub get &&
+        cd $CURRENT_DIR/packages/state_beacon_flutter &&
+        flutter pub get &&
         cd $CURRENT_DIR/examples/flutter_main &&
         flutter pub get &&
         cd $CURRENT_DIR/examples/counter &&
@@ -84,6 +99,8 @@ deps() {
         cd $CURRENT_DIR/examples/auth_flow &&
         flutter pub get &&
         cd $CURRENT_DIR/examples/skeleton &&
+        flutter pub get &&
+        cd $CURRENT_DIR/examples/github_search &&
         flutter pub get
 
 }

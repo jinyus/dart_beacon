@@ -1,13 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lite_ref/lite_ref.dart';
-import 'package:state_beacon/src/value_notifier_beacon.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
+import 'package:state_beacon_flutter/src/value_notifier_beacon.dart';
 
 part 'readable.dart';
 part 'watch_observe.dart';
 part 'writable.dart';
-part 'scoped_ref.dart';
 
 final Map<int, ValueNotifierBeacon<dynamic>> _vnCache = {};
 
