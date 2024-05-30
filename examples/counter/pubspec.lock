@@ -174,15 +174,23 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "0.45.0"
+    version: "1.0.0"
   state_beacon_core:
     dependency: transitive
     description:
       name: state_beacon_core
-      sha256: "7e6b3f157cb822acb77829f6696e562064a4b9a5cd687e4056d203288135c20c"
+      sha256: c109a5fee4b93f1cf2fcb2e6ea9c74285654e3e8799eb6e33c69581807214f94
       url: "https://pub.dev"
     source: hosted
-    version: "0.43.5"
+    version: "1.0.0"
+  state_beacon_flutter:
+    dependency: transitive
+    description:
+      name: state_beacon_flutter
+      sha256: "4429e1efc43ded8d05d34e2d9049cefa5c4d48a1f3cdaa43435015c5d73ec284"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   stream_channel:
     dependency: transitive
     description:
