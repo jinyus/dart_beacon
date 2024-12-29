@@ -95,6 +95,23 @@ abstract class Producer<T> implements Disposable {
     }
   }
 
+  /// This is true if the beacon is guarded from being disposed by
+  /// its dependants.
+  bool _guarded = false;
+
+  /// Prevents the beacon from being disposed by its dependants.
+  /// The beacon will still be disposed if its dependencies are disposed.
+  ///
+  /// ```dart
+  /// final number = Beacon(0)..guard();
+  /// final doubled = number.map((value) => value * 2);
+  /// doubled.dispose();
+  /// number.disposed; // false
+  /// ```
+  void guard() {
+    _guarded = true;
+  }
+
   /// The number of listeners subscribed to this beacon.
   int get listenersCount => _observers.length;
 
