@@ -71,7 +71,7 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
       });
 
       onDispose(() {
-        if (isDisposing) return;
+        if (isDisposing || target._guarded) return;
         isDisposing = true;
         target.dispose();
       });
