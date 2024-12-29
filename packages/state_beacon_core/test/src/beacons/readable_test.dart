@@ -167,4 +167,26 @@ void main() {
     beacon.value = 1;
     beacon.value = 2;
   });
+
+  test('should not dispose when dependant is disposed when guarded', () {
+    final number = Beacon.writable(0);
+
+    number.guard();
+
+    final doubled = number.map((value) => value * 2);
+
+    doubled.dispose();
+
+    expect(number.isDisposed, false);
+  });
+
+  test('should dispose when dependant is disposed when not guarded', () {
+    final number = Beacon.writable(0);
+
+    final doubled = number.map((value) => value * 2);
+
+    doubled.dispose();
+
+    expect(number.isDisposed, true);
+  });
 }
