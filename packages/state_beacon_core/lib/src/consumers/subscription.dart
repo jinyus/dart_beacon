@@ -43,21 +43,8 @@ class Subscription<T> implements Consumer {
   @override
   List<Producer<dynamic>?> sources = [];
 
-  var _innerStatus = DIRTY;
-
   @override
-  set _status(Status newStatus) {
-    final toRun = _innerStatus == CLEAN &&
-        newStatus == DIRTY &&
-        !_effectQueue.contains(this);
-    _innerStatus = newStatus;
-    if (toRun) {
-      _schedule();
-    }
-  }
-
-  @override
-  Status get _status => _innerStatus;
+  Status _status = DIRTY;
 
   void _schedule() {
     if (synchronous) {
