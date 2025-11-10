@@ -13,7 +13,11 @@ class Subscription<T> implements Consumer {
   }) {
     // derived beacons are lazy so they aren't registered as observers
     // of their sources until they are actually used
-    if (startNow || _derivedSource?.isEmpty == true) {
+    // If the derived beacon is already initialized and has no observers,
+    // we need to schedule to ensure it gets registered properly
+    if (startNow ||
+        _derivedSource?.isEmpty == true ||
+        (_derivedSource != null && _derivedSource!._observers.isEmpty)) {
       _schedule();
     } else {
       _status = CLEAN;
@@ -43,21 +47,8 @@ class Subscription<T> implements Consumer {
   @override
   List<Producer<dynamic>?> sources = [];
 
-  var _innerStatus = DIRTY;
-
   @override
-  set _status(Status newStatus) {
-    final toRun = _innerStatus == CLEAN &&
-        newStatus == DIRTY &&
-        !_effectQueue.contains(this);
-    _innerStatus = newStatus;
-    if (toRun) {
-      _schedule();
-    }
-  }
-
-  @override
-  Status get _status => _innerStatus;
+  Status _status = DIRTY;
 
   void _schedule() {
     if (synchronous) {
