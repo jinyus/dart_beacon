@@ -577,20 +577,34 @@ _NB_: The `previousValue` and current value will always be the same because the 
 
 Similar to Beacon.list(), but for Sets.
 
+```dart
+var uniqueNumbers = Beacon.hashSet<int>({1, 2, 3});
+
+Beacon.effect(() {
+  print(uniqueNumbers.value); // Outputs: {1, 2, 3}
+});
+
+uniqueNumbers.add(4); // Outputs: {1, 2, 3, 4}
+
+uniqueNumbers.remove(2); // Outputs: {1, 3, 4}
+```
+
 #### Beacon.hashMap:
 
 Similar to Beacon.list(), but for Maps.
 
 ```dart
-var nums = Beacon.list<int>([1, 2, 3]);
+var userMap = Beacon.hashMap<String, int>({});
 
 Beacon.effect(() {
- print(nums.value); // Outputs: [1, 2, 3]
+  print(userMap.value); // Outputs: {}
 });
 
-nums.add(4); // Outputs: [1, 2, 3, 4]
+userMap['Alice'] = 25; // Outputs: {Alice: 25}
 
-nums.remove(2); // Outputs: [1, 3, 4]
+userMap['Bob'] = 30; // Outputs: {Alice: 25, Bob: 30}
+
+userMap.remove('Alice'); // Outputs: {Bob: 30}
 ```
 
 ### AsyncValue:
