@@ -10,6 +10,9 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
   final T Function() _compute;
 
   @override
+  bool get isDerived => true;
+
+  @override
   T peek() {
     updateIfNecessary();
     return super.peek();
