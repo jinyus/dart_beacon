@@ -5,7 +5,18 @@ import 'package:state_beacon_core/state_beacon_core.dart';
 
 typedef VoidCallback = void Function();
 
-class BroadPropagationBenchmark extends BenchmarkBase {
+class BeaconBench extends BenchmarkBase {
+  BeaconBench(super.name);
+
+  @override
+  void exercise() {
+    for (var i = 0; i < 1000; i++) {
+      run();
+    }
+  }
+}
+
+class BroadPropagationBenchmark extends BeaconBench {
   BroadPropagationBenchmark() : super('BroadPropagationBenchmark');
 
   final head = Beacon.writable(0);
@@ -52,7 +63,7 @@ class BroadPropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class DeepPropagationBenchmark extends BenchmarkBase {
+class DeepPropagationBenchmark extends BeaconBench {
   DeepPropagationBenchmark() : super('DeepPropagationBenchmark');
 
   late final WritableBeacon<int> head;
@@ -104,7 +115,7 @@ class DeepPropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class AvoidablePropagationBenchmark extends BenchmarkBase {
+class AvoidablePropagationBenchmark extends BeaconBench {
   AvoidablePropagationBenchmark() : super('AvoidablePropagationBenchmark');
 
   late final WritableBeacon<int> head;
@@ -174,8 +185,8 @@ class AvoidablePropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class DiamondPropagationBenchmark extends BenchmarkBase {
-  DiamondPropagationBenchmark() : super('DiamondPropagationBenchmark');
+class DiamondBenchmark extends BeaconBench {
+  DiamondBenchmark() : super('DiamondBenchmark');
 
   static const width = 5;
   late final WritableBeacon<int> head;
@@ -236,8 +247,8 @@ class DiamondPropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class MuxPropagationBenchmark extends BenchmarkBase {
-  MuxPropagationBenchmark() : super('MuxPropagationBenchmark');
+class MuxBenchmark extends BeaconBench {
+  MuxBenchmark() : super('MuxBenchmark');
 
   late final List<WritableBeacon<int>> heads;
   late final ReadableBeacon<Map<int, int>> mux;
@@ -306,7 +317,7 @@ class MuxPropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class RepeatedObserversBenchmark extends BenchmarkBase {
+class RepeatedObserversBenchmark extends BeaconBench {
   RepeatedObserversBenchmark() : super('RepeatedObserversBenchmark');
 
   static const size = 30;
@@ -365,8 +376,8 @@ class RepeatedObserversBenchmark extends BenchmarkBase {
   }
 }
 
-class TrianglePropagationBenchmark extends BenchmarkBase {
-  TrianglePropagationBenchmark() : super('TrianglePropagationBenchmark');
+class TriangleBenchmark extends BeaconBench {
+  TriangleBenchmark() : super('TriangleBenchmark');
 
   static const width = 10;
   late final WritableBeacon<int> head;
@@ -434,8 +445,8 @@ class TrianglePropagationBenchmark extends BenchmarkBase {
   }
 }
 
-class UnstablePropagationBenchmark extends BenchmarkBase {
-  UnstablePropagationBenchmark() : super('UnstablePropagationBenchmark');
+class UnstableBenchmark extends BeaconBench {
+  UnstableBenchmark() : super('UnstableBenchmark');
 
   late final WritableBeacon<int> head;
   late final ReadableBeacon<int> double;
@@ -501,9 +512,9 @@ void main(List<String> args) {
   BroadPropagationBenchmark().report();
   DeepPropagationBenchmark().report();
   AvoidablePropagationBenchmark().report();
-  DiamondPropagationBenchmark().report();
-  MuxPropagationBenchmark().report();
+  DiamondBenchmark().report();
+  MuxBenchmark().report();
   RepeatedObserversBenchmark().report();
-  TrianglePropagationBenchmark().report();
-  UnstablePropagationBenchmark().report();
+  TriangleBenchmark().report();
+  UnstableBenchmark().report();
 }
