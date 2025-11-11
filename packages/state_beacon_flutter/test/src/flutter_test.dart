@@ -53,7 +53,7 @@ void main() {
           body: FutureCounter(derived: derivedFutureCounter),
         ),
       ),
-      k10ms,
+      duration: k10ms,
     );
 
     await tester.pumpAndSettle();
@@ -68,7 +68,7 @@ void main() {
           body: FutureCounter(derived: derivedFutureCounter),
         ),
       ),
-      k10ms * 2,
+      duration: k10ms * 2,
     );
 
     await tester.pumpAndSettle();
@@ -84,7 +84,7 @@ void main() {
           body: FutureCounter(derived: derivedFutureCounter),
         ),
       ),
-      k10ms * 2,
+      duration: k10ms * 2,
     );
 
     await tester.pumpAndSettle();
