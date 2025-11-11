@@ -1,0 +1,18 @@
+name: new_code
+description: A sample command-line application.
+version: 1.0.0
+publish_to: none
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.3.2
+
+# Add regular dependencies here.
+dependencies:
+  benchmark_harness: ^2.2.2
+  state_beacon_core: 
+    path: ../../packages/state_beacon_core
+
+dev_dependencies:
+  lints: ^3.0.0
+
