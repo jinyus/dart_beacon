@@ -26,7 +26,7 @@ jobs:
         if: github.event.pull_request.draft == false
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - uses: subosito/flutter-action@v2
 
@@ -59,7 +59,7 @@ jobs:
             #       flutter test
 
             - name: Upload coverage reports to Codecov
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v5
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
               with:
