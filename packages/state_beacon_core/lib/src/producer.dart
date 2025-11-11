@@ -101,7 +101,7 @@ abstract class Producer<T> implements Disposable {
 
   /// This is true if the producer is a DerivedBeacon.
   /// Used to avoid type checks in hot paths.
-  bool get isDerived => false;
+  bool get _isDerived => false;
 
   /// Prevents the beacon from being disposed by its dependants.
   /// The beacon will still be disposed if its dependencies are disposed.

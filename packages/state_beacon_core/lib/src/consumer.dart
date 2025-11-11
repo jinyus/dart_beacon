@@ -27,7 +27,7 @@ mixin Consumer {
 
     if (_status == CHECK) {
       for (final source in sources) {
-        if (source!.isDerived) {
+        if (source!._isDerived) {
           (source as DerivedBeacon).updateIfNecessary();
 
           if (_status == DIRTY) {
