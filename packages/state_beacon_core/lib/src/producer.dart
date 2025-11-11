@@ -99,6 +99,10 @@ abstract class Producer<T> implements Disposable {
   /// its dependants.
   bool _guarded = false;
 
+  /// This is true if the producer is a DerivedBeacon.
+  /// Used to avoid type checks in hot paths.
+  bool get isDerived => false;
+
   /// Prevents the beacon from being disposed by its dependants.
   /// The beacon will still be disposed if its dependencies are disposed.
   ///
@@ -195,7 +199,8 @@ abstract class Producer<T> implements Disposable {
   }
 
   void _notifyListeners() {
-    for (var i = 0; i < _observers.length; i++) {
+    final len = _observers.length;
+    for (var i = 0; i < len; i++) {
       _observers[i].markDirty();
     }
   }
