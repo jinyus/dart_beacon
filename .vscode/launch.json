@@ -40,5 +40,16 @@
             "request": "launch",
             "type": "dart"
         },
+        {
+            "name": "Profile bench",
+            "request": "launch",
+            "type": "dart",
+            "program": "examples/bench/lib/main.dart",
+            "args": [
+                "--profile",
+                "-d",
+                "linux"
+            ]
+        },
     ]
 }
