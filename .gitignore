@@ -1,3 +1,5 @@
 packages/state_beacon/pubspec_overrides.yaml
 codebuff.json
 knowledge.md
+.fvm*
+.vscode
