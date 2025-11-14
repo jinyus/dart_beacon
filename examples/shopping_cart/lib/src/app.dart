@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shopping_cart/src/cart/view.dart';
 import 'package:shopping_cart/src/catalog/view.dart';
+import 'package:shopping_cart/src/localization/app_localizations.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {

@@ -11,8 +11,8 @@ dependencies:
         sdk: flutter
     flutter_localizations:
         sdk: flutter
-    intl: ^0.18.0
-    provider: ^6.1.1
+    intl: ^0.20.2
+    provider: ^6.1.5+1
     state_beacon:
         path: ../../packages/state_beacon
 
@@ -20,7 +20,7 @@ dev_dependencies:
     flutter_test:
         sdk: flutter
     mocktail: ^1.0.0
-    very_good_analysis: ^5.1.0
+    very_good_analysis: ^10.0.0
 
 flutter:
     uses-material-design: true
