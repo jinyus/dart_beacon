@@ -1,7 +1,7 @@
 import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-void runAll() {
+String runAll() {
   final b1 = BroadPropagationBenchmark();
   final b2 = DeepPropagationBenchmark();
   final b3 = AvoidablePropagationBenchmark();
@@ -11,6 +11,7 @@ void runAll() {
   final b7 = TriangleBenchmark();
   final b8 = UnstableBenchmark();
 
+  final start = Stopwatch()..start();
   b1.setup();
   b1.exercise();
   b2.setup();
@@ -27,6 +28,8 @@ void runAll() {
   b7.exercise();
   b8.setup();
   b8.exercise();
+  final elapsed = start.elapsed;
+  return 'Took ${elapsed.inMilliseconds / 1000}s';
 }
 
 class BeaconBench extends BenchmarkBase {

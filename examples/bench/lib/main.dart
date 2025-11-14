@@ -2,13 +2,16 @@ import 'package:bench/benchmarks.dart';
 import 'package:flutter/material.dart';
 import 'package:state_beacon/state_beacon.dart';
 
+// This is used to profile the core library with the flutter profiler
+
 final runningBeacon = Beacon.writable(false);
+final resultBeacon = Beacon.writable<String>('Idle');
 
 void runBench() {
   runningBeacon.value = true;
   Future.delayed(Duration(seconds: 1)).then((_) {
     try {
-      runAll();
+      resultBeacon.value = runAll();
     } finally {
       runningBeacon.value = false;
     }
@@ -44,7 +47,7 @@ class BenchText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final running = runningBeacon.watch(context);
-    final text = running ? 'Running' : 'Idle';
+    final text = running ? 'Running' : resultBeacon.watch(context);
     final theme = Theme.of(context);
     return Text(text, style: theme.textTheme.displayLarge);
   }
