@@ -1,3 +1,8 @@
+# 1.0.2
+
+-   [Fix] Bug that caused some widgets to not rebuild when using go_router et al.
+-   [Refactor] Minor performance improvements.
+
 # 1.0.1
 
 -   Bug Fix: Flutter edge-case for derivedBeacons. This was fixed before but the current fix is more efficient.
