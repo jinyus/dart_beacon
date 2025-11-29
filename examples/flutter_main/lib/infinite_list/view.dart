@@ -28,11 +28,9 @@ class InfiniteListPage extends StatelessWidget {
                         final item = items[index];
 
                         return switch (item) {
-                          ItemData(value: final value) =>
-                            ItemTile(title: value),
+                          ItemData(:final value) => ItemTile(title: value),
                           ItemLoading() => const BottomWidget(),
-                          ItemError(error: final err) =>
-                            BottomWidget(error: err),
+                          ItemError(:final error) => BottomWidget(error: error),
                         };
                       },
                       itemCount: items.length,
@@ -79,7 +77,7 @@ class _BottomWidgetState extends State<BottomWidget> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // this widgets gets built when we reach the end of the list,
+      // this widget gets built when we reach the end of the list,
       // therefore, we should load more items
       if (widget.error == null) {
         infiniteControllerRef.read(context).pageNum.increment();

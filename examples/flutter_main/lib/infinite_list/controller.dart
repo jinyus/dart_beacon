@@ -7,9 +7,10 @@ class InfiniteController extends BeaconController {
   late final pageNum = B.filtered(1);
 
   // this re-executes the future when the pageNum changes
-  late final rawItems = B.future(
-    () => repo.fetchItems(pageNum.value, limit: pageSize),
-  );
+  late final rawItems = B.future(() {
+    final page = pageNum.value;
+    return repo.fetchItems(page, limit: pageSize);
+  });
 
   late final parsedItems = B.writable(<ListItem>[ItemLoading()]);
 
@@ -17,12 +18,8 @@ class InfiniteController extends BeaconController {
     // prevent the pageNum from changing when the list is loading
     pageNum.setFilter((_, __) => rawItems.isData);
 
-    // transform raw items into ListItems
-    parsedItems.wrap(
-      rawItems,
-      startNow: false,
-      then: (newAsyncValue) {
-        // get the current list
+    rawItems.subscribe(
+      (newAsyncValue) {
         final newList = parsedItems.peek().toList();
 
         // remove the last item if it's an ItemLoading or ItemError
@@ -45,6 +42,7 @@ class InfiniteController extends BeaconController {
           _ => newList..add(ItemLoading()),
         };
       },
+      startNow: false,
     );
   }
 }
