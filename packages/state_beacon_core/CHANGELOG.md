@@ -1,3 +1,7 @@
+# 1.0.2
+
+-   [Refactor] Minor performance improvements.
+
 # 1.0.1
 
 -   Bug Fix: Flutter edge-case for derivedBeacons. This was fixed before but the current fix is more efficient.

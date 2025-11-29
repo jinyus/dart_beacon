@@ -31,6 +31,6 @@ packages:
       path: "../../packages/state_beacon_core"
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.0.2"
 sdks:
   dart: ">=3.3.2 <4.0.0"
