@@ -3,11 +3,14 @@ part of 'search.dart';
 class WeatherController extends BeaconController {
   final WeatherRepository repo;
 
-  late final searchTextBeacon = B.lazyDebounced(duration: k100ms * 10);
+  late final searchText = TextEditingBeacon(group: B);
+
+  late final searchTextDebounced =
+      searchText.filter((_, n) => n.text.isNotEmpty).debounce(k100ms * 10);
 
   late final _searchResults = B.future(
     () async {
-      final query = searchTextBeacon.value;
+      final query = searchTextDebounced.value.text;
       return await repo.fetchWeather(query);
     },
     manualStart: true,
@@ -17,7 +20,10 @@ class WeatherController extends BeaconController {
   // to make it easier to test/mock. This is optional.
   ReadableBeacon<AsyncValue<Weather>> get searchResults => _searchResults;
 
-  WeatherController(this.repo);
+  WeatherController(this.repo) {
+    // start searching when the beacon is first set
+    searchTextDebounced.next().then((_) => start());
+  }
 
   void start() {
     _searchResults.start();

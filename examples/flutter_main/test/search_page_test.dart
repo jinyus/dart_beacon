@@ -18,13 +18,16 @@ void main() {
   final weatherCtrl = MockWeatherController();
 
   testWidgets('Search Page Test', (WidgetTester tester) async {
-    final searchTextBeacon = Beacon.lazyDebounced<String>();
+    final searchTextBeacon = Beacon.lazyDebounced<TextEditingValue>();
+
+    final searchText = TextEditingBeacon();
 
     late final searchResults =
         Beacon.writable<AsyncValue<Weather>>(AsyncIdle());
 
-    when(() => weatherCtrl.searchTextBeacon).thenReturn(searchTextBeacon);
+    when(() => weatherCtrl.searchTextDebounced).thenReturn(searchTextBeacon);
     when(() => weatherCtrl.searchResults).thenReturn(searchResults);
+    when(() => weatherCtrl.searchText).thenReturn(searchText);
     when(weatherCtrl.start).thenAnswer((_) {
       searchResults.value = AsyncLoading();
     });
@@ -44,7 +47,7 @@ void main() {
 
     expect(find.text('Enter a city to search for its weather'), findsOneWidget);
 
-    searchTextBeacon.value = 'new york';
+    searchTextBeacon.value = TextEditingValue(text: 'new york');
 
     weatherCtrl.start();
 

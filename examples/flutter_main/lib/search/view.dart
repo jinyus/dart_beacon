@@ -28,42 +28,15 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class SearchInput extends StatefulWidget {
+class SearchInput extends StatelessWidget {
   const SearchInput({super.key});
 
   @override
-  State<SearchInput> createState() => _SearchInputState();
-}
-
-class _SearchInputState extends State<SearchInput> {
-  final textController = TextEditingController();
-
-  @override
-  void initState() {
-    final controller = weatherControllerRef.read(context);
-    final searchTextBeacon = controller.searchTextBeacon;
-    textController.addListener(() {
-      if (textController.text.isEmpty) return;
-      searchTextBeacon.value = textController.text;
-    });
-
-    // Start searching when beacon is first set
-    searchTextBeacon.next().then((value) => controller.start());
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    textController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final wController = weatherControllerRef.of(context);
     return TextField(
       style: k24Text,
-      controller: textController,
+      controller: wController.searchText.controller,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Enter a city',
@@ -88,12 +61,12 @@ class SearchResults extends StatelessWidget {
         children: [
           k16SizeBox,
           switch (searchResults) {
-            AsyncData<Weather>(value: final v) => Text(
-                '$v',
+            AsyncData<Weather> data => Text(
+                '${data.value}',
                 style: k32Text,
                 textAlign: TextAlign.center,
               ),
-            AsyncError(error: final _) => const Text(
+            AsyncError _ => const Text(
                 'Nextwork Error',
                 style: TextStyle(color: Colors.red, fontSize: 24),
                 textAlign: TextAlign.center,
