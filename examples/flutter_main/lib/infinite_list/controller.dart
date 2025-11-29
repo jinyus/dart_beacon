@@ -45,4 +45,8 @@ class InfiniteController extends BeaconController {
       startNow: false,
     );
   }
+
+  void loadNextPage() => pageNum.increment();
+
+  void retryOnError() => rawItems.reset();
 }

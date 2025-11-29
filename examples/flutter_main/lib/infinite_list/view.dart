@@ -29,8 +29,8 @@ class InfiniteListPage extends StatelessWidget {
 
                         return switch (item) {
                           ItemData(:final value) => ItemTile(title: value),
-                          ItemLoading() => const BottomWidget(),
-                          ItemError(:final error) => BottomWidget(error: error),
+                          ItemLoading() => const LoadingIndicator(),
+                          ItemError(:final error) => ErrorDisplay(error: error),
                         };
                       },
                       itemCount: items.length,
@@ -61,59 +61,55 @@ class ItemTile extends StatelessWidget {
   }
 }
 
-class BottomWidget extends StatefulWidget {
-  const BottomWidget({
-    super.key,
-    this.error,
-  });
-
-  final Object? error;
+class LoadingIndicator extends StatefulWidget {
+  const LoadingIndicator({super.key});
 
   @override
-  State<BottomWidget> createState() => _BottomWidgetState();
+  State<LoadingIndicator> createState() => _LoadingIndicatorState();
 }
 
-class _BottomWidgetState extends State<BottomWidget> {
+class _LoadingIndicatorState extends State<LoadingIndicator> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // this widget gets built when we reach the end of the list,
       // therefore, we should load more items
-      if (widget.error == null) {
-        infiniteControllerRef.read(context).pageNum.increment();
-      }
+      infiniteControllerRef.read(context).loadNextPage();
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.error == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    return const Center(child: CircularProgressIndicator());
+  }
+}
 
-    const style = TextStyle(fontSize: 20);
-    if (widget.error is NoMoreItemsException) {
-      return const Text(
-        'No More Items',
-        style: style,
-        textAlign: TextAlign.center,
-      );
-    }
+class ErrorDisplay extends StatelessWidget {
+  const ErrorDisplay({
+    super.key,
+    required this.error,
+  });
 
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         Text(
-          widget.error?.toString() ?? 'Unknown Error',
-          style: style,
+          error.toString(),
+          style: const TextStyle(fontSize: 20),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 5),
-        ElevatedButton(
-          style: btnStyle,
-          onPressed: () => infiniteControllerRef.read(context).rawItems.reset(),
-          child: const Text('retry'),
-        )
+        if (error is! NoMoreItemsException) ...[
+          const SizedBox(height: 5),
+          ElevatedButton(
+            style: btnStyle,
+            onPressed: () => infiniteControllerRef.read(context).retryOnError(),
+            child: const Text('retry'),
+          )
+        ]
       ],
     );
   }

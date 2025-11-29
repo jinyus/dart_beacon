@@ -9,7 +9,7 @@ class PostRepository {
 
     // randomly throw an error
     if (pageNum > 2 && math.Random().nextBool()) {
-      throw Exception('Network Error');
+      throw Exception('Random Network Error');
     }
 
     final start = (pageNum - 1) * 10;
