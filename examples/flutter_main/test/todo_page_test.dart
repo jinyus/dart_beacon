@@ -9,40 +9,18 @@ import 'package:example/todo/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mocktail/mocktail.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-class MockTodoController extends Mock implements TodoController {}
-
 void main() {
-  final todoCtrl = MockTodoController();
-
   testWidgets('Todo Page Test', (WidgetTester tester) async {
-    final todosBeacon = Beacon.list(<Todo>[]);
-    final inputTextBeacon = Beacon.writable('');
-    final filterBeacon = Beacon.writable(Filter.active);
-
-    final filteredTodos = Beacon.derived(() {
-      final todos = todosBeacon.value;
-
-      return switch (filterBeacon.value) {
-        Filter.all => todos.toList(),
-        Filter.active => todos.where((e) => !e.completed).toList(),
-        Filter.done => todos.where((e) => e.completed).toList()
-      };
-    });
-
-    when(() => todoCtrl.todosBeacon).thenReturn(todosBeacon);
-    when(() => todoCtrl.inputTextBeacon).thenReturn(inputTextBeacon);
-    when(() => todoCtrl.filterBeacon).thenReturn(filterBeacon);
-    when(() => todoCtrl.filteredTodos).thenReturn(filteredTodos);
+    final controller = TodoController();
 
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: LiteRefScope(
             overrides: {
-              todoControllerRef.overrideWith((_) => todoCtrl),
+              todoControllerRef.overrideWith((_) => controller),
             },
             child: const TodoPage(),
           ),
@@ -50,63 +28,72 @@ void main() {
       ),
     );
 
-    todosBeacon.add(
-      const Todo(
-        id: '1',
-        description: 'new todo',
-      ),
-    );
+    // adding todo
+    final inputFinder = find.byKey(const Key('todoInput'));
+    expect(inputFinder, findsOneWidget);
 
+    await tester.enterText(inputFinder, 'todo #1');
+    await tester.pump();
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+
+    expect(find.text('todo #1'), findsOneWidget);
+
+    // filter by done
+    await tester.tap(find.byKey(const ValueKey('Filter.done button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('new todo'), findsOneWidget);
+    expect(find.text('todo #1'), findsNothing);
 
-    filterBeacon.value = Filter.done;
-
+    // adding another todo
+    await tester.enterText(inputFinder, 'todo #2');
+    await tester.pump();
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('Filter.all button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('new todo'), findsNothing);
+    expect(controller.todosBeacon.value.length, 2);
 
-    todosBeacon.add(
-      const Todo(
-        id: '2',
-        description: 'done todo',
-        completed: true,
-      ),
-    );
+    expect(find.text('todo #1'), findsOneWidget);
+    expect(find.text('todo #2'), findsOneWidget);
 
-    // find checkbox
+    final todo2ID = controller.todosBeacon.value.values.last.id;
+    final todo1ID = controller.todosBeacon.value.values.first.id;
+
+    await tester.tap(find.byKey(ValueKey('$todo2ID checkbox')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('Filter.done button')));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Checkbox), findsOneWidget);
+    expect(find.text('todo #1'), findsNothing);
+    expect(find.text('todo #2'), findsOneWidget);
 
-    expect(find.text('done todo'), findsOneWidget);
-    expect(find.text('new todo'), findsNothing);
-
-    filterBeacon.value = Filter.active;
-
+    await tester.tap(find.byKey(const ValueKey('Filter.active button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('new todo'), findsOneWidget);
-    expect(find.text('done todo'), findsNothing);
+    expect(find.text('todo #1'), findsOneWidget);
+    expect(find.text('todo #2'), findsNothing);
 
-    filterBeacon.value = Filter.all;
-
+    await tester.tap(find.byKey(ValueKey('$todo1ID delete button')));
     await tester.pumpAndSettle();
 
-    expect(find.byType(Checkbox), findsNWidgets(2));
+    expect(find.text('todo #1'), findsNothing);
+    expect(find.text('todo #2'), findsNothing);
 
-    await tester.tap(find.byKey(const ValueKey('1 delete button')));
-
+    await tester.tap(find.byKey(const ValueKey('Filter.all button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('new todo'), findsNothing);
-    expect(find.text('done todo'), findsOneWidget);
+    expect(controller.todosBeacon.value.length, 1);
+    expect(find.text('todo #1'), findsNothing);
+    expect(find.text('todo #2'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('2 delete button')));
-
+    await tester.tap(find.byKey(ValueKey('$todo2ID delete button')));
     await tester.pumpAndSettle();
 
-    expect(find.text('done todo'), findsNothing);
+    expect(find.text('todo #2'), findsNothing);
+
+    expect(controller.todosBeacon.value.length, 0);
   });
 }

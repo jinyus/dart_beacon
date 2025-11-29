@@ -8,7 +8,7 @@ import 'package:example/todo/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-final brightness = Beacon.writable(Brightness.light);
+final brightness = Ref.scoped((_) => Beacon.writable(Brightness.light));
 
 void main() => runApp(LiteRefScope(child: const MyApp()));
 
@@ -76,7 +76,8 @@ class MyHomePage extends StatelessWidget {
         ),
         floatingActionButton: IconButton(
           onPressed: () {
-            brightness.value = isDark ? Brightness.light : Brightness.dark;
+            brightness.of(context).value =
+                isDark ? Brightness.light : Brightness.dark;
           },
           icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
         ),

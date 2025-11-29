@@ -1,30 +1,34 @@
 part of 'todo.dart';
 
 class TodoController extends BeaconController {
-  late final todosBeacon = B.list(<Todo>[]);
-  late final inputTextBeacon = B.writable('');
+  late final todosBeacon = B.hashMap(<String, Todo>{});
+  late final inputTextBeacon = TextEditingBeacon(text: '', group: B);
   late final filterBeacon = B.writable(Filter.all);
 
   late final filteredTodos = B.derived(() {
     final todos = todosBeacon.value;
 
     return switch (filterBeacon.value) {
-      Filter.all => todos.toList(),
-      Filter.active => todos.where((e) => !e.completed).toList(),
-      Filter.done => todos.where((e) => e.completed).toList()
+      Filter.all => todos.values.toList(),
+      Filter.active => todos.values.where((e) => !e.completed).toList(),
+      Filter.done => todos.values.where((e) => e.completed).toList()
     };
   });
 
   void addTodo() {
-    final text = inputTextBeacon.value;
+    final text = inputTextBeacon.text;
     if (text.isNotEmpty) {
-      todosBeacon.add(
-        Todo(
-          id: DateTime.now().toIso8601String(),
-          description: text,
-        ),
-      );
-      inputTextBeacon.value = '';
+      final id = DateTime.now().toIso8601String();
+      todosBeacon[id] = Todo(id: id, description: text);
     }
+  }
+
+  void deleteTodo(String todoID) {
+    todosBeacon.remove(todoID);
+  }
+
+  void toggleTodo(bool completed, String todoID) {
+    final todo = todosBeacon[todoID]!;
+    todosBeacon[todoID] = todo.copyWith(completed: completed);
   }
 }

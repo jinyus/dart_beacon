@@ -1,6 +1,7 @@
 part of 'todo.dart';
 
 final todoControllerRef = Ref.scoped((ctx) => TodoController());
+final todoFocusRef = Ref.scoped((ctx) => FocusNode());
 
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
@@ -29,49 +30,27 @@ class TodoPage extends StatelessWidget {
   }
 }
 
-class TodoInput extends StatefulWidget {
+class TodoInput extends StatelessWidget {
   const TodoInput({super.key});
 
   @override
-  State<TodoInput> createState() => _TodoInputState();
-}
-
-class _TodoInputState extends State<TodoInput> {
-  late final TodoController controller;
-  late final textController = TextEditingController(
-    text: controller.inputTextBeacon.peek(),
-  );
-  final focus = FocusNode();
-
-  @override
-  void initState() {
-    controller = todoControllerRef.read(context);
-    textController.addListener(() {
-      controller.inputTextBeacon.value = textController.text;
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    textController.dispose();
-    focus.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final todoController = todoControllerRef.of(context);
+    final inputTextBeacon = todoController.inputTextBeacon;
+    final focus = todoFocusRef.of(context);
+
     return TextField(
+      key: const Key('todoInput'),
       style: k24Text,
       focusNode: focus,
-      controller: textController,
+      controller: inputTextBeacon.controller,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Todo',
       ),
       onSubmitted: (_) {
-        controller.addTodo();
-        textController.clear();
+        todoController.addTodo();
+        inputTextBeacon.clear();
         focus.requestFocus();
       },
     );
@@ -104,31 +83,22 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final todosBeacon = todoControllerRef(context).todosBeacon;
+    final controller = todoControllerRef(context);
+
     return ListTile(
       tileColor: Theme.of(context).colorScheme.secondaryContainer,
       title: Text(todo.description, style: k24Text),
       trailing: IconButton(
         key: ValueKey('${todo.id} delete button'),
         icon: const Icon(Icons.delete, color: Colors.red),
-        onPressed: () {
-          todosBeacon.removeWhere((e) => e.id == todo.id);
-        },
+        onPressed: () => controller.deleteTodo(todo.id),
       ),
       leading: Checkbox(
+        key: ValueKey('${todo.id} checkbox'),
         value: todo.completed,
         onChanged: (value) {
           if (value == null) return;
-          todosBeacon.mapInPlace((e) {
-            if (e.id == todo.id) {
-              return Todo(
-                id: e.id,
-                description: e.description,
-                completed: value,
-              );
-            }
-            return e;
-          });
+          controller.toggleTodo(value, todo.id);
         },
       ),
     );
@@ -148,6 +118,7 @@ class FilterButtons extends StatelessWidget {
         3,
         (int index) {
           return ChoiceChip(
+            key: ValueKey('${Filter.values[index]} button'),
             label: Text(Filter.values[index].name, style: k24Text),
             selected: current.index == index,
             onSelected: (bool selected) {
