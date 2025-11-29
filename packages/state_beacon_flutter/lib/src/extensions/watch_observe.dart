@@ -32,7 +32,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
   ///}
   /// ```
   T watch(BuildContext context) {
-    final key = context.hashCode;
+    final key = identityHashCode(context);
 
     return _watchOrObserve(
       key,
