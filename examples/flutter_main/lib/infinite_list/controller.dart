@@ -4,6 +4,7 @@ class InfiniteController extends BeaconController {
   static const pageSize = 10;
 
   final PostRepository repo;
+
   late final pageNum = B.filtered(1);
 
   // this re-executes the future when the pageNum changes
@@ -49,4 +50,10 @@ class InfiniteController extends BeaconController {
   void loadNextPage() => pageNum.increment();
 
   void retryOnError() => rawItems.reset();
+
+  Future refresh() async {
+    pageNum.reset();
+    parsedItems.reset();
+    return parsedItems.next();
+  }
 }

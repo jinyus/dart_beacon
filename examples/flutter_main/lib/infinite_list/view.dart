@@ -9,6 +9,8 @@ class InfiniteListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = infiniteControllerRef.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -21,20 +23,32 @@ class InfiniteListPage extends StatelessWidget {
                 const Text('Infinite List', style: k24Text),
                 Expanded(
                   child: Builder(builder: (ctx) {
-                    final items = infiniteControllerRef.select(
-                        context, (c) => c.parsedItems);
-                    return ListView.separated(
-                      itemBuilder: (context, index) {
-                        final item = items[index];
+                    final items = controller.parsedItems.watch(ctx);
+                    return RefreshIndicator(
+                      onRefresh: () async => controller.refresh(),
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                          },
+                        ),
+                        child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            final item = items[index];
 
-                        return switch (item) {
-                          ItemData(:final value) => ItemTile(title: value),
-                          ItemLoading() => const LoadingIndicator(),
-                          ItemError(:final error) => ErrorDisplay(error: error),
-                        };
-                      },
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 5),
+                            return switch (item) {
+                              ItemData(:final value) => ItemTile(title: value),
+                              ItemLoading() => const LoadingIndicator(),
+                              ItemError(:final error) =>
+                                ErrorDisplay(error: error),
+                            };
+                          },
+                          itemCount: items.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 5),
+                        ),
+                      ),
                     );
                   }),
                 ),
