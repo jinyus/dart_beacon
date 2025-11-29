@@ -32,7 +32,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
   ///}
   /// ```
   T watch(BuildContext context) {
-    final key = context.hashCode;
+    final key = identityHashCode(context);
 
     return _watchOrObserve(
       key,
@@ -67,7 +67,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     bool synchronous = false,
   }) {
     final key = Object.hash(
-      context,
+      identityHashCode(context),
       'isObserving', // create 1 subscription for each widget
     );
 
