@@ -67,7 +67,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     bool synchronous = false,
   }) {
     final key = Object.hash(
-      context,
+      identityHashCode(context),
       'isObserving', // create 1 subscription for each widget
     );
 
