@@ -3,13 +3,21 @@ import 'package:state_beacon/state_beacon.dart';
 import 'models.dart';
 
 class CalculatorController extends BeaconController {
-  late final display = B.writable('0');
-
   late final lastAction = B.writable<CalculatorAction>(ClearAction());
 
-  double? _firstOperand;
-  Operation? _operation;
-  bool _shouldResetDisplay = false;
+  late final firstOperand = B.writable<double?>(null);
+  late final operation = B.writable<Operation?>(null);
+  late final display = B.writable('0');
+
+  late final shouldResetDisplay = B.derived(() {
+    final action = lastAction.value;
+    final prevAction = lastAction.previousValue;
+    
+    if (action is NumberAction || action is DecimalAction) {
+      return prevAction is OperationAction || prevAction is EqualsAction;
+    }
+    return false;
+  });
 
   CalculatorController() {
     lastAction.subscribe(_handleAction);
@@ -21,16 +29,14 @@ class CalculatorController extends BeaconController {
         display.value = '0';
       case NumberAction():
         final current = display.peek();
-        if (current == '0' || _shouldResetDisplay) {
-          _shouldResetDisplay = false;
+        if (current == '0' || shouldResetDisplay.peek()) {
           display.value = action.digit;
         } else {
           display.value = current + action.digit;
         }
       case DecimalAction():
         final current = display.peek();
-        if (_shouldResetDisplay) {
-          _shouldResetDisplay = false;
+        if (shouldResetDisplay.peek()) {
           display.value = '0.';
         } else if (!current.contains('.')) {
           display.value = '$current.';
@@ -45,12 +51,15 @@ class CalculatorController extends BeaconController {
       case OperationAction():
         break;
       case EqualsAction():
-        if (_operation != null && _firstOperand != null) {
+        if (operation.peek() != null && firstOperand.peek() != null) {
           final second = double.tryParse(display.peek()) ?? 0;
-          final result = _calculate(_firstOperand!, second, _operation!);
-          _firstOperand = result;
-          _operation = null;
-          _shouldResetDisplay = true;
+          final result = _calculate(
+            firstOperand.peek()!,
+            second,
+            operation.peek()!,
+          );
+          firstOperand.value = result;
+          operation.value = null;
           display.value = _formatResult(result);
         }
     }
@@ -62,17 +71,23 @@ class CalculatorController extends BeaconController {
 
   void inputOperation(Operation op) {
     final currentValue = double.tryParse(display.peek()) ?? 0;
+    final prevAction = lastAction.peek();
 
-    if (_firstOperand != null && _operation != null && !_shouldResetDisplay) {
-      final result = _calculate(_firstOperand!, currentValue, _operation!);
-      _firstOperand = result;
-      display.value = _formatResult(result);
+    if (firstOperand.peek() != null &&
+        operation.peek() != null &&
+        prevAction is! OperationAction &&
+        prevAction is! EqualsAction) {
+      final result = _calculate(
+        firstOperand.peek()!,
+        currentValue,
+        operation.peek()!,
+      );
+      firstOperand.value = result;
     } else {
-      _firstOperand = currentValue;
+      firstOperand.value = currentValue;
     }
 
-    _operation = op;
-    _shouldResetDisplay = true;
+    operation.value = op;
     lastAction.value = OperationAction(op);
   }
 
@@ -81,9 +96,8 @@ class CalculatorController extends BeaconController {
   }
 
   void clear() {
-    _firstOperand = null;
-    _operation = null;
-    _shouldResetDisplay = false;
+    firstOperand.value = null;
+    operation.value = null;
     lastAction.value = ClearAction();
   }
 
