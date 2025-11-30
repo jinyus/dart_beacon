@@ -154,6 +154,7 @@ class AvoidablePropagationBenchmark extends BeaconBench {
   var callCount = 0;
 
   void busy() {
+    // ignore: unused_local_variable
     int a = 0;
     for (int i = 0; i < 100; i++) {
       a++;

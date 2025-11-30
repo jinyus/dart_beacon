@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars, hash_and_equals, avoid_equals_and_hash_code_on_mutable_classes
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:state_beacon_flutter/state_beacon_flutter.dart';
@@ -63,7 +65,9 @@ void main() {
     'context hashCode investigation',
     (WidgetTester tester) async {
       final counter = Beacon.writable(0);
+      // ignore: unused_local_variable
       BuildContext? firstContext;
+      // ignore: unused_local_variable
       BuildContext? secondContext;
 
       await tester.pumpWidget(
@@ -253,7 +257,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Count: 1'), findsOneWidget);
 
-      navigatorKey.currentState!.push(
+      await navigatorKey.currentState!.push(
         MaterialPageRoute<void>(
           builder: (_) => const Scaffold(body: Text('Second Page')),
         ),

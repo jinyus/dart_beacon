@@ -47,7 +47,7 @@ void main() {
 
     expect(find.text('Enter a city to search for its weather'), findsOneWidget);
 
-    searchTextBeacon.value = TextEditingValue(text: 'new york');
+    searchTextBeacon.value = const TextEditingValue(text: 'new york');
 
     weatherCtrl.start();
 
