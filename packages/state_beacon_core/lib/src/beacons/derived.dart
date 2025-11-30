@@ -14,12 +14,26 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   T peek() {
-    updateIfNecessary();
+    if (currentConsumer != this) {
+      updateIfNecessary();
+    } else {
+      // recursion, make sure this is beacon is not empty
+      if (isEmpty) {
+        throw StateError(
+          'Derived Beacon called recursively before it has a value',
+        );
+      }
+    }
     return super.peek();
   }
 
   @override
   T get value {
+    assert(
+      currentConsumer != this,
+      'Recursive access detected: DerivedBeacon cannot access its own value during'
+      ' computation. Use peek() instead.',
+    );
     currentConsumer?.startWatching(this);
     updateIfNecessary();
     return _value;
