@@ -88,27 +88,6 @@ void main() {
     expect(d(), 20);
   });
 
-  //todo: fix this test
-  // test('should not watch new beacon conditionally', () {
-  //   final num1 = Beacon.writable<int>(10);
-  //   final num2 = Beacon.writable<int>(20);
-
-  //   final derivedBeacon = Beacon.derived(
-  //     () {
-  //       if (num2().isEven) return num2();
-  //       return num1.value + num2.value;
-  //     },
-  //     supportConditional: false,
-  //   );
-
-  //   expect(derivedBeacon(), 20);
-
-  //   // should not trigger recompute as it wasn't accessed on first run
-  //   num1.value = 15;
-
-  //   expect(derivedBeacon.value, 20);
-  // });
-
   test('should stop watching dependencies when it has no more watchers',
       () async {
     final num1 = Beacon.writable<int>(10);
