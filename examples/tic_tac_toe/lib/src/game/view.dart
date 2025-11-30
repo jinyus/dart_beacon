@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:state_beacon/state_beacon.dart';
 import 'package:tic_tac_toe/src/game/controller.dart';
 
+import 'models.dart';
+
 final gameControllerRef = Ref.scoped((_) => GameController());
 
 class GameView extends StatelessWidget {

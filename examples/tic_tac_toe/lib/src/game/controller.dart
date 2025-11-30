@@ -1,63 +1,32 @@
 import 'package:state_beacon/state_beacon.dart';
 
-enum Player {
-  x(),
-  o();
-
-  Player get opponent => this == o ? x : o;
-}
-
-enum GameStatus {
-  playing(),
-  xWins(),
-  oWins(),
-  draw();
-
-  bool isPlaying() => this == playing;
-}
-
-typedef PlayerMove = ({Player player, int position});
-
-typedef GameResult = ({GameStatus status, List<int>? winningLine});
+import 'models.dart';
 
 final _emptyBoard = List<Player?>.filled(9, null);
 
-sealed class Action {}
-
-class ResetAction extends Action {}
-
-class MoveAction extends Action {
-  final Player player;
-  final int position;
-
-  MoveAction({required this.player, required this.position});
-}
-
 class GameController extends BeaconController {
-  GameController() {
-    nextAction.setFilter((prev, next) {
-      return switch (next) {
-        ResetAction() => true,
-        MoveAction move => gameResult.value.status.isPlaying() &&
-            board.peek()[move.position] == null,
-      };
-    });
+  late final ReadableBeacon<List<Player?>> board = B.derived(() {
+    final action = nextAction.value;
 
-    nextAction.subscribe((action) {
-      switch (action) {
-        case ResetAction():
-          board.value = _emptyBoard.toList();
-        case MoveAction move:
-          board[move.position] = move.player;
-      }
-    }, startNow: false);
-  }
-
-  late final board = B.list(_emptyBoard.toList());
+    switch (action) {
+      case ResetAction():
+        return _emptyBoard.toList();
+      case MoveAction move:
+        final current = board.peek().toList();
+        current[move.position] = move.player;
+        return current;
+    }
+  });
 
   late final gameResult = B.derived(() => _checkWinner(board.value));
 
-  late final nextAction = B.filtered<Action>(ResetAction());
+  late final nextAction = B.filtered<Action>(ResetAction(), filter: (_, next) {
+    return switch (next) {
+      ResetAction() => true,
+      MoveAction move => gameResult.value.status.isPlaying() &&
+          board.peek()[move.position] == null,
+    };
+  });
 
   late final nextPlayer = B.derived(() {
     return switch (nextAction.value) {
