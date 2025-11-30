@@ -1,0 +1,27 @@
+name: tic_tac_toe
+description: Tic Tac Toe game example using state_beacon
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  state_beacon: 
+    path: ../../packages/state_beacon
+
+dependency_overrides:
+  state_beacon_core: 
+    path: ../../packages/state_beacon_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
