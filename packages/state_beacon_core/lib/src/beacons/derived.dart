@@ -14,7 +14,16 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   T peek() {
-    updateIfNecessary();
+    if (currentConsumer != this) {
+      updateIfNecessary();
+    } else {
+      // recursion, make sure this is beacon is not empty
+      if (isEmpty) {
+        throw StateError(
+          'Derived Beacon called recursively before it has a value',
+        );
+      }
+    }
     return super.peek();
   }
 

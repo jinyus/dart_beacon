@@ -249,4 +249,110 @@ void main() {
   //   expect(ran, 1);
   //   expect(a.listenersCount, 1);
   // });
+
+  test('should allow recursive derived beacon call with existing value', () {
+    final counter = Beacon.writable(0);
+    late ReadableBeacon<int> derived;
+
+    derived = Beacon.derived(() {
+      final count = counter.value;
+      if (count > 0 && count < 3) {
+        return derived.peek() + count;
+      }
+      return count;
+    });
+
+    expect(derived.value, 0);
+
+    counter.value = 1;
+    expect(derived.value, 1);
+
+    counter.value = 2;
+    expect(derived.value, 3);
+
+    counter.value = 3;
+    expect(derived.value, 3);
+  });
+
+  test('should throw StateError when recursively called before it has a value',
+      () {
+    late ReadableBeacon<int> derived;
+
+    derived = Beacon.derived(() {
+      return derived.peek() + 1;
+    });
+
+    expect(
+      () => derived.value,
+      throwsA(
+        isA<StateError>().having(
+          (e) => e.message,
+          'message',
+          contains('Derived Beacon called recursively before it has a value'),
+        ),
+      ),
+    );
+  });
+
+  test('should handle nested recursive derived beacon calls', () {
+    final a = Beacon.writable(0);
+    late ReadableBeacon<int> derived1;
+    late ReadableBeacon<int> derived2;
+
+    derived1 = Beacon.derived(() {
+      final val = a.value;
+      if (val > 0) {
+        return val + derived1.peek();
+      }
+      return val;
+    });
+
+    derived2 = Beacon.derived(() {
+      final val = derived1.value;
+      if (val > 0 && val < 5) {
+        return val + derived2.peek();
+      }
+      return val;
+    });
+
+    expect(derived2.value, 0);
+
+    a.value = 1;
+    expect(derived1.value, 1);
+    expect(derived2.value, 1);
+
+    a.value = 2;
+    expect(derived1.value, 3);
+    expect(derived2.value, 4);
+
+    a.value = 3;
+    expect(derived1.value, 6);
+    expect(derived2.value, 6);
+  });
+
+  test('should distinguish between recursive peek() and value access', () {
+    final trigger = Beacon.writable(0);
+    late ReadableBeacon<int> derived;
+    var computeCount = 0;
+
+    derived = Beacon.derived(() {
+      computeCount++;
+      final val = trigger.value;
+      if (val > 0) {
+        return val + derived.peek();
+      }
+      return val;
+    });
+
+    expect(derived.value, 0);
+    expect(computeCount, 1);
+
+    trigger.value = 1;
+    expect(derived.value, 1);
+    expect(computeCount, 2);
+
+    trigger.value = 2;
+    expect(derived.value, 3);
+    expect(computeCount, 3);
+  });
 }
