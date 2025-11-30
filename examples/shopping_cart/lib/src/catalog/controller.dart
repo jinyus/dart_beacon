@@ -10,14 +10,9 @@ class CatalogController {
 
   final CatalogService _catalogService;
 
-  late final _catalog = Beacon.future(
-    _catalogService.load,
-    manualStart: true,
-  );
+  late final _catalog = Beacon.future(_catalogService.load);
 
   ReadableBeacon<AsyncValue<Catalog>> get catalog => _catalog;
-
-  void start() => _catalog.start();
 
   void refresh() => _catalog.reset();
 }

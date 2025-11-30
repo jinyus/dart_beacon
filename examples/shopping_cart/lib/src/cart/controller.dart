@@ -7,7 +7,9 @@ import 'package:state_beacon/state_beacon.dart';
 import 'service.dart';
 
 class CartController extends BeaconController {
-  CartController(this._cartService);
+  CartController(this._cartService) {
+    _cart.tryCatch(() => _cartService.loadProducts());
+  }
 
   final CartService _cartService;
 
@@ -19,10 +21,6 @@ class CartController extends BeaconController {
   late final removingItems = B.family((int id) => B.writable(false));
 
   ReadableBeacon<AsyncValue<Cart>> get cart => _cart;
-
-  Future<void> start() async {
-    await _cart.tryCatch(() => _cartService.loadProducts());
-  }
 
   Future<void> addItem(Product item) async {
     addingItems(item.id).value = true;
