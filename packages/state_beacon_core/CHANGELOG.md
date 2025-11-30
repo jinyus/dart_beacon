@@ -1,3 +1,22 @@
+# 1.1.0
+
+-   [Feat] Derived Beacons can now access their own value with '.peek()'. The beacon must have a value so a base case is required.
+
+```dart
+final counter = Beacon.writable(0);
+
+late final ReadableBeacon<int> accumulated;
+
+accumulated = Beacon.derived(() {
+    final count = counter.value;
+
+    if (count == 0) {
+        return 0; // base case
+    }
+    return accumulated.peek() + counter.value;
+});
+```
+
 # 1.0.2
 
 -   [Refactor] Minor performance improvements.
