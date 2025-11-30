@@ -355,4 +355,23 @@ void main() {
     expect(derived.value, 3);
     expect(computeCount, 3);
   });
+
+  test('should throw AssertionError on recursive value access', () {
+    late ReadableBeacon<int> derived;
+
+    derived = Beacon.derived(() {
+      return derived.value + 1;
+    });
+
+    expect(
+      () => derived.value,
+      throwsA(
+        isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('Recursive access detected'),
+        ),
+      ),
+    );
+  });
 }
