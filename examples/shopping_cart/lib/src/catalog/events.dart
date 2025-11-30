@@ -1,4 +1,0 @@
-enum CatalogEvent {
-  started,
-  refresh,
-}

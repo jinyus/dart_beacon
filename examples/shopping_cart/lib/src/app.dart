@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           AppLocalizations.of(context)!.appTitle,
 
       theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      // darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
 
       // Define a function to handle named routes in order to support

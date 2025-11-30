@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shopping_cart/deps.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-import 'events.dart';
-
 const loadingIndicator = Center(child: CircularProgressIndicator());
 
 class CartView extends StatelessWidget {
@@ -56,8 +54,7 @@ class CartList extends StatelessWidget {
             if (item == null) {
               return const SizedBox.shrink();
             }
-            final isRemoving =
-                controller.removingIndex.watch(context).contains(item);
+            final isRemoving = controller.removingItems(item.id).watch(context);
 
             return Material(
               shape: RoundedRectangleBorder(
@@ -79,7 +76,7 @@ class CartList extends StatelessWidget {
                     onPressed: isRemoving
                         ? null
                         : () {
-                            controller.dispatch(CartItemRemoved(item));
+                            controller.removeItem(item);
                           },
                   ),
                 ),

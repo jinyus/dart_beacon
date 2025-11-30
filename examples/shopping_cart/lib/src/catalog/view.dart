@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:shopping_cart/deps.dart';
-import 'package:shopping_cart/src/cart/events.dart';
-import 'package:shopping_cart/src/catalog/events.dart';
 import 'package:shopping_cart/src/models/product.dart';
 import 'package:state_beacon/state_beacon.dart';
 
@@ -21,7 +19,7 @@ class CatalogView extends StatelessWidget {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          controller.dispatch(CatalogEvent.refresh);
+          controller.refresh();
         },
         child: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(
@@ -115,8 +113,7 @@ class AddButton extends StatelessWidget {
             final cart = state.lastData!;
             final isInCart = cart.items.contains(item);
 
-            final isAdding =
-                controller.addingItem.watch(context).contains(item);
+            final isAdding = controller.addingItems(item.id).watch(context);
 
             final btnChild = isAdding
                 ? const CircularProgressIndicator()
@@ -129,9 +126,8 @@ class AddButton extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                   minimumSize: const Size(100, 50)),
-              onPressed: isInCart || isAdding
-                  ? null
-                  : () => controller.dispatch(CartItemAdded(item)),
+              onPressed:
+                  isInCart || isAdding ? null : () => controller.addItem(item),
               child: isInCart
                   ? const Icon(Icons.check, semanticLabel: 'ADDED')
                   : btnChild,

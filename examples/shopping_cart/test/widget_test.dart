@@ -24,8 +24,8 @@ final _sampleCatalog = Catalog([
   Product(id: 2, name: 'Product 2', price: 2, color: Colors.black),
 ]);
 
-final _addingItem = Beacon.hashSet<Product>({});
-final _removingItem = Beacon.hashSet<Product>({});
+final _addingItem = Beacon.family((int id) => Beacon.writable(false));
+final _removingItem = Beacon.family((int id) => Beacon.writable(false));
 
 final _mockCart = Beacon.writable<AsyncValue<Cart>>(AsyncLoading());
 final _mockCatalog = Beacon.writable<AsyncValue<Catalog>>(AsyncLoading());
@@ -40,8 +40,8 @@ void main() {
 
   testWidgets('Full app test', (WidgetTester tester) async {
     when(() => cartC.cart).thenReturn(_mockCart);
-    when(() => cartC.addingItem).thenReturn(_addingItem);
-    when(() => cartC.removingIndex).thenReturn(_removingItem);
+    when(() => cartC.addingItems).thenReturn(_addingItem);
+    when(() => cartC.removingItems).thenReturn(_removingItem);
     when(() => catalogC.catalog).thenReturn(_mockCatalog);
 
     await tester.pumpWidget(LiteRefScope(

@@ -3,7 +3,6 @@
 import 'package:shopping_cart/src/models/models.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-import 'events.dart';
 import 'service.dart';
 
 class CatalogController {
@@ -18,12 +17,7 @@ class CatalogController {
 
   ReadableBeacon<AsyncValue<Catalog>> get catalog => _catalog;
 
-  Future<void> dispatch(CatalogEvent event) async {
-    switch (event) {
-      case CatalogEvent.started:
-        _catalog.start();
-      case CatalogEvent.refresh:
-        _catalog.reset();
-    }
-  }
+  void start() => _catalog.start();
+
+  void refresh() => _catalog.reset();
 }
