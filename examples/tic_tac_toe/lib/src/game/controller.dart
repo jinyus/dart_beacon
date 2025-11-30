@@ -1,79 +1,78 @@
 import 'package:state_beacon/state_beacon.dart';
 
-enum Player { x, o }
+enum Player {
+  x(),
+  o();
 
-enum GameStatus { playing, xWins, oWins, draw }
+  Player get opponent => this == o ? x : o;
+}
 
-class GameState {
-  final List<Player?> board;
-  final Player currentPlayer;
-  final GameStatus status;
-  final List<int>? winningLine;
+enum GameStatus {
+  playing(),
+  xWins(),
+  oWins(),
+  draw();
 
-  const GameState({
-    required this.board,
-    required this.currentPlayer,
-    required this.status,
-    this.winningLine,
-  });
+  bool isPlaying() => this == playing;
+}
 
-  GameState copyWith({
-    List<Player?>? board,
-    Player? currentPlayer,
-    GameStatus? status,
-    List<int>? winningLine,
-  }) {
-    return GameState(
-      board: board ?? this.board,
-      currentPlayer: currentPlayer ?? this.currentPlayer,
-      status: status ?? this.status,
-      winningLine: winningLine ?? this.winningLine,
-    );
-  }
+typedef PlayerMove = ({Player player, int position});
+
+typedef GameResult = ({GameStatus status, List<int>? winningLine});
+
+final _emptyBoard = List<Player?>.filled(9, null);
+
+sealed class Action {}
+
+class ResetAction extends Action {}
+
+class MoveAction extends Action {
+  final Player player;
+  final int position;
+
+  MoveAction({required this.player, required this.position});
 }
 
 class GameController extends BeaconController {
-  late final gameState = B.writable(
-    GameState(
-      board: List.filled(9, null),
-      currentPlayer: Player.x,
-      status: GameStatus.playing,
-    ),
-  );
+  GameController() {
+    nextAction.setFilter((prev, next) {
+      return switch (next) {
+        ResetAction() => true,
+        MoveAction move => gameResult.value.status.isPlaying() &&
+            board.peek()[move.position] == null,
+      };
+    });
 
-  void makeMove(int index) {
-    final state = gameState.value;
-
-    if (state.status != GameStatus.playing || state.board[index] != null) {
-      return;
-    }
-
-    final newBoard = List<Player?>.from(state.board);
-    newBoard[index] = state.currentPlayer;
-
-    final winCheck = _checkWinner(newBoard);
-    final status = winCheck.status;
-    final winningLine = winCheck.winningLine;
-
-    gameState.value = state.copyWith(
-      board: newBoard,
-      currentPlayer:
-          state.currentPlayer == Player.x ? Player.o : Player.x,
-      status: status,
-      winningLine: winningLine,
-    );
+    nextAction.subscribe((action) {
+      switch (action) {
+        case ResetAction():
+          board.value = _emptyBoard.toList();
+        case MoveAction move:
+          board[move.position] = move.player;
+      }
+    }, startNow: false);
   }
 
-  void reset() {
-    gameState.value = GameState(
-      board: List.filled(9, null),
-      currentPlayer: Player.x,
-      status: GameStatus.playing,
-    );
+  late final board = B.list(_emptyBoard.toList());
+
+  late final gameResult = B.derived(() => _checkWinner(board.value));
+
+  late final nextAction = B.filtered<Action>(ResetAction());
+
+  late final nextPlayer = B.derived(() {
+    return switch (nextAction.value) {
+      ResetAction() => Player.x,
+      MoveAction move => move.player.opponent,
+    };
+  });
+
+  void doMove(int index) {
+    nextAction.value = MoveAction(player: nextPlayer.peek(), position: index);
   }
 
-  ({GameStatus status, List<int>? winningLine}) _checkWinner(
-      List<Player?> board) {
+  void reset() => nextAction.value = ResetAction();
+
+  GameResult _checkWinner(List<Player?> board) {
     const winPatterns = [
       [0, 1, 2],
       [3, 4, 5],

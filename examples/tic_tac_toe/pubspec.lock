@@ -184,12 +184,11 @@ packages:
     source: path
     version: "1.0.2"
   state_beacon_core:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: state_beacon_core
-      sha256: b6bc1e7addb52b218f651e0279e17ceaaf20bf28285e7bf5a6828d2ece24eb19
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../packages/state_beacon_core"
+      relative: true
+    source: path
     version: "1.0.2"
   state_beacon_flutter:
     dependency: transitive

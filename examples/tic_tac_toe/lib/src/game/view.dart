@@ -39,15 +39,17 @@ class GameStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = gameControllerRef.select(context, (c) => c.gameState);
+    final controller = gameControllerRef(context);
+    final player = controller.nextPlayer.watch(context);
+    final status = controller.gameResult.watch(context).status;
     final theme = Theme.of(context);
 
     String statusText;
     Color statusColor;
 
-    switch (state.status) {
+    switch (status) {
       case GameStatus.playing:
-        statusText = 'Player ${state.currentPlayer == Player.x ? 'X' : 'O'}\'s turn';
+        statusText = 'Player ${player.name.toUpperCase()}\'s turn';
         statusColor = theme.colorScheme.primary;
       case GameStatus.xWins:
         statusText = 'Player X Wins!';
@@ -112,10 +114,11 @@ class GameCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = gameControllerRef(context);
-    final state = controller.gameState.watch(context);
+    final board = controller.board.watch(context);
+    final winningLine = controller.gameResult.watch(context).winningLine;
     final theme = Theme.of(context);
-    final player = state.board[index];
-    final isWinningCell = state.winningLine?.contains(index) ?? false;
+    final player = board[index];
+    final isWinningCell = winningLine?.contains(index) ?? false;
 
     Color getCellColor() {
       if (isWinningCell) {
@@ -134,7 +137,7 @@ class GameCell extends StatelessWidget {
       color: getCellColor(),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: () => controller.makeMove(index),
+        onTap: () => controller.doMove(index),
         borderRadius: BorderRadius.circular(12),
         child: Center(
           child: AnimatedSwitcher(

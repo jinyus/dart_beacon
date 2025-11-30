@@ -10,8 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   state_beacon: 
     path: ../../packages/state_beacon
+
+dependency_overrides:
+  state_beacon_core: 
+    path: ../../packages/state_beacon_core
 
 dev_dependencies:
   flutter_test:
