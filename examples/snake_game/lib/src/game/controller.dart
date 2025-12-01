@@ -26,12 +26,13 @@ class GameController extends BeaconController {
       ChangeDirectionAction action => action.direction,
       PauseGameAction() => direction.peek(),
       ResumeGameAction() => direction.peek(),
-      CollisionAction() => direction.peek(),
+      MoveSnakeAction() => direction.peek(),
     };
   });
 
   late final ReadableBeacon<GameStatus> status = B.derived(() {
     final action = nextAction.value;
+    final currentSnake = snake.value;
 
     switch (action) {
       case StartGameAction():
@@ -42,8 +43,16 @@ class GameController extends BeaconController {
         return GameStatus.playing;
       case ChangeDirectionAction():
         return status.peek();
-      case CollisionAction():
-        return GameStatus.gameOver;
+      case MoveSnakeAction():
+        if (currentSnake.isEmpty) return status.peek();
+
+        final head = currentSnake.first;
+        final newHead = head.move(direction.peek());
+
+        if (_isCollision(newHead, currentSnake)) {
+          return GameStatus.gameOver;
+        }
+        return status.peek();
     }
   });
 
@@ -114,8 +123,9 @@ class GameController extends BeaconController {
     final head = currentSnake.first;
     final newHead = head.move(direction.peek());
 
+    nextAction.value = MoveSnakeAction();
+
     if (_isCollision(newHead, currentSnake)) {
-      nextAction.value = CollisionAction();
       _gameTimer?.cancel();
       return;
     }
