@@ -174,11 +174,23 @@ class GameControls extends StatelessWidget {
       height: 240,
       child: Column(
         children: [
-          if (status == GameStatus.paused || status == GameStatus.gameOver) ...[
+          if (status == GameStatus.paused) ...[
+            FilledButton.icon(
+              onPressed: controller.resumeGame,
+              icon: const Icon(Icons.play_arrow),
+              label: const Text('Resume'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+              ),
+            ),
+          ],
+          if (status == GameStatus.gameOver) ...[
             FilledButton.icon(
               onPressed: controller.startGame,
               icon: const Icon(Icons.play_arrow),
-              label: Text(status == GameStatus.gameOver ? 'New Game' : 'Start Game'),
+              label: const Text('New Game'),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 backgroundColor: theme.colorScheme.primary,
