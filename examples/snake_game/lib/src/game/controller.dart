@@ -19,6 +19,8 @@ class GameController extends BeaconController {
     });
   }
 
+  bool get notStarted => snake.previousValue == null;
+
   late final nextAction = B.filtered<GameAction>(
     PauseGameAction(),
     filter: (prev, next) {

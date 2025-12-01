@@ -138,7 +138,9 @@ class GameBoard extends StatelessWidget {
                 width: cellSize - 1,
                 height: cellSize - 1,
                 decoration: BoxDecoration(
-                  color: position == snake.first ? Colors.green.shade700 : Colors.green,
+                  color: position == snake.first
+                      ? Colors.green.shade700
+                      : Colors.green,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -168,6 +170,7 @@ class GameControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = gameControllerRef(context);
     final status = controller.status.watch(context);
+    final notStarted = controller.notStarted;
     final theme = Theme.of(context);
 
     return SizedBox(
@@ -178,9 +181,12 @@ class GameControls extends StatelessWidget {
             FilledButton.icon(
               onPressed: controller.resumeGame,
               icon: const Icon(Icons.play_arrow),
-              label: const Text('Resume'),
+              label: Text(notStarted ? 'Start' : 'Resume'),
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
               ),
@@ -192,7 +198,10 @@ class GameControls extends StatelessWidget {
               icon: const Icon(Icons.play_arrow),
               label: const Text('New Game'),
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
               ),
@@ -207,7 +216,10 @@ class GameControls extends StatelessWidget {
                   icon: const Icon(Icons.pause),
                   label: const Text('Pause'),
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -216,7 +228,10 @@ class GameControls extends StatelessWidget {
                   icon: const Icon(Icons.restart_alt),
                   label: const Text('Restart'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ],
@@ -235,19 +250,22 @@ class GameControls extends StatelessWidget {
                     Row(
                       children: [
                         IconButton.filled(
-                          onPressed: () => controller.changeDirection(Direction.left),
+                          onPressed: () =>
+                              controller.changeDirection(Direction.left),
                           icon: const Icon(Icons.arrow_back),
                           iconSize: 32,
                         ),
                         const SizedBox(width: 8),
                         IconButton.filled(
-                          onPressed: () => controller.changeDirection(Direction.down),
+                          onPressed: () =>
+                              controller.changeDirection(Direction.down),
                           icon: const Icon(Icons.arrow_downward),
                           iconSize: 32,
                         ),
                         const SizedBox(width: 8),
                         IconButton.filled(
-                          onPressed: () => controller.changeDirection(Direction.right),
+                          onPressed: () =>
+                              controller.changeDirection(Direction.right),
                           icon: const Icon(Icons.arrow_forward),
                           iconSize: 32,
                         ),
@@ -270,7 +288,7 @@ class InstructionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
