@@ -17,6 +17,12 @@ class GameController extends BeaconController {
         _gameTimer?.cancel();
       }
     });
+
+    speed.subscribe((newSpeed) {
+      if (status.peek().isPlaying) {
+        _startGameLoop();
+      }
+    });
   }
 
   bool get notStarted => snake.previousValue == null;
@@ -70,7 +76,7 @@ class GameController extends BeaconController {
 
   late final ReadableBeacon<Direction> direction = B.derived(() {
     return switch (nextAction.value) {
-      _ when direction.isEmpty => Direction.right,
+      // _ when direction.isEmpty => Direction.right,
       StartGameAction() => Direction.right,
       PauseGameAction() when direction.isEmpty => Direction.right,
       ChangeDirectionAction action => action.direction,
@@ -106,6 +112,9 @@ class GameController extends BeaconController {
     }
   });
 
+  // Speed decreases by 30ms every 50 points (snake grows by 5 segments).
+  // Starts at 300ms, capped at minimum of 100ms.
+  // Changes trigger game loop restart via subscription in constructor.
   late final ReadableBeacon<int> speed = B.derived(() {
     final currentScore = score.value;
     final reduction = (currentScore ~/ 50) * 30;
@@ -138,9 +147,6 @@ class GameController extends BeaconController {
     final newHead = currentSnake.first;
 
     if (newHead == food.value) {
-      if (score.peek() % 50 == 0 && score.peek() > 0) {
-        _startGameLoop();
-      }
       food.value = _generateFood();
     }
   }
