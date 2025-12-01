@@ -2,6 +2,12 @@
 
 Classic Snake game built with Flutter and state_beacon for state management.
 
+
+
+https://github.com/user-attachments/assets/2b1352ae-1d9b-4ee9-84b4-3e843b54c527
+
+
+
 ## Project Structure
 
 ```
