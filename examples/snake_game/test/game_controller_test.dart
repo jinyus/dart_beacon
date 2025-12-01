@@ -74,7 +74,7 @@ void main() {
       test('resumeGame does not change status when game over', () {
         controller.startGame();
         controller.nextAction.value = MoveSnakeAction();
-        
+
         if (controller.status.value == GameStatus.gameOver) {
           controller.resumeGame();
           expect(controller.status.value, GameStatus.gameOver);
@@ -141,10 +141,10 @@ void main() {
       test('snake grows when eating food', () {
         controller.startGame();
         final initialLength = controller.snake.value.length;
-        
+
         controller.food.value = const Position(11, 10);
         controller.nextAction.value = MoveSnakeAction();
-        
+
         expect(controller.snake.value.length, greaterThan(initialLength));
       });
 
@@ -168,11 +168,11 @@ void main() {
       test('snake can move without collision', () async {
         controller.startGame();
         await Future.delayed(const Duration(milliseconds: 10));
-        
+
         for (int i = 0; i < 5; i++) {
           controller.nextAction.value = MoveSnakeAction();
         }
-        
+
         expect(controller.status.value, GameStatus.playing);
       });
     });
@@ -182,7 +182,7 @@ void main() {
         controller.startGame();
         await Future.delayed(const Duration(milliseconds: 10));
         expect(controller.score.value, 0);
-        
+
         controller.food.value = const Position(11, 10);
         controller.nextAction.value = MoveSnakeAction();
         expect(controller.score.value, 10);
@@ -192,13 +192,13 @@ void main() {
         controller.startGame();
         await Future.delayed(const Duration(milliseconds: 10));
         final initialSpeed = controller.speed.value;
-        
+
         for (int i = 0; i < 5; i++) {
           final head = controller.snake.value.first;
           controller.food.value = Position(head.x + 1, head.y);
           controller.nextAction.value = MoveSnakeAction();
         }
-        
+
         expect(controller.score.value, 50);
         expect(controller.speed.value, lessThan(initialSpeed));
       });
@@ -215,7 +215,7 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 10));
         controller.nextAction.value = MoveSnakeAction();
         controller.nextAction.value = StartGameAction();
-        
+
         expect(controller.snake.value, [const Position(10, 10)]);
         expect(controller.direction.value, Direction.right);
         expect(controller.status.value, GameStatus.playing);
@@ -226,7 +226,7 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 10));
         controller.nextAction.value = MoveSnakeAction();
         final snakeBeforePause = controller.snake.value;
-        
+
         controller.nextAction.value = PauseGameAction();
         expect(controller.snake.value, snakeBeforePause);
         expect(controller.status.value, GameStatus.paused);
@@ -236,7 +236,7 @@ void main() {
         controller.startGame();
         await Future.delayed(const Duration(milliseconds: 10));
         final initialSnake = controller.snake.value;
-        
+
         controller.changeDirection(Direction.down);
         await Future.delayed(const Duration(milliseconds: 10));
         expect(controller.direction.value, Direction.down);
