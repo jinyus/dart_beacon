@@ -13,7 +13,13 @@ class GameController extends BeaconController {
   late final direction = B.writable<Direction>(Direction.right);
   late final status = B.writable<GameStatus>(GameStatus.paused);
   late final score = B.writable<int>(0);
-  late final speed = B.writable<int>(initialSpeed);
+
+  late final ReadableBeacon<int> speed = B.derived(() {
+    final currentScore = score.value;
+    final reduction = (currentScore ~/ 50) * 30;
+    final newSpeed = initialSpeed - reduction;
+    return newSpeed > 100 ? newSpeed : 100;
+  });
 
   late final ReadableBeacon<Position> food = B.derived(() {
     // game just started
@@ -40,7 +46,6 @@ class GameController extends BeaconController {
     direction.value = Direction.right;
     status.value = GameStatus.playing;
     score.value = 0;
-    speed.value = initialSpeed;
     _startGameLoop();
   }
 
@@ -90,9 +95,7 @@ class GameController extends BeaconController {
       score.value = score.peek() + 10;
       // food.value = _generateFood();
 
-      if (score.peek() % 50 == 0 && speed.peek() > 100) {
-        final newSpeed = speed.peek() - 30;
-        speed.value = newSpeed;
+      if (score.peek() % 50 == 0) {
         _startGameLoop();
       }
     } else {
