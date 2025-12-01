@@ -17,24 +17,45 @@ class GameController extends BeaconController {
     });
   }
 
-  late final snake = B.writable<List<Position>>([const Position(10, 10)]);
+  late final ReadableBeacon<List<Position>> snake = B.derived(() {
+    final action = nextAction.value;
+
+    if (snake.isEmpty) return [const Position(10, 10)];
+
+    switch (action) {
+      case StartGameAction():
+        return [const Position(10, 10)];
+      case PauseGameAction():
+      case ResumeGameAction():
+      case ChangeDirectionAction():
+        return snake.peek();
+      case MoveSnakeAction():
+        final currentSnake = snake.peek().toList();
+        final head = currentSnake.first;
+        var newHead = head.move(direction.peek());
+
+        if (newHead.x < 0) newHead = Position(gridSize - 1, newHead.y);
+        if (newHead.x >= gridSize) newHead = Position(0, newHead.y);
+        if (newHead.y < 0) newHead = Position(newHead.x, gridSize - 1);
+        if (newHead.y >= gridSize) newHead = Position(newHead.x, 0);
+
+        currentSnake.insert(0, newHead);
+
+        if (newHead != food.peek()) {
+          currentSnake.removeLast();
+        }
+
+        return currentSnake;
+    }
+  });
 
   late final nextAction = B.filtered<GameAction>(
     PauseGameAction(),
     filter: (prev, next) => true,
   );
 
-  late final ReadableBeacon<Direction> direction = B.derived(() {
-    return switch (nextAction.value) {
-      _ when direction.isEmpty => Direction.right,
-      StartGameAction() => Direction.right,
-      PauseGameAction() when direction.isEmpty => Direction.right,
-      ChangeDirectionAction action => action.direction,
-      PauseGameAction() => direction.peek(),
-      ResumeGameAction() => direction.peek(),
-      MoveSnakeAction() => direction.peek(),
-    };
-  });
+  late final WritableBeacon<Direction> direction =
+      B.writable(Direction.right);
 
   late final ReadableBeacon<GameStatus> status = B.derived(() {
     final action = nextAction.value;
@@ -73,16 +94,9 @@ class GameController extends BeaconController {
     return (snake.value.length - 1) * 10;
   });
 
-  late final ReadableBeacon<Position> food = B.derived(() {
-    // game just started
-    if (snake.value.length == 1 && food.isEmpty) return _generateFood();
-
-    // snake eat food
-    if (snake.value.first == food.peek()) return _generateFood();
-
-    // snake moves
-    return food.peek();
-  });
+  late final WritableBeacon<Position> food = B.writable(
+    _generateFood(isFirst: true),
+  );
 
   Timer? _gameTimer;
 
@@ -93,7 +107,7 @@ class GameController extends BeaconController {
   }
 
   void startGame() {
-    snake.value = [const Position(10, 10)];
+    direction.value = Direction.right;
     nextAction.value = StartGameAction();
     _startGameLoop();
   }
@@ -111,8 +125,8 @@ class GameController extends BeaconController {
 
   void changeDirection(Direction newDirection) {
     if (!status.peek().isPlaying) return;
-    if (newDirection != direction.peek().opposite) {
-      nextAction.value = ChangeDirectionAction(newDirection);
+    if (newDirection != direction.value.opposite) {
+      direction.value = newDirection;
     }
   }
 
@@ -127,41 +141,30 @@ class GameController extends BeaconController {
   void _moveSnake() {
     if (status.peek() != GameStatus.playing) return;
 
-    final currentSnake = snake.peek().toList();
-    final head = currentSnake.first;
-    var newHead = head.move(direction.peek());
-
-    // Wrap around walls
-    if (newHead.x < 0) newHead = Position(gridSize - 1, newHead.y);
-    if (newHead.x >= gridSize) newHead = Position(0, newHead.y);
-    if (newHead.y < 0) newHead = Position(newHead.x, gridSize - 1);
-    if (newHead.y >= gridSize) newHead = Position(newHead.x, 0);
-
     nextAction.value = MoveSnakeAction();
 
-    currentSnake.insert(0, newHead);
+    final currentSnake = snake.peek();
+    final newHead = currentSnake.first;
 
-    if (newHead == food.peek()) {
+    if (newHead == food.value) {
       if (score.peek() % 50 == 0 && score.peek() > 0) {
         _startGameLoop();
       }
-    } else {
-      currentSnake.removeLast();
+      food.value = _generateFood();
     }
-
-    snake.value = currentSnake;
   }
 
   bool _isCollision(Position head, List<Position> snakeBody) {
     return snakeBody.contains(head);
   }
 
-  Position _generateFood() {
+  Position _generateFood({bool isFirst = false}) {
     final random = Random();
     Position newFood;
+    final currentSnake = isFirst ? [const Position(10, 10)] : snake.peek();
     do {
       newFood = Position(random.nextInt(gridSize), random.nextInt(gridSize));
-    } while (snake.peek().contains(newFood));
+    } while (currentSnake.contains(newFood));
     return newFood;
   }
 }
