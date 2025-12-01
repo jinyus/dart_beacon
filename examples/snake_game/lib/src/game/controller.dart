@@ -23,7 +23,7 @@ class GameController extends BeaconController {
 
   late final nextAction = B.filtered<GameAction>(
     PauseGameAction(),
-    filter: (prev, next) {
+    filter: (_, next) {
       return switch (next) {
         ResumeGameAction() => status.peek() == GameStatus.paused,
         ChangeDirectionAction action =>
