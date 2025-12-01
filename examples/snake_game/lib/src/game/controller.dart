@@ -19,6 +19,7 @@ class GameController extends BeaconController {
 
   late final ReadableBeacon<List<Position>> snake = B.derived(() {
     final action = nextAction.value;
+    final snakeDirection = direction.value;
 
     if (snake.isEmpty) return [const Position(10, 10)];
 
@@ -28,12 +29,11 @@ class GameController extends BeaconController {
       case PauseGameAction():
       case ResumeGameAction():
       case ChangeDirectionAction():
-        direction.value;
         return snake.peek();
       case MoveSnakeAction():
         final currentSnake = snake.peek().toList();
         final head = currentSnake.first;
-        var newHead = head.move(direction.value);
+        var newHead = head.move(snakeDirection);
 
         if (newHead.x < 0) newHead = Position(gridSize - 1, newHead.y);
         if (newHead.x >= gridSize) newHead = Position(0, newHead.y);
