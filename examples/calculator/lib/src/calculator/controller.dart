@@ -7,7 +7,6 @@ class CalculatorController extends BeaconController {
 
   late final firstOperand = B.writable<double?>(null);
   late final operation = B.writable<Operation?>(null);
-  late final display = B.writable('0');
 
   late final shouldResetDisplay = B.derived(() {
     final action = lastAction.value;
@@ -19,68 +18,66 @@ class CalculatorController extends BeaconController {
     return false;
   });
 
-  CalculatorController() {
-    lastAction.subscribe(_handleAction);
-  }
-
-  void _handleAction(CalculatorAction action) {
+  late final display = B.derived(() {
+    final action = lastAction.value;
+    final current = display.previousValue ?? '0';
+    
     switch (action) {
       case ClearAction():
-        display.value = '0';
+        return '0';
       case NumberAction():
-        final current = display.peek();
-        if (current == '0' || shouldResetDisplay.peek()) {
-          display.value = action.digit;
+        if (current == '0' || shouldResetDisplay.value) {
+          return action.digit;
         } else {
-          display.value = current + action.digit;
+          return current + action.digit;
         }
       case DecimalAction():
-        final current = display.peek();
-        if (shouldResetDisplay.peek()) {
-          display.value = '0.';
+        if (shouldResetDisplay.value) {
+          return '0.';
         } else if (!current.contains('.')) {
-          display.value = '$current.';
+          return '$current.';
         }
+        return current;
       case DeleteAction():
-        final current = display.peek();
         if (current.length <= 1) {
-          display.value = '0';
+          return '0';
         } else {
-          display.value = current.substring(0, current.length - 1);
+          return current.substring(0, current.length - 1);
         }
       case OperationAction():
-        break;
+        return current;
       case EqualsAction():
-        if (operation.peek() != null && firstOperand.peek() != null) {
-          final second = double.tryParse(display.peek()) ?? 0;
+        if (operation.value != null && firstOperand.value != null) {
+          final second = double.tryParse(current) ?? 0;
           final result = _calculate(
-            firstOperand.peek()!,
+            firstOperand.value!,
             second,
-            operation.peek()!,
+            operation.value!,
           );
           firstOperand.value = result;
           operation.value = null;
-          display.value = _formatResult(result);
+          return _formatResult(result);
         }
+        return current;
     }
-  }
+  });
 
   void inputNumber(String digit) {
     lastAction.value = NumberAction(digit);
   }
 
   void inputOperation(Operation op) {
-    final currentValue = double.tryParse(display.peek()) ?? 0;
-    final prevAction = lastAction.peek();
+    final currentValue = double.tryParse(display.value) ?? 0;
+    final prevAction = lastAction.value;
 
-    if (firstOperand.peek() != null &&
-        operation.peek() != null &&
+    if (firstOperand.value != null &&
+        operation.value != null &&
         prevAction is! OperationAction &&
         prevAction is! EqualsAction) {
       final result = _calculate(
-        firstOperand.peek()!,
+        firstOperand.value!,
         currentValue,
-        operation.peek()!,
+        operation.value!,
       );
       firstOperand.value = result;
     } else {
