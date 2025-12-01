@@ -117,9 +117,7 @@ class GameController extends BeaconController {
     return (snake.value.length - 1) * 10;
   });
 
-  late final WritableBeacon<Position> food = B.writable(
-    _generateFood(isFirst: true),
-  );
+  late final WritableBeacon<Position> food = B.writable(_generateFood());
 
   Timer? _gameTimer;
 
@@ -164,9 +162,9 @@ class GameController extends BeaconController {
   }
 
   final _random = Random();
-  Position _generateFood({bool isFirst = false}) {
+  Position _generateFood() {
     Position newFood;
-    final currentSnake = isFirst ? [const Position(10, 10)] : snake.peek();
+    final currentSnake = notStarted ? [const Position(10, 10)] : snake.peek();
     do {
       newFood = Position(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (currentSnake.contains(newFood));
