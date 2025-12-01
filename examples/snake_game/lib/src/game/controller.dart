@@ -15,6 +15,12 @@ class GameController extends BeaconController {
         _gameTimer?.cancel();
       }
     });
+
+    nextAction.subscribe((action) {
+      if (action is StartGameAction || action is ResumeGameAction) {
+        _startGameLoop();
+      }
+    });
   }
 
   late final ReadableBeacon<List<Position>> snake = B.derived(() {
@@ -119,7 +125,6 @@ class GameController extends BeaconController {
 
   void startGame() {
     nextAction.value = StartGameAction();
-    _startGameLoop();
   }
 
   void pauseGame() {
@@ -129,7 +134,6 @@ class GameController extends BeaconController {
   void resumeGame() {
     if (status.peek() == GameStatus.paused) {
       nextAction.value = ResumeGameAction();
-      _startGameLoop();
     }
   }
 
