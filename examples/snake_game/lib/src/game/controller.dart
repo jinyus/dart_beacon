@@ -84,11 +84,10 @@ class GameController extends BeaconController {
 
     switch (action) {
       case StartGameAction():
+      case ResumeGameAction():
         return GameStatus.playing;
       case PauseGameAction():
         return GameStatus.paused;
-      case ResumeGameAction():
-        return GameStatus.playing;
       case ChangeDirectionAction():
         return status.peek();
       case MoveSnakeAction():
