@@ -57,4 +57,4 @@ class ChangeDirectionAction extends GameAction {
   ChangeDirectionAction(this.direction);
 }
 
-class MoveSnakeAction extends GameAction {} 
+class CollisionAction extends GameAction {} 
