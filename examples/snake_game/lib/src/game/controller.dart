@@ -18,8 +18,6 @@ class GameController extends BeaconController {
   }
 
   late final snake = B.writable<List<Position>>([const Position(10, 10)]);
-  // late final direction = B.writable<Direction>(Direction.right);
-  late final score = B.writable<int>(0);
 
   late final nextAction = B.filtered<GameAction>(
     PauseGameAction(),
@@ -71,6 +69,10 @@ class GameController extends BeaconController {
     return newSpeed > 100 ? newSpeed : 100;
   });
 
+  late final score = B.derived(() {
+    return (snake.value.length - 1) * 10;
+  });
+
   late final ReadableBeacon<Position> food = B.derived(() {
     // game just started
     if (snake.value.length == 1 && food.isEmpty) return _generateFood();
@@ -92,7 +94,6 @@ class GameController extends BeaconController {
 
   void startGame() {
     snake.value = [const Position(10, 10)];
-    score.value = 0;
     nextAction.value = StartGameAction();
     _startGameLoop();
   }
@@ -141,9 +142,7 @@ class GameController extends BeaconController {
     currentSnake.insert(0, newHead);
 
     if (newHead == food.peek()) {
-      score.value = score.peek() + 10;
-
-      if (score.peek() % 50 == 0) {
+      if (score.peek() % 50 == 0 && score.peek() > 0) {
         _startGameLoop();
       }
     } else {
