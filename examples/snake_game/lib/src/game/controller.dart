@@ -10,15 +10,11 @@ const int initialSpeed = 300;
 
 class GameController extends BeaconController {
   GameController() {
-    status.subscribe((value) {
-      if (!value.isPlaying) {
-        _gameTimer?.cancel();
-      }
-    });
-
-    nextAction.subscribe((action) {
-      if (action is StartGameAction || action is ResumeGameAction) {
+    status.subscribe((nextStatus) {
+      if (nextStatus.isPlaying) {
         _startGameLoop();
+      } else {
+        _gameTimer?.cancel();
       }
     });
   }
@@ -150,12 +146,6 @@ class GameController extends BeaconController {
     }
   }
 
-  @override
-  void dispose() {
-    _gameTimer?.cancel();
-    super.dispose();
-  }
-
   void startGame() {
     nextAction.value = StartGameAction();
   }
@@ -180,5 +170,11 @@ class GameController extends BeaconController {
       newFood = Position(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (currentSnake.contains(newFood));
     return newFood;
+  }
+
+  @override
+  void dispose() {
+    _gameTimer?.cancel();
+    super.dispose();
   }
 }
