@@ -170,81 +170,84 @@ class GameControls extends StatelessWidget {
     final status = controller.status.watch(context);
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        if (status == GameStatus.paused || status == GameStatus.gameOver) ...[
-          FilledButton.icon(
-            onPressed: controller.startGame,
-            icon: const Icon(Icons.play_arrow),
-            label: Text(status == GameStatus.gameOver ? 'New Game' : 'Start Game'),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
+    return SizedBox(
+      height: 240,
+      child: Column(
+        children: [
+          if (status == GameStatus.paused || status == GameStatus.gameOver) ...[
+            FilledButton.icon(
+              onPressed: controller.startGame,
+              icon: const Icon(Icons.play_arrow),
+              label: Text(status == GameStatus.gameOver ? 'New Game' : 'Start Game'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+              ),
             ),
-          ),
-        ],
-        if (status == GameStatus.playing) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FilledButton.icon(
-                onPressed: controller.pauseGame,
-                icon: const Icon(Icons.pause),
-                label: const Text('Pause'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-              ),
-              const SizedBox(width: 16),
-              OutlinedButton.icon(
-                onPressed: controller.startGame,
-                icon: const Icon(Icons.restart_alt),
-                label: const Text('Restart'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  IconButton.filled(
-                    onPressed: () => controller.changeDirection(Direction.up),
-                    icon: const Icon(Icons.arrow_upward),
-                    iconSize: 32,
+          ],
+          if (status == GameStatus.playing) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: controller.pauseGame,
+                  icon: const Icon(Icons.pause),
+                  label: const Text('Pause'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
-                  Row(
-                    children: [
-                      IconButton.filled(
-                        onPressed: () => controller.changeDirection(Direction.left),
-                        icon: const Icon(Icons.arrow_back),
-                        iconSize: 32,
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filled(
-                        onPressed: () => controller.changeDirection(Direction.down),
-                        icon: const Icon(Icons.arrow_downward),
-                        iconSize: 32,
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filled(
-                        onPressed: () => controller.changeDirection(Direction.right),
-                        icon: const Icon(Icons.arrow_forward),
-                        iconSize: 32,
-                      ),
-                    ],
+                ),
+                const SizedBox(width: 16),
+                OutlinedButton.icon(
+                  onPressed: controller.startGame,
+                  icon: const Icon(Icons.restart_alt),
+                  label: const Text('Restart'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(
+                  children: [
+                    IconButton.filled(
+                      onPressed: () => controller.changeDirection(Direction.up),
+                      icon: const Icon(Icons.arrow_upward),
+                      iconSize: 32,
+                    ),
+                    Row(
+                      children: [
+                        IconButton.filled(
+                          onPressed: () => controller.changeDirection(Direction.left),
+                          icon: const Icon(Icons.arrow_back),
+                          iconSize: 32,
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.filled(
+                          onPressed: () => controller.changeDirection(Direction.down),
+                          icon: const Icon(Icons.arrow_downward),
+                          iconSize: 32,
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.filled(
+                          onPressed: () => controller.changeDirection(Direction.right),
+                          icon: const Icon(Icons.arrow_forward),
+                          iconSize: 32,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
