@@ -91,7 +91,7 @@ class GameController extends BeaconController {
       case ChangeDirectionAction():
         return status.peek();
       case MoveSnakeAction():
-        if (currentSnake.isEmpty) return status.peek();
+        if (currentSnake.length < 4) return status.peek();
 
         final head = currentSnake.first;
         final newHead = head.move(direction.peek());
