@@ -19,6 +19,20 @@ class GameController extends BeaconController {
     });
   }
 
+  late final nextAction = B.filtered<GameAction>(
+    PauseGameAction(),
+    filter: (prev, next) {
+      return switch (next) {
+        ResumeGameAction() => status.peek() == GameStatus.paused,
+        ChangeDirectionAction action =>
+          status.peek().isPlaying &&
+              action.direction != direction.peek().opposite,
+        PauseGameAction() || MoveSnakeAction() => status.peek().isPlaying,
+        StartGameAction() => true,
+      };
+    },
+  );
+
   late final ReadableBeacon<List<Position>> snake = B.derived(() {
     final action = nextAction.value;
     final snakeDirection = direction.value;
@@ -51,20 +65,6 @@ class GameController extends BeaconController {
         return currentSnake;
     }
   });
-
-  late final nextAction = B.filtered<GameAction>(
-    PauseGameAction(),
-    filter: (prev, next) {
-      return switch (next) {
-        ResumeGameAction() => status.peek() == GameStatus.paused,
-        ChangeDirectionAction action =>
-          status.peek().isPlaying &&
-              action.direction != direction.peek().opposite,
-        PauseGameAction() || MoveSnakeAction() => status.peek().isPlaying,
-        StartGameAction() => true,
-      };
-    },
-  );
 
   late final ReadableBeacon<Direction> direction = B.derived(() {
     return switch (nextAction.value) {
