@@ -58,7 +58,16 @@ class GameController extends BeaconController {
 
   late final nextAction = B.filtered<GameAction>(
     PauseGameAction(),
-    filter: (prev, next) => true,
+    filter: (prev, next) {
+      return switch (next) {
+        ResumeGameAction() => status.peek() == GameStatus.paused,
+        ChangeDirectionAction action =>
+          status.peek().isPlaying &&
+              action.direction != direction.peek().opposite,
+        PauseGameAction() || MoveSnakeAction() => status.peek().isPlaying,
+        StartGameAction() => true,
+      };
+    },
   );
 
   late final ReadableBeacon<Direction> direction = B.derived(() {
@@ -117,33 +126,6 @@ class GameController extends BeaconController {
 
   Timer? _gameTimer;
 
-  @override
-  void dispose() {
-    _gameTimer?.cancel();
-    super.dispose();
-  }
-
-  void startGame() {
-    nextAction.value = StartGameAction();
-  }
-
-  void pauseGame() {
-    nextAction.value = PauseGameAction();
-  }
-
-  void resumeGame() {
-    if (status.peek() == GameStatus.paused) {
-      nextAction.value = ResumeGameAction();
-    }
-  }
-
-  void changeDirection(Direction newDirection) {
-    if (!status.peek().isPlaying) return;
-    if (newDirection != direction.peek().opposite) {
-      nextAction.value = ChangeDirectionAction(newDirection);
-    }
-  }
-
   void _startGameLoop() {
     _gameTimer?.cancel();
     _gameTimer = Timer.periodic(
@@ -168,12 +150,34 @@ class GameController extends BeaconController {
     }
   }
 
+  @override
+  void dispose() {
+    _gameTimer?.cancel();
+    super.dispose();
+  }
+
+  void startGame() {
+    nextAction.value = StartGameAction();
+  }
+
+  void pauseGame() {
+    nextAction.value = PauseGameAction();
+  }
+
+  void resumeGame() {
+    nextAction.value = ResumeGameAction();
+  }
+
+  void changeDirection(Direction newDirection) {
+    nextAction.value = ChangeDirectionAction(newDirection);
+  }
+
+  final _random = Random();
   Position _generateFood({bool isFirst = false}) {
-    final random = Random();
     Position newFood;
     final currentSnake = isFirst ? [const Position(10, 10)] : snake.peek();
     do {
-      newFood = Position(random.nextInt(gridSize), random.nextInt(gridSize));
+      newFood = Position(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (currentSnake.contains(newFood));
     return newFood;
   }
