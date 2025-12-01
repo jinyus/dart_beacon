@@ -9,6 +9,14 @@ const int gridSize = 20;
 const int initialSpeed = 300;
 
 class GameController extends BeaconController {
+  GameController() {
+    status.subscribe((value) {
+      if (value == GameStatus.gameOver) {
+        _gameTimer?.cancel();
+      }
+    });
+  }
+
   late final snake = B.writable<List<Position>>([const Position(10, 10)]);
   // late final direction = B.writable<Direction>(Direction.right);
   late final score = B.writable<int>(0);
@@ -124,11 +132,6 @@ class GameController extends BeaconController {
     final newHead = head.move(direction.peek());
 
     nextAction.value = MoveSnakeAction();
-
-    if (_isCollision(newHead, currentSnake)) {
-      _gameTimer?.cancel();
-      return;
-    }
 
     currentSnake.insert(0, newHead);
 
