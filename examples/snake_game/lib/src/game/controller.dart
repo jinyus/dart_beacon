@@ -129,7 +129,13 @@ class GameController extends BeaconController {
 
     final currentSnake = snake.peek().toList();
     final head = currentSnake.first;
-    final newHead = head.move(direction.peek());
+    var newHead = head.move(direction.peek());
+
+    // Wrap around walls
+    if (newHead.x < 0) newHead = Position(gridSize - 1, newHead.y);
+    if (newHead.x >= gridSize) newHead = Position(0, newHead.y);
+    if (newHead.y < 0) newHead = Position(newHead.x, gridSize - 1);
+    if (newHead.y >= gridSize) newHead = Position(newHead.x, 0);
 
     nextAction.value = MoveSnakeAction();
 
@@ -149,10 +155,6 @@ class GameController extends BeaconController {
   }
 
   bool _isCollision(Position head, List<Position> snakeBody) {
-    if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
-      return true;
-    }
-
     return snakeBody.contains(head);
   }
 
