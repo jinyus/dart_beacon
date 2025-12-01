@@ -116,6 +116,11 @@ class GameController extends BeaconController {
   // Starts at 300ms, capped at minimum of 100ms.
   // Changes trigger game loop restart via subscription in constructor.
   late final ReadableBeacon<int> speed = B.derived(() {
+    // if speed is already 100, short circuit
+    if (!speed.isEmpty && speed.peek() == 100) {
+      return 100;
+    }
+
     final currentScore = score.value;
     final reduction = (currentScore ~/ 50) * 30;
     final newSpeed = initialSpeed - reduction;
