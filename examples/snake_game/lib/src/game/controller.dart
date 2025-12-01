@@ -28,11 +28,12 @@ class GameController extends BeaconController {
       case PauseGameAction():
       case ResumeGameAction():
       case ChangeDirectionAction():
+        direction.value;
         return snake.peek();
       case MoveSnakeAction():
         final currentSnake = snake.peek().toList();
         final head = currentSnake.first;
-        var newHead = head.move(direction.peek());
+        var newHead = head.move(direction.value);
 
         if (newHead.x < 0) newHead = Position(gridSize - 1, newHead.y);
         if (newHead.x >= gridSize) newHead = Position(0, newHead.y);
@@ -54,8 +55,17 @@ class GameController extends BeaconController {
     filter: (prev, next) => true,
   );
 
-  late final WritableBeacon<Direction> direction =
-      B.writable(Direction.right);
+  late final ReadableBeacon<Direction> direction = B.derived(() {
+    return switch (nextAction.value) {
+      _ when direction.isEmpty => Direction.right,
+      StartGameAction() => Direction.right,
+      PauseGameAction() when direction.isEmpty => Direction.right,
+      ChangeDirectionAction action => action.direction,
+      PauseGameAction() => direction.peek(),
+      ResumeGameAction() => direction.peek(),
+      MoveSnakeAction() => direction.peek(),
+    };
+  });
 
   late final ReadableBeacon<GameStatus> status = B.derived(() {
     final action = nextAction.value;
@@ -107,7 +117,6 @@ class GameController extends BeaconController {
   }
 
   void startGame() {
-    direction.value = Direction.right;
     nextAction.value = StartGameAction();
     _startGameLoop();
   }
@@ -125,8 +134,8 @@ class GameController extends BeaconController {
 
   void changeDirection(Direction newDirection) {
     if (!status.peek().isPlaying) return;
-    if (newDirection != direction.value.opposite) {
-      direction.value = newDirection;
+    if (newDirection != direction.peek().opposite) {
+      nextAction.value = ChangeDirectionAction(newDirection);
     }
   }
 
