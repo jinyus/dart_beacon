@@ -86,7 +86,8 @@ class GameController extends BeaconController {
         final head = currentSnake.first;
         final newHead = head.move(direction.peek());
 
-        if (_isCollision(newHead, currentSnake)) {
+        // collision
+        if (currentSnake.contains(newHead)) {
           return GameStatus.gameOver;
         }
         return status.peek();
@@ -161,10 +162,6 @@ class GameController extends BeaconController {
       }
       food.value = _generateFood();
     }
-  }
-
-  bool _isCollision(Position head, List<Position> snakeBody) {
-    return snakeBody.contains(head);
   }
 
   Position _generateFood({bool isFirst = false}) {
