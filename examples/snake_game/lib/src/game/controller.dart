@@ -11,7 +11,7 @@ const int initialSpeed = 300;
 class GameController extends BeaconController {
   GameController() {
     status.subscribe((value) {
-      if (value == GameStatus.gameOver) {
+      if (!value.isPlaying) {
         _gameTimer?.cancel();
       }
     });
@@ -99,7 +99,6 @@ class GameController extends BeaconController {
 
   void pauseGame() {
     nextAction.value = PauseGameAction();
-    _gameTimer?.cancel();
   }
 
   void resumeGame() {
