@@ -10,9 +10,49 @@ const int initialSpeed = 300;
 
 class GameController extends BeaconController {
   late final snake = B.writable<List<Position>>([const Position(10, 10)]);
-  late final direction = B.writable<Direction>(Direction.right);
-  late final status = B.writable<GameStatus>(GameStatus.paused);
+  // late final direction = B.writable<Direction>(Direction.right);
   late final score = B.writable<int>(0);
+
+  late final nextAction = B.filtered<GameAction>(
+    PauseGameAction(),
+    filter: (prev, next) => true,
+  );
+
+  late final ReadableBeacon<Direction> direction = B.derived(() {
+    return switch (nextAction.value) {
+      _ when direction.isEmpty => Direction.right,
+      StartGameAction() => Direction.right,
+      PauseGameAction() when direction.isEmpty => Direction.right,
+      ChangeDirectionAction action => action.direction,
+      PauseGameAction() => direction.peek(),
+      ResumeGameAction() => direction.peek(),
+      MoveSnakeAction() => direction.peek(),
+    };
+  });
+
+  late final ReadableBeacon<GameStatus> status = B.derived(() {
+    final action = nextAction.value;
+
+    switch (action) {
+      case StartGameAction():
+        return GameStatus.playing;
+      case PauseGameAction():
+        return GameStatus.paused;
+      case ResumeGameAction():
+        return GameStatus.playing;
+      case ChangeDirectionAction():
+        return status.peek();
+      case MoveSnakeAction():
+        final currentSnake = snake.peek();
+        final head = currentSnake.first;
+        final newHead = head.move(direction.peek());
+
+        if (_isCollision(newHead, currentSnake)) {
+          return GameStatus.gameOver;
+        }
+        return status.peek();
+    }
+  });
 
   late final ReadableBeacon<int> speed = B.derived(() {
     final currentScore = score.value;
@@ -42,29 +82,27 @@ class GameController extends BeaconController {
 
   void startGame() {
     snake.value = [const Position(10, 10)];
-    // food.value = _generateFood();
-    direction.value = Direction.right;
-    status.value = GameStatus.playing;
     score.value = 0;
+    nextAction.value = StartGameAction();
     _startGameLoop();
   }
 
   void pauseGame() {
-    status.value = GameStatus.paused;
+    nextAction.value = PauseGameAction();
     _gameTimer?.cancel();
   }
 
   void resumeGame() {
-    if (status.value == GameStatus.paused) {
-      status.value = GameStatus.playing;
+    if (status.peek() == GameStatus.paused) {
+      nextAction.value = ResumeGameAction();
       _startGameLoop();
     }
   }
 
   void changeDirection(Direction newDirection) {
-    if (!status.value.isPlaying) return;
+    if (!status.peek().isPlaying) return;
     if (newDirection != direction.peek().opposite) {
-      direction.value = newDirection;
+      nextAction.value = ChangeDirectionAction(newDirection);
     }
   }
 
@@ -84,7 +122,7 @@ class GameController extends BeaconController {
     final newHead = head.move(direction.peek());
 
     if (_isCollision(newHead, currentSnake)) {
-      status.value = GameStatus.gameOver;
+      nextAction.value = MoveSnakeAction();
       _gameTimer?.cancel();
       return;
     }
@@ -93,7 +131,6 @@ class GameController extends BeaconController {
 
     if (newHead == food.peek()) {
       score.value = score.peek() + 10;
-      // food.value = _generateFood();
 
       if (score.peek() % 50 == 0) {
         _startGameLoop();
