@@ -372,7 +372,7 @@ Future<List<Todo>> loadTodos() async { ... }
 
 Future<List<Todo>> addTodo(Todo newTodo) async {
   await todoService.addTodo(newTodo);
-  final currentTodos = todoBeacon.peek();
+  final currentTodos = todosBeacon.lastData ?? [];
   return [newTodo, ...currentTodos];
 }
 
@@ -380,6 +380,14 @@ final todosBeacon = Beacon.future(() => loadTodos());
 
 // Later, add a new todo without refetching all todos
 await todosBeacon.updateWith(() => addTodo(newTodo));
+
+// You can also provide an optimistic result
+// which will be set immediately while the future is being resolved.
+final optimisticTodos = [newTodo, ...todosBeacon.lastData ?? []];
+await todosBeacon.updateWith(
+  () => addTodo(newTodo),
+  optimisticResult: optimisticTodos,
+);
 ```
 
 ### Beacon.stream:
