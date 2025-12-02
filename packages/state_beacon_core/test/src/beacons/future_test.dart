@@ -1196,4 +1196,370 @@ void main() {
     expect(f1.isData, true);
     expect(f1.unwrapValue(), 999);
   });
+
+  group('updateWith with optimistic updates', () {
+    test('should immediately set optimistic result', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 1);
+
+      final updateFuture = f1.updateWith(
+        () async {
+          await delay(k10ms);
+          return 42;
+        },
+        optimisticResult: 99,
+      );
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 99);
+
+      await updateFuture;
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 42);
+    });
+
+    test('should revert to previous data on error with optimistic update',
+        () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 1);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          throw Exception('update failed');
+        },
+        optimisticResult: 99,
+      );
+
+      expect(f1.isError, true);
+      final error = f1.value as AsyncError;
+      expect(error.error, isA<Exception>());
+      expect(error.lastData, 1);
+    });
+
+    test(
+        'should preserve null as previous data on error with optimistic update',
+        () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      expect(f1.isIdle, true);
+      expect(f1.lastData, null);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          throw Exception('update failed');
+        },
+        optimisticResult: 99,
+      );
+
+      expect(f1.isError, true);
+      final error = f1.value as AsyncError;
+      expect(error.error, isA<Exception>());
+      expect(error.lastData, null);
+    });
+
+    test('should not show loading state with optimistic update', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.isData, true);
+
+      var loadingCount = 0;
+      f1.subscribe((value) {
+        if (value is AsyncLoading) loadingCount++;
+      });
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          return 42;
+        },
+        optimisticResult: 99,
+      );
+
+      expect(loadingCount, 0);
+    });
+
+    test('should handle rapid optimistic updates', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.unwrapValue(), 1);
+
+      final update1 = f1.updateWith(
+        () async {
+          await delay(k10ms * 5);
+          return 100;
+        },
+        optimisticResult: 10,
+      );
+
+      await delay(k1ms);
+      expect(f1.unwrapValue(), 10);
+
+      final update2 = f1.updateWith(
+        () async {
+          await delay(k10ms * 5);
+          return 200;
+        },
+        optimisticResult: 20,
+      );
+
+      await delay(k1ms);
+      expect(f1.unwrapValue(), 20);
+
+      await update1;
+      await update2;
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 200);
+    });
+
+    test('should cancel optimistic update when reset is called', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.unwrapValue(), 1);
+
+      final updateFuture = f1.updateWith(
+        () async {
+          await delay(k10ms * 5);
+          return 99;
+        },
+        optimisticResult: 50,
+      );
+
+      await delay(k1ms);
+      expect(f1.unwrapValue(), 50);
+
+      f1.reset();
+
+      await updateFuture;
+      await delay(k10ms * 2);
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 1);
+    });
+
+    test('should ignore optimistic update when beacon set to idle', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.unwrapValue(), 1);
+
+      final updateFuture = f1.updateWith(
+        () async {
+          await delay(k10ms * 5);
+          return 99;
+        },
+        optimisticResult: 50,
+      );
+
+      await delay(k1ms);
+      expect(f1.unwrapValue(), 50);
+
+      f1.idle();
+
+      await updateFuture;
+
+      expect(f1.isIdle, true);
+    });
+
+    test('should work with optimistic update on idle beacon', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      expect(f1.isIdle, true);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          return 42;
+        },
+        optimisticResult: 99,
+      );
+
+      expect(f1.isData, true);
+      expect(f1.unwrapValue(), 42);
+    });
+
+    test('should handle multiple sequential optimistic updates with errors',
+        () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.unwrapValue(), 1);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          throw Exception('first error');
+        },
+        optimisticResult: 10,
+      );
+
+      expect(f1.isError, true);
+      final error1 = f1.value as AsyncError;
+      expect(error1.lastData, 1);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          throw Exception('second error');
+        },
+        optimisticResult: 20,
+      );
+
+      expect(f1.isError, true);
+      final error2 = f1.value as AsyncError;
+      expect(error2.lastData, 1);
+    });
+
+    test('should update lastData after successful optimistic update', () async {
+      final f1 = Beacon.future(
+        () async {
+          await delay(k10ms);
+          return 1;
+        },
+        manualStart: true,
+      );
+
+      f1.start();
+      await delay(k10ms * 2);
+
+      expect(f1.unwrapValue(), 1);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          return 100;
+        },
+        optimisticResult: 50,
+      );
+
+      expect(f1.lastData, 100);
+
+      await f1.updateWith(
+        () async {
+          await delay(k10ms);
+          throw Exception('error after success');
+        },
+        optimisticResult: 200,
+      );
+
+      expect(f1.isError, true);
+      final error = f1.value as AsyncError;
+      expect(error.lastData, 100);
+    });
+
+    test('should handle optimistic update when dependency changes', () async {
+      final count = Beacon.writable(0);
+      var ran = 0;
+
+      final f1 = Beacon.future(() async {
+        count.value;
+        await delay(k1ms);
+        return ++ran;
+      });
+
+      await delay(k10ms);
+
+      expect(ran, 1);
+      expect(f1.unwrapValue(), 1);
+
+      final updateFuture = f1.updateWith(
+        () async {
+          await delay(k10ms);
+          return 999;
+        },
+        optimisticResult: 500,
+      );
+
+      await delay(k1ms);
+      expect(f1.unwrapValue(), 500);
+
+      count.value = 1;
+
+      await delay(k1ms);
+      await updateFuture;
+
+      expect(ran, 2);
+      expect(f1.unwrapValue(), 2);
+    });
+  });
 }

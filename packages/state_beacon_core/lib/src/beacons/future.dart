@@ -35,8 +35,23 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
   ///
   /// If the beacon is set to idle with `.idle()` before [compute] finishes,
   /// the result of [compute] will be ignored.
-  Future<void> updateWith(FutureCallback<T> compute) async {
-    final loadCount = _setLoadingWithLastData();
+  ///
+  /// If [optimisticResult] is provided, it will be set immediately instead of
+  /// setting the loading state. If an error occurs, the `.lastData` of the
+  /// error will be set to the previous state before the optimistic update.
+  Future<void> updateWith(
+    FutureCallback<T> compute, {
+    T? optimisticResult,
+  }) async {
+    late final int loadCount;
+    late final T? previousState;
+    if (optimisticResult != null) {
+      loadCount = ++_loadCount;
+      previousState = lastData;
+      _setValue(AsyncData(optimisticResult));
+    } else {
+      loadCount = _setLoadingWithLastData();
+    }
     try {
       final result = await compute();
 
@@ -51,7 +66,14 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
       if (loadCount != _loadCount) {
         return;
       }
-      _setErrorWithLastData(error, stackTrace);
+
+      if (optimisticResult != null) {
+        // the optimistic update failed, revert to previous state
+        _setValue(AsyncError(error, stackTrace)..setLastData(previousState));
+        return;
+      } else {
+        _setErrorWithLastData(error, stackTrace);
+      }
     }
   }
 
