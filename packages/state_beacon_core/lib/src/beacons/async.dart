@@ -16,9 +16,15 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
     if (!manualStart) _start();
   }
 
-  void _setLoadingWithLastData() {
-    if (isLoading) return;
+  /// This records how many times loading has been set.
+  /// If a compute finishes but loading has been set again since
+  /// it started, we ignore the result.
+  int _loadCount = 0;
+
+  int _setLoadingWithLastData() {
+    if (isLoading) return ++_loadCount;
     _setValue(AsyncLoading()..setLastData(lastData));
+    return ++_loadCount;
   }
 
   void _setErrorWithLastData(Object error, [StackTrace? stackTrace]) {
@@ -73,15 +79,30 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
 
     _effectDispose = Beacon.effect(
       () {
-        _setLoadingWithLastData();
+        final loadCount = _setLoadingWithLastData();
         final stream = _compute();
 
         // we do this because the streamcontroller can run code onListen
         // and we don't want to track beacons accessed in that callback.
         Beacon.untracked(() {
           _sub = stream.listen(
-            (v) => _setValue(AsyncData(v)),
-            onError: _setErrorWithLastData,
+            (v) {
+              // .updateWith() was called before we finished computing
+              // so we ignore this result. This is only relevant for
+              // FutureBeacons.
+              // nb: this is not to ignore our own stale results
+              //     as that is handled by _unsubFromStream.
+              if (loadCount != _loadCount) {
+                return;
+              }
+              _setValue(AsyncData(v));
+            },
+            onError: (Object error, [StackTrace? stackTrace]) {
+              if (loadCount != _loadCount) {
+                return;
+              }
+              _setErrorWithLastData(error, stackTrace);
+            },
             cancelOnError: cancelOnError,
           );
         });

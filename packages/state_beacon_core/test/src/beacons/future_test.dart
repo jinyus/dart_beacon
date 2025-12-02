@@ -1014,4 +1014,186 @@ void main() {
 
     expect(f1.isIdle, true);
   });
+
+  test('updateWith() should update beacon with successful result', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    await f1.updateWith(() async {
+      await delay(k10ms);
+      return 42;
+    });
+
+    expect(f1.isData, true);
+    expect(f1.unwrapValue(), 42);
+  });
+
+  test('updateWith() should update beacon with error', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    await f1.updateWith(() async {
+      await delay(k10ms);
+      throw Exception('updateWith error');
+    });
+
+    expect(f1.isError, true);
+    final error = f1.value as AsyncError;
+    expect(error.error, isA<Exception>());
+  });
+
+  test('updateWith() should be cancelled if reset is called', () async {
+    var updateCalled = 0;
+    var resetCalled = 0;
+
+    final f1 = Beacon.future(
+      () async {
+        resetCalled++;
+        await delay(k10ms * 5);
+        return resetCalled;
+      },
+      manualStart: true,
+    );
+
+    final updateFuture = f1.updateWith(() async {
+      updateCalled++;
+      await delay(k10ms * 5);
+      return 999;
+    });
+
+    await delay(k10ms);
+
+    f1.reset();
+
+    await updateFuture;
+    await delay(k10ms * 6);
+
+    expect(updateCalled, 1);
+    expect(resetCalled, 1);
+    expect(f1.isData, true);
+    expect(f1.unwrapValue(), 1);
+  });
+
+  test('updateWith() should be cancelled if new updateWith is called',
+      () async {
+    var firstCalled = 0;
+    var secondCalled = 0;
+
+    final f1 = Beacon.future(() async => 0, manualStart: true);
+
+    final firstUpdate = f1.updateWith(() async {
+      firstCalled++;
+      await delay(k10ms * 5);
+      return 111;
+    });
+
+    await delay(k10ms);
+
+    final secondUpdate = f1.updateWith(() async {
+      secondCalled++;
+      await delay(k10ms * 5);
+      return 222;
+    });
+
+    await firstUpdate;
+    await secondUpdate;
+    await delay(k10ms);
+
+    expect(firstCalled, 1);
+    expect(secondCalled, 1);
+    expect(f1.isData, true);
+    expect(f1.unwrapValue(), 222);
+  });
+
+  test('updateWith should be ignored when a dependency changes', () async {
+    final count = Beacon.writable(0);
+    var ran = 0;
+
+    final f1 = Beacon.future(() async {
+      count.value;
+      await delay(k1ms);
+      return ++ran;
+    });
+
+    await delay(k10ms);
+
+    expect(ran, 1);
+    expect(f1.unwrapValue(), 1);
+
+    final updateFuture = f1.updateWith(() async {
+      await delay(k10ms);
+      return 999;
+    });
+
+    await delay(k1ms);
+
+    count.value = 1;
+
+    await delay(k1ms);
+    await updateFuture;
+
+    expect(ran, 2);
+    expect(f1.unwrapValue(), 2);
+  });
+
+  test('updateWith result should be ignored when beacon is set to idle',
+      () async {
+    final f1 = Beacon.future(() async {
+      await delay(k1ms);
+      return 100;
+    });
+
+    await delay(k10ms);
+
+    expect(f1.unwrapValue(), 100);
+
+    final updateFuture = f1.updateWith(() async {
+      await delay(k10ms);
+      return 999;
+    });
+
+    await delay(k1ms);
+
+    f1.idle();
+
+    await updateFuture;
+
+    expect(f1.isIdle, true);
+  });
+
+  test('updateWith result should have priority when beacon is loading',
+      () async {
+    final f1 = Beacon.future(() async {
+      await delay(k10ms * 3);
+      return 100;
+    });
+
+    await delay(k1ms);
+
+    expect(f1.isLoading, true);
+
+    final _ = f1.updateWith(() async {
+      await delay(k10ms);
+      return 999;
+    });
+
+    await delay(k10ms * 5);
+
+    expect(f1.isData, true);
+    expect(f1.unwrapValue(), 999);
+  });
 }

@@ -25,10 +25,41 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     _wakeUp();
   }
 
+  /// Updates the beacon with the result of the [compute].
+  ///
+  /// If the beacon is reset before [compute] finishes,
+  /// the result of [compute] will be ignored.
+  ///
+  /// If the beacon is currently loading, the result of [compute]
+  /// will take priority and set when it finishes.
+  ///
+  /// If the beacon is set to idle with `.idle()` before [compute] finishes,
+  /// the result of [compute] will be ignored.
+  Future<void> updateWith(FutureCallback<T> compute) async {
+    final loadCount = _setLoadingWithLastData();
+    try {
+      final result = await compute();
+
+      if (loadCount != _loadCount) {
+        // this means that the beacon was reset/retriggered while we were waiting
+        // so we ignore this result
+        return;
+      }
+
+      _setValue(AsyncData(result));
+    } catch (error, stackTrace) {
+      if (loadCount != _loadCount) {
+        return;
+      }
+      _setErrorWithLastData(error, stackTrace);
+    }
+  }
+
   /// Sets the beacon to the [AsyncIdle] state.
   /// The `lastData` will be set to the current value.
   /// The beacon will have to be started manually to resume.
   void idle() {
+    _loadCount++;
     _setValue(AsyncIdle()..setLastData(lastData));
     _cancel();
   }
