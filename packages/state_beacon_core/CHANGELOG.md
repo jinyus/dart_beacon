@@ -1,3 +1,32 @@
+# 1.2.0
+
+-   [Feat] Add `Future.updateWith()`
+
+The `updateWith` method allows you to update a FutureBeacon's value with the provided callback. This differs from `overrideWith` because it updates the value only once, while `overrideWith` replaces the original callback supplied to the beacon.
+
+```dart
+Future<List<Todo>> loadTodos() async { ... }
+
+Future<List<Todo>> addTodo(Todo newTodo) async {
+  await todoService.addTodo(newTodo);
+  final currentTodos = todosBeacon.lastData ?? [];
+  return [newTodo, ...currentTodos];
+}
+
+final todosBeacon = Beacon.future(() => loadTodos());
+
+// Later, add a new todo without refetching all todos
+await todosBeacon.updateWith(() => addTodo(newTodo));
+
+// You can also provide an optimistic result
+// which will be set immediately while the future is being resolved.
+final optimisticTodos = [newTodo, ...todosBeacon.lastData ?? []];
+await todosBeacon.updateWith(
+  () => addTodo(newTodo),
+  optimisticResult: optimisticTodos,
+);
+```
+
 # 1.1.0
 
 -   [Feat] Derived Beacons can now access their own value with '.peek()'. The beacon must have a value so a base case is required.
