@@ -25,10 +25,63 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     _wakeUp();
   }
 
+  /// Updates the beacon with the result of the [compute].
+  ///
+  /// If the beacon is reset before [compute] finishes,
+  /// the result of [compute] will be ignored.
+  ///
+  /// If the beacon is currently loading, the result of [compute]
+  /// will take priority and set when it finishes.
+  ///
+  /// If the beacon is set to idle with `.idle()` before [compute] finishes,
+  /// the result of [compute] will be ignored.
+  ///
+  /// If [optimisticResult] is provided, it will be set immediately instead of
+  /// setting the loading state. If an error occurs, the `.lastData` of the
+  /// error will be set to the previous state before the optimistic update.
+  Future<void> updateWith(
+    FutureCallback<T> compute, {
+    T? optimisticResult,
+  }) async {
+    late final int loadCount;
+    late final T? previousState;
+    if (optimisticResult != null) {
+      loadCount = ++_loadCount;
+      previousState = lastData;
+      _setValue(AsyncData(optimisticResult));
+    } else {
+      loadCount = _setLoadingWithLastData();
+    }
+    try {
+      final result = await compute();
+
+      if (loadCount != _loadCount) {
+        // this means that the beacon was reset/retriggered while we were waiting
+        // so we ignore this result
+        return;
+      }
+
+      _setValue(AsyncData(result));
+    } catch (error, stackTrace) {
+      if (loadCount != _loadCount) {
+        return;
+      }
+
+      if (optimisticResult != null) {
+        // the optimistic update failed, revert to previous state
+        _setValue(AsyncError(error, stackTrace)..setLastData(previousState));
+        return;
+      } else {
+        _setErrorWithLastData(error, stackTrace);
+      }
+    }
+  }
+
   /// Sets the beacon to the [AsyncIdle] state.
   /// The `lastData` will be set to the current value.
   /// The beacon will have to be started manually to resume.
   void idle() {
+    _loadCount++;
     _setValue(AsyncIdle()..setLastData(lastData));
     _cancel();
   }
