@@ -1,3 +1,8 @@
+# 1.3.0
+
+-   [Feat] Add queuing to FutureBeacon.updateWith()
+    The `updateWith` method calls are now queued when there is an ongoing update. This ensures that all calls are executed in the order they were made, preventing race conditions and inconsistent state.
+
 # 1.2.0
 
 -   [Feat] Add `Future.updateWith()`
