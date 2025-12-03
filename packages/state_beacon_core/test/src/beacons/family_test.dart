@@ -33,7 +33,7 @@ void main() {
 
     expect(doubled.isLoading, true);
 
-    await delay();
+    await doubled.next();
 
     expect(doubled.value.unwrap(), '20');
 
