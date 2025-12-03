@@ -1076,6 +1076,7 @@ void main() {
     });
 
     await delay(k10ms);
+    expect(f1.isLoading, true);
 
     f1.reset();
 
@@ -1088,7 +1089,7 @@ void main() {
     expect(f1.unwrapValue(), 1);
   });
 
-  test('updateWith() should be cancelled if new updateWith is called',
+  test('updateWith() should be overwritten if new updateWith is called',
       () async {
     var firstCalled = 0;
     var secondCalled = 0;
@@ -1102,6 +1103,8 @@ void main() {
     });
 
     await delay(k10ms);
+
+    expect(f1.isLoading, true);
 
     final secondUpdate = f1.updateWith(() async {
       secondCalled++;
@@ -1141,6 +1144,8 @@ void main() {
 
     await delay(k1ms);
 
+    expect(f1.isLoading, true);
+
     count.value = 1;
 
     await delay(k1ms);
@@ -1168,11 +1173,13 @@ void main() {
 
     await delay(k1ms);
 
+    expect(f1.isLoading, true);
     f1.idle();
 
     await updateFuture;
 
     expect(f1.isIdle, true);
+    expect(f1.lastData, 100);
   });
 
   test('updateWith result should have priority when beacon is loading',
@@ -1208,7 +1215,7 @@ void main() {
       );
 
       f1.start();
-      await delay(k10ms * 2);
+      await f1.next();
 
       expect(f1.isData, true);
       expect(f1.unwrapValue(), 1);
@@ -1221,6 +1228,7 @@ void main() {
         optimisticResult: 99,
       );
 
+      await delay(k1ms);
       expect(f1.isData, true);
       expect(f1.unwrapValue(), 99);
 
@@ -1352,7 +1360,8 @@ void main() {
       );
 
       await delay(k1ms);
-      expect(f1.unwrapValue(), 20);
+      // optimistic value from update1
+      expect(f1.unwrapValue(), 10);
 
       await update1;
       await update2;
@@ -1560,6 +1569,91 @@ void main() {
 
       expect(ran, 2);
       expect(f1.unwrapValue(), 2);
+    });
+
+    test('should queue multiple updateWith calls in FIFO order', () async {
+      final futureBeacon = Beacon.future(() async => 0);
+      await delay(k10ms);
+      final last5 = futureBeacon
+          .filter((_, next) => next.isData)
+          .map((v) => v.unwrap())
+          .buffer(5);
+
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        await delay(k10ms * 5);
+        return 1;
+      });
+
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        await delay(k10ms);
+        return 2;
+      });
+
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        await delay(k10ms);
+        return 3;
+      });
+
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        await delay(k10ms);
+        return 4;
+      });
+
+      await delay(k10ms);
+
+      // still 0 because the first update hasn't finished
+      expect(futureBeacon.lastData, 0);
+
+      await delay(k10ms * 10);
+
+      expect(last5.value, [0, 1, 2, 3, 4]);
+      expect(futureBeacon.unwrapValue(), 4);
+    });
+
+    test('should not execute queued updates when beacon is retriggered',
+        () async {
+      final count = Beacon.writable(0);
+      final futureBeacon = Beacon.future(() async => count.value);
+      await delay(k10ms);
+      final last2 = futureBeacon
+          .filter((_, next) => next.isData)
+          .map((v) => v.unwrap())
+          .buffer(2);
+
+      var update1Ran = 0;
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        update1Ran++;
+        await delay(k10ms * 2);
+        return 1;
+      });
+
+      var update2Ran = 0;
+      // ignore: unawaited_futures
+      futureBeacon.updateWith(() async {
+        update2Ran++;
+        await delay(k10ms);
+        return 2;
+      });
+
+      await delay(k10ms);
+
+      // still 0 because the first update hasn't finished
+      expect(futureBeacon.lastData, 0);
+
+      // this should ignore update1 result and not execute update2 at all
+      count.increment();
+
+      await delay(k10ms * 10);
+
+      expect(update1Ran, 1);
+      expect(update2Ran, 0);
+      expect(last2.value, [0, 1]);
+      expect(futureBeacon.unwrapValue(), 1);
     });
   });
 }

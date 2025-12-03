@@ -30,8 +30,8 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
   /// If the beacon is reset before [compute] finishes,
   /// the result of [compute] will be ignored.
   ///
-  /// If the beacon is currently loading, the result of [compute]
-  /// will take priority and set when it finishes.
+  /// If multiple calls to updateWith is made, they will be
+  /// queued and execute in FIFO order.
   ///
   /// If the beacon is set to idle with `.idle()` before [compute] finishes,
   /// the result of [compute] will be ignored.
@@ -43,21 +43,40 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
     FutureCallback<T> compute, {
     T? optimisticResult,
   }) async {
-    late final int loadCount;
+    final completer = Completer<void>();
+    final previousQueue = _updateQueue;
+    _updateQueue = completer.future;
+
+    final loadCount = _loadCount;
+
+    try {
+      await previousQueue;
+      if (loadCount == _loadCount) {
+        await _performUpdate(compute, optimisticResult: optimisticResult);
+      }
+    } finally {
+      completer.complete();
+    }
+  }
+
+  Future<void> _performUpdate(
+    FutureCallback<T> compute, {
+    T? optimisticResult,
+  }) async {
+    final loadCount = _loadCount;
     late final T? previousState;
     if (optimisticResult != null) {
-      loadCount = ++_loadCount;
       previousState = lastData;
       _setValue(AsyncData(optimisticResult));
     } else {
-      loadCount = _setLoadingWithLastData();
+      _setLoadingWithLastData();
     }
     try {
       final result = await compute();
 
+      // this means that the beacon was reset/retriggered while we were waiting
+      // so we ignore this result
       if (loadCount != _loadCount) {
-        // this means that the beacon was reset/retriggered while we were waiting
-        // so we ignore this result
         return;
       }
 
@@ -68,7 +87,6 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
       }
 
       if (optimisticResult != null) {
-        // the optimistic update failed, revert to previous state
         _setValue(AsyncError(error, stackTrace)..setLastData(previousState));
         return;
       } else {
