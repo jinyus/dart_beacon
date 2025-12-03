@@ -21,10 +21,12 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
   /// it started, we ignore the result.
   int _loadCount = 0;
 
-  int _setLoadingWithLastData() {
-    if (isLoading) return ++_loadCount;
+  /// This stores the execution of the last call
+  /// to .updateWith.
+  Future<void> _updateQueue = Future.value();
+
+  void _setLoadingWithLastData() {
     _setValue(AsyncLoading()..setLastData(lastData));
-    return ++_loadCount;
   }
 
   void _setErrorWithLastData(Object error, [StackTrace? stackTrace]) {
@@ -79,7 +81,16 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
 
     _effectDispose = Beacon.effect(
       () {
-        final loadCount = _setLoadingWithLastData();
+        // If this changes after we are done computing
+        // then a call to .updateWith was made so we
+        // ignore our result.
+        final currentUpdateWithFuture = _updateQueue;
+
+        // this is used to invalidate any pending update
+        // made via .updateWith
+        _loadCount++;
+
+        _setLoadingWithLastData();
         final stream = _compute();
 
         // we do this because the streamcontroller can run code onListen
@@ -92,13 +103,13 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
               // FutureBeacons.
               // nb: this is not to ignore our own stale results
               //     as that is handled by _unsubFromStream.
-              if (loadCount != _loadCount) {
+              if (currentUpdateWithFuture != _updateQueue) {
                 return;
               }
               _setValue(AsyncData(v));
             },
             onError: (Object error, [StackTrace? stackTrace]) {
-              if (loadCount != _loadCount) {
+              if (currentUpdateWithFuture != _updateQueue) {
                 return;
               }
               _setErrorWithLastData(error, stackTrace);
