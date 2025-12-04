@@ -2,6 +2,9 @@
 
 This example demonstrates how to implement a splash page in aFlutter using State Beacon for state management and dependency injection.
 
+
+https://github.com/user-attachments/assets/4547a14a-616b-44fa-b12a-c04c6aa259fd
+
 ## Key Components
 
 ### 1. Startup Beacon
