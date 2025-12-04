@@ -214,6 +214,10 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   /// expect(count.value, equals(20));
   /// expect(filteredCount.value, equals(20));
   /// ```
+  ///
+  /// The first value will not be filtered if the source is lazy.
+  /// You can override this by setting lazyBypass to false.
+  ///
   /// See: `Beacon.filtered` for more details.
   FilteredBeacon<T> filter(
     bool Function(T?, T) filter, {
