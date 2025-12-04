@@ -299,7 +299,7 @@ Bad: someBeacon.buffer(10).map();
     beacon.wrap(
       this,
       disposeTogether: true,
-      startNow: !isEmpty,
+      startNow: !isEmpty || _isDerived,
       synchronous: synchronous,
     );
 

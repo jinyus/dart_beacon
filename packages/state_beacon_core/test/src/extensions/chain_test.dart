@@ -737,4 +737,15 @@ void main() {
 
     await expectLater(s.buffer(3).next(), completion([0, 1, 2]));
   });
+
+  test('should have value if wrapping derived', () async {
+    // BeaconObserver.useLogging();
+    final count = Beacon.writable<int>(0);
+
+    final derived = Beacon.derived(() => count.value * 2);
+
+    final throttled = derived.throttle(k10ms);
+
+    expect(throttled.value, 0);
+  });
 }
