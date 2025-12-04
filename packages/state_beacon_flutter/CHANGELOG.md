@@ -1,3 +1,15 @@
+# 1.3.1
+
+-   [Fix] Chaining methods on derived beacons now eagerly fetches the value allowing it to be used instantly.
+
+```dart
+final count = Beacon.writable<int>(0);
+
+final throttled = Beacon.derived(() => count.value * 2).throttle(k10ms);
+
+expect(throttled.value, 0);
+```
+
 # 1.3.0
 
 -   [Feat] Add queuing to FutureBeacon.updateWith()

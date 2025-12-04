@@ -1017,10 +1017,9 @@ Returns a [ReadableBeacon] that wraps a Beacon and tranforms its values.
 final stream = Stream.periodic(k1ms, (i) => i).take(5);
 final beacon = stream
     .toRawBeacon(isLazy: true)
-    .map((v) => v + 1)
-    .filter((_, n) => n.isEven);
+    .map((v) => v.toString());
 
-await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
+await expectLater(beacon.toStream(), emitsInOrder(['0', '1', '2', '3', '4']));
 ```
 
 > [!NOTE]
