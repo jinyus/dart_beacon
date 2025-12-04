@@ -21,15 +21,26 @@ class CartController extends BeaconController {
   // expose it as immutable so it can only be modified by the controller
   ReadableBeacon<AsyncValue<Cart>> get cart => _cart;
 
+  List<Product> get _currentItems => _cart.lastData?.items ?? [];
+
   Future<void> addItem(Product item) async {
     addingItems(item.id).value = true;
-    await _cart.updateWith(() => _cartService.add(item));
+    await _cart.updateWith(() async {
+      await _cartService.add(item);
+
+      // request was successful, return updated cart
+      // no need to reload from service, we can just update locally
+      return Cart(items: [..._currentItems, item]);
+    });
     addingItems(item.id).value = false;
   }
 
   Future<void> removeItem(Product item) async {
     removingItems(item.id).value = true;
-    await _cart.updateWith(() => _cartService.remove(item));
+    await _cart.updateWith(() async {
+      await _cartService.remove(item);
+      return Cart(items: [..._currentItems]..remove(item));
+    });
     removingItems(item.id).value = false;
   }
 }

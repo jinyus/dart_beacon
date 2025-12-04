@@ -211,23 +211,22 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "1.2.0"
+    version: "1.3.0"
   state_beacon_core:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: state_beacon_core
-      sha256: "1b5af2f86a3f39e22858291d0c0dc7456ff4c1259b8b7cc160bad43bc2d458e8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
+      path: "../../packages/state_beacon_core"
+      relative: true
+    source: path
+    version: "1.3.0"
   state_beacon_flutter:
     dependency: transitive
     description:
       name: state_beacon_flutter
-      sha256: d728cd2d32d60b707599dcd6403bc87e06ce58dc12c1d97f7d54dd6efcac4396
+      sha256: "2c083b3fab4c5c587949cd9e061765c9e4ee1f544169dd307098df98db94b0e9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   stream_channel:
     dependency: transitive
     description:
