@@ -20,9 +20,9 @@ class FormController with BeaconController {
     // don't show error until the user types or submit
     if (!_hasSubmitted.value && value.isEmpty) return null;
 
-    if (value.length > 4) return null;
+    if (value.length < 4) return 'Enter at least 4 characters';
 
-    return 'Enter at least 4 characters';
+    return null;
   });
 
   late final emailError = B.derived(() {
