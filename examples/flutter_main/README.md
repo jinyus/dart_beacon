@@ -1,16 +1,13 @@
-# example
+This examples demonstrates how to use the `state_beacon` package in various scenarios.
 
-A new Flutter project.
+It has the following features:
 
-## Getting Started
+-   A counter app demonstrating basic state management.
+-   A todo list app showcasing dynamic state updates.
+-   A weather app example fetching and displaying data based on state changes.
+-   An infinite scrolling list to illustrate performance with large datasets.
+-   A Konami game which showcases various types of beacons.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p align="center">
+  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
+</p>
