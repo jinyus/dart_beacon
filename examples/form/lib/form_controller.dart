@@ -53,9 +53,9 @@ class FormController with BeaconController {
     return null;
   });
 
-  bool submit() {
+  String? submit() {
     _hasSubmitted.value = true;
-    return switch ((
+    final isValid = switch ((
       usernameError.peek(),
       emailError.peek(),
       passwordError.peek(),
@@ -63,5 +63,11 @@ class FormController with BeaconController {
       (null, null, null) => true,
       _ => false,
     };
+
+    if (!isValid) return null;
+
+    return 'Username: ${username.text}\n'
+        'Password: ${password.text}\n'
+        'Email: ${email.text}';
   }
 }

@@ -141,20 +141,15 @@ class SubmitButton extends StatelessWidget {
       ),
       onPressed: () {
         final controller = formControllerRef.read(context);
-        final isValid = controller.submit();
-        // FocusScope.of(context).unfocus();
+        final message = controller.submit();
 
-        if (isValid) {
-          final message =
-              'Username: ${controller.username.text}\n'
-              'Password: ${controller.password.text}\n'
-              'Email: ${controller.email.text}';
-          final snackBar = SnackBar(
-            content: Text(message, style: TextStyle(fontSize: 20)),
-            backgroundColor: Colors.green,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
+        if (message == null) return;
+
+        final snackBar = SnackBar(
+          content: Text(message, style: TextStyle(fontSize: 20)),
+          backgroundColor: Colors.green,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       },
       child: Text('Submit', style: TextStyle(fontSize: 24)),
     );
