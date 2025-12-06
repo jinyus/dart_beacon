@@ -53,16 +53,12 @@ class FormController with BeaconController {
     return null;
   });
 
+  bool get isValid =>
+      (usernameError.peek(), emailError.peek(), passwordError.peek()) ==
+      (null, null, null);
+
   String? submit() {
     _hasSubmitted.value = true;
-    final isValid = switch ((
-      usernameError.peek(),
-      emailError.peek(),
-      passwordError.peek(),
-    )) {
-      (null, null, null) => true,
-      _ => false,
-    };
 
     if (!isValid) return null;
 
