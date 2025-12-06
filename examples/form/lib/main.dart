@@ -197,13 +197,11 @@ class CategoryChip extends StatelessWidget {
       label: Text(category),
       selected: isSelected,
       onSelected: (selected) {
-        final newCategories = Set<String>.from(categories);
         if (selected) {
-          newCategories.add(category);
+          formController.categories.add(category);
         } else {
-          newCategories.remove(category);
+          formController.categories.remove(category);
         }
-        formController.categories.value = newCategories;
       },
       backgroundColor: Colors.grey[200],
       selectedColor: Theme.of(context).primaryColor,

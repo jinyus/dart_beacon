@@ -10,7 +10,7 @@ class FormController with BeaconController {
   late final password = TextEditingBeacon(text: '', group: B);
   late final passwordConfirm = TextEditingBeacon(text: '', group: B);
   late final accountType = B.writable<String?>('Buyer');
-  late final categories = B.writable<Set<String>>({'clothes'});
+  late final categories = B.hashSet<String>({'clothes'});
 
   // this allows us to hide the errors until
   // the user starts typing or press submit
