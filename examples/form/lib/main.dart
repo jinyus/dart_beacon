@@ -159,9 +159,6 @@ class CategoryField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formController = formControllerRef.of(context);
-    final categories = formController.categories.watch(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -173,10 +170,10 @@ class CategoryField extends StatelessWidget {
         Wrap(
           spacing: 8,
           children: [
-            CategoryChip(category: 'clothes', selectedCategories: categories),
-            CategoryChip(category: 'shoes', selectedCategories: categories),
-            CategoryChip(category: 'hats', selectedCategories: categories),
-            CategoryChip(category: 'bags', selectedCategories: categories),
+            CategoryChip(category: 'clothes'),
+            CategoryChip(category: 'shoes'),
+            CategoryChip(category: 'hats'),
+            CategoryChip(category: 'bags'),
           ],
         ),
       ],
@@ -186,24 +183,21 @@ class CategoryField extends StatelessWidget {
 
 class CategoryChip extends StatelessWidget {
   final String category;
-  final Set<String> selectedCategories;
 
-  const CategoryChip({
-    super.key,
-    required this.category,
-    required this.selectedCategories,
-  });
+  const CategoryChip({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = selectedCategories.contains(category);
     final formController = formControllerRef.of(context);
+    final categories = formController.categories.watch(context);
+
+    final isSelected = categories.contains(category);
 
     return FilterChip(
       label: Text(category),
       selected: isSelected,
       onSelected: (selected) {
-        final newCategories = Set<String>.from(selectedCategories);
+        final newCategories = Set<String>.from(categories);
         if (selected) {
           newCategories.add(category);
         } else {
