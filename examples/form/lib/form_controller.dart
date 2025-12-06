@@ -5,6 +5,9 @@ class FormController with BeaconController {
     r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)',
   );
 
+  // BeaconController provides a 'B' property which is a BeaconGroup.
+  // It allows us to dispose all beacons created in this group
+  // when the controller is disposed.
   late final username = TextEditingBeacon(text: '', group: B);
   late final email = TextEditingBeacon(text: '', group: B);
   late final password = TextEditingBeacon(text: '', group: B);
