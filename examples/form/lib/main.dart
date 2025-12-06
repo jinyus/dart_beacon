@@ -159,6 +159,9 @@ class CategoryField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formController = formControllerRef.of(context);
+    final categoryError = formController.categoryError.watch(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,6 +179,13 @@ class CategoryField extends StatelessWidget {
             CategoryChip(category: 'bags'),
           ],
         ),
+        if (categoryError != null) ...[
+          SizedBox(height: 8),
+          Text(
+            categoryError,
+            style: TextStyle(color: Colors.red, fontSize: 12),
+          ),
+        ],
       ],
     );
   }

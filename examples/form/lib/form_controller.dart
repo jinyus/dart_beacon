@@ -55,6 +55,10 @@ class FormController with BeaconController {
     return null;
   });
 
+  late final categoryError = B.derived(
+    () => categories.value.isEmpty ? 'Select at least one category' : null,
+  );
+
   bool get isValid =>
       (usernameError.peek(), emailError.peek(), passwordError.peek()) ==
       (null, null, null);
