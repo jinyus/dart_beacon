@@ -34,6 +34,8 @@ class FormApp extends StatelessWidget {
             EmailField(),
             const SizedBox(height: 16),
             AccountTypeField(),
+            const SizedBox(height: 16),
+            CategoryField(),
             const SizedBox(height: 32),
             PasswordField(),
             const SizedBox(height: 32),
@@ -148,6 +150,70 @@ class AccountTypeField extends StatelessWidget {
         DropdownMenuItem(value: 'Seller', child: Text('Seller')),
       ],
       onChanged: formController.accountType.set,
+    );
+  }
+}
+
+class CategoryField extends StatelessWidget {
+  const CategoryField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final formController = formControllerRef.of(context);
+    final categories = formController.categories.watch(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Categories',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            CategoryChip(category: 'clothes', selectedCategories: categories),
+            CategoryChip(category: 'shoes', selectedCategories: categories),
+            CategoryChip(category: 'hats', selectedCategories: categories),
+            CategoryChip(category: 'bags', selectedCategories: categories),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class CategoryChip extends StatelessWidget {
+  final String category;
+  final Set<String> selectedCategories;
+
+  const CategoryChip({
+    super.key,
+    required this.category,
+    required this.selectedCategories,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = selectedCategories.contains(category);
+    final formController = formControllerRef.of(context);
+
+    return FilterChip(
+      label: Text(category),
+      selected: isSelected,
+      onSelected: (selected) {
+        final newCategories = Set<String>.from(selectedCategories);
+        if (selected) {
+          newCategories.add(category);
+        } else {
+          newCategories.remove(category);
+        }
+        formController.categories.value = newCategories;
+      },
+      backgroundColor: Colors.grey[200],
+      selectedColor: Theme.of(context).primaryColor,
+      labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
     );
   }
 }
