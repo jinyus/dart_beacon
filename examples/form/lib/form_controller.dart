@@ -9,6 +9,7 @@ class FormController with BeaconController {
   late final email = TextEditingBeacon(text: '', group: B);
   late final password = TextEditingBeacon(text: '', group: B);
   late final passwordConfirm = TextEditingBeacon(text: '', group: B);
+  late final accountType = B.writable<String?>('Buyer');
 
   // this allows us to hide the errors until
   // the user starts typing or press submit
@@ -64,6 +65,7 @@ class FormController with BeaconController {
 
     return 'Username: ${username.text}\n'
         'Password: ${password.text}\n'
-        'Email: ${email.text}';
+        'Email: ${email.text}\n'
+        'Gender: ${accountType.value}';
   }
 }

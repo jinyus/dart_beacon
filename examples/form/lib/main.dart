@@ -32,6 +32,8 @@ class FormApp extends StatelessWidget {
             UsernameField(),
             const SizedBox(height: 16),
             EmailField(),
+            const SizedBox(height: 16),
+            AccountTypeField(),
             const SizedBox(height: 32),
             PasswordField(),
             const SizedBox(height: 32),
@@ -123,6 +125,29 @@ class PasswordConfirmField extends StatelessWidget {
         border: OutlineInputBorder(),
       ),
       maxLength: 30,
+    );
+  }
+}
+
+class AccountTypeField extends StatelessWidget {
+  const AccountTypeField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final formController = formControllerRef.of(context);
+    final gender = formController.accountType.watch(context);
+
+    return DropdownButtonFormField<String>(
+      initialValue: gender,
+      decoration: InputDecoration(
+        labelText: 'Account Type',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        DropdownMenuItem(value: 'Buyer', child: Text('Buyer')),
+        DropdownMenuItem(value: 'Seller', child: Text('Seller')),
+      ],
+      onChanged: formController.accountType.set,
     );
   }
 }
