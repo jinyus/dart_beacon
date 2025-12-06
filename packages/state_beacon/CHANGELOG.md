@@ -1,3 +1,7 @@
+# 1.3.2
+
+-   [Fix] Minor improvement by removing internal redundant method call
+
 # 1.3.1
 
 -   [Fix] Chaining methods on derived beacons now eagerly fetches the value allowing it to be used instantly.
