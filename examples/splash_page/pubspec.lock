@@ -143,10 +143,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
+      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.17.0"
   path:
     dependency: transitive
     description:
@@ -182,22 +182,22 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "1.3.0"
+    version: "1.3.1"
   state_beacon_core:
     dependency: "direct overridden"
     description:
       path: "../../packages/state_beacon_core"
       relative: true
     source: path
-    version: "1.3.0"
+    version: "1.3.1"
   state_beacon_flutter:
     dependency: transitive
     description:
       name: state_beacon_flutter
-      sha256: "2c083b3fab4c5c587949cd9e061765c9e4ee1f544169dd307098df98db94b0e9"
+      sha256: "7a9db1a4532f0563e240ab1803751810c3d619a1d631e101b4abac43a21b4406"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.3.1"
   stream_channel:
     dependency: transitive
     description:
@@ -226,10 +226,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "522f00f556e73044315fa4585ec3270f1808a4b186c936e612cab0b565ff1e00"
+      sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.6"
+    version: "0.7.7"
   vector_math:
     dependency: transitive
     description:
