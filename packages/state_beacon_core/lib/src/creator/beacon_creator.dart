@@ -445,9 +445,6 @@ class _BeaconCreator {
   /// It will cancel the stream subscription and enter a sleep state.
   /// It will resume executing once a listener is added or its value is accessed.
   ///
-  /// If `supportConditional` is `false`(default: true), it will only look dependencies on its first run.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used and no new dependencies will be added. This can be used as a performance optimization.
-  ///
   /// Example:
   /// ```dart
   /// final userID = Beacon.writable<int>(18235);
@@ -624,11 +621,6 @@ class _BeaconCreator {
   /// Creates an effect based on a provided function. The provided function will be called
   /// whenever one of its dependencies change.
   ///
-  /// If `supportConditional` is `false`, the effect look for its dependencies on its first run only.
-  /// This means once a beacon is added as a dependency, it will not be removed even if it's no longer used
-  /// and any beacon not accessed in the first run will not be tracked.
-  /// Defaults to `true`.
-  ///
   /// Example:
   /// ```dart
   /// final age = Beacon.writable(15);
@@ -647,6 +639,9 @@ class _BeaconCreator {
   /// ```
   VoidCallback effect(
     Function fn, {
+    @Deprecated(
+      'The supportConditional parameter is no longer needed and will be removed in the next major version.',
+    )
     bool supportConditional = true,
     String? name,
   }) {
