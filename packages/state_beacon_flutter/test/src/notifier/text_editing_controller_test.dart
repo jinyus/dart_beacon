@@ -48,6 +48,12 @@ void main() {
     expect(controller.text, '1');
 
     expect(beacon.selection, controller.selection);
+
+    beacon.value = const TextEditingValue(text: 'hello');
+    expect(controller.text, 'hello');
+
+    beacon.text = 'goodbye';
+    expect(controller.text, 'goodbye');
   });
 
   test('should add beacon to group provided', () {
@@ -62,5 +68,16 @@ void main() {
     expect(group.beacons.isEmpty, true);
 
     expect(beacon.isDisposed, true);
+  });
+
+  test('should call dispose once', () {
+    final beacon = TextEditingBeacon(text: '1');
+    var called = 0;
+
+    beacon
+      ..onDispose(() => called++)
+      ..dispose();
+
+    expect(called, 1);
   });
 }

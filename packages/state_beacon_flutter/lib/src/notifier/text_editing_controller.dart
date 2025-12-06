@@ -73,6 +73,10 @@ class TextEditingBeacon extends WritableBeacon<TextEditingValue> {
 
   @override
   void dispose() {
+    // we are being disposed so controller doesn't
+    // need to call our dispose method.
+    _controller.disposeCallback = null;
+
     _controller.dispose();
     super.dispose();
   }
