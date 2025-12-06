@@ -4,6 +4,6 @@ Each form field is implemented as a `TextEditingBeacon`, which manages the text 
 
 
 <div align='center'>
-  <video src='https://github.com/user-attachments/assets/095942bd-56a6-4d5a-9f7c-88507715f28f' />
+  <video src='https://github.com/user-attachments/assets/53f74589-bfd4-4f04-a38f-1e4a3585e644' />
 </div>
 
