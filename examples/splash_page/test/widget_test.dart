@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:splash_page/app.dart';
+import 'package:splash_page/main.dart';
 import 'package:state_beacon/state_beacon.dart';
 
 void main() {
