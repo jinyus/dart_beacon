@@ -27,7 +27,7 @@ final recipeControllerRef = Ref.scoped(
   (ctx) => RecipeController(recipeServiceRef.of(ctx)),
 );
 
-// This where you intialize all asynchronous dependencies
+// This is where you intialize all asynchronous dependencies
 // that your app requires. This allows us to control how
 // they are initialized. eg:
 // - initialize them in parallel (see the example below)
