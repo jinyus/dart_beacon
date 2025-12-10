@@ -204,7 +204,9 @@ class ListBeacon<E> extends WritableBeacon<List<E>> {
   /// ```
   bool remove(Object? value) {
     final result = _value.remove(value);
-    _setValue(_value, force: true);
+    if (result) {
+      _setValue(_value, force: true);
+    }
     return result;
   }
 
