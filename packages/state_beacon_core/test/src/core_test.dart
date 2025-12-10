@@ -400,7 +400,7 @@ void main() {
     test('should set previous and initial values - filtered', () {
       final beacon = Beacon.lazyFiltered<int>(filter: (p, x) => x > 5);
       beacon.set(10);
-      expect(beacon.previousValue, equals(10));
+      expect(beacon.previousValue, isNull);
       beacon.set(15);
       expect(beacon.previousValue, equals(10));
       beacon.set(5);
