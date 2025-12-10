@@ -74,7 +74,9 @@ class SetBeacon<E> extends WritableBeacon<Set<E>> {
   /// ```
   bool remove(Object? value) {
     final result = _value.remove(value);
-    _setValue(_value, force: true);
+    if (result) {
+      _setValue(_value, force: true);
+    }
     return result;
   }
 
