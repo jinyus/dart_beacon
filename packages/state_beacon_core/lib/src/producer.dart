@@ -187,7 +187,6 @@ abstract class Producer<T> implements Disposable {
     if (_isEmpty) {
       _isEmpty = false;
       _initialValue = newValue;
-      _previousValue = newValue;
       _value = newValue;
       _notifyListeners();
     } else if (_value != newValue || force) {

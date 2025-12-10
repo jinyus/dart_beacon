@@ -146,6 +146,17 @@ void main() {
     expect(uBeacon.value, 10);
   });
 
+  test('should have previousValue null on first initialization', () {
+    final beacon = Beacon.lazyWritable<int>();
+    expect(beacon.previousValue, isNull);
+
+    beacon.value = 20;
+    expect(beacon.previousValue, isNull);
+
+    beacon.value = 30;
+    expect(beacon.previousValue, 20);
+  });
+
   test('should notify when same value is set with force option', () async {
     final beacon = Beacon.writable(10);
     const time = Duration(milliseconds: 5);
