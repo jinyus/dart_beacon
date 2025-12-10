@@ -94,4 +94,25 @@ void main() {
 
     expect(called, 10);
   });
+
+  test('should not notify when remove() fails to find key', () {
+    final data = Beacon.hashMap<String, int>({'a': 1, 'b': 2});
+
+    var called = 0;
+
+    data.subscribe((_) => called++);
+
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+
+    final result = data.remove('z');
+
+    expect(result, isNull);
+    expect(data.value, equals({'a': 1, 'b': 2}));
+
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+  });
 }

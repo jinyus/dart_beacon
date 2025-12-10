@@ -68,8 +68,11 @@ class MapBeacon<K, V> extends WritableBeacon<Map<K, V>> {
   /// print(terrestrial); // {1: Mercury, 3: Earth}
   /// ```
   V? remove(Object? key) {
+    final lengthBefore = _value.length;
     final result = _value.remove(key);
-    _setValue(_value, force: true);
+    if (_value.length != lengthBefore) {
+      _setValue(_value, force: true);
+    }
     return result;
   }
 

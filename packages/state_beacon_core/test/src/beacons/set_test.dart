@@ -104,4 +104,25 @@ void main() {
 
     expect(called, 10);
   });
+
+  test('should not notify when remove() fails to find element', () {
+    final nums = Beacon.hashSet<int>({1, 2, 3});
+
+    var called = 0;
+
+    nums.subscribe((_) => called++);
+
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+
+    final result = nums.remove(99);
+
+    expect(result, false);
+    expect(nums.value, equals({1, 2, 3}));
+
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+  });
 }
