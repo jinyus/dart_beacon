@@ -20,7 +20,18 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
   /// emitted when the beacon is unblocked.
   final bool dropBlocked;
 
-  final List<T> _buffer = [];
+  final List<(T, bool)> _buffer = [];
+
+  void _processBuffer(Timer timer) {
+    if (_buffer.isEmpty) {
+      _timer?.cancel();
+      _blocked = false;
+      return;
+    }
+
+    final (bufferedValue, force) = _buffer.removeAt(0);
+    _setValue(bufferedValue, force: force);
+  }
 
   /// Whether or not this beacon is currently blocked.
   bool get isBlocked => _blocked;
@@ -44,7 +55,7 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
 
     if (_blocked) {
       if (!dropBlocked) {
-        _buffer.add(newValue);
+        _buffer.add((newValue, force));
       }
       return;
     }
@@ -55,19 +66,12 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
 
     _blocked = true;
     _timer?.cancel();
-    _timer = Timer.periodic(_duration!, (_) {
-      if (_buffer.isNotEmpty) {
-        final bufferedValue = _buffer.removeAt(0);
-        _setValue(bufferedValue, force: force);
-      } else {
-        _timer?.cancel();
-        _blocked = false;
-      }
-    });
+    _timer = Timer.periodic(_duration!, _processBuffer);
   }
 
   void _cleanUp() {
     _timer?.cancel();
+    _timer = null;
     _blocked = false;
     _buffer.clear();
   }

@@ -204,4 +204,41 @@ void main() {
 
     expect(called, 5); // 5 notifications should be sent
   });
+
+  test('should handle force parameter correctly in buffered updates', () async {
+    final beacon = Beacon.throttled(
+      0,
+      duration: k10ms * 5,
+      dropBlocked: false,
+    );
+
+    final values = <int>[];
+    var notifyCount = 0;
+
+    beacon.subscribe((val) {
+      values.add(val);
+      notifyCount++;
+    });
+
+    beacon.set(1);
+    BeaconScheduler.flush();
+    expect(values, [1]);
+    expect(notifyCount, 1);
+
+    beacon.set(1, force: false);
+    await delay(k10ms);
+    expect(values, [1]);
+    expect(notifyCount, 1);
+
+    await delay(k10ms * 5);
+    expect(values, [1]);
+    expect(notifyCount, 1);
+
+    beacon.set(1, force: true);
+    await delay(k10ms);
+
+    await delay(k10ms * 5);
+    expect(values, [1, 1]);
+    expect(notifyCount, 2);
+  });
 }
