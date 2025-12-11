@@ -20,7 +20,11 @@ class Subscription<T> implements Consumer {
         (_derivedSource != null && _derivedSource!._observers.isEmpty)) {
       _schedule();
     } else {
+      // For regular beacons with startNow=false, we don't schedule initially
+      // but we still mark as CLEAN so future updates will work
       _status = CLEAN;
+      // Mark that we've already "ran" the initial update (which we're skipping)
+      _ran = true;
     }
 
     assert(() {
@@ -104,11 +108,19 @@ class Subscription<T> implements Consumer {
       return;
     }
 
+    // Skip callback on first run if startNow is false
+    final shouldRunCallback = _ran || startNow;
+
+    // Track if this is the first run
     _ran = true;
 
-    // If startNow is true and producer is an empty derived. We need to peek()
-    // to initialize the derived and register it as an observer of its sources.
-    if (_derivedSource != null || !producer.isEmpty) fn(producer.peek());
+    if (shouldRunCallback) {
+      // If producer is an empty derived, peek() will initialize it
+      // and register it as an observer of its sources.
+      if (_derivedSource != null || !producer.isEmpty) {
+        fn(producer.peek());
+      }
+    }
 
     // After the update, set the status to
     // clean since we've processed the latest value.

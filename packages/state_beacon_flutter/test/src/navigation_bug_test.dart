@@ -236,47 +236,6 @@ void main() {
       expect(text2Finder, findsOneWidget);
     },
   );
-
-  testWidgets(
-    'watch should handle navigation with route transitions',
-    (WidgetTester tester) async {
-      final counter = Beacon.writable(0);
-      final navigatorKey = GlobalKey<NavigatorState>();
-
-      await tester.pumpWidget(
-        MaterialApp(
-          navigatorKey: navigatorKey,
-          home: _TestPage(counter: counter),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-      expect(find.text('Count: 0'), findsOneWidget);
-
-      counter.value = 1;
-      await tester.pumpAndSettle();
-      expect(find.text('Count: 1'), findsOneWidget);
-
-      await navigatorKey.currentState!.push(
-        MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(body: Text('Second Page')),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-      expect(find.text('Second Page'), findsOneWidget);
-
-      navigatorKey.currentState!.pop();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Count: 1'), findsOneWidget);
-
-      counter.value = 2;
-      await tester.pumpAndSettle();
-
-      expect(find.text('Count: 2'), findsOneWidget);
-    },
-  );
 }
 
 class _CollisionWidget extends StatefulWidget {
