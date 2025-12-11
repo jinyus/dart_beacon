@@ -46,6 +46,22 @@ void main() {
     beacon.decrement();
 
     expect(beacon.value, 0);
+
+    final doubleBeacon = Beacon.writable(1.3);
+
+    doubleBeacon.increment();
+
+    BeaconScheduler.flush();
+
+    expect(doubleBeacon.value, 2.3);
+
+    doubleBeacon.decrement();
+    doubleBeacon.decrement();
+
+    BeaconScheduler.flush();
+
+    expect(doubleBeacon.value, lessThan(0.301));
+    expect(doubleBeacon.value, greaterThan(0.291));
   });
 
   test('should set correct async state', () async {
