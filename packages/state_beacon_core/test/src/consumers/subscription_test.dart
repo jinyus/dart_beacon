@@ -257,6 +257,92 @@ void main() {
   });
 
   test(
+    'subscription with startNow=false should not '
+    'invoke callback immediately for derived',
+    () async {
+      final source = Beacon.writable(10);
+      final derived = Beacon.derived(() => source.value * 2);
+
+      // Initialize the derived by reading it
+      expect(derived.value, 20);
+
+      var callCount = 0;
+      final receivedValues = <int>[];
+
+      // Subscribe with startNow = false
+      // The callback should NOT be invoked immediately
+      final unsub = derived.subscribe(
+        (value) {
+          callCount++;
+          receivedValues.add(value);
+        },
+        startNow: false,
+      );
+
+      BeaconScheduler.flush();
+
+      // Bug #4: Previously, this would fail because the callback
+      // was invoked immediately despite startNow=false
+      expect(
+        callCount,
+        0,
+        reason: 'startNow=false should prevent immediate callback',
+      );
+
+      expect(receivedValues, isEmpty);
+
+      // Now trigger an update
+      source.value = 15;
+      BeaconScheduler.flush();
+
+      // The callback should be invoked on actual updates
+      expect(callCount, 1);
+      expect(receivedValues, [30]);
+
+      unsub();
+    },
+  );
+
+  test(
+    'subscription with startNow=false should not '
+    'invoke callback immediately for lazy beacon',
+    () async {
+      final source = Beacon.lazyWritable<int>();
+
+      var callCount = 0;
+      final receivedValues = <int>[];
+
+      // Subscribe with startNow = false
+      // The callback should NOT be invoked immediately
+      final unsub = source.subscribe(
+        (value) {
+          callCount++;
+          receivedValues.add(value);
+        },
+        startNow: true,
+      );
+
+      BeaconScheduler.flush();
+
+      // Bug #4: Previously, this would fail because the callback
+      // was invoked immediately despite startNow=false
+      expect(callCount, 0);
+
+      expect(receivedValues, isEmpty);
+
+      // Now trigger an update
+      source.value = 15;
+      BeaconScheduler.flush();
+
+      // The callback should be invoked on actual updates
+      expect(callCount, 1);
+      expect(receivedValues, [15]);
+
+      unsub();
+    },
+  );
+
+  test(
     'subscription to derived should run'
     ' until disposed when startNow=false(sync)',
     () async {
