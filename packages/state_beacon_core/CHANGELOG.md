@@ -1,3 +1,12 @@
+# 1.3.3
+
+- [Deprecate] deprecate supportConditional parameter in effect methods. This param was already ignored in v0.34.0 but wasn't marked as deprecated
+- [Fix] forced writes to throttled beacons incorrectly dropped the `force` flag when those writes were added to the buffer.
+- [Fix] Map.remove,List.remove and Set.remove no longer notifies listerners when nothing was removed.
+- [Fix] previousValue was incorrectly set when using lazy beacons
+- [Fix] Edge case where a subscription to a derived beacon with startNow=false would run immediately
+
+
 # 1.3.2
 
 -   [Fix] Minor improvement by removing internal redundant method call
