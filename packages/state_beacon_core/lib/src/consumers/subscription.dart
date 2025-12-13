@@ -9,7 +9,6 @@ class Subscription<T> implements Consumer {
     this.producer,
     this.fn, {
     required this.startNow,
-    required this.synchronous,
   }) {
     // derived beacons are lazy so they aren't registered as observers
     // of their sources until they are actually used
@@ -41,9 +40,6 @@ class Subscription<T> implements Consumer {
   /// Whether the subscription should start immediately.
   final bool startNow;
 
-  /// Whether the subscription should run synchronously.
-  final bool synchronous;
-
   /// The callback that runs when the producer changes.
   final void Function(T) fn;
 
@@ -57,10 +53,6 @@ class Subscription<T> implements Consumer {
   Status _status = DIRTY;
 
   void _schedule() {
-    if (synchronous) {
-      updateIfNecessary();
-      return;
-    }
     _effectQueue.add(this);
     _flushFn();
   }
@@ -134,17 +126,8 @@ class Subscription<T> implements Consumer {
   void dispose() {
     _isDisposed = true;
     // Remove this subscription from the producer's observer list.
-    if (synchronous) {
-      // Defer removal to the next microtask to avoid
-      // modifying the list during iteration
-      scheduleMicrotask(() {
-        producer._removeObserver(this);
-        _effectQueue.remove(this);
-      });
-    } else {
-      producer._removeObserver(this);
-      _effectQueue.remove(this);
-    }
+    producer._removeObserver(this);
+    _effectQueue.remove(this);
   }
 
   @override

@@ -22,9 +22,7 @@ class ReadableBeacon<T> extends Producer<T> {
 
   /// Returns a broadcast [Stream] that emits the current value
   /// and all subsequent updates to the value of this beacon.
-  /// If [synchronous] is true, `autobatching` will be disabled
-  /// and all updates will be emitted immediately.
-  Stream<T> toStream({bool synchronous = false}) {
+  Stream<T> toStream() {
     _controller ??= StreamController<T>.broadcast(
       onListen: () {
         // onListen is only called when sub count goes from 0 to 1.
@@ -32,7 +30,6 @@ class ReadableBeacon<T> extends Producer<T> {
         // so _unsub will always be null here but checking doesn't hurt
         _unsubFromSelf ??= subscribe(
           _controller!.add,
-          synchronous: synchronous,
         );
       },
       onCancel: () {

@@ -209,21 +209,15 @@ abstract class Producer<T> implements Disposable {
   ///
   /// If [startNow] is true, the callback will be called immediately
   /// with the current value of the beacon.
-  ///
-  /// If [synchronous] is true, the callback will be ran synchronously.
-  /// This also means that the scheduler will be ignored and automatic
-  /// batching of updates will be disabled.
   VoidCallback subscribe(
     void Function(T) callback, {
     bool startNow = true,
-    bool synchronous = false,
   }) {
     assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
     final sub = Subscription(
       this,
       callback,
       startNow: startNow,
-      synchronous: synchronous,
     );
     _observers.add(sub);
     return sub.dispose;

@@ -37,7 +37,6 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
     void Function(V)? then,
     bool disposeTogether = false,
     bool startNow = true,
-    bool synchronous = true,
   }) {
     if (_wrapped.containsKey(target.hashCode)) return;
 
@@ -56,7 +55,6 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
     final unsub = target.subscribe(
       fn,
       startNow: startNow,
-      synchronous: synchronous,
     );
 
     _wrapped[target.hashCode] = unsub;

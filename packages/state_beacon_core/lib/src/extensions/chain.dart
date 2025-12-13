@@ -44,7 +44,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -95,7 +95,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -124,7 +124,6 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   DebouncedBeacon<T> debounce(
     Duration duration, {
     String? name,
-    bool synchronous = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -147,7 +146,7 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -170,7 +169,6 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
   ThrottledBeacon<T> throttle(
     Duration duration, {
     bool dropBlocked = true,
-    bool synchronous = true,
     String? name,
   }) {
     assert(
@@ -195,7 +193,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -223,7 +221,6 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
     bool Function(T?, T) filter, {
     String? name,
     bool lazyBypass = true,
-    bool synchronous = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -247,7 +244,7 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
       lazyBypass: lazyBypass,
     );
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
@@ -271,7 +268,6 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
   ReadableBeacon<O> map<O>(
     MapFilter<T, O> mapFN, {
     String? name,
-    bool synchronous = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -287,20 +283,18 @@ Bad: someBeacon.buffer(10).map();
 
     final beacon = _MappedBeacon(mapFN, name: name);
 
-    _wrapAndDelegate(beacon, synchronous);
+    _wrapAndDelegate(beacon);
 
     return beacon;
   }
 
   void _wrapAndDelegate<InputT, OutputT>(
     BeaconWrapper<InputT, OutputT> beacon,
-    bool synchronous,
   ) {
     beacon.wrap(
       this,
       disposeTogether: true,
       startNow: !isEmpty || _isDerived,
-      synchronous: synchronous,
     );
 
     // Example 1:

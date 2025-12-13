@@ -263,25 +263,11 @@ void main() {
     );
   });
 
-  test('should NOT autobatch when synchronous=true', () {
+  test('should autobatch', () async {
     final original = Beacon.writable(10);
     final wrapper = Beacon.writable(0);
 
     wrapper.wrap(original);
-    expect(wrapper.value, 10);
-
-    original.value = 20;
-    expect(wrapper.value, 20);
-
-    original.value = 30;
-    expect(wrapper.value, 30);
-  });
-
-  test('should autobatch when synchronous=false', () async {
-    final original = Beacon.writable(10);
-    final wrapper = Beacon.writable(0);
-
-    wrapper.wrap(original, synchronous: false);
     expect(wrapper.value, 0);
     await expectLater(wrapper.next(), completion(10));
 

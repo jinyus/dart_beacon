@@ -112,16 +112,20 @@ void main() {
 
     var ran = 0;
 
-    family.entries.subscribe((_) => ran++, synchronous: true, startNow: false);
+    family.entries.subscribe((_) => ran++, startNow: false);
 
     final beacon1 = family(1);
     final beacon2 = family(2);
 
-    expect(ran, 2);
+    BeaconScheduler.flush();
+
+    expect(ran, 1);
 
     family.clear();
 
-    expect(ran, 3);
+    BeaconScheduler.flush();
+
+    expect(ran, 2);
 
     expect(beacon1.isDisposed, true);
     expect(beacon2.isDisposed, true);
@@ -145,9 +149,11 @@ void main() {
     expect(getBeacons(), [beacon1, beacon2]);
     expect(getKeys(), [1, 2]);
 
-    family.entries.subscribe((_) => ran++, synchronous: true, startNow: false);
+    family.entries.subscribe((_) => ran++, startNow: false);
 
     final beacon3 = family(3);
+
+    BeaconScheduler.flush();
 
     expect(getBeacons(), [beacon1, beacon2, beacon3]);
     expect(getKeys(), [1, 2, 3]);
@@ -156,9 +162,13 @@ void main() {
 
     family(3);
 
+    BeaconScheduler.flush();
+
     expect(ran, 1);
 
     beacon1.dispose();
+
+    BeaconScheduler.flush();
 
     expect(getBeacons(), [beacon2, beacon3]);
     expect(getKeys(), [2, 3]);
@@ -167,12 +177,16 @@ void main() {
 
     family.remove(2);
 
+    BeaconScheduler.flush();
+
     expect(getBeacons(), [beacon3]);
     expect(getKeys(), [3]);
 
     expect(ran, 3);
 
     final beacon4 = family(4);
+
+    BeaconScheduler.flush();
 
     expect(getBeacons(), [beacon3, beacon4]);
     expect(getKeys(), [3, 4]);
@@ -183,6 +197,8 @@ void main() {
     expect(family.containsKey(2), false);
 
     family.clear();
+
+    BeaconScheduler.flush();
 
     expect(getBeacons(), isEmpty);
     expect(getKeys(), isEmpty);
