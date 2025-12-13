@@ -384,9 +384,12 @@ void main() {
     var mounted = true;
 
     late void Function() unsub;
-    unsub = beacon.subscribe((v) {
-      if (!mounted) unsub(); // Unsubscribe when "unmounted"
-    }, synchronous: true);
+    unsub = beacon.subscribe(
+      (v) {
+        if (!mounted) unsub(); // Unsubscribe when "unmounted"
+      },
+      synchronous: true,
+    );
 
     beacon.subscribe((v) {}, synchronous: true); // Second observer
 
