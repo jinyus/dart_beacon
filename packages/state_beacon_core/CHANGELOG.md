@@ -1,3 +1,7 @@
+# 1.3.4
+
+- [Fix] synchronous subscription RangeError when disposed in it's callback.
+
 # 1.3.3
 
 - [Deprecate] deprecate supportConditional parameter in effect methods. This param was already ignored in v0.34.0 but wasn't marked as deprecated
