@@ -378,4 +378,39 @@ void main() {
       expect(called, 1);
     },
   );
+
+  test('RangeError when subscription unsubscribes in callback(sync)', () {
+    final beacon = Beacon.writable<int>(0);
+    var mounted = true;
+
+    late void Function() unsub;
+    unsub = beacon.subscribe(
+      (v) {
+        if (!mounted) unsub(); // Unsubscribe when "unmounted"
+      },
+      synchronous: true,
+    );
+
+    beacon.subscribe((v) {}, synchronous: true); // Second observer
+
+    beacon.value = 1; // Works fine
+    mounted = false;
+    beacon.value = 2; // RangeError!
+  });
+
+  test('RangeError when subscription unsubscribes in callback', () {
+    final beacon = Beacon.writable<int>(0);
+    var mounted = true;
+
+    late void Function() unsub;
+    unsub = beacon.subscribe((v) {
+      if (!mounted) unsub(); // Unsubscribe when "unmounted"
+    });
+
+    beacon.subscribe((v) {}, synchronous: true); // Second observer
+
+    beacon.value = 1; // Works fine
+    mounted = false;
+    beacon.value = 2; // RangeError!
+  });
 }

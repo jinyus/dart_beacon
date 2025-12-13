@@ -15,7 +15,8 @@ void main() {
     expect(wrapper.value, equals(10));
   });
 
-  test('should remove subscription for all wrapped beacons on dispose', () {
+  test('should remove subscription for all wrapped beacons on dispose',
+      () async {
     // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);
     final doubledCount = Beacon.derived<int>(() => count.value * 2);
@@ -33,11 +34,13 @@ void main() {
 
     wrapper.dispose();
 
+    await delay();
+
     expect(doubledCount.listenersCount, 0);
     expect(count.listenersCount, 1);
   });
 
-  test('should remove subscription for all wrapped beacons', () {
+  test('should remove subscription for all wrapped beacons', () async {
     final count = Beacon.readable<int>(10);
     final doubledCount = Beacon.derived<int>(() => count.value * 2);
 
@@ -54,6 +57,8 @@ void main() {
     expect(count.listenersCount, 2);
 
     wrapper.clearWrapped();
+
+    await delay();
 
     expect(doubledCount.listenersCount, 0);
     expect(count.listenersCount, 1);
