@@ -239,6 +239,8 @@ void main() {
         .filter((p, n) => n > 0, name: 'f2')
         .filter((p, n) => n > 10, name: 'f3');
 
+    BeaconScheduler.flush();
+
     filtered.value = 1;
 
     BeaconScheduler.flush();
@@ -286,6 +288,8 @@ void main() {
         .debounce(k10ms, name: 'debounced')
         .filter(neverFilter, name: 'f1')
         .filter(neverFilter, name: 'f2');
+
+    BeaconScheduler.flush();
 
     expect(filtered.isEmpty, false);
     expect(filtered.value, 10);
@@ -370,6 +374,8 @@ void main() {
 
     final buffered = Beacon.bufferedCount<int>(5);
     final buffTime = Beacon.bufferedTime<int>(duration: k10ms);
+
+    BeaconScheduler.flush();
 
     expect(
       () => buffered.filter(neverFilter),
@@ -514,6 +520,8 @@ void main() {
 
     final buff = count.buffer(5, name: 'buff');
 
+    BeaconScheduler.flush();
+
     tbeacon.set(20);
     BeaconScheduler.flush();
     tbeacon.set(20);
@@ -532,6 +540,8 @@ void main() {
     final tbeacon = count.debounce(k10ms);
 
     final buff = count.buffer(5);
+
+    BeaconScheduler.flush();
 
     tbeacon.set(20);
     BeaconScheduler.flush();
@@ -552,6 +562,8 @@ void main() {
 
     final buff = count.buffer(5);
 
+    BeaconScheduler.flush();
+
     tbeacon.set(20);
     BeaconScheduler.flush();
     tbeacon.set(20);
@@ -571,6 +583,8 @@ void main() {
 
     final buff = count.buffer(5);
 
+    BeaconScheduler.flush();
+
     tbeacon.add(20);
     BeaconScheduler.flush();
     tbeacon.add(20);
@@ -589,6 +603,8 @@ void main() {
     final tbeacon = count.bufferTime(k10ms);
 
     final buff = count.buffer(5);
+
+    BeaconScheduler.flush();
 
     tbeacon.add(20);
     BeaconScheduler.flush();
@@ -616,6 +632,8 @@ void main() {
         .map((v) => v + 1)
         .filter((_, n) => n.isEven);
 
+    BeaconScheduler.flush();
+
     await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
   });
 
@@ -631,6 +649,9 @@ void main() {
 
     // rerouted to filtered beacon first
     beacon.set(10);
+
+    BeaconScheduler.flush();
+
     expect(beacon.value, 11);
   });
 
@@ -639,13 +660,19 @@ void main() {
 
     final mapped = count.map((v) => '${v * 2}');
 
+    BeaconScheduler.flush();
+
     expect(mapped.value, '20');
 
     count.value = 20;
 
+    BeaconScheduler.flush();
+
     expect(mapped.value, '40');
 
     final buff = mapped.buffer(5);
+
+    BeaconScheduler.flush();
 
     buff.add('60');
     BeaconScheduler.flush();
@@ -655,19 +682,28 @@ void main() {
     expect(mapped.value, '40');
 
     count.value = 30;
+    BeaconScheduler.flush();
+
     expect(mapped.value, '60');
     expect(buff.currentBuffer(), ['40', '60', '60']);
 
     count.value = 40;
+
+    BeaconScheduler.flush();
+
     expect(mapped.value, '80');
     expect(buff.currentBuffer(), ['40', '60', '60', '80']);
 
     count.value = 50;
+    BeaconScheduler.flush();
+
     expect(mapped.value, '100');
     expect(buff(), ['40', '60', '60', '80', '100']);
     expect(buff.currentBuffer(), <String>[]);
 
     buff.reset();
+    BeaconScheduler.flush();
+
     expect(buff.value, <String>[]);
     expect(buff.currentBuffer(), <String>[]);
     // these won't change because the input type is different
@@ -680,13 +716,19 @@ void main() {
 
     final mapped = count.map((v) => v * 2);
 
+    BeaconScheduler.flush();
+
     expect(mapped.value, 20);
 
     count.value = 20;
 
+    BeaconScheduler.flush();
+
     expect(mapped.value, 40);
 
     final buff = mapped.buffer(5);
+
+    BeaconScheduler.flush();
 
     buff.add(60);
     BeaconScheduler.flush();
@@ -695,18 +737,26 @@ void main() {
     expect(mapped.value, 120);
 
     count.value = 30;
+    BeaconScheduler.flush();
+
     expect(mapped.value, 60);
     expect(buff.currentBuffer(), [40, 120, 60]);
 
     buff.add(40);
+    BeaconScheduler.flush();
+
     expect(mapped.value, 80);
     expect(buff.currentBuffer(), [40, 120, 60, 80]);
 
     buff.add(50);
+    BeaconScheduler.flush();
+
     expect(mapped.value, 100);
     expect(buff(), [40, 120, 60, 80, 100]);
 
     buff.reset();
+    BeaconScheduler.flush();
+
     expect(buff.value, <int>[]);
     expect(buff.currentBuffer(), <int>[20]);
     expect(count.value, 10);
@@ -721,18 +771,24 @@ void main() {
           .toRawBeacon(isLazy: true)
           .map((v) => v + 1)
           .filter((_, n) => n.isEven);
+      BeaconScheduler.flush();
 
       await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
 
       beacon.set(10);
+      BeaconScheduler.flush();
 
       // map added 1 making it 11, filter removed it
       expect(beacon.value, 4);
 
       beacon.set(11);
+      BeaconScheduler.flush();
+
       expect(beacon.value, 12);
 
       beacon.reset();
+      BeaconScheduler.flush();
+
       expect(beacon.value, 1);
     },
   );
@@ -758,6 +814,8 @@ void main() {
     final derived = Beacon.derived(() => count.value * 2);
 
     final throttled = derived.throttle(k10ms);
+
+    BeaconScheduler.flush();
 
     expect(throttled.value, 0);
   });

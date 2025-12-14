@@ -164,6 +164,8 @@ void main() {
 
     final doubled = number.map((value) => value * 2);
 
+    BeaconScheduler.flush();
+
     doubled.dispose();
 
     expect(number.isDisposed, false);
