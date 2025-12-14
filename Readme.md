@@ -11,7 +11,7 @@
 
 ## Overview
 
-A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter; `state_beacon` leverages the [node coloring technique](https://dev.to/modderme123/super-charging-fine-grained-reactive-performance-47ph) created by [Milo Mighdoll](https://x.com/milomg__) and used in the latest versions of [SolidJS](https://www.youtube.com/watch?v=jHDzGYHY2ew&t=5291s) and [reactively](https://github.com/modderme123/reactively).
+A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter; `state_beacon` leverages the [node coloring technique](https://milomg.dev/2022-12-01/reactivity) created by [Milo Mighdoll](https://x.com/milomg__) and used in the latest versions of [SolidJS](https://www.youtube.com/watch?v=jHDzGYHY2ew&t=5291s) and [reactively](https://github.com/modderme123/reactively).
 
 Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
 <br>All examples: https://github.com/jinyus/dart_beacon/tree/main/examples
