@@ -883,6 +883,8 @@ void main() {
         .filter((_, n) => n.isData)
         .map((v) => v.unwrapOrNull() ?? [], name: 'm');
 
+    BeaconScheduler.flush();
+
     final d = Beacon.derived(
       () {
         final res = sFiltered.value;
@@ -1579,6 +1581,8 @@ void main() {
           .map((v) => v.unwrap())
           .buffer(5);
 
+      BeaconScheduler.flush();
+
       // ignore: unawaited_futures
       futureBeacon.updateWith(() async {
         await delay(k10ms * 5);
@@ -1623,6 +1627,8 @@ void main() {
           .filter((_, next) => next.isData)
           .map((v) => v.unwrap())
           .buffer(2);
+
+      BeaconScheduler.flush();
 
       var update1Ran = 0;
       // ignore: unawaited_futures
