@@ -438,123 +438,6 @@ class _BeaconCreator {
     return beacon;
   }
 
-  /// Specialized `DerivedBeacon` that subscribes to the stream returned from its callback and updates its value based on the emitted values.
-  /// When a dependency changes, the beacon will unsubscribe from the old stream and subscribe to the new one.
-  ///
-  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-  /// It will cancel the stream subscription and enter a sleep state.
-  /// It will resume executing once a listener is added or its value is accessed.
-  ///
-  /// Example:
-  /// ```dart
-  /// final userID = Beacon.writable<int>(18235);
-  ///
-  /// final profileBeacon = Beacon.derivedStream(() {
-  ///  return getProfileStreamFromUID(userID.value);
-  /// });
-  /// ```
-  // coverage:ignore-start
-  @Deprecated(
-    'Use Beacon.streamRaw instead. This method will be removed in the next major version.',
-  )
-  ReadableBeacon<T> derivedStream<T>(
-    Stream<T> Function() compute, {
-    String? name,
-    bool shouldSleep = true,
-    bool supportConditional = true,
-    bool cancelOnError = false,
-  }) {
-    return RawStreamBeacon<T>(
-      compute,
-      cancelOnError: cancelOnError,
-      shouldSleep: true,
-      isLazy: true,
-      name: name ?? 'RawStreamBeacon<$T>',
-    );
-  }
-
-  /// Creates a `DerivedBeacon` whose value is derived from an asynchronous computation.
-  /// This beacon will recompute its value every time one of its dependencies change.
-  /// The result is wrapped in an `AsyncValue`, which can be in one of three states: loading, data, or error.
-  ///
-  /// If `manualStart` is `true`(default:false), the future will not execute until [start()] is called.
-  ///
-  /// If `cancelRunning` is `true`(default), the results of a current execution will be discarded
-  /// if another execution is triggered before the current one finishes.
-  ///
-  /// If `shouldSleep` is `true`(default), the callback will not execute if the beacon is no longer being watched.
-  /// It will resume executing once a listener is added or its value is accessed.
-  /// This means that it will enter the `loading` state when woken up.
-  ///
-  ///
-  /// Example:
-  /// ```dart
-  ///   final counter = Beacon.writable(0);
-  ///
-  ///   // The future will be recomputed whenever the counter changes
-  ///   final derivedFutureCounter = Beacon.derivedFuture(() async {
-  ///     final count = counter.value;
-  ///     await Future.delayed(Duration(seconds: count));
-  ///     return '$count second has passed.';
-  ///   });
-  ///
-  ///   class FutureCounter extends StatelessWidget {
-  ///   const FutureCounter({super.key});
-  ///
-  ///   @override
-  ///   Widget build(BuildContext context) {
-  ///     return switch (derivedFutureCounter.watch(context)) {
-  ///       AsyncData<String>(value: final v) => Text(v),
-  ///       AsyncError(error: final e) => Text('$e'),
-  ///       AsyncLoading() => const CircularProgressIndicator(),
-  ///     };
-  ///   }
-  /// }
-  /// ```
-  @Deprecated(
-    'Use Beacon.future instead. This method will be removed in the next major version.',
-  )
-  FutureBeacon<T> derivedFuture<T>(
-    FutureCallback<T> compute, {
-    bool manualStart = false,
-    bool cancelRunning = true,
-    bool shouldSleep = true,
-    String? name,
-  }) {
-    return FutureBeacon<T>(
-      compute,
-      manualStart: manualStart,
-      shouldSleep: shouldSleep,
-      name: name ?? 'FutureBeacon<$T>',
-    );
-  }
-
-  /// Executes a batched update which allows multiple updates to be batched into a single update.
-  /// This can be used to optimize performance by reducing the number of update notifications.
-  ///
-  /// Example:
-  /// ```dart
-  /// final age = Beacon.writable<int>(10);
-  ///
-  /// var callCount = 0;
-  ///
-  /// age.subscribe((_) => callCount++);
-  ///
-  /// Beacon.batch(() {
-  ///   age.value = 15;
-  ///   age.value = 16;
-  ///   age.value = 20;
-  ///   age.value = 23;
-  /// });
-  ///
-  /// expect(callCount, equals(1)); // There were 4 updates, but only 1 notification
-  /// ```
-  @Deprecated(
-    'Batching is now done automatically. This method will be removed in the next major version.',
-  )
-  void batch(VoidCallback callback) {}
-  // coverage:ignore-end
-
   /// Creates a `ListBeacon` with an initial list value.
   /// This beacon manages a list of items, allowing for reactive updates and manipulations of the list.
   ///
@@ -639,10 +522,6 @@ class _BeaconCreator {
   /// ```
   VoidCallback effect(
     Function fn, {
-    @Deprecated(
-      'The supportConditional parameter is no longer needed and will be removed in the next major version.',
-    )
-    bool supportConditional = true,
     String? name,
   }) {
     final effect = Effect(fn, name: name);

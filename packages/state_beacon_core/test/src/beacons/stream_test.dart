@@ -23,7 +23,7 @@ void main() {
     final myBeacon = Beacon.stream(() => myStream);
 
     expect(
-      myBeacon.toStream(),
+      myBeacon.stream,
       emitsInOrder([
         isA<AsyncLoading<int>>(),
         isA<AsyncData<int>>(),
@@ -45,7 +45,7 @@ void main() {
     final myBeacon = Beacon.stream(errorStream);
 
     expect(
-      myBeacon.toStream(),
+      myBeacon.stream,
       emitsInOrder(
         [
           isA<AsyncLoading<int>>(),

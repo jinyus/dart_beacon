@@ -622,7 +622,7 @@ void main() {
     final stream = Stream.periodic(k1ms, (i) => i).take(5);
     final beacon = stream.toRawBeacon(isLazy: true).map((v) => v * 10);
 
-    await expectLater(beacon.toStream(), emitsInOrder([0, 10, 20, 30, 40]));
+    await expectLater(beacon.stream, emitsInOrder([0, 10, 20, 30, 40]));
   });
 
   test('should transform input values when use mid-chain', () async {
@@ -634,7 +634,7 @@ void main() {
 
     BeaconScheduler.flush();
 
-    await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
+    await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
   });
 
   test('should transform input values when use mid-chain/2', () async {
@@ -643,7 +643,7 @@ void main() {
         .map((v) => v + 1)
         .throttle(k1ms);
 
-    await expectLater(beacon.toStream(), emitsInOrder([1, 3, 5]));
+    await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
 
     await delay();
 
@@ -773,7 +773,7 @@ void main() {
           .filter((_, n) => n.isEven);
       BeaconScheduler.flush();
 
-      await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
+      await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
 
       beacon.set(10);
       BeaconScheduler.flush();

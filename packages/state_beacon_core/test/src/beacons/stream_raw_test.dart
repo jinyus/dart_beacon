@@ -143,7 +143,7 @@ void main() {
     );
 
     await expectLater(
-      d.toStream(),
+      d.stream,
       emitsInOrder([
         <int>[],
         [1, 2, 3],
@@ -370,7 +370,7 @@ void main() {
 
     late final s = Beacon.streamRaw(() => stream, initialValue: 0);
 
-    expect(s.toStream(), emitsInOrder([0, 1, 2, 3]));
+    expect(s.stream, emitsInOrder([0, 1, 2, 3]));
   });
 
   test('should cancel subscription to old stream', () async {

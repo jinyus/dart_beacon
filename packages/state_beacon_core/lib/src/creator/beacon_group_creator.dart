@@ -107,11 +107,6 @@ class BeaconGroup extends _BeaconCreator {
   @override
   VoidCallback effect(
     Function fn, {
-    @Deprecated(
-      'The supportConditional parameter is no longer needed and '
-      'will be removed in the next major version.',
-    )
-    bool supportConditional = true,
     String? name,
   }) {
     final callback = super.effect(fn, name: name);
