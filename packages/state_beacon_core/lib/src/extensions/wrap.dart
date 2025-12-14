@@ -53,7 +53,10 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
     final fn = then ?? ((val) => _onNewValueFromWrapped(val as T));
 
     final unsub = target.subscribe(
-      fn,
+      (v) {
+        if (isDisposed) return;
+        fn(v);
+      },
       startNow: startNow,
     );
 
