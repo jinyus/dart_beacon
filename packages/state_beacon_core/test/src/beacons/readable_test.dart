@@ -146,7 +146,7 @@ void main() {
     expect(stream1.hashCode, stream2.hashCode);
   });
 
-  test('should autobatch when synchronous=false', () {
+  test('should autobatch updates', () {
     final beacon = Beacon.writable(0);
 
     final stream1 = beacon.toStream();

@@ -13,6 +13,8 @@ void main() {
 
     final buffered = beacon.buffer(3);
 
+    BeaconScheduler.flush();
+
     expect(buffered, isA<BufferedCountBeacon<int>>());
 
     beacon.set(1);
@@ -72,6 +74,8 @@ void main() {
 
     final buffered = beacon.bufferTime(k10ms);
 
+    BeaconScheduler.flush();
+
     expect(buffered, isA<BufferedTimeBeacon<int>>());
 
     buffered.add(1);
@@ -94,6 +98,8 @@ void main() {
 
     final debounced = beacon.debounce(k10ms);
 
+    BeaconScheduler.flush();
+
     expect(debounced, isA<DebouncedBeacon<int>>());
 
     beacon.set(1);
@@ -114,6 +120,8 @@ void main() {
     final beacon = Beacon.writable(0);
 
     final throttled = beacon.throttle(k10ms);
+
+    BeaconScheduler.flush();
 
     expect(throttled, isA<ThrottledBeacon<int>>());
 
@@ -147,6 +155,7 @@ void main() {
 
     expect(filtered.value, 2);
   });
+
   test('should dispose together when wrapped is disposed(3)', () async {
     // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);
@@ -156,6 +165,8 @@ void main() {
         .throttle(k10ms)
         .debounce(k10ms)
         .filter(neverFilter);
+
+    BeaconScheduler.flush();
 
     Beacon.effect(() => beacon.value);
 
@@ -173,6 +184,8 @@ void main() {
   test('should delegate writes to parent when chained', () async {
     final beacon = Beacon.writable<int>(0);
     final filtered = beacon.filter((p, n) => n.isEven);
+
+    BeaconScheduler.flush();
 
     filtered.value = 1;
 

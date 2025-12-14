@@ -21,7 +21,6 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   BufferedCountBeacon<T> buffer(
     int count, {
     String? name,
-    bool synchronous = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -72,7 +71,6 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   BufferedTimeBeacon<T> bufferTime(
     Duration duration, {
     String? name,
-    bool synchronous = true,
   }) {
     assert(
       this is! BufferedBaseBeacon,

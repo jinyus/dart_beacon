@@ -332,7 +332,6 @@ void main() {
     BeaconScheduler.flush();
 
     // There were 4 updates, but only 1 notification
-    // In synchronous mode, there are 4 notifications
     expect(callCount, 1);
   });
 
