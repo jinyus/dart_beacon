@@ -164,7 +164,7 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
   /// expect(throttledCount.value, equals(10)); // this is 10 because the update was throttled
   /// ```
   /// See: `Beacon.throttled` for more details.
-  ThrottledBeacon<T> throttle(
+  ReableThrottledBeacon<T> throttle(
     Duration duration, {
     bool dropBlocked = true,
     String? name,

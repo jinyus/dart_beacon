@@ -1,19 +1,38 @@
 part of '../producer.dart';
 
+/// An immutable base class for ThrottledBeacon
+mixin ReableThrottledBeacon<T> on ReadableBeacon<T> {
+  bool _blocked = false;
+  Duration? _duration;
+
+  /// Whether or not this beacon is currently blocked.
+  bool get isBlocked => _blocked;
+
+  /// Sets the duration of the throttle.
+  /// If [unblock] is true, the beacon will be unblocked if
+  /// it is currently blocked.
+  void setDuration(Duration newDuration, {bool unblock = true}) {
+    _duration = newDuration;
+    if (unblock) {
+      _blocked = false;
+    }
+  }
+}
+
 /// A beacon that throttles updates to its value.
-class ThrottledBeacon<T> extends WritableBeacon<T> {
+class ThrottledBeacon<T> extends WritableBeacon<T>
+    with ReableThrottledBeacon<T> {
   /// @macro [ThrottledBeacon]
   ThrottledBeacon({
     Duration? duration,
     super.initialValue,
     this.dropBlocked = true,
     super.name,
-  }) : _duration = duration;
+  }) {
+    _duration = duration;
+  }
 
-  /// The duration to throttle updates for.
-  Duration? _duration;
   Timer? _timer;
-  bool _blocked = false;
 
   /// If true, values will be dropped while the beacon is blocked.
   /// If false, values will be buffered and
@@ -31,19 +50,6 @@ class ThrottledBeacon<T> extends WritableBeacon<T> {
 
     final (bufferedValue, force) = _buffer.removeAt(0);
     _setValue(bufferedValue, force: force);
-  }
-
-  /// Whether or not this beacon is currently blocked.
-  bool get isBlocked => _blocked;
-
-  /// Sets the duration of the throttle.
-  /// If [unblock] is true, the beacon will be unblocked if
-  /// it is currently blocked.
-  void setDuration(Duration newDuration, {bool unblock = true}) {
-    _duration = newDuration;
-    if (unblock) {
-      _blocked = false;
-    }
   }
 
   @override

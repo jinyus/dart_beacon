@@ -278,27 +278,6 @@ void main() {
     expect(result, [0, 1]);
   });
 
-  test('should force all delegated writes (throttled)', () async {
-    final count = Beacon.writable<int>(10, name: 'count');
-
-    final tbeacon = count.throttle(k10ms, name: 'throttled');
-
-    final buff = count.buffer(5, name: 'buff');
-
-    BeaconScheduler.flush();
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
   test('should force all delegated writes (debounced)', () async {
     final count = Beacon.writable<int>(10);
 
@@ -342,19 +321,10 @@ void main() {
   test('should transform input values when use mid-chain/2', () async {
     final beacon = Beacon.periodic(k10ms, (i) => i)
         .filter((_, n) => n.isEven)
-        .map((v) => v + 1)
+        .map((v) => '$v')
         .throttle(k1ms);
 
-    await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
-
-    await delay();
-
-    // rerouted to filtered beacon first
-    beacon.set(10);
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 11);
+    await expectLater(beacon.stream, emitsInOrder(['0', '2', '4']));
   });
 
   test('should work when next is paired with buffer', () async {
