@@ -44,12 +44,6 @@ extension WritableWrap<T, U> on BeaconWrapper<T, U> {
       throw WrapTargetWrongTypeException(name, target.name);
     }
 
-    // if (startNow && target.isEmpty) {
-    //   throw Exception(
-    //     'target($target) is uninitialized so startNow must be false',
-    //   );
-    // }
-
     final fn = then ?? ((val) => _onNewValueFromWrapped(val as T));
 
     final unsub = target.subscribe(
