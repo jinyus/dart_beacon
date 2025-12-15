@@ -81,9 +81,16 @@ void main() {
         ..subscribe((value) => buffer = value)
         ..add(1)
         ..add(2)
-        ..reset();
+        ..add(3);
+
+      expect(beacon.value, [1, 2, 3]);
+
+      beacon.reset();
 
       expect(beacon.currentBuffer.value, equals([]));
+      expect(beacon.value, equals([]));
+
+      BeaconScheduler.flush();
       expect(buffer, equals([]));
     });
   });
