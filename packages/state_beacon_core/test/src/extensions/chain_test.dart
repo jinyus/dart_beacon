@@ -278,27 +278,6 @@ void main() {
     expect(result, [0, 1]);
   });
 
-  test('should force all delegated writes (debounced)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.debounce(k10ms);
-
-    final buff = count.buffer(5);
-
-    BeaconScheduler.flush();
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
   test('should transform input values', () async {
     final stream = Stream.periodic(k1ms, (i) => i).take(5);
     final beacon = stream.toRawBeacon(isLazy: true).map((v) => v * 10);

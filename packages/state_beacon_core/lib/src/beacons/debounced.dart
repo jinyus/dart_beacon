@@ -16,11 +16,6 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
 
   @override
   void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-
     if (_isEmpty || duration == null) {
       _setValue(newValue, force: force);
       return;

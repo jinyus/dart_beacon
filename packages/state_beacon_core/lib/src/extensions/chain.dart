@@ -119,7 +119,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// ```
   ///
   /// See: `Beacon.debounced` for more details.
-  DebouncedBeacon<T> debounce(
+  ReadableBeacon<T> debounce(
     Duration duration, {
     String? name,
   }) {
