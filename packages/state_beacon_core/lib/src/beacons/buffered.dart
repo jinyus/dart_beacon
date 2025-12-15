@@ -23,6 +23,7 @@ abstract class ReadableBufferedBeacon<T> extends ReadableBeacon<List<T>> {
   /// Clears the buffer
   void reset({bool force = false}) {
     _clearBuffer();
+    _setValue(_initialValue, force: force);
   }
 }
 
@@ -39,12 +40,6 @@ abstract class BufferedBaseBeacon<T> extends ReadableBufferedBeacon<T>
 
   /// Adds a new value to the buffer.
   void add(T newValue);
-
-  @override
-  void reset({bool force = false}) {
-    super.reset();
-    _setValue(_initialValue, force: force);
-  }
 
   @override
   void dispose() {
