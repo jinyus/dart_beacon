@@ -12,6 +12,10 @@ dependencies:
         sdk: flutter
     state_beacon_core: ^1.3.4
 
+dependency_overrides:
+  state_beacon_core: 
+    path: ../state_beacon_core
+
 dev_dependencies:
     flutter_lints: ^3.0.0
     flutter_test:

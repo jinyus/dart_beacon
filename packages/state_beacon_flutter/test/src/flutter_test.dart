@@ -132,20 +132,6 @@ void main() {
     expect(widget.observedCount, 1);
   });
 
-  testWidgets('should call observe synchronously', (WidgetTester tester) async {
-    final counter = Beacon.writable(0);
-    final widget = Counter(counter: counter, synchronous: true);
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: widget)));
-
-    counter.increment();
-    counter.increment();
-    counter.increment();
-
-    await tester.pumpAndSettle();
-
-    expect(widget.observedCount, 3);
-  });
-
   testWidgets('should show snackbar for going negative',
       (WidgetTester tester) async {
     // Build the Counter widget
@@ -242,9 +228,8 @@ class CounterColumn extends StatelessWidget {
 
 // ignore: must_be_immutable
 class Counter extends StatelessWidget {
-  Counter({required this.counter, super.key, this.synchronous = false});
+  Counter({required this.counter, super.key});
 
-  final bool synchronous;
   final WritableBeacon<int> counter;
 
   int builtCount = 0;
@@ -273,7 +258,6 @@ class Counter extends StatelessWidget {
           );
         }
       },
-      synchronous: synchronous,
     );
     return Text(
       counter.watch(context).toString(),

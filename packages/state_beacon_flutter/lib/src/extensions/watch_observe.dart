@@ -61,11 +61,7 @@ extension WidgetUtils<T> on BaseBeacon<T> {
   ///   }
   /// }
   /// ```
-  void observe(
-    BuildContext context,
-    ObserverCallback<T> callback, {
-    bool synchronous = false,
-  }) {
+  void observe(BuildContext context, ObserverCallback<T> callback) {
     final key = Object.hash(
       identityHashCode(context),
       'isObserving', // create 1 subscription for each widget
@@ -75,7 +71,6 @@ extension WidgetUtils<T> on BaseBeacon<T> {
       key,
       context,
       callback: () => callback(previousValue as T, peek()),
-      synchronous: synchronous,
     );
   }
 
@@ -83,7 +78,6 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     int key,
     BuildContext context, {
     VoidCallback? callback,
-    bool synchronous = false,
   }) {
     if ($$widgetSubscribers$$.contains(key)) {
       return peek();
@@ -112,7 +106,6 @@ extension WidgetUtils<T> on BaseBeacon<T> {
     unsub = subscribe(
       handleNewValue,
       startNow: false,
-      synchronous: synchronous,
     );
 
     // coverage:ignore-start
