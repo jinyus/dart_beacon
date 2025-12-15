@@ -38,22 +38,12 @@ abstract class BufferedBaseBeacon<T> extends ReadableBufferedBeacon<T>
   }
 
   /// Adds a new value to the buffer.
-  void add(T newValue) {
-    _internalAdd(newValue, delegated: true);
-  }
-
-  void _internalAdd(T newValue, {bool delegated = false});
+  void add(T newValue);
 
   @override
   void reset({bool force = false}) {
     super.reset();
     _setValue(_initialValue, force: force);
-
-    // we clear the buffer first because the delegate will
-    // add its own initial value back to the buffer
-    if (_delegate != null) {
-      _delegate!.reset(force: force);
-    }
   }
 
   @override
@@ -68,7 +58,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBufferedBeacon<T>
 
   @override
   void _onNewValueFromWrapped(T value) {
-    _internalAdd(value);
+    add(value);
   }
 }
 
@@ -82,11 +72,7 @@ class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
   final int countThreshold;
 
   @override
-  void _internalAdd(T newValue, {bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
+  void add(T newValue) {
     super._addToBuffer(newValue);
 
     if (_buffer.length == countThreshold) {
@@ -108,12 +94,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
   Timer? _timer;
 
   @override
-  void _internalAdd(T newValue, {bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-
+  void add(T newValue) {
     super._addToBuffer(newValue);
     _startTimerIfNeeded();
   }
