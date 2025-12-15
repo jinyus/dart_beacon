@@ -32,7 +32,6 @@ class FilteredBeacon<T> extends WritableBeacon<T>
   }
 
   /// Whether values should be filtered out if the beacon is empty.
-  ///
   final bool lazyBypass;
 
   @override
