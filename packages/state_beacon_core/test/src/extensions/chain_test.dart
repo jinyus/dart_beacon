@@ -181,140 +181,6 @@ void main() {
     expect(beacon.listenersCount, 0);
   });
 
-  test('should delegate writes to parent when chained', () async {
-    final beacon = Beacon.writable<int>(0);
-    final filtered = beacon.filter((p, n) => n.isEven);
-
-    BeaconScheduler.flush();
-
-    filtered.value = 1;
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 1);
-    expect(filtered.value, 0);
-
-    filtered.increment();
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 1);
-    expect(filtered.value, 0);
-
-    filtered.value = 2;
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 2);
-    expect(filtered.value, 2);
-  });
-
-  test('should delegate writes to parent when chained/2', () async {
-    // BeaconObserver.instance = LoggingObserver();
-    final filtered =
-        Beacon.lazyDebounced<int>(duration: k10ms).filter((p, n) => n.isEven);
-
-    filtered.value = 1; // 1st value so not debounced
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 1);
-
-    filtered.increment();
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 1); // debouncing so not updated yet
-
-    await delay(k10ms * 2);
-
-    expect(filtered.value, 2);
-  });
-
-  test('should delegate writes to parent when chained/3', () async {
-    // BeaconObserver.instance = LoggingObserver();
-
-    final filtered = Beacon.writable(0)
-        .filter((p, n) => n.isEven, name: 'f1')
-        .filter((p, n) => n > 0, name: 'f2')
-        .filter((p, n) => n > 10, name: 'f3');
-
-    BeaconScheduler.flush();
-
-    filtered.value = 1;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = -2; // doesn't pass f2
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = 6; // doesn't pass f3
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = 12;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 12);
-
-    filtered.value = 0;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 12);
-
-    filtered.reset();
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-  });
-
-  test('should delegate writes to parent when chained/4', () async {
-    // BeaconObserver.instance = LoggingObserver();
-
-    final count = Beacon.writable<int>(10, name: 'count');
-
-    final filtered = count
-        .throttle(k10ms, name: 'throttled')
-        .debounce(k10ms, name: 'debounced')
-        .filter(neverFilter, name: 'f1')
-        .filter(neverFilter, name: 'f2');
-
-    BeaconScheduler.flush();
-
-    expect(filtered.isEmpty, false);
-    expect(filtered.value, 10);
-
-    filtered.value = 20; // throttled
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 10);
-
-    await delay(k10ms * 2.1);
-
-    expect(filtered.value, 10);
-
-    filtered.value = 30;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 10); // debounced
-
-    await delay(k10ms * 1.1);
-
-    expect(filtered.value, 30);
-  });
-
   test('should throw when trying to chain a buffered beacon', () async {
     final count = Beacon.writable<int>(10, name: 'count');
 
@@ -454,27 +320,6 @@ void main() {
     expect(buff.value, [10, 20, 20, 5, 5]);
   });
 
-  test('should force all delegated writes (filtered)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.filter((p, n) => n > 5);
-
-    final buff = count.buffer(5);
-
-    BeaconScheduler.flush();
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
   test('should transform input values', () async {
     final stream = Stream.periodic(k1ms, (i) => i).take(5);
     final beacon = stream.toRawBeacon(isLazy: true).map((v) => v * 10);
@@ -511,36 +356,6 @@ void main() {
 
     expect(beacon.value, 11);
   });
-
-  test(
-    "should delegate to map when it's the first writable in the chain",
-    () async {
-      final stream = Stream.periodic(k1ms, (i) => i).take(5);
-      final beacon = stream
-          .toRawBeacon(isLazy: true)
-          .map((v) => v + 1)
-          .filter((_, n) => n.isEven);
-      BeaconScheduler.flush();
-
-      await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
-
-      beacon.set(10);
-      BeaconScheduler.flush();
-
-      // map added 1 making it 11, filter removed it
-      expect(beacon.value, 4);
-
-      beacon.set(11);
-      BeaconScheduler.flush();
-
-      expect(beacon.value, 12);
-
-      beacon.reset();
-      BeaconScheduler.flush();
-
-      expect(beacon.value, 1);
-    },
-  );
 
   test('should work when next is paired with buffer', () async {
     // BeaconObserver.useLogging();

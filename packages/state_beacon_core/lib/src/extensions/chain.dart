@@ -215,7 +215,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
   /// You can override this by setting lazyBypass to false.
   ///
   /// See: `Beacon.filtered` for more details.
-  FilteredBeacon<T> filter(
+  ReadableFilteredBeacon<T> filter(
     bool Function(T?, T) filter, {
     String? name,
     bool lazyBypass = true,

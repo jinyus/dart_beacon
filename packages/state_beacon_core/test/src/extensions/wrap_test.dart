@@ -207,22 +207,22 @@ void main() {
       () => count.value * 2,
       name: 'derived',
     );
+    final sum = Beacon.writable(20);
 
     final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 
-    doubledCount.filter(neverFilter).wrap(
-          wrapper,
-          disposeTogether: true,
-        );
+    sum.wrap(
+      wrapper,
+      disposeTogether: true,
+    );
 
     BeaconScheduler.flush();
 
     expect(wrapper.value, equals(10));
 
-    expect(doubledCount.listenersCount, 1);
-    expect(count.listenersCount, 2);
+    expect(count.listenersCount, 1);
 
     wrapper.dispose();
 
