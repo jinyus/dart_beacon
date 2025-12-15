@@ -32,8 +32,6 @@ class Subscription<T> implements Consumer {
     }());
   }
 
-  bool _isDisposed = false;
-
   /// The producer that this subscription is watching.
   final Producer<T> producer;
 
@@ -73,7 +71,7 @@ class Subscription<T> implements Consumer {
 
   @override
   void updateIfNecessary() {
-    if (_status == CLEAN || _isDisposed) return;
+    if (_status == CLEAN) return;
 
     // Check dependent sources (only for DerivedBeacon)
     if (_status == CHECK) {
@@ -124,7 +122,6 @@ class Subscription<T> implements Consumer {
   /// Disposes of the subscription.
   @override
   void dispose() {
-    _isDisposed = true;
     // Remove this subscription from the producer's observer list.
     producer._removeObserver(this);
     _effectQueue.remove(this);
