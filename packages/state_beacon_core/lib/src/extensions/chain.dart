@@ -100,6 +100,8 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
 
   /// Returns a [DebouncedBeacon] that wraps this Beacon.
   ///
+  /// If [allowFirst] is true, the first value will not be debounced.
+  ///
   /// ```
   /// final count = Beacon.writable(10);
   /// final debouncedCount = count.debounce(duration: k10ms);
@@ -118,6 +120,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// See: `Beacon.debounced` for more details.
   ReadableBeacon<T> debounce(
     Duration duration, {
+    bool allowFirst = false,
     String? name,
   }) {
     assert(
@@ -139,6 +142,7 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
     final beacon = Beacon.lazyDebounced<T>(
       duration: duration,
       name: name,
+      allowFirst: allowFirst,
     );
 
     _wrapThis(beacon);

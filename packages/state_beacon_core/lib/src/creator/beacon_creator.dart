@@ -93,15 +93,19 @@ class _BeaconCreator {
   /// Like `Beacon.debounced` but behaves like a late variable.
   /// It must be set before it's read.
   ///
+  /// If [allowFirst] is true, the first value will not be debounced.
+  ///
   /// Throws `UninitializeLazyReadException` if it's read before being set..
   DebouncedBeacon<T> lazyDebounced<T>({
     Duration? duration,
     T? initialValue,
+    bool allowFirst = false,
     String? name,
   }) =>
       DebouncedBeacon<T>(
         initialValue: initialValue,
         duration: duration,
+        allowFirst: allowFirst,
         name: name ?? 'LazyDebouncedBeacon<$T>',
       );
 

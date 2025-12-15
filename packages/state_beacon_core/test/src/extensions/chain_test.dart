@@ -52,7 +52,10 @@ void main() {
 
     expect(buffered.value, [1, 2, 3]);
 
-    expect(debounced.value, 1);
+    expect(
+      () => debounced.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
 
     expect(throttled.value, 1);
 
@@ -109,7 +112,10 @@ void main() {
     beacon.set(3);
     BeaconScheduler.flush();
 
-    expect(debounced.value, 0);
+    expect(
+      () => debounced.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
 
     await delay(k10ms * 2);
 
@@ -166,7 +172,7 @@ void main() {
         .debounce(k10ms)
         .filter(neverFilter);
 
-    BeaconScheduler.flush();
+    await delay(k1ms * 15);
 
     Beacon.effect(() => beacon.value);
 
@@ -245,7 +251,7 @@ void main() {
     BeaconScheduler.flush();
 
     expect(beacon(), <int>[]);
-    await expectLater(beacon.currentBuffer.next(), completion([0]));
+    await expectLater(beacon.currentBuffer.next(), completion([8]));
   });
 
   test('should throttle input beacon', () async {

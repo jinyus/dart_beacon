@@ -174,12 +174,14 @@ class BeaconGroup extends _BeaconCreator {
   DebouncedBeacon<T> lazyDebounced<T>({
     Duration? duration,
     T? initialValue,
+    bool allowFirst = false,
     String? name,
   }) {
     final beacon = super.lazyDebounced<T>(
       duration: duration,
       initialValue: initialValue,
       name: name,
+      allowFirst: allowFirst,
     );
     add(beacon);
     return beacon;

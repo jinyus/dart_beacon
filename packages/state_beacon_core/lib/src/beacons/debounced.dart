@@ -7,7 +7,10 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
     this.duration,
     super.initialValue,
     super.name,
-  });
+    bool allowFirst = false,
+  }) : _allowFirst = allowFirst;
+
+  final bool _allowFirst;
 
   /// The duration to debounce updates for.
   final Duration? duration;
@@ -16,7 +19,7 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
 
   @override
   void set(T newValue, {bool force = false}) {
-    if (_isEmpty || duration == null) {
+    if (duration == null || (_isEmpty && _allowFirst)) {
       _setValue(newValue, force: force);
       return;
     }
