@@ -35,7 +35,7 @@ class FilteredBeacon<T> extends WritableBeacon<T>
   final bool lazyBypass;
 
   @override
-  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
+  void set(T newValue, {bool force = false}) {
     final shouldBypass = isEmpty && lazyBypass;
 
     if (shouldBypass ||

@@ -4,9 +4,6 @@ part of '../producer.dart';
 extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// Returns a [BufferedCountBeacon] that wraps this Beacon.
   ///
-  /// NB: All writes to the buffered beacon
-  /// will be delegated to the wrapped beacon.
-  ///
   /// ```
   /// final count = Beacon.writable(10);
   /// final bufferedBeacon = count.buffer(2);
@@ -43,15 +40,16 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon);
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty || _isDerived,
+    );
 
     return beacon;
   }
 
   /// Returns a [BufferedTimeBeacon] that wraps this Beacon.
-  ///
-  /// NB: All writes to the buffered beacon
-  /// will be delegated to the wrapped beacon.
   ///
   /// ```
   /// final count = Beacon.writable(10);
@@ -93,15 +91,16 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon);
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty || _isDerived,
+    );
 
     return beacon;
   }
 
   /// Returns a [DebouncedBeacon] that wraps this Beacon.
-  ///
-  /// NB: All writes to the debounced beacon
-  /// will be delegated to the wrapped beacon.
   ///
   /// ```
   /// final count = Beacon.writable(10);
@@ -144,15 +143,16 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon);
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty || _isDerived,
+    );
 
     return beacon;
   }
 
   /// Returns a [ThrottledBeacon] that wraps this Beacon.
-  ///
-  /// NB: All writes to the throttled beacon
-  /// will be delegated to the wrapped beacon.
   ///
   /// ```
   /// final count = Beacon.writable(10);
@@ -191,15 +191,16 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    _wrapAndDelegate(beacon);
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty || _isDerived,
+    );
 
     return beacon;
   }
 
   /// Returns a [FilteredBeacon] that wraps this Beacon.
-  ///
-  /// NB: All writes to the filtered beacon
-  /// will be delegated to the wrapped beacon.
   ///
   /// ```dart
   /// final count = Beacon.writable(10);
@@ -242,15 +243,16 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
       lazyBypass: lazyBypass,
     );
 
-    _wrapAndDelegate(beacon);
+    beacon.wrap(
+      this,
+      disposeTogether: true,
+      startNow: !isEmpty || _isDerived,
+    );
 
     return beacon;
   }
 
   /// Returns a [ReadableBeacon] that wraps a Beacon and tranforms its values.
-  ///
-  /// NB: All writes to the filtered beacon
-  /// will be delegated to the wrapped beacon.
   ///
   /// ```dart
   /// final count = Beacon.writable(10);
@@ -281,63 +283,12 @@ Bad: someBeacon.buffer(10).map();
 
     final beacon = _MappedBeacon(mapFN, name: name);
 
-    _wrapAndDelegate(beacon);
-
-    return beacon;
-  }
-
-  void _wrapAndDelegate<InputT, OutputT>(
-    BeaconWrapper<InputT, OutputT> beacon,
-  ) {
     beacon.wrap(
       this,
       disposeTogether: true,
       startNow: !isEmpty || _isDerived,
     );
 
-    // Example 1:
-    // writable<int> -> filter<int> -> map<int,int> -> buffer
-    // - when writable.filter():
-    // 1. if writable is beaconwrapper<int,dynamic> : true
-    // 2. if writable's delegate is WritableBeacon<int> : false
-    // 3. if writable's delegate is null : true
-    // 4. set writable to be filter's delegate
-
-    // - when writable.filter().map():
-    // 1. if filter is beaconwrapper<int,int> : true
-    // 2. if filter's delegate is WritableBeacon<int> : true
-    // 3. set writable to be map's delegate
-
-    // - when writable.filter().map().buffer():
-    // 1. if map is beaconwrapper<int,dynamic> : true
-    // 2. if map's delegate is WritableBeacon<int> : true
-    // 3. set writable to be buffer's delegate
-
-    // Example 2:
-    // writable<int> -> filter<int> -> map<int,string> -> buffer
-    // - when writable.filter():
-    // 1. if writable is beaconwrapper<int,int> : true
-    // 2. if writable's delegate is WritableBeacon<int> : false
-    // 3. if writable's delegate is null : true
-    // 4. set writable to be filter's delegate
-
-    // - when writable.filter().map():
-    // 1. if filter is beaconwrapper<int,dynamic> : true
-    // 2. if filter's delegate is WritableBeacon<int> : true
-    // 3. set writable to be map's delegate
-
-    // - when writable.filter().map().buffer():
-    // 1. if map is beaconwrapper<String,dynamic> : false
-    // 2. buffer takes a String so we can't delegate the writable<int> to it
-
-    // stream -> map -> filter -> buffer
-    // if this is a BeaconWrapper, then assign this's delegate to the new beacon
-    if (this case final BeaconWrapper<InputT, dynamic> wrapped) {
-      if (wrapped._delegate case final WritableBeacon<InputT> delegate) {
-        beacon._delegate = delegate;
-      } else if (wrapped._delegate == null) {
-        beacon._delegate = wrapped;
-      }
-    }
+    return beacon;
   }
 }

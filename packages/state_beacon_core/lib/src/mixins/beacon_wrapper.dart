@@ -8,8 +8,6 @@ part of '../producer.dart';
 mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   final _wrapped = <int, VoidCallback>{};
 
-  BeaconWrapper<InputT, dynamic>? _delegate;
-
   /// Disposes all currently wrapped beacons
   void clearWrapped() {
     for (final unsub in _wrapped.values) {
@@ -21,14 +19,4 @@ mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   /// Wrapper beacons can have different methods to set the value,
   /// so this is should be implemented by the wrapper.
   void _onNewValueFromWrapped(InputT value);
-
-  // coverage:ignore-start
-  /// Sets the delegate beacon to listen to.
-  void set(InputT value, {bool force = false}) {
-    throw UnimplementedError();
-  }
-  // coverage:ignore-end
-
-  /// Wraps a beacon and listens to its changes.
-  void reset({bool force = false});
 }

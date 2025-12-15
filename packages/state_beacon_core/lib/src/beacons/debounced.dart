@@ -15,7 +15,7 @@ class DebouncedBeacon<T> extends WritableBeacon<T> {
   Timer? _debounceTimer;
 
   @override
-  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
+  void set(T newValue, {bool force = false}) {
     if (_isEmpty || duration == null) {
       _setValue(newValue, force: force);
       return;
