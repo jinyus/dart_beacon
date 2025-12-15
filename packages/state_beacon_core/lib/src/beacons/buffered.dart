@@ -73,11 +73,11 @@ class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
 
   @override
   void add(T newValue) {
-    super._addToBuffer(newValue);
+    _addToBuffer(newValue);
 
     if (_buffer.length == countThreshold) {
       _setValue(List.from(_buffer));
-      super._clearBuffer();
+      _clearBuffer();
     }
   }
 }
@@ -95,7 +95,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
 
   @override
   void add(T newValue) {
-    super._addToBuffer(newValue);
+    _addToBuffer(newValue);
     _startTimerIfNeeded();
   }
 
@@ -103,7 +103,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer(duration, () {
         _setValue(List.from(_buffer));
-        super._clearBuffer();
+        _clearBuffer();
         _timer = null;
       });
     }
