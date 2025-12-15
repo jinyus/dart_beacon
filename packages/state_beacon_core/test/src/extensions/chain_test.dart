@@ -332,4 +332,19 @@ void main() {
 
     expect(throttled.value, 0);
   });
+
+  test('should clear currentBuffer when it fills', () {
+    final count = Beacon.writable(10);
+    final bufferedBeacon = count.buffer(2);
+    BeaconScheduler.flush(); // allow buffer to read first value
+
+    expect(bufferedBeacon.value, equals([]));
+    expect(bufferedBeacon.currentBuffer.value, equals([10]));
+
+    count.set(20);
+    BeaconScheduler.flush();
+
+    expect(bufferedBeacon.value, equals([10, 20]));
+    expect(bufferedBeacon.currentBuffer.value, equals([]));
+  });
 }

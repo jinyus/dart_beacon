@@ -7,12 +7,17 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// ```
   /// final count = Beacon.writable(10);
   /// final bufferedBeacon = count.buffer(2);
+  /// BeaconScheduler.flush(); // allow buffer to read first value
   ///
-  /// bufferedBeacon.add(20); //  equivalent to count.set(20, force: true);
-  ///
-  /// expect(count.value, equals(20));
   /// expect(bufferedBeacon.value, equals([]));
-  /// expect(bufferedBeacon.currentBuffer.value, equals([20]));
+  /// expect(bufferedBeacon.currentBuffer.value, equals([10]));
+  ///
+  /// count.set(20);
+  /// BeaconScheduler.flush();
+  ///
+  /// expect(bufferedBeacon.value, equals([10, 20]));
+  /// expect(bufferedBeacon.currentBuffer.value, equals([]));
+  ///
   /// ```
   /// See: `Beacon.bufferedCount` for more details.
   ReadableBufferedBeacon<T> buffer(
@@ -40,11 +45,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    beacon.wrap(
-      this,
-      disposeTogether: true,
-      startNow: !isEmpty || _isDerived,
-    );
+    _wrapThis(beacon);
 
     return beacon;
   }
@@ -54,12 +55,13 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// ```
   /// final count = Beacon.writable(10);
   /// final bufferedBeacon = count.bufferTime(duration: k10ms);
+  /// await Future.delayed(k1ms);
   ///
-  /// bufferedBeacon.add(20); //  equivalent to count.set(20, force: true);
+  /// count.set(20);
   ///
   /// expect(count.value, equals(20));
   /// expect(bufferedBeacon.value, equals([]));
-  /// expect(bufferedBeacon.currentBuffer.value, equals([20]));
+  /// expect(bufferedBeacon.currentBuffer.value, equals([10,20]));
   ///
   /// await Future.delayed(k10ms);
   ///
@@ -91,11 +93,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
       name: name,
     );
 
-    beacon.wrap(
-      this,
-      disposeTogether: true,
-      startNow: !isEmpty || _isDerived,
-    );
+    _wrapThis(beacon);
 
     return beacon;
   }
@@ -143,11 +141,7 @@ final beacon = Beacon.debounced<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    beacon.wrap(
-      this,
-      disposeTogether: true,
-      startNow: !isEmpty || _isDerived,
-    );
+    _wrapThis(beacon);
 
     return beacon;
   }
@@ -191,11 +185,7 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
       name: name,
     );
 
-    beacon.wrap(
-      this,
-      disposeTogether: true,
-      startNow: !isEmpty || _isDerived,
-    );
+    _wrapThis(beacon);
 
     return beacon;
   }
@@ -243,11 +233,7 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
       lazyBypass: lazyBypass,
     );
 
-    beacon.wrap(
-      this,
-      disposeTogether: true,
-      startNow: !isEmpty || _isDerived,
-    );
+    _wrapThis(beacon);
 
     return beacon;
   }
@@ -283,12 +269,16 @@ Bad: someBeacon.buffer(10).map();
 
     final beacon = _MappedBeacon(mapFN, name: name);
 
+    _wrapThis(beacon);
+
+    return beacon;
+  }
+
+  void _wrapThis<I, O>(BeaconWrapper<I, O> beacon) {
     beacon.wrap(
       this,
       disposeTogether: true,
       startNow: !isEmpty || _isDerived,
     );
-
-    return beacon;
   }
 }
