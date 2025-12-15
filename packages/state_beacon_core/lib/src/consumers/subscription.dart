@@ -57,8 +57,6 @@ class Subscription<T> implements Consumer {
 
   @override
   void stale(Status newStatus) {
-    // If already dirty, no need to update the status
-    if (_status == DIRTY) return;
     if (_status < newStatus) {
       final oldStatus = _status;
       _status = newStatus;

@@ -23,7 +23,6 @@ class Effect with Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status == DIRTY) return;
     if (_status < newStatus) {
       final oldStatus = _status;
       _status = newStatus;
