@@ -173,7 +173,7 @@ class _BeaconCreator {
   /// ```dart
   /// var pageNum = Beacon.filtered(1); // we will set the filter function later
   ///
-  /// final posts = Beacon.derivedFuture(() async {Repository.getPosts(pageNum.value);});
+  /// final posts = Beacon.future(() async {Repository.getPosts(pageNum.value);});
   ///
   /// pageNum.setFilter((prev, next) => posts.value is! AsyncLoading); // can't change pageNum while loading
   /// ```
