@@ -260,4 +260,27 @@ void main() {
       unsub();
     },
   );
+
+  test('should notify all observers', () {
+    final count = Beacon.writable(0);
+    final triple = Beacon.derived(() => count.value * 3);
+
+    var sub1Called = 0;
+    var sub2Called = 0;
+
+    triple.subscribe((_) => ++sub1Called);
+    triple.subscribe((_) => ++sub2Called);
+
+    BeaconScheduler.flush();
+
+    expect(sub1Called, 1);
+    expect(sub2Called, 1);
+
+    count.increment();
+
+    BeaconScheduler.flush();
+
+    expect(sub1Called, 2);
+    expect(sub2Called, 2, reason: 'async sub should also be called');
+  });
 }
