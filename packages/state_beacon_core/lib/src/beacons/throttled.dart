@@ -54,11 +54,6 @@ class ThrottledBeacon<T> extends WritableBeacon<T>
 
   @override
   void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-
     if (_blocked) {
       if (!dropBlocked) {
         _buffer.add((newValue, force));
