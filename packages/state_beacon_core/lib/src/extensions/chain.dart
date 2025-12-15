@@ -18,7 +18,7 @@ extension ReadableBeaconWrapUtils<T> on ReadableBeacon<T> {
   /// expect(bufferedBeacon.currentBuffer.value, equals([20]));
   /// ```
   /// See: `Beacon.bufferedCount` for more details.
-  BufferedCountBeacon<T> buffer(
+  ReadableBufferedBeacon<T> buffer(
     int count, {
     String? name,
   }) {
@@ -68,7 +68,7 @@ final beacon = Beacon.bufferedCount<T>(count).wrap(someBufferedBeacon)
   /// expect(bufferedBeacon.value, equals([20]));
   /// ```
   /// See: `Beacon.bufferedTime` for more details.
-  BufferedTimeBeacon<T> bufferTime(
+  ReadableBufferedBeacon<T> bufferTime(
     Duration duration, {
     String? name,
   }) {

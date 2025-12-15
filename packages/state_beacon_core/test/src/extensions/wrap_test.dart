@@ -212,7 +212,7 @@ void main() {
 
     wrapper.wrap(count, disposeTogether: true);
 
-    doubledCount.filter(neverFilter).buffer(1).wrap(
+    doubledCount.filter(neverFilter).wrap(
           wrapper,
           disposeTogether: true,
         );

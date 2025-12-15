@@ -2,11 +2,10 @@
 
 part of '../producer.dart';
 
-/// Base class for buffered beacons.
-abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
-    with BeaconWrapper<T, List<T>> {
+/// Immutable Base class for buffered beacons
+abstract class ReadableBufferedBeacon<T> extends ReadableBeacon<List<T>> {
   // ignore: public_member_api_docs
-  BufferedBaseBeacon({super.name}) : super(initialValue: []);
+  ReadableBufferedBeacon({super.name}) : super(initialValue: []);
 
   final List<T> _buffer = [];
 
@@ -16,14 +15,26 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   /// This can be listened to directly.
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
-  void _addToBuffer(T newValue) {
-    _buffer.add(newValue);
-    _currentBuffer.add(newValue);
-  }
-
   void _clearBuffer() {
     _buffer.clear();
     _currentBuffer.reset();
+  }
+
+  /// Clears the buffer
+  void reset({bool force = false}) {
+    _clearBuffer();
+  }
+}
+
+/// Base class for buffered beacons.
+abstract class BufferedBaseBeacon<T> extends ReadableBufferedBeacon<T>
+    with BeaconWrapper<T, List<T>> {
+  // ignore: public_member_api_docs
+  BufferedBaseBeacon({super.name});
+
+  void _addToBuffer(T newValue) {
+    _buffer.add(newValue);
+    _currentBuffer.add(newValue);
   }
 
   /// Adds a new value to the buffer.
@@ -33,10 +44,9 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   void _internalAdd(T newValue, {bool delegated = false});
 
-  /// Clears the buffer
   @override
   void reset({bool force = false}) {
-    _clearBuffer();
+    super.reset();
     _setValue(_initialValue, force: force);
 
     // we clear the buffer first because the delegate will
