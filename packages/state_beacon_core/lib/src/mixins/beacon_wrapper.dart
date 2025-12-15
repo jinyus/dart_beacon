@@ -19,4 +19,26 @@ mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   /// Wrapper beacons can have different methods to set the value,
   /// so this is should be implemented by the wrapper.
   void _onNewValueFromWrapped(InputT value);
+
+  /// Subscribes to changes in the beacon
+  /// returns a function that can be called to unsubscribe
+  ///
+  /// This disables automatic batching is not recommended for
+  /// most usecases. Use [subscribe] if you are unsure.
+  ///
+  /// If [startNow] is true, the callback will be called immediately
+  /// with the current value of the beacon.
+  VoidCallback subscribeSynchronously(
+    void Function(OutputT) callback, {
+    bool startNow = true,
+  }) {
+    assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
+    final sub = SyncSubscription(
+      this,
+      callback,
+      startNow: startNow,
+    );
+    _observers.add(sub);
+    return sub.dispose;
+  }
 }

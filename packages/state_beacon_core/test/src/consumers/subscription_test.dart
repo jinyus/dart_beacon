@@ -283,4 +283,23 @@ void main() {
     expect(sub1Called, 2);
     expect(sub2Called, 2, reason: 'async sub should also be called');
   });
+
+  test('should not throw when unsub in own callback', () {
+    final beacon = Beacon.writable<int>(0);
+    var mounted = true;
+
+    late void Function() unsub;
+    unsub = beacon.subscribe(
+      (v) {
+        if (!mounted) unsub(); // Unsubscribe when "unmounted"
+      },
+    );
+
+    beacon.subscribeSynchronously((v) {});
+    beacon.subscribe((v) {});
+    beacon.value = 1;
+    mounted = false;
+    beacon.value = 2;
+    BeaconScheduler.flush();
+  });
 }
