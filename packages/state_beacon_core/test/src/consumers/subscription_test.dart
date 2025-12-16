@@ -302,4 +302,31 @@ void main() {
     beacon.value = 2;
     BeaconScheduler.flush();
   });
+
+  test('should notify all observers (sync+async)', () {
+    final count = Beacon.writable(0);
+    final triple = Beacon.derived(() => count.value * 3);
+
+    var syncCalled = 0;
+    var asyncCalled = 0;
+    var async2Called = 0;
+
+    triple.subscribe((_) => ++asyncCalled);
+    triple.subscribe((_) => ++async2Called);
+    count.subscribeSynchronously((_) => syncCalled++);
+
+    BeaconScheduler.flush();
+
+    expect(asyncCalled, 1);
+    expect(async2Called, 1);
+    expect(syncCalled, 1);
+
+    count.increment();
+    expect(syncCalled, 2);
+
+    BeaconScheduler.flush();
+
+    expect(syncCalled, 2);
+    expect(asyncCalled, 2);
+  });
 }
