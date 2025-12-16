@@ -329,4 +329,85 @@ void main() {
     expect(syncCalled, 2);
     expect(asyncCalled, 2);
   });
+
+  test('derived subscription does not emit when value is unchanged', () {
+    final a = Beacon.writable(0, name: 'a');
+    final b = Beacon.derived(() => a().isEven ? 'even' : 'odd');
+
+    var callCount = 0;
+    final received = <String>[];
+
+    final unsub = b.subscribe((value) {
+      callCount++;
+      received.add(value);
+    });
+
+    BeaconScheduler.flush();
+
+    expect(callCount, 1);
+    expect(received, ['even']);
+
+    // Change source without changing derived result
+    a.value = 2;
+    BeaconScheduler.flush();
+
+    expect(callCount, 1, reason: 'derived output did not change');
+
+    // Force another "even" value
+    a.set(4, force: true);
+    BeaconScheduler.flush();
+
+    expect(callCount, 1,
+        reason: 'forcing same derived value should not notify');
+
+    unsub();
+  });
+
+  test(
+    'derived subscription with startNow=false only emits on updates',
+    () {
+      final source = Beacon.writable(1);
+      final doubled = Beacon.derived(() => source() * 2);
+
+      var derivedEvaluations = 0;
+      final deep = Beacon.derived(
+        () {
+          derivedEvaluations++;
+          return doubled() + 1;
+        },
+      );
+
+      var callCount = 0;
+      final observed = <int>[];
+
+      final unsub = deep.subscribe(
+        (value) {
+          callCount++;
+          observed.add(value);
+        },
+        startNow: false,
+      );
+
+      // Before flushing, nothing should have run yet
+      expect(derivedEvaluations, 0);
+      expect(callCount, 0);
+
+      BeaconScheduler.flush();
+
+      // The derived chain should have initialized once, but
+      // the subscription callback should still not have run
+      expect(derivedEvaluations, 1);
+      expect(callCount, 0);
+
+      // Now change the source and flush again
+      source.value = 2;
+      BeaconScheduler.flush();
+
+      expect(derivedEvaluations, 2);
+      expect(callCount, 1);
+      expect(observed, [5]); // (2 * 2) + 1
+
+      unsub();
+    },
+  );
 }
