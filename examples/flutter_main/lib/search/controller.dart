@@ -5,8 +5,9 @@ class WeatherController extends BeaconController {
 
   late final searchText = TextEditingBeacon(group: B);
 
-  late final searchTextDebounced =
-      searchText.filter((_, n) => n.text.isNotEmpty).debounce(k100ms * 10);
+  late final searchTextDebounced = searchText
+      .filter((_, next) => next.text.trim().isNotEmpty)
+      .debounce(k100ms * 10);
 
   late final _searchResults = B.future(
     () async {
@@ -25,7 +26,7 @@ class WeatherController extends BeaconController {
     searchTextDebounced.next().then((_) => start());
   }
 
-  void start() {
-    _searchResults.start();
-  }
+  void start() => _searchResults.start();
+
+  void retry() => _searchResults.reset();
 }
