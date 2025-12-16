@@ -241,4 +241,13 @@ void main() {
     expect(values, [1, 1]);
     expect(notifyCount, 2);
   });
+
+  test('should fetch value when chained', () async {
+    final count = Beacon.writable(10);
+    final t = count.throttle(k10ms);
+
+    await delay();
+
+    expect(t.value, 10);
+  });
 }
