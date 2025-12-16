@@ -1001,6 +1001,33 @@ void main() {
     expect(called, 1);
   });
 
+  test('should support deeply nested FutureBeacon.toFuture chains', () async {
+    const depth = 50;
+
+    final count = Beacon.writable(1);
+
+    var previous = Beacon.future(
+      () async => count.value,
+      name: 'fb0',
+    );
+
+    for (var i = 1; i < depth; i++) {
+      final parent = previous;
+      final current = Beacon.future(
+        () async {
+          final v = await parent.toFuture();
+          return v + 1;
+        },
+        name: 'fb$i',
+      );
+      previous = current;
+    }
+
+    final result = await previous.toFuture();
+
+    expect(result, depth);
+  });
+
   test('idle() should set the beacon to the idle state', () async {
     final f1 = Beacon.future(() async {
       await delay(k10ms);
