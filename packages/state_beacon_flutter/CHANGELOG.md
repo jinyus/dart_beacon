@@ -1,3 +1,65 @@
+# 2.0.0
+
+- [Breaking] `anyBeacon.toStream()` is now `anyBeacon.stream`
+
+- [Breaking] The lazyBypass parameter in `.filter()` chain method was replaced with allowFirst (set to false by default).
+
+    Previously, the first value sent to a lazy filtered beacon would not be filtered as `lazyBypass` was `true` by default. This caused confusion as most persons expect it to be filtered. The name of the parameter has been changed to `allowFirst` and it is set to `false` by default.
+
+    ### OLD
+    ```
+    final count = Beacon.writable(0);
+    final gtThan10 = count.filter((prev,next) => next>10);
+
+    expect(gtThan10.peek(), 0); // first value was set immediately
+    ```
+
+    ### NEW
+    ```
+    final count = Beacon.writable(0);
+    final gtThan10 = count.filter((prev,next) => next>10);
+
+    expect(gtThan10.peek, throwsException) // no value has been set as yet
+
+    count.value = 20;
+
+    await gtThan10.next();
+
+    expect(d.peek(), 20) // value set after passing the filter
+    ```
+
+- [Breaking]  Added allowFirst parameter to lazyDebounced and `.debounce()` chain method (set to false by default)
+
+    Previously, the first value sent to a lazy debounced beacon would not be debounced. It is now debounced by default and you can allow the first value to go through by setting `allowFirst` to `true`.
+
+    ### OLD
+    ```
+    final ms500 = Duration(milliseconds:500);
+    final count = Beacon.writable(0);
+    final d = count.debounce(ms500);
+
+    expect(d.peek(), 0); // first value was set immediately
+    ```
+
+    ### NEW
+    ```
+    final ms500 = Duration(milliseconds:500);
+    final count = Beacon.writable(0);
+    final d = count.debounce(ms500);
+
+    expect(d.peek, throwsException) // no value has been set as yet
+
+    await Future.delayed(ms500*2);
+
+    expect(d.peek(), 0) // value set after being debounced
+    ```
+
+- [Breaking] synchronous parameter has been removed from the `.subscribe()` method. Synchronous subscriptions are only available for `Writable` and `Buffered` beacons through the `.subscribeSynchronously()` method.
+
+- [Breaking] Chaining methods are now asynchronous and return immutable beacons. ie: `map`, `filter`, `debounce`, `throttle`, `buffer`, and `bufferTime`. 
+
+    These being writable complicated the codebase as writes had to be rerouted to the first mutable beacon in the chain. The alternative is to mutate the original beacon directly.
+    
 # 1.3.4
 
 - [Fix] synchronous subscription RangeError when disposed in it's callback.
