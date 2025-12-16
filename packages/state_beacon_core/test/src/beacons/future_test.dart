@@ -1690,4 +1690,30 @@ void main() {
       expect(futureBeacon.unwrapValue(), 1);
     });
   });
+
+  test('should not throw when disposed before completion', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    f1.start();
+
+    await delay(k1ms);
+
+    expect(f1.isLoading, true);
+
+    f1.dispose();
+
+    expect(f1.isDisposed, true);
+
+    await delay(k10ms * 2);
+
+    expect(f1.isDisposed, true);
+  });
 }
