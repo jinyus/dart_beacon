@@ -103,7 +103,7 @@ abstract class AsyncBeacon<T> extends ReadableBeacon<AsyncValue<T>>
               // FutureBeacons.
               // nb: this is not to ignore our own stale results
               //     as that is handled by _unsubFromStream.
-              if (currentUpdateWithFuture != _updateQueue) {
+              if (currentUpdateWithFuture != _updateQueue || _isDisposed) {
                 return;
               }
               _setValue(AsyncData(v));

@@ -1205,6 +1205,35 @@ void main() {
     expect(f1.unwrapValue(), 999);
   });
 
+  test('updateWith() should complete even if beacon is disposed', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms * 5);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    final updateFuture = f1.updateWith(() async {
+      await delay(k10ms * 5);
+      return 42;
+    });
+
+    await delay(k1ms);
+
+    expect(f1.isLoading, true);
+
+    f1.dispose();
+
+    expect(f1.isDisposed, true);
+
+    await expectLater(updateFuture, completes);
+
+    expect(f1.isDisposed, true);
+  });
+
   group('updateWith with optimistic updates', () {
     test('should immediately set optimistic result', () async {
       final f1 = Beacon.future(
