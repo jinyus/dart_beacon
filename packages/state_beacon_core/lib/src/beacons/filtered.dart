@@ -26,19 +26,16 @@ class FilteredBeacon<T> extends WritableBeacon<T>
     super.initialValue,
     BeaconFilter<T>? filter,
     super.name,
-    this.lazyBypass = true,
-  }) {
+    bool allowFirst = false,
+  }) : _allowFirst = allowFirst {
     _filter = filter;
   }
 
-  /// Whether values should be filtered out if the beacon is empty.
-  final bool lazyBypass;
+  final bool _allowFirst;
 
   @override
   void set(T newValue, {bool force = false}) {
-    final shouldBypass = isEmpty && lazyBypass;
-
-    if (shouldBypass ||
+    if ((_isEmpty && _allowFirst) ||
         (_filter?.call(isEmpty ? null : peek(), newValue) ?? true)) {
       _setValue(newValue, force: force);
     }

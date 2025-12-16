@@ -883,7 +883,7 @@ void main() {
         .filter((_, n) => n.isData)
         .map((v) => v.unwrapOrNull() ?? [], name: 'm');
 
-    BeaconScheduler.flush();
+    await sFiltered.next();
 
     final d = Beacon.derived(
       () {
@@ -896,7 +896,6 @@ void main() {
     await expectLater(
       d.stream,
       emitsInOrder([
-        <int>[],
         [1, 2, 3],
         [4, 5, 6],
       ]),

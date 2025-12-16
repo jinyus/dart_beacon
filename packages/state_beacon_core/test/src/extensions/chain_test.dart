@@ -298,9 +298,7 @@ void main() {
         .map((v) => v + 1)
         .filter((_, n) => n.isEven);
 
-    BeaconScheduler.flush();
-
-    await expectLater(beacon.stream, emitsInOrder([1, 2, 4]));
+    await expectLater(beacon.stream, emitsInOrder([2, 4]));
   });
 
   test('should transform input values when use mid-chain/2', () async {

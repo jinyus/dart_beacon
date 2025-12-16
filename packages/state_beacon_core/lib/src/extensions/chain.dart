@@ -196,24 +196,25 @@ final beacon = Beacon.throttled<T>(0).wrap(someBufferedBeacon)
 
   /// Returns a [FilteredBeacon] that wraps this Beacon.
   ///
+  /// If `allowFirst` is true, the first value will not be filtered
+  ///
   /// ```dart
   /// final count = Beacon.writable(10);
   /// final filteredCount = count.filter((prev, next) => next > 10);
   ///
-  /// filteredCount.value = 20; //  equivalent to count.set(20, force: true);
+  /// count.value = 20;
+  /// await Future.delayed(Duration(milliseconds:10))
   ///
   /// expect(count.value, equals(20));
   /// expect(filteredCount.value, equals(20));
   /// ```
   ///
-  /// The first value will not be filtered if the source is lazy.
-  /// You can override this by setting lazyBypass to false.
   ///
   /// See: `Beacon.filtered` for more details.
   ReadableFilteredBeacon<T> filter(
     bool Function(T?, T) filter, {
     String? name,
-    bool lazyBypass = true,
+    bool allowFirst = false,
   }) {
     assert(
       this is! BufferedBaseBeacon,
@@ -234,7 +235,7 @@ final beacon = Beacon.filtered<T>(0).wrap(someBufferedBeacon)
     final beacon = Beacon.lazyFiltered<T>(
       filter: filter,
       name: name,
-      lazyBypass: lazyBypass,
+      allowFirst: allowFirst,
     );
 
     _wrapThis(beacon);
