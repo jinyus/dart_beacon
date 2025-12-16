@@ -61,7 +61,8 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
         completer.completeError(
           Exception(
             '$name was disposed before a value was emitted. '
-            'Provide a fallback value to avoid this error.',
+            'Provide a fallback value to avoid this error. '
+            'OR use `.subscribe((_){}, startNow:false)` as an alternative.',
           ),
         );
       }
