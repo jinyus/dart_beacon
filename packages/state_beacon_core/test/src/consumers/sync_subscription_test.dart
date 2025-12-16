@@ -466,4 +466,115 @@ void main() {
 
     expect(() => beacon.set(2), throwsException);
   });
+
+  test(
+    'sync subscriptions can dispose other sync subscriptions during iteration',
+    () async {
+      final beacon = Beacon.writable(0);
+      var firstCalls = 0;
+      var secondCalls = 0;
+
+      late void Function() unsubscribeFirst;
+
+      unsubscribeFirst = beacon.subscribeSynchronously(
+        (_) {
+          firstCalls++;
+        },
+        startNow: true,
+      );
+
+      beacon.subscribeSynchronously(
+        (_) {
+          secondCalls++;
+          if (secondCalls == 1) {
+            // Dispose the first subscription while the observer list
+            // is being iterated. This must not cause concurrent
+            // modification errors and must be handled via microtask.
+            unsubscribeFirst();
+          }
+        },
+        startNow: true,
+      );
+
+      // Initial subscriptions run once each
+      expect(firstCalls, 1);
+      expect(secondCalls, 1);
+
+      // First update: both subscriptions are still present
+      beacon.value = 1;
+      expect(firstCalls, 2);
+      expect(secondCalls, 2);
+
+      // Allow the scheduled microtask from unsubscribeFirst to run
+      await delay();
+
+      // Second update: only the second subscription should be called
+      beacon.value = 2;
+      expect(firstCalls, 2, reason: 'first subscription should be disposed');
+      expect(secondCalls, 3, reason: 'second subscription should remain active');
+    },
+  );
+
+  test(
+    'sync and async subscriptions can dispose themselves without races',
+    () async {
+      final beacon = Beacon.writable(0);
+
+      var syncCalls = 0;
+      var asyncCalls = 0;
+
+      late void Function() unsubscribeSync;
+      late void Function() unsubscribeAsync;
+
+      unsubscribeSync = beacon.subscribeSynchronously(
+        (_) {
+          syncCalls++;
+          if (syncCalls == 2) {
+            // Dispose sync subscription on the second call
+            unsubscribeSync();
+          }
+        },
+        startNow: true,
+      );
+
+      unsubscribeAsync = beacon.subscribe(
+        (_) {
+          asyncCalls++;
+          if (asyncCalls == 1) {
+            // Dispose async subscription on the first async flush
+            unsubscribeAsync();
+          }
+        },
+        startNow: true,
+      );
+
+      // Initial sync subscription runs immediately
+      expect(syncCalls, 1);
+      // Async subscription is queued until flush
+      expect(asyncCalls, 0);
+
+      BeaconScheduler.flush();
+
+      // After flush, async subscription should have run once
+      expect(asyncCalls, 1);
+
+      // First explicit update: sync runs and schedules its own disposal
+      beacon.value = 1;
+      expect(syncCalls, 2);
+
+      BeaconScheduler.flush();
+
+      // Async subscription was already disposed after first call
+      expect(asyncCalls, 1);
+
+      // Allow any scheduled microtasks from sync disposal to complete
+      await delay();
+
+      // Second explicit update: neither subscription should be called again
+      beacon.value = 2;
+      expect(syncCalls, 2, reason: 'sync subscription should be disposed');
+      BeaconScheduler.flush();
+      expect(asyncCalls, 1, reason: 'async subscription should be disposed');
+    },
+  );
 }
