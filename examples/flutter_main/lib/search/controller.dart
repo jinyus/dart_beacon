@@ -23,7 +23,7 @@ class WeatherController extends BeaconController {
 
   WeatherController(this.repo) {
     // start searching when the beacon is first set
-    searchTextDebounced.next().then((_) => start());
+    searchTextDebounced.subscribe((_) => start(), startNow: false);
   }
 
   void start() => _searchResults.start();
