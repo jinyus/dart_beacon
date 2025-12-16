@@ -37,6 +37,18 @@ test_target() {
             flutter test $2 &&
             echo "testing counter example" &&
             cd ../counter &&
+            flutter test $2  &&
+            echo "testing form example" &&
+            cd ../form &&
+            flutter test $2 &&
+            echo "testing tictactoe example" &&
+            cd ../tic_tac_toe &&
+            flutter test $2 &&
+            echo "testing snake example" &&
+            cd ../snake_game &&
+            flutter test $2 &&
+            echo "testing splash page example" &&
+            cd ../splash_page &&
             flutter test $2
     elif [ "$1" == "all" ]; then
         test_target "core" "$2" &&
