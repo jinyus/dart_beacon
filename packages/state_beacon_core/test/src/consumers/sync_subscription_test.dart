@@ -510,8 +510,8 @@ void main() {
 
       // Second update: only the second subscription should be called
       beacon.value = 2;
-      expect(firstCalls, 2, reason: 'first subscription should be disposed');
-      expect(secondCalls, 3, reason: 'second subscription should remain active');
+      expect(firstCalls, 2, reason: 'subscription1 should be disposed');
+      expect(secondCalls, 3, reason: 'subscription2 should remain active');
     },
   );
 

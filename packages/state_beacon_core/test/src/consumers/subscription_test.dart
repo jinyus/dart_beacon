@@ -357,8 +357,11 @@ void main() {
     a.set(4, force: true);
     BeaconScheduler.flush();
 
-    expect(callCount, 1,
-        reason: 'forcing same derived value should not notify');
+    expect(
+      callCount,
+      1,
+      reason: 'forcing same derived value should not notify',
+    );
 
     unsub();
   });
