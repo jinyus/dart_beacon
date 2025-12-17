@@ -8,7 +8,7 @@ class Subscription<T> implements Consumer {
   Subscription(
     this.producer,
     this.fn, {
-    required this.startNow,
+    required bool startNow,
   }) {
     if (startNow) {
       _schedule();
@@ -16,8 +16,6 @@ class Subscription<T> implements Consumer {
       // For beacons with startNow=false, we don't schedule initially
       // but we still mark as CLEAN so future updates will work
       _status = CLEAN;
-      // Mark that we've already "ran" the initial update (which we're skipping)
-      _ran = true;
     }
 
     assert(() {
@@ -28,9 +26,6 @@ class Subscription<T> implements Consumer {
 
   /// The producer that this subscription is watching.
   final Producer<T> producer;
-
-  /// Whether the subscription should start immediately.
-  final bool startNow;
 
   /// The callback that runs when the producer changes.
   final void Function(T) fn;
@@ -47,36 +42,11 @@ class Subscription<T> implements Consumer {
   }
 
   @override
-  void stale(Status newStatus) {
-    if (_status < newStatus) {
-      final oldStatus = _status;
-      _status = newStatus;
-
-      if (oldStatus == CLEAN) {
-        _schedule();
-      }
-    }
-  }
-
-  @override
-  void updateIfNecessary() {
-    if (_status == DIRTY) {
-      update();
-      _status = CLEAN;
-    }
-  }
-
-  var _ran = false;
+  void updateIfNecessary() => update();
 
   @override
   void update() {
-    // Skip callback on first run if startNow is false
-    final shouldRunCallback = _ran || startNow;
-
-    // Track if this is the first run
-    _ran = true;
-
-    if (shouldRunCallback && !producer.isEmpty) {
+    if (!producer.isEmpty) {
       fn(producer.peek());
     }
 
@@ -94,17 +64,19 @@ class Subscription<T> implements Consumer {
   }
 
   @override
-  void markDirty() => stale(DIRTY);
-
-  @override
-  void markCheck() => stale(CHECK);
+  void markDirty() {
+    if (_status == CLEAN) {
+      _status = DIRTY;
+      _schedule();
+    }
+  }
 
   @override
   void _sourceDisposed(Producer<dynamic> source) {
     // if one of our sources is disposed, we should dispose ourselves
     // this is a bit strict because other sources might still be alive
     // but I want to enforce this to promote good practices
-    Future.microtask(dispose);
+    scheduleMicrotask(dispose);
   }
 
   // these should never be called
@@ -113,6 +85,12 @@ class Subscription<T> implements Consumer {
   Producer<dynamic>? _producerAtIndex(int index) {
     throw UnimplementedError();
   }
+
+  @override
+  void stale(Status newStatus) => throw UnimplementedError();
+
+  @override
+  void markCheck() => throw UnimplementedError();
 
   @override
   void stopWatchingAllAfter(int index) {
@@ -194,8 +172,6 @@ class DerivedSubscription<T> implements Consumer {
 
   @override
   void updateIfNecessary() {
-    if (_status == CLEAN) return;
-
     // Check dependent sources (only for DerivedBeacon)
     if (_status == CHECK) {
       producer.updateIfNecessary();

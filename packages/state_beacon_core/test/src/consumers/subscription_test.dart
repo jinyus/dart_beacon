@@ -77,10 +77,6 @@ void main() {
     BeaconScheduler.flush();
     expect(called, 2);
 
-    // a.set(2, force: true); // force change
-    // BeaconScheduler.flush();
-    // expect(called, 3);
-
     dispose();
     a.value = 10;
     BeaconScheduler.flush();
