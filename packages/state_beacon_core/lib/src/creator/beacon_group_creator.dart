@@ -107,11 +107,6 @@ class BeaconGroup extends _BeaconCreator {
   @override
   VoidCallback effect(
     Function fn, {
-    @Deprecated(
-      'The supportConditional parameter is no longer needed and '
-      'will be removed in the next major version.',
-    )
-    bool supportConditional = true,
     String? name,
   }) {
     final callback = super.effect(fn, name: name);
@@ -179,12 +174,14 @@ class BeaconGroup extends _BeaconCreator {
   DebouncedBeacon<T> lazyDebounced<T>({
     Duration? duration,
     T? initialValue,
+    bool allowFirst = false,
     String? name,
   }) {
     final beacon = super.lazyDebounced<T>(
       duration: duration,
       initialValue: initialValue,
       name: name,
+      allowFirst: allowFirst,
     );
     add(beacon);
     return beacon;
@@ -194,13 +191,13 @@ class BeaconGroup extends _BeaconCreator {
   FilteredBeacon<T> lazyFiltered<T>({
     T? initialValue,
     BeaconFilter<T>? filter,
-    bool lazyBypass = true,
+    bool allowFirst = false,
     String? name,
   }) {
     final beacon = super.lazyFiltered<T>(
       initialValue: initialValue,
       filter: filter,
-      lazyBypass: lazyBypass,
+      allowFirst: allowFirst,
       name: name,
     );
 

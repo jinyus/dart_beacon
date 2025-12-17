@@ -2,11 +2,10 @@
 
 part of '../producer.dart';
 
-/// Base class for buffered beacons.
-abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
-    with BeaconWrapper<T, List<T>> {
+/// Immutable Base class for buffered beacons
+abstract class ReadableBufferedBeacon<T> extends ReadableBeacon<List<T>> {
   // ignore: public_member_api_docs
-  BufferedBaseBeacon({super.name}) : super(initialValue: []);
+  ReadableBufferedBeacon({super.name}) : super(initialValue: []);
 
   final List<T> _buffer = [];
 
@@ -16,35 +15,31 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
   /// This can be listened to directly.
   ReadableBeacon<List<T>> get currentBuffer => _currentBuffer;
 
-  void _addToBuffer(T newValue) {
-    _buffer.add(newValue);
-    _currentBuffer.add(newValue);
-  }
-
   void _clearBuffer() {
     _buffer.clear();
     _currentBuffer.reset();
   }
 
-  /// Adds a new value to the buffer.
-  void add(T newValue) {
-    _internalAdd(newValue, delegated: true);
-  }
-
-  void _internalAdd(T newValue, {bool delegated = false});
-
   /// Clears the buffer
-  @override
   void reset({bool force = false}) {
     _clearBuffer();
     _setValue(_initialValue, force: force);
-
-    // we clear the buffer first because the delegate will
-    // add its own initial value back to the buffer
-    if (_delegate != null) {
-      _delegate!.reset(force: force);
-    }
   }
+}
+
+/// Base class for buffered beacons.
+abstract class BufferedBaseBeacon<T> extends ReadableBufferedBeacon<T>
+    with BeaconWrapper<T, List<T>> {
+  // ignore: public_member_api_docs
+  BufferedBaseBeacon({super.name});
+
+  void _addToBuffer(T newValue) {
+    _buffer.add(newValue);
+    _currentBuffer.add(newValue);
+  }
+
+  /// Adds a new value to the buffer.
+  void add(T newValue);
 
   @override
   void dispose() {
@@ -58,7 +53,7 @@ abstract class BufferedBaseBeacon<T> extends ReadableBeacon<List<T>>
 
   @override
   void _onNewValueFromWrapped(T value) {
-    _internalAdd(value);
+    add(value);
   }
 }
 
@@ -72,16 +67,12 @@ class BufferedCountBeacon<T> extends BufferedBaseBeacon<T> {
   final int countThreshold;
 
   @override
-  void _internalAdd(T newValue, {bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-    super._addToBuffer(newValue);
+  void add(T newValue) {
+    _addToBuffer(newValue);
 
     if (_buffer.length == countThreshold) {
       _setValue(List.from(_buffer));
-      super._clearBuffer();
+      _clearBuffer();
     }
   }
 }
@@ -98,13 +89,8 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
   Timer? _timer;
 
   @override
-  void _internalAdd(T newValue, {bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-
-    super._addToBuffer(newValue);
+  void add(T newValue) {
+    _addToBuffer(newValue);
     _startTimerIfNeeded();
   }
 
@@ -112,7 +98,7 @@ class BufferedTimeBeacon<T> extends BufferedBaseBeacon<T> {
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer(duration, () {
         _setValue(List.from(_buffer));
-        super._clearBuffer();
+        _clearBuffer();
         _timer = null;
       });
     }

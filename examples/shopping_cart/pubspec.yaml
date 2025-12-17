@@ -21,6 +21,8 @@ dependencies:
 dependency_overrides:
   state_beacon_core: 
     path: ../../packages/state_beacon_core
+  state_beacon_flutter: 
+    path: ../../packages/state_beacon_flutter
 
 dev_dependencies:
     flutter_lints: ^2.0.0

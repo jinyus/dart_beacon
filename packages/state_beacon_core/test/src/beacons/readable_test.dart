@@ -49,7 +49,7 @@ void main() {
   test('should return a stream', () async {
     final a = Beacon.writable(1);
 
-    final stream = a.toStream();
+    final stream = a.stream;
 
     var called = 0;
 
@@ -114,7 +114,7 @@ void main() {
 
   test('should convert a beacon to a stream', () async {
     final beacon = Beacon.writable(0);
-    final stream = beacon.toStream();
+    final stream = beacon.stream;
 
     expect(stream, isA<Stream<int>>());
 
@@ -140,29 +140,18 @@ void main() {
   test('should cache stream', () {
     final beacon = Beacon.writable(0);
 
-    final stream1 = beacon.toStream();
-    final stream2 = beacon.toStream();
+    final stream1 = beacon.stream;
+    final stream2 = beacon.stream;
 
     expect(stream1.hashCode, stream2.hashCode);
   });
 
-  test('should autobatch when synchronous=false', () {
+  test('should autobatch updates', () {
     final beacon = Beacon.writable(0);
 
-    final stream1 = beacon.toStream();
+    final stream1 = beacon.stream;
 
     expectLater(stream1, emitsInOrder([2]));
-
-    beacon.value = 1;
-    beacon.value = 2;
-  });
-
-  test('should disable autobatching when synchronous=true', () {
-    final beacon = Beacon.writable(0);
-
-    final stream1 = beacon.toStream(synchronous: true);
-
-    expectLater(stream1, emitsInOrder([0, 1, 2]));
 
     beacon.value = 1;
     beacon.value = 2;
@@ -174,6 +163,8 @@ void main() {
     number.guard();
 
     final doubled = number.map((value) => value * 2);
+
+    BeaconScheduler.flush();
 
     doubled.dispose();
 

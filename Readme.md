@@ -852,7 +852,7 @@ age.value = 22;
 age.value = 23;
 ```
 
-### myBeacon.toStream():
+### myBeacon.stream:
 
 This returns a stream that emits the beacon's value whenever it changes.
 
@@ -1019,7 +1019,7 @@ final beacon = stream
     .toRawBeacon(isLazy: true)
     .map((v) => v.toString());
 
-await expectLater(beacon.toStream(), emitsInOrder(['0', '1', '2', '3', '4']));
+await expectLater(beacon.stream, emitsInOrder(['0', '1', '2', '3', '4']));
 ```
 
 > [!NOTE]
@@ -1153,12 +1153,12 @@ expect(c.isDisposed, true);
 
 ## Testing
 
-Beacons can expose a `Stream` with the `.toStream()` method. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
+Beacons can expose a `Stream` with the `.stream` method. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
 
 ```dart
 final count = Beacon.writable(10);
 
-final stream = count.toStream();
+final stream = count.stream;
 
 Future.delayed(Duration(milliseconds: 1), () => count.value = 20);
 

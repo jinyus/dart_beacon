@@ -447,7 +447,7 @@ void main() {
     // BeaconScheduler.flush();
 
     await expectLater(
-      stats.toStream(),
+      stats.stream,
       emitsInOrder([
         isA<AsyncLoading<String>>(),
         isA<AsyncError<String>>(),
@@ -673,7 +673,7 @@ void main() {
     num1.increment();
 
     await expectLater(
-      derivedBeacon.toStream(),
+      derivedBeacon.stream,
       emitsInOrder([
         isA<AsyncLoading<int>>(),
         AsyncData<int>(11),
@@ -854,7 +854,7 @@ void main() {
     );
 
     await expectLater(
-      f.toStream(),
+      f.stream,
       emitsInOrder([
         isA<AsyncLoading<List<int>>>(),
         isA<AsyncData<List<int>>>(),
@@ -883,6 +883,8 @@ void main() {
         .filter((_, n) => n.isData)
         .map((v) => v.unwrapOrNull() ?? [], name: 'm');
 
+    await sFiltered.next();
+
     final d = Beacon.derived(
       () {
         final res = sFiltered.value;
@@ -892,9 +894,8 @@ void main() {
     );
 
     await expectLater(
-      d.toStream(),
+      d.stream,
       emitsInOrder([
-        <int>[],
         [1, 2, 3],
         [4, 5, 6],
       ]),
@@ -998,6 +999,33 @@ void main() {
     await expectLater(f1.toFuture(resetIfError: false), throwsException);
 
     expect(called, 1);
+  });
+
+  test('should support deeply nested FutureBeacon.toFuture chains', () async {
+    const depth = 50;
+
+    final count = Beacon.writable(1);
+
+    var previous = Beacon.future(
+      () async => count.value,
+      name: 'fb0',
+    );
+
+    for (var i = 1; i < depth; i++) {
+      final parent = previous;
+      final current = Beacon.future(
+        () async {
+          final v = await parent.toFuture();
+          return v + 1;
+        },
+        name: 'fb$i',
+      );
+      previous = current;
+    }
+
+    final result = await previous.toFuture();
+
+    expect(result, depth);
   });
 
   test('idle() should set the beacon to the idle state', () async {
@@ -1202,6 +1230,35 @@ void main() {
 
     expect(f1.isData, true);
     expect(f1.unwrapValue(), 999);
+  });
+
+  test('updateWith() should complete even if beacon is disposed', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms * 5);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    final updateFuture = f1.updateWith(() async {
+      await delay(k10ms * 5);
+      return 42;
+    });
+
+    await delay(k1ms);
+
+    expect(f1.isLoading, true);
+
+    f1.dispose();
+
+    expect(f1.isDisposed, true);
+
+    await expectLater(updateFuture, completes);
+
+    expect(f1.isDisposed, true);
   });
 
   group('updateWith with optimistic updates', () {
@@ -1579,6 +1636,8 @@ void main() {
           .map((v) => v.unwrap())
           .buffer(5);
 
+      BeaconScheduler.flush();
+
       // ignore: unawaited_futures
       futureBeacon.updateWith(() async {
         await delay(k10ms * 5);
@@ -1624,6 +1683,8 @@ void main() {
           .map((v) => v.unwrap())
           .buffer(2);
 
+      BeaconScheduler.flush();
+
       var update1Ran = 0;
       // ignore: unawaited_futures
       futureBeacon.updateWith(() async {
@@ -1655,5 +1716,31 @@ void main() {
       expect(last2.value, [0, 1]);
       expect(futureBeacon.unwrapValue(), 1);
     });
+  });
+
+  test('should not throw when disposed before completion', () async {
+    final f1 = Beacon.future(
+      () async {
+        await delay(k10ms);
+        return 1;
+      },
+      manualStart: true,
+    );
+
+    expect(f1.isIdle, true);
+
+    f1.start();
+
+    await delay(k1ms);
+
+    expect(f1.isLoading, true);
+
+    f1.dispose();
+
+    expect(f1.isDisposed, true);
+
+    await delay(k10ms * 2);
+
+    expect(f1.isDisposed, true);
   });
 }

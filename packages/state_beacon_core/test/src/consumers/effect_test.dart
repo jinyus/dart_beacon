@@ -41,8 +41,6 @@ void main() {
     college.value = 'Yale';
     BeaconScheduler.flush();
 
-    // if (isSynchronousMode) return;
-
     expect(buff, [
       'Bob is 20 years old',
       'Alice is 20 years old',

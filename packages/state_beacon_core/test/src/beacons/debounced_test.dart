@@ -55,4 +55,47 @@ void main() {
 
     expect(called, 5); // 5 notifications should be sent
   });
+
+  test('should debounce first value when lazy', () async {
+    final b = Beacon.lazyDebounced<int>(duration: k10ms);
+    final c = b.debounce(k10ms);
+
+    b.set(5); // should be debounced
+
+    expect(
+      () => b.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
+
+    expect(
+      () => c.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
+
+    await delay(k10ms * 1.5);
+
+    expect(b.value, 5);
+
+    // c is still debounced
+    expect(
+      () => c.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
+
+    await delay(k10ms * 1.5);
+
+    expect(c.value, 5);
+  });
+
+  test('should not debounce first value when lazy', () async {
+    final b = Beacon.lazyDebounced<int>(duration: k10ms, allowFirst: true);
+    final c = b.debounce(k10ms, allowFirst: true);
+
+    b.set(5); // should be debounced
+
+    expect(b.value, 5);
+
+    BeaconScheduler.flush(); // allow c to capture first value
+    expect(c.value, 5);
+  });
 }

@@ -4,6 +4,8 @@
 ACTION=$1
 # The second argument is the target (core, flutter, or example)
 TARGET=$2
+# Store additional arguments in a variable
+ADDITIONAL_ARGS="${@:3}"
 
 CURRENT_DIR=$(pwd)
 
@@ -14,32 +16,44 @@ test_target() {
     if [ "$1" == "core" ]; then
         echo "testing core"
         cd packages/state_beacon_core &&
-            flutter test --coverage --timeout 5s
+            flutter test --coverage --timeout 5s $2
 
     elif [ "$1" == "flutter" ]; then
         echo "testing flutter"
         cd packages/state_beacon_flutter &&
-            flutter test --coverage
+            flutter test --coverage $2
 
     elif [ "$1" == "main" ]; then
         echo "testing main"
         cd packages/state_beacon &&
-            flutter test --coverage
+            flutter test --coverage $2
 
     elif [ "$1" == "example" ]; then
         echo "testing flutter_main example"
         cd examples/flutter_main &&
-            flutter test &&
+            flutter test $2 &&
             echo "testing shopping_cart example" &&
             cd ../shopping_cart &&
-            flutter test &&
+            flutter test $2 &&
             echo "testing counter example" &&
             cd ../counter &&
-            flutter test
+            flutter test $2  &&
+            echo "testing form example" &&
+            cd ../form &&
+            flutter test $2 &&
+            echo "testing tictactoe example" &&
+            cd ../tic_tac_toe &&
+            flutter test $2 &&
+            echo "testing snake example" &&
+            cd ../snake_game &&
+            flutter test $2 &&
+            echo "testing splash page example" &&
+            cd ../splash_page &&
+            flutter test $2
     elif [ "$1" == "all" ]; then
-        test_target "core" &&
-            test_target "flutter" &&
-            test_target "example"
+        test_target "core" "$2" &&
+            test_target "flutter" "$2" &&
+            test_target "example" "$2"
     else
         echo -e "unknown test \"$1\" \nValid tests are: core, flutter, example, all"
     fi
@@ -49,7 +63,7 @@ test_target() {
 publish_and_update_pubignore() {
     cp .gitignore .pubignore &&
         echo test/ | tee -a .pubignore &&
-        dart pub publish
+        dart pub publish "$@"
     rm .pubignore
 }
 
@@ -60,22 +74,22 @@ publish_target() {
         if [ "$1" == "core" ]; then
             echo "publishing core"
             cd packages/state_beacon_core &&
-                publish_and_update_pubignore
+                publish_and_update_pubignore $2
 
         elif [ "$1" == "flutter" ]; then
             echo "publishing flutter"
             cd packages/state_beacon_flutter &&
-                publish_and_update_pubignore
+                publish_and_update_pubignore $2
 
         elif [ "$1" == "main" ]; then
             echo "publishing main"
             cd packages/state_beacon &&
-                publish_and_update_pubignore
+                publish_and_update_pubignore $2
 
         elif [ "$1" == "lint" ]; then
             echo "publishing lint"
             cd packages/state_beacon_lints
-            dart pub publish
+            dart pub publish $2
         else
             echo -e "unknown package \"$1\" \nValid packages are: core, flutter, lint"
         fi
@@ -107,9 +121,9 @@ deps() {
 
 # Main logic to decide whether to test or publish based on the first argument
 if [ "$ACTION" == "test" ]; then
-    test_target $TARGET
+    test_target $TARGET $ADDITIONAL_ARGS
 elif [ "$ACTION" == "pub" ]; then
-    publish_target $TARGET
+    publish_target $TARGET $ADDITIONAL_ARGS
 elif [ "$ACTION" == "deps" ]; then
     deps
 else

@@ -76,13 +76,13 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
 
       // this means that the beacon was reset/retriggered while we were waiting
       // so we ignore this result
-      if (loadCount != _loadCount) {
+      if (loadCount != _loadCount || _isDisposed) {
         return;
       }
 
       _setValue(AsyncData(result));
     } catch (error, stackTrace) {
-      if (loadCount != _loadCount) {
+      if (loadCount != _loadCount || _isDisposed) {
         return;
       }
 

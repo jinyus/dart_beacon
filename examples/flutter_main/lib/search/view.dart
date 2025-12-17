@@ -66,10 +66,18 @@ class SearchResults extends StatelessWidget {
                 style: k32Text,
                 textAlign: TextAlign.center,
               ),
-            AsyncError _ => const Text(
-                'Nextwork Error',
-                style: TextStyle(color: Colors.red, fontSize: 24),
-                textAlign: TextAlign.center,
+            AsyncError _ => Column(
+                children: [
+                  const Text(
+                    'Nextwork Error',
+                    style: TextStyle(color: Colors.red, fontSize: 24),
+                    textAlign: TextAlign.center,
+                  ),
+                  ElevatedButton(
+                    onPressed: () => weatherControllerRef.read(context).retry(),
+                    child: const Text('retry'),
+                  )
+                ],
               ),
             AsyncLoading() => const CircularProgressIndicator(),
             AsyncIdle() => const Text(

@@ -8,8 +8,6 @@ part of '../producer.dart';
 mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   final _wrapped = <int, VoidCallback>{};
 
-  BeaconWrapper<InputT, dynamic>? _delegate;
-
   /// Disposes all currently wrapped beacons
   void clearWrapped() {
     for (final unsub in _wrapped.values) {
@@ -22,13 +20,25 @@ mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   /// so this is should be implemented by the wrapper.
   void _onNewValueFromWrapped(InputT value);
 
-  // coverage:ignore-start
-  /// Sets the delegate beacon to listen to.
-  void set(InputT value, {bool force = false}) {
-    throw UnimplementedError();
+  /// Subscribes to changes in the beacon
+  /// returns a function that can be called to unsubscribe
+  ///
+  /// This disables automatic batching is not recommended for
+  /// most usecases. Use [subscribe] if you are unsure.
+  ///
+  /// If [startNow] is true, the callback will be called immediately
+  /// with the current value of the beacon.
+  VoidCallback subscribeSynchronously(
+    void Function(OutputT) callback, {
+    bool startNow = true,
+  }) {
+    assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
+    final sub = SyncSubscription(
+      this,
+      callback,
+      startNow: startNow,
+    );
+    _observers.add(sub);
+    return sub.dispose;
   }
-  // coverage:ignore-end
-
-  /// Wraps a beacon and listens to its changes.
-  void reset({bool force = false});
 }

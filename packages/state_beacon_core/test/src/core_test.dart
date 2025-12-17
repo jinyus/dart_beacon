@@ -332,7 +332,6 @@ void main() {
     BeaconScheduler.flush();
 
     // There were 4 updates, but only 1 notification
-    // In synchronous mode, there are 4 notifications
     expect(callCount, 1);
   });
 
@@ -705,5 +704,60 @@ void main() {
     a.value = 20;
     a.dispose();
     expect(a.peek(), 20);
+  });
+
+  test('guard should allow beacon to outlive its dependants', () async {
+    final a = Beacon.writable(1)..guard();
+    final b = a.map((val) => val.toString());
+
+    expect(a.isDisposed, isFalse);
+    expect(b.isDisposed, isFalse);
+
+    b.dispose();
+    await delay();
+
+    expect(b.isDisposed, isTrue);
+    expect(a.isDisposed, isFalse);
+  });
+
+  test('multiple dispose callbacks should all run once', () {
+    final a = Beacon.writable(10);
+    var first = 0;
+    var second = 0;
+
+    a.onDispose(() {
+      first++;
+    });
+
+    a.onDispose(() {
+      second++;
+    });
+
+    a.dispose();
+
+    expect(first, 1);
+    expect(second, 1);
+
+    // Calling dispose again should not re-run callbacks
+    a.dispose();
+
+    expect(first, 1);
+    expect(second, 1);
+  });
+
+  test('widget subscribers set is cleared on dispose', () {
+    final a = Beacon.writable(0);
+    // ignore: deprecated_member_use_from_same_package
+    a.$$widgetSubscribers$$
+      ..add(1)
+      ..add(2);
+
+    // ignore: deprecated_member_use_from_same_package
+    expect(a.$$widgetSubscribers$$, isNotEmpty);
+
+    a.dispose();
+
+    // ignore: deprecated_member_use_from_same_package
+    expect(a.$$widgetSubscribers$$, isEmpty);
   });
 }

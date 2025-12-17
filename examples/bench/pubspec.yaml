@@ -13,6 +13,11 @@ dependencies:
     state_beacon:
         path: ../../packages/state_beacon
 
-
+dependency_overrides:
+  state_beacon_core: 
+    path: ../../packages/state_beacon_core
+  state_beacon_flutter: 
+    path: ../../packages/state_beacon_flutter
+    
 flutter:
     uses-material-design: true

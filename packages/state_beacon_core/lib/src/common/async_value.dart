@@ -19,18 +19,6 @@ sealed class AsyncValue<T> {
     _oldData = value;
   }
 
-  // coverage:ignore-start
-  /// If this is [AsyncData], returns it's value.
-  /// Otherwise returns `null`.
-  @Deprecated('Use `.unwrapOrNull()` instead')
-  T? get valueOrNull {
-    if (this case AsyncData<T>(:final value)) {
-      return value;
-    }
-    return null;
-  }
-  // coverage:ignore-end
-
   /// Returns the last data that was successfully loaded
   /// This is useful when the current state is [AsyncError] or [AsyncLoading]
   T? get lastData => unwrapOrNull() ?? _oldData;

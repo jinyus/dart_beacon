@@ -13,6 +13,8 @@ void main() {
 
     final buffered = beacon.buffer(3);
 
+    BeaconScheduler.flush();
+
     expect(buffered, isA<BufferedCountBeacon<int>>());
 
     beacon.set(1);
@@ -50,7 +52,10 @@ void main() {
 
     expect(buffered.value, [1, 2, 3]);
 
-    expect(debounced.value, 1);
+    expect(
+      () => debounced.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
 
     expect(throttled.value, 1);
 
@@ -72,13 +77,15 @@ void main() {
 
     final buffered = beacon.bufferTime(k10ms);
 
+    BeaconScheduler.flush();
+
     expect(buffered, isA<BufferedTimeBeacon<int>>());
 
-    buffered.add(1);
+    beacon.set(1);
     BeaconScheduler.flush();
-    buffered.add(2);
+    beacon.set(2);
     BeaconScheduler.flush();
-    buffered.add(3);
+    beacon.set(3);
     BeaconScheduler.flush();
 
     expect(buffered.currentBuffer.value, [0, 1, 2, 3]);
@@ -94,6 +101,8 @@ void main() {
 
     final debounced = beacon.debounce(k10ms);
 
+    BeaconScheduler.flush();
+
     expect(debounced, isA<DebouncedBeacon<int>>());
 
     beacon.set(1);
@@ -103,7 +112,10 @@ void main() {
     beacon.set(3);
     BeaconScheduler.flush();
 
-    expect(debounced.value, 0);
+    expect(
+      () => debounced.value,
+      throwsA(isA<UninitializeLazyReadException>()),
+    );
 
     await delay(k10ms * 2);
 
@@ -114,6 +126,8 @@ void main() {
     final beacon = Beacon.writable(0);
 
     final throttled = beacon.throttle(k10ms);
+
+    BeaconScheduler.flush();
 
     expect(throttled, isA<ThrottledBeacon<int>>());
 
@@ -147,6 +161,7 @@ void main() {
 
     expect(filtered.value, 2);
   });
+
   test('should dispose together when wrapped is disposed(3)', () async {
     // BeaconObserver.instance = LoggingObserver();
     final count = Beacon.readable<int>(10);
@@ -156,6 +171,8 @@ void main() {
         .throttle(k10ms)
         .debounce(k10ms)
         .filter(neverFilter);
+
+    await delay(k1ms * 15);
 
     Beacon.effect(() => beacon.value);
 
@@ -170,193 +187,13 @@ void main() {
     expect(beacon.listenersCount, 0);
   });
 
-  test('should delegate writes to parent when chained', () async {
-    final beacon = Beacon.writable<int>(0);
-    final filtered = beacon.filter((p, n) => n.isEven);
-
-    filtered.value = 1;
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 1);
-    expect(filtered.value, 0);
-
-    filtered.increment();
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 1);
-    expect(filtered.value, 0);
-
-    filtered.value = 2;
-
-    BeaconScheduler.flush();
-
-    expect(beacon.value, 2);
-    expect(filtered.value, 2);
-  });
-
-  test('should delegate writes to parent when chained/2', () async {
-    // BeaconObserver.instance = LoggingObserver();
-    final filtered =
-        Beacon.lazyDebounced<int>(duration: k10ms).filter((p, n) => n.isEven);
-
-    filtered.value = 1; // 1st value so not debounced
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 1);
-
-    filtered.increment();
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 1); // debouncing so not updated yet
-
-    await delay(k10ms * 2);
-
-    expect(filtered.value, 2);
-  });
-
-  test('should delegate writes to parent when chained/3', () async {
-    // BeaconObserver.instance = LoggingObserver();
-
-    final filtered = Beacon.writable(0)
-        .filter((p, n) => n.isEven, name: 'f1')
-        .filter((p, n) => n > 0, name: 'f2')
-        .filter((p, n) => n > 10, name: 'f3');
-
-    filtered.value = 1;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = -2; // doesn't pass f2
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = 6; // doesn't pass f3
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-
-    filtered.value = 12;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 12);
-
-    filtered.value = 0;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 12);
-
-    filtered.reset();
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 0);
-  });
-
-  test('should delegate writes to parent when chained/4', () async {
-    // BeaconObserver.instance = LoggingObserver();
-
-    final count = Beacon.writable<int>(10, name: 'count');
-
-    final filtered = count
-        .throttle(k10ms, name: 'throttled')
-        .debounce(k10ms, name: 'debounced')
-        .filter(neverFilter, name: 'f1')
-        .filter(neverFilter, name: 'f2');
-
-    expect(filtered.isEmpty, false);
-    expect(filtered.value, 10);
-
-    filtered.value = 20; // throttled
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 10);
-
-    await delay(k10ms * 2.1);
-
-    expect(filtered.value, 10);
-
-    filtered.value = 30;
-
-    BeaconScheduler.flush();
-
-    expect(filtered.value, 10); // debounced
-
-    await delay(k10ms * 1.1);
-
-    expect(filtered.value, 30);
-  });
-
-  test('should delegate writes to parent when chained/5', () async {
-    final count = Beacon.writable<int>(10, name: 'count');
-
-    final buffered =
-        count.filter(name: 'f1', (_, n) => n > 5).buffer(2, name: 'buffered');
-
-    BeaconScheduler.flush();
-
-    expect(buffered.value, <int>[]);
-    expect(buffered.currentBuffer(), <int>[10]);
-
-    buffered.add(20);
-
-    BeaconScheduler.flush();
-
-    expect(count.value, 20);
-    expect(buffered.value, <int>[10, 20]);
-    expect(buffered.currentBuffer(), <int>[]);
-
-    buffered.add(2); // doesn't pass filter
-
-    BeaconScheduler.flush();
-
-    expect(count.value, 2);
-    expect(buffered.value, <int>[10, 20]); // no change
-    expect(buffered.currentBuffer(), <int>[]); // no change
-
-    buffered.add(50); // doesn't pass filter
-
-    BeaconScheduler.flush();
-
-    expect(count.value, 50);
-    expect(buffered.value, <int>[10, 20]);
-    expect(buffered.currentBuffer(), <int>[50]);
-
-    buffered.add(70); // doesn't pass filter
-
-    BeaconScheduler.flush();
-
-    expect(count.value, 70);
-    expect(buffered.value, <int>[50, 70]);
-    expect(buffered.currentBuffer(), <int>[]);
-
-    // BeaconObserver.instance = LoggingObserver();
-
-    buffered.reset();
-
-    BeaconScheduler.flush();
-
-    expect(count.value, 10);
-    expect(buffered.value, <int>[]);
-    expect(buffered.currentBuffer(), <int>[10]);
-  });
-
   test('should throw when trying to chain a buffered beacon', () async {
     final count = Beacon.writable<int>(10, name: 'count');
 
     final buffered = Beacon.bufferedCount<int>(5);
     final buffTime = Beacon.bufferedTime<int>(duration: k10ms);
+
+    BeaconScheduler.flush();
 
     expect(
       () => buffered.filter(neverFilter),
@@ -414,7 +251,7 @@ void main() {
     BeaconScheduler.flush();
 
     expect(beacon(), <int>[]);
-    await expectLater(beacon.currentBuffer.next(), completion([0]));
+    await expectLater(beacon.currentBuffer.next(), completion([8]));
   });
 
   test('should throttle input beacon', () async {
@@ -447,153 +284,11 @@ void main() {
     expect(result, [0, 1]);
   });
 
-  test('should force all delegated writes', () async {
-    final count = Beacon.writable<int>(10);
-    var called = 0;
-
-    final buff =
-        count.filter(name: 'f1', (p, n) => n > 5).buffer(2, name: 'buffered');
-
-    BeaconScheduler.flush();
-
-    count.subscribe((p0) => called++);
-
-    expect(called, 0);
-
-    buff.add(20);
-
-    BeaconScheduler.flush();
-
-    expect(called, 1);
-
-    expect(buff(), [10, 20]);
-    expect(buff.currentBuffer(), isEmpty);
-
-    buff.add(20);
-
-    BeaconScheduler.flush();
-
-    expect(called, 2);
-
-    expect(buff.currentBuffer(), [20]);
-
-    buff.add(5);
-
-    BeaconScheduler.flush();
-
-    expect(called, 3);
-
-    expect(buff.currentBuffer(), [20]);
-
-    buff.add(5);
-
-    BeaconScheduler.flush();
-
-    expect(called, 4);
-
-    expect(buff.currentBuffer(), [20]);
-  });
-
-  test('should force all delegated writes (throttled)', () async {
-    final count = Beacon.writable<int>(10, name: 'count');
-
-    final tbeacon = count.throttle(k10ms, name: 'throttled');
-
-    final buff = count.buffer(5, name: 'buff');
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
-  test('should force all delegated writes (debounced)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.debounce(k10ms);
-
-    final buff = count.buffer(5);
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
-  test('should force all delegated writes (filtered)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.filter((p, n) => n > 5);
-
-    final buff = count.buffer(5);
-
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(20);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-    tbeacon.set(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
-  test('should force all delegated writes (buffered)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.buffer(5);
-
-    final buff = count.buffer(5);
-
-    tbeacon.add(20);
-    BeaconScheduler.flush();
-    tbeacon.add(20);
-    BeaconScheduler.flush();
-    tbeacon.add(5);
-    BeaconScheduler.flush();
-    tbeacon.add(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
-  test('should force all delegated writes (bufferedTime)', () async {
-    final count = Beacon.writable<int>(10);
-
-    final tbeacon = count.bufferTime(k10ms);
-
-    final buff = count.buffer(5);
-
-    tbeacon.add(20);
-    BeaconScheduler.flush();
-    tbeacon.add(20);
-    BeaconScheduler.flush();
-    tbeacon.add(5);
-    BeaconScheduler.flush();
-    tbeacon.add(5);
-    BeaconScheduler.flush();
-
-    expect(buff.value, [10, 20, 20, 5, 5]);
-  });
-
   test('should transform input values', () async {
     final stream = Stream.periodic(k1ms, (i) => i).take(5);
     final beacon = stream.toRawBeacon(isLazy: true).map((v) => v * 10);
 
-    await expectLater(beacon.toStream(), emitsInOrder([0, 10, 20, 30, 40]));
+    await expectLater(beacon.stream, emitsInOrder([0, 10, 20, 30, 40]));
   });
 
   test('should transform input values when use mid-chain', () async {
@@ -603,126 +298,17 @@ void main() {
         .map((v) => v + 1)
         .filter((_, n) => n.isEven);
 
-    await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
+    await expectLater(beacon.stream, emitsInOrder([2, 4]));
   });
 
   test('should transform input values when use mid-chain/2', () async {
     final beacon = Beacon.periodic(k10ms, (i) => i)
         .filter((_, n) => n.isEven)
-        .map((v) => v + 1)
+        .map((v) => '$v')
         .throttle(k1ms);
 
-    await expectLater(beacon.toStream(), emitsInOrder([1, 3, 5]));
-
-    await delay();
-
-    // rerouted to filtered beacon first
-    beacon.set(10);
-    expect(beacon.value, 11);
+    await expectLater(beacon.stream, emitsInOrder(['0', '2', '4']));
   });
-
-  test('should not delegate to map beacon when output type differs', () {
-    final count = Beacon.writable<int>(10);
-
-    final mapped = count.map((v) => '${v * 2}');
-
-    expect(mapped.value, '20');
-
-    count.value = 20;
-
-    expect(mapped.value, '40');
-
-    final buff = mapped.buffer(5);
-
-    buff.add('60');
-    BeaconScheduler.flush();
-    expect(buff.currentBuffer(), ['40', '60']);
-    // can't delegate to map because the input type is different
-    expect(count.value, 20);
-    expect(mapped.value, '40');
-
-    count.value = 30;
-    expect(mapped.value, '60');
-    expect(buff.currentBuffer(), ['40', '60', '60']);
-
-    count.value = 40;
-    expect(mapped.value, '80');
-    expect(buff.currentBuffer(), ['40', '60', '60', '80']);
-
-    count.value = 50;
-    expect(mapped.value, '100');
-    expect(buff(), ['40', '60', '60', '80', '100']);
-    expect(buff.currentBuffer(), <String>[]);
-
-    buff.reset();
-    expect(buff.value, <String>[]);
-    expect(buff.currentBuffer(), <String>[]);
-    // these won't change because the input type is different
-    expect(count.value, 50);
-    expect(mapped.value, '100');
-  });
-
-  test('should delegate to map beacon when output type is the same', () {
-    final count = Beacon.writable<int>(10);
-
-    final mapped = count.map((v) => v * 2);
-
-    expect(mapped.value, 20);
-
-    count.value = 20;
-
-    expect(mapped.value, 40);
-
-    final buff = mapped.buffer(5);
-
-    buff.add(60);
-    BeaconScheduler.flush();
-    expect(buff.currentBuffer(), [40, 120]);
-    expect(count.value, 60);
-    expect(mapped.value, 120);
-
-    count.value = 30;
-    expect(mapped.value, 60);
-    expect(buff.currentBuffer(), [40, 120, 60]);
-
-    buff.add(40);
-    expect(mapped.value, 80);
-    expect(buff.currentBuffer(), [40, 120, 60, 80]);
-
-    buff.add(50);
-    expect(mapped.value, 100);
-    expect(buff(), [40, 120, 60, 80, 100]);
-
-    buff.reset();
-    expect(buff.value, <int>[]);
-    expect(buff.currentBuffer(), <int>[20]);
-    expect(count.value, 10);
-    expect(mapped.value, 20);
-  });
-
-  test(
-    "should delegate to map when it's the first writable in the chain",
-    () async {
-      final stream = Stream.periodic(k1ms, (i) => i).take(5);
-      final beacon = stream
-          .toRawBeacon(isLazy: true)
-          .map((v) => v + 1)
-          .filter((_, n) => n.isEven);
-
-      await expectLater(beacon.toStream(), emitsInOrder([1, 2, 4]));
-
-      beacon.set(10);
-
-      // map added 1 making it 11, filter removed it
-      expect(beacon.value, 4);
-
-      beacon.set(11);
-      expect(beacon.value, 12);
-
-      beacon.reset();
-      expect(beacon.value, 1);
-    },
-  );
 
   test('should work when next is paired with buffer', () async {
     // BeaconObserver.useLogging();
@@ -746,6 +332,23 @@ void main() {
 
     final throttled = derived.throttle(k10ms);
 
+    BeaconScheduler.flush();
+
     expect(throttled.value, 0);
+  });
+
+  test('should clear currentBuffer when it fills', () {
+    final count = Beacon.writable(10);
+    final bufferedBeacon = count.buffer(2);
+    BeaconScheduler.flush(); // allow buffer to read first value
+
+    expect(bufferedBeacon.value, equals([]));
+    expect(bufferedBeacon.currentBuffer.value, equals([10]));
+
+    count.set(20);
+    BeaconScheduler.flush();
+
+    expect(bufferedBeacon.value, equals([10, 20]));
+    expect(bufferedBeacon.currentBuffer.value, equals([]));
   });
 }

@@ -25,10 +25,7 @@ extension ValueNotifierUtils<T> on ValueNotifier<T> {
     addListener(update);
 
     beacon
-      ..subscribe(
-        (v) => safeWrite(() => value = v),
-        synchronous: true,
-      )
+      ..subscribeSynchronously((v) => safeWrite(() => value = v))
       ..onDispose(() => removeListener(update));
 
     return beacon;

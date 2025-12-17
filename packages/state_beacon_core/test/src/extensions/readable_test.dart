@@ -215,7 +215,7 @@ void main() {
 
   test(
     'next should complete with current value if fallback '
-    'is provided but beacon is not lazy disposed/derived',
+    'is provided but lazy beacon gets a value',
     () async {
       final beacon = Beacon.writable<int>(50);
 
@@ -246,23 +246,4 @@ void main() {
       expect(futureValue, throwsException);
     },
   );
-
-  // test('should throw when wrapping a lazy beacon with start=true', () {
-  //   final beacon = Beacon.lazyWritable<int>();
-
-  //   expect(
-  //     () => beacon.throttle(duration: k10ms),
-  //     throwsException,
-  //   );
-
-  //   expect(
-  //     () => beacon.debounce(duration: k10ms),
-  //     throwsException,
-  //   );
-
-  //   expect(
-  //     beacon.filter,
-  //     throwsException,
-  //   );
-  // });
 }

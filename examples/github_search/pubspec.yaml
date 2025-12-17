@@ -14,6 +14,12 @@ dependencies:
         path: ../../packages/state_beacon
     url_launcher: ^6.2.5
 
+dependency_overrides:
+  state_beacon_core: 
+    path: ../../packages/state_beacon_core
+  state_beacon_flutter: 
+    path: ../../packages/state_beacon_flutter
+
 dev_dependencies:
     flutter_test:
         sdk: flutter

@@ -4,9 +4,6 @@ final _effectQueue = Queue<Consumer>();
 void Function() _flushFn = _asyncScheduler;
 bool _flushing = false;
 
-/// Whether the scheduler is in synchronous mode
-// bool isSynchronousMode = _stabilizeFn == _syncScheduler;
-
 // coverage:ignore-start
 /// `Effects` are not synchronous, their execution is controlled by a scheduler.
 /// When a dependency of an `effect` changes, it is added to a queue and
@@ -54,17 +51,6 @@ abstract class BeaconScheduler {
     _flushing = false;
     _flushFn = _customFPS(updatesPerSecond);
   }
-
-  /// This scheduler processes updates synchronously. This is not recommended
-  /// for production apps and only provided to make testing easier.
-  ///
-  /// With this scheduler, you aren't protected from stackoverflows when
-  /// an effect mutates a beacon that it depends on. This is a infinite loop
-  /// with the sync scheduler.
-  // static void useSyncScheduler() {
-  //   isSynchronousMode = true;
-  //   _stabilizeFn = _syncScheduler;
-  // }
 }
 
 void _flushEffects() {

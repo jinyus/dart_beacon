@@ -14,6 +14,8 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
   /// If this is a lazy beacon and it's disposed before a value is emitted,
   /// the future will be completed with an error if a [fallback] value is not provided.
   ///
+  /// This should generally not be used unless you are sure that the beacon will not be disposed
+  /// before emitting a value. Use `.subscribe((_){}, startNow:false)` as an alternative.
   ///
   /// Example:
   ///
@@ -59,7 +61,8 @@ extension ReadableBeaconUtils<T> on ReadableBeacon<T> {
         completer.completeError(
           Exception(
             '$name was disposed before a value was emitted. '
-            'Provide a fallback value to avoid this error.',
+            'Provide a fallback value to avoid this error. '
+            'OR use `.subscribe((_){}, startNow:false)` as an alternative.',
           ),
         );
       }

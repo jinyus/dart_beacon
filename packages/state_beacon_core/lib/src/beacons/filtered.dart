@@ -5,40 +5,37 @@ part of '../producer.dart';
 // ignore: public_member_api_docs
 typedef BeaconFilter<T> = bool Function(T?, T);
 
-/// A beacon that filters updates to its value based on a function.
-class FilteredBeacon<T> extends WritableBeacon<T> {
-  /// @macro [FilteredBeacon]
-  FilteredBeacon({
-    super.initialValue,
-    BeaconFilter<T>? filter,
-    super.name,
-    this.lazyBypass = true,
-  }) : _filter = filter;
-
+/// An immutable base class for FilteredBeacon
+mixin ReadableFilteredBeacon<T> on ReadableBeacon<T> {
   BeaconFilter<T>? _filter;
-
-  /// Whether or not this beacon has a filter.
-  bool get hasFilter => _filter != null;
-
-  /// Whether values should be filtered out if the beacon is empty.
-  ///
-  final bool lazyBypass;
 
   /// Set the function that will be used to filter subsequent values.
   void setFilter(BeaconFilter<T> newFilter) {
     _filter = newFilter;
   }
 
+  /// Whether or not this beacon has a filter.
+  bool get hasFilter => _filter != null;
+}
+
+/// A beacon that filters updates to its value based on a function.
+class FilteredBeacon<T> extends WritableBeacon<T>
+    with ReadableFilteredBeacon<T> {
+  /// @macro [FilteredBeacon]
+  FilteredBeacon({
+    super.initialValue,
+    BeaconFilter<T>? filter,
+    super.name,
+    bool allowFirst = false,
+  }) : _allowFirst = allowFirst {
+    _filter = filter;
+  }
+
+  final bool _allowFirst;
+
   @override
-  void _internalSet(T newValue, {bool force = false, bool delegated = false}) {
-    if (delegated && _delegate != null) {
-      _delegate!.set(newValue, force: true);
-      return;
-    }
-
-    final shouldBypass = isEmpty && lazyBypass;
-
-    if (shouldBypass ||
+  void set(T newValue, {bool force = false}) {
+    if ((_isEmpty && _allowFirst) ||
         (_filter?.call(isEmpty ? null : peek(), newValue) ?? true)) {
       _setValue(newValue, force: force);
     }

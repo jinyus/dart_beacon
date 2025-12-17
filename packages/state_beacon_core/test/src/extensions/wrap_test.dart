@@ -11,6 +11,7 @@ void main() {
     final original = Beacon.readable<int>(10);
     final wrapper = Beacon.writable<int>(0);
     wrapper.wrap(original);
+    BeaconScheduler.flush();
 
     expect(wrapper.value, equals(10));
   });
@@ -26,6 +27,8 @@ void main() {
     wrapper
       ..wrap(count)
       ..wrap(doubledCount);
+
+    BeaconScheduler.flush();
 
     expect(wrapper.value, equals(20));
 
@@ -49,6 +52,8 @@ void main() {
     wrapper
       ..wrap(count, then: wrapper.add)
       ..wrap(doubledCount);
+
+    BeaconScheduler.flush();
 
     expect(wrapper.value, equals([]));
     expect(wrapper.currentBuffer.value, [10, 20]);
@@ -88,6 +93,8 @@ void main() {
     wrapper.wrap(original, then: (val) => wrapper.value = 'Number $val');
     bufWrapper.wrap(original, then: (val) => bufWrapper.add('Number $val'));
 
+    BeaconScheduler.flush();
+
     expect(wrapper.value, equals('Number 2'));
     expect(bufWrapper.currentBuffer.value, equals(['Number 2']));
   });
@@ -124,9 +131,13 @@ void main() {
       duration: const Duration(milliseconds: 200),
     );
 
+    BeaconScheduler.flush();
+
     const maxCalls = 15;
 
     numsSlow.wrap(numsFast);
+    BeaconScheduler.flush();
+
     var streamCalled = 0;
     var throttledCalled = 0;
 
@@ -172,6 +183,8 @@ void main() {
     wrapper.wrap(count, disposeTogether: true);
     final buff = doubledCount.filter(neverFilter).buffer(1);
 
+    BeaconScheduler.flush();
+
     expect(wrapper.value, equals(10));
 
     expect(doubledCount.listenersCount, 1);
@@ -194,20 +207,22 @@ void main() {
       () => count.value * 2,
       name: 'derived',
     );
+    final sum = Beacon.writable(20);
 
     final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
 
-    doubledCount.filter(neverFilter).buffer(1).wrap(
-          wrapper,
-          disposeTogether: true,
-        );
+    sum.wrap(
+      wrapper,
+      disposeTogether: true,
+    );
+
+    BeaconScheduler.flush();
 
     expect(wrapper.value, equals(10));
 
-    expect(doubledCount.listenersCount, 1);
-    expect(count.listenersCount, 2);
+    expect(count.listenersCount, 1);
 
     wrapper.dispose();
 
@@ -222,6 +237,8 @@ void main() {
     final wrapper = Beacon.writable<int>(0, name: 'wrapper');
 
     wrapper.wrap(count, disposeTogether: true);
+
+    BeaconScheduler.flush();
 
     expect(wrapper.value, equals(10));
 
@@ -263,25 +280,11 @@ void main() {
     );
   });
 
-  test('should NOT autobatch when synchronous=true', () {
+  test('should autobatch', () async {
     final original = Beacon.writable(10);
     final wrapper = Beacon.writable(0);
 
     wrapper.wrap(original);
-    expect(wrapper.value, 10);
-
-    original.value = 20;
-    expect(wrapper.value, 20);
-
-    original.value = 30;
-    expect(wrapper.value, 30);
-  });
-
-  test('should autobatch when synchronous=false', () async {
-    final original = Beacon.writable(10);
-    final wrapper = Beacon.writable(0);
-
-    wrapper.wrap(original, synchronous: false);
     expect(wrapper.value, 0);
     await expectLater(wrapper.next(), completion(10));
 

@@ -29,29 +29,6 @@ void main() {
     expect(called, 3);
   });
 
-  test('subscription to beacon should run until disposed(sync)', () async {
-    // BeaconObserver.instance = LoggingObserver();
-    final a = Beacon.writable(0, name: 'a');
-    var called = 0;
-
-    final dispose = a.subscribe((_) => called++, synchronous: true);
-
-    expect(called, 1);
-
-    a.value = 2;
-    expect(called, 2);
-
-    a.value = 2; // no change
-    expect(called, 2);
-
-    a.set(2, force: true); // force change
-    expect(called, 3);
-
-    dispose();
-    a.value = 10;
-    expect(called, 3);
-  });
-
   test('subscription to beacon should run until disposed when startNow=false',
       () async {
     final a = Beacon.writable(0);
@@ -80,36 +57,6 @@ void main() {
     expect(called, 2);
   });
 
-  test(
-    'subscription to beacon should run until'
-    ' disposed when startNow=false (sync)',
-    () async {
-      final a = Beacon.writable(0);
-      var called = 0;
-
-      final dispose = a.subscribe(
-        (_) => called++,
-        startNow: false,
-        synchronous: true,
-      );
-
-      expect(called, 0);
-
-      a.value = 2;
-      expect(called, 1);
-
-      a.value = 2; // no change
-      expect(called, 1);
-
-      a.set(2, force: true); // force change
-      expect(called, 2);
-
-      dispose();
-      a.value = 10;
-      expect(called, 2);
-    },
-  );
-
   test('subscription to derived should run until disposed', () async {
     final a = Beacon.writable(0, name: 'a');
     final b = Beacon.derived(() => a() * 2, name: 'b');
@@ -137,34 +84,6 @@ void main() {
     dispose();
     a.value = 10;
     BeaconScheduler.flush();
-    expect(called, 2);
-  });
-
-  test('subscription to derived should run  until disposed(sync)', () async {
-    final a = Beacon.writable(0, name: 'a');
-    final b = Beacon.derived(() => a() * 2, name: 'b');
-    final c = Beacon.derived(() => b() * 2, name: 'c');
-
-    var called = 0;
-
-    final dispose = c.subscribe((_) => called++, synchronous: true);
-
-    expect(called, 1);
-
-    a.value = 2;
-
-    expect(called, 2);
-
-    a.value = 2; // no change
-
-    expect(called, 2);
-
-    // a.set(2, force: true); // force change
-    // expect(called, 3);
-
-    dispose();
-    a.value = 10;
-
     expect(called, 2);
   });
 
@@ -342,44 +261,30 @@ void main() {
     },
   );
 
-  test(
-    'subscription to derived should run'
-    ' until disposed when startNow=false(sync)',
-    () async {
-      final a = Beacon.writable(0, name: 'a');
-      final b = Beacon.derived(() => a() * 2, name: 'b');
-      final c = Beacon.derived(() => b() * 2, name: 'c');
+  test('should notify all observers', () {
+    final count = Beacon.writable(0);
+    final triple = Beacon.derived(() => count.value * 3);
 
-      var called = 0;
+    var sub1Called = 0;
+    var sub2Called = 0;
 
-      final dispose = c.subscribe(
-        (_) => called++,
-        startNow: false,
-        synchronous: true,
-      );
+    triple.subscribe((_) => ++sub1Called);
+    triple.subscribe((_) => ++sub2Called);
 
-      expect(called, 0);
+    BeaconScheduler.flush();
 
-      a.value = 2;
+    expect(sub1Called, 1);
+    expect(sub2Called, 1);
 
-      expect(called, 1);
+    count.increment();
 
-      a.value = 2; // no change
+    BeaconScheduler.flush();
 
-      expect(called, 1);
+    expect(sub1Called, 2);
+    expect(sub2Called, 2, reason: 'async sub should also be called');
+  });
 
-      a.set(2, force: true); // force change
-
-      expect(called, 1); // propagation won't make it to c
-
-      dispose();
-      a.value = 10;
-
-      expect(called, 1);
-    },
-  );
-
-  test('RangeError when subscription unsubscribes in callback(sync)', () {
+  test('should not throw when unsub in own callback', () {
     final beacon = Beacon.writable<int>(0);
     var mounted = true;
 
@@ -388,29 +293,124 @@ void main() {
       (v) {
         if (!mounted) unsub(); // Unsubscribe when "unmounted"
       },
-      synchronous: true,
     );
 
-    beacon.subscribe((v) {}, synchronous: true); // Second observer
-
-    beacon.value = 1; // Works fine
+    beacon.subscribeSynchronously((v) {});
+    beacon.subscribe((v) {});
+    beacon.value = 1;
     mounted = false;
-    beacon.value = 2; // RangeError!
+    beacon.value = 2;
+    BeaconScheduler.flush();
   });
 
-  test('RangeError when subscription unsubscribes in callback', () {
-    final beacon = Beacon.writable<int>(0);
-    var mounted = true;
+  test('should notify all observers (sync+async)', () {
+    final count = Beacon.writable(0);
+    final triple = Beacon.derived(() => count.value * 3);
 
-    late void Function() unsub;
-    unsub = beacon.subscribe((v) {
-      if (!mounted) unsub(); // Unsubscribe when "unmounted"
+    var syncCalled = 0;
+    var asyncCalled = 0;
+    var async2Called = 0;
+
+    triple.subscribe((_) => ++asyncCalled);
+    triple.subscribe((_) => ++async2Called);
+    count.subscribeSynchronously((_) => syncCalled++);
+
+    BeaconScheduler.flush();
+
+    expect(asyncCalled, 1);
+    expect(async2Called, 1);
+    expect(syncCalled, 1);
+
+    count.increment();
+    expect(syncCalled, 2);
+
+    BeaconScheduler.flush();
+
+    expect(syncCalled, 2);
+    expect(asyncCalled, 2);
+  });
+
+  test('derived subscription does not emit when value is unchanged', () {
+    final a = Beacon.writable(0, name: 'a');
+    final b = Beacon.derived(() => a().isEven ? 'even' : 'odd');
+
+    var callCount = 0;
+    final received = <String>[];
+
+    final unsub = b.subscribe((value) {
+      callCount++;
+      received.add(value);
     });
 
-    beacon.subscribe((v) {}, synchronous: true); // Second observer
+    BeaconScheduler.flush();
 
-    beacon.value = 1; // Works fine
-    mounted = false;
-    beacon.value = 2; // RangeError!
+    expect(callCount, 1);
+    expect(received, ['even']);
+
+    // Change source without changing derived result
+    a.value = 2;
+    BeaconScheduler.flush();
+
+    expect(callCount, 1, reason: 'derived output did not change');
+
+    // Force another "even" value
+    a.set(4, force: true);
+    BeaconScheduler.flush();
+
+    expect(
+      callCount,
+      1,
+      reason: 'forcing same derived value should not notify',
+    );
+
+    unsub();
   });
+
+  test(
+    'derived subscription with startNow=false only emits on updates',
+    () {
+      final source = Beacon.writable(1);
+      final doubled = Beacon.derived(() => source() * 2);
+
+      var derivedEvaluations = 0;
+      final deep = Beacon.derived(
+        () {
+          derivedEvaluations++;
+          return doubled() + 1;
+        },
+      );
+
+      var callCount = 0;
+      final observed = <int>[];
+
+      final unsub = deep.subscribe(
+        (value) {
+          callCount++;
+          observed.add(value);
+        },
+        startNow: false,
+      );
+
+      // Before flushing, nothing should have run yet
+      expect(derivedEvaluations, 0);
+      expect(callCount, 0);
+
+      BeaconScheduler.flush();
+
+      // The derived chain should have initialized once, but
+      // the subscription callback should still not have run
+      expect(derivedEvaluations, 1);
+      expect(callCount, 0);
+
+      // Now change the source and flush again
+      source.value = 2;
+      BeaconScheduler.flush();
+
+      expect(derivedEvaluations, 2);
+      expect(callCount, 1);
+      expect(observed, [5]); // (2 * 2) + 1
+
+      unsub();
+    },
+  );
 }

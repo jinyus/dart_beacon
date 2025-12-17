@@ -72,7 +72,8 @@ class _KonamiPageState extends State<KonamiPage> {
       autofocus: true,
       focusNode: fNode,
       onKeyEvent: (e) {
-        konamiControllerRef(context)
+        konamiControllerRef
+            .read(context)
             .keys
             .set(e.logicalKey.keyLabel, force: true);
       },

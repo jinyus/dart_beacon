@@ -42,9 +42,8 @@ class TextEditingBeacon extends WritableBeacon<TextEditingValue> {
       safeWrite(() => set(_controller.value, force: true));
     });
 
-    subscribe(
+    subscribeSynchronously(
       (v) => safeWrite(() => _controller.value = v),
-      synchronous: true,
     );
 
     _controller.disposeCallback = dispose;

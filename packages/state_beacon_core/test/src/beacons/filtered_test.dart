@@ -28,23 +28,28 @@ void main() {
   });
 
   test('should bypass filter function for first value', () {
-    final beacon = Beacon.lazyFiltered<int>(filter: (prev, next) => next > 5);
+    final beacon = Beacon.lazyFiltered<int>(
+      filter: (prev, next) => next > 5,
+      allowFirst: true,
+    );
     beacon.value = 4;
     expect(beacon.value, 4); // Value should update
 
-    beacon.value = 4;
+    beacon.value = 2;
     expect(beacon.value, 4); // Value should not update
 
     beacon.value = 6;
     expect(beacon.value, 6); // Value should update
+
+    beacon.value = 4;
+    expect(beacon.value, 6); // Value should not update
   });
 
   test(
-    'should not bypass filter function for first value when lazyBypass=false',
+    'should not bypass filter function for first value when allowFirst=false',
     () {
       final beacon = Beacon.lazyFiltered<int>(
         filter: (prev, next) => next > 5,
-        lazyBypass: false,
       );
 
       beacon.value = 4;
