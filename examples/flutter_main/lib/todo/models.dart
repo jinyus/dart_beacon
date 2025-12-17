@@ -1,5 +1,7 @@
 part of 'todo.dart';
 
+typedef ID = String;
+
 enum Filter { all, active, done }
 
 @immutable
@@ -10,12 +12,12 @@ class Todo {
     this.completed = false,
   });
 
-  final String id;
+  final ID id;
   final String description;
   final bool completed;
 
   Todo copyWith({
-    String? id,
+    ID? id,
     String? description,
     bool? completed,
   }) {

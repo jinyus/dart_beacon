@@ -1,7 +1,7 @@
 part of 'todo.dart';
 
 class TodoController extends BeaconController {
-  late final todosBeacon = B.hashMap(<String, Todo>{});
+  late final todosBeacon = B.hashMap(<ID, Todo>{});
   late final inputTextBeacon = TextEditingBeacon(text: '', group: B);
   late final filterBeacon = B.writable(Filter.all);
 
@@ -16,16 +16,14 @@ class TodoController extends BeaconController {
   });
 
   void addTodo() {
-    final text = inputTextBeacon.text;
+    final text = inputTextBeacon.text.trim();
     if (text.isNotEmpty) {
       final id = DateTime.now().toIso8601String();
       todosBeacon[id] = Todo(id: id, description: text);
     }
   }
 
-  void deleteTodo(String todoID) {
-    todosBeacon.remove(todoID);
-  }
+  void deleteTodo(String todoID) => todosBeacon.remove(todoID);
 
   void toggleTodo(bool completed, String todoID) {
     final todo = todosBeacon[todoID]!;
