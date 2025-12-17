@@ -57,6 +57,12 @@ class _KonamiPageState extends State<KonamiPage> {
       },
       startNow: false,
     );
+
+    // request focus after every key press
+    konamiControllerRef
+        .read(context)
+        .keys
+        .subscribe((_) => fNode.requestFocus());
     super.initState();
   }
 
