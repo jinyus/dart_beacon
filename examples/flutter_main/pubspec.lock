@@ -390,21 +390,21 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "1.3.4"
+    version: "2.0.0"
   state_beacon_core:
     dependency: "direct overridden"
     description:
       path: "../../packages/state_beacon_core"
       relative: true
     source: path
-    version: "1.3.4"
+    version: "2.0.0"
   state_beacon_flutter:
     dependency: "direct overridden"
     description:
       path: "../../packages/state_beacon_flutter"
       relative: true
     source: path
-    version: "1.3.4"
+    version: "2.0.0"
   state_beacon_lint:
     dependency: "direct dev"
     description:
