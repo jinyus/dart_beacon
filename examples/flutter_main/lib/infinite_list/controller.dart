@@ -30,7 +30,7 @@ class InfiniteController extends BeaconController {
 
         parsedItems.value = switch (newAsyncValue) {
           // if successful, add the items to the list
-          AsyncData<List<String>>(value: final lst) => newList
+          AsyncData(value: final lst) => newList
             ..addAll(lst.map(ItemData.new))
             ..add(lst.length < pageSize
                 ? ItemError(NoMoreItemsException())

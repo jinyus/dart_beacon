@@ -22,35 +22,35 @@ class InfiniteListPage extends StatelessWidget {
               children: [
                 const Text('Infinite List', style: k24Text),
                 Expanded(
-                  child: Builder(builder: (ctx) {
-                    final items = controller.parsedItems.watch(ctx);
-                    return RefreshIndicator(
-                      onRefresh: () async => controller.refresh(),
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context).copyWith(
-                          dragDevices: {
-                            PointerDeviceKind.touch,
-                            PointerDeviceKind.mouse,
-                          },
-                        ),
-                        child: ListView.separated(
+                  child: RefreshIndicator(
+                    onRefresh: () async => controller.refresh(),
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                        },
+                      ),
+                      child: Builder(builder: (ctx) {
+                        final items = controller.parsedItems.watch(ctx);
+
+                        return ListView.separated(
                           itemBuilder: (context, index) {
                             final item = items[index];
 
                             return switch (item) {
-                              ItemData(:final value) => ItemTile(title: value),
+                              ItemData d => ItemTile(title: d.value),
                               ItemLoading() => const LoadingIndicator(),
-                              ItemError(:final error) =>
-                                ErrorDisplay(error: error),
+                              ItemError e => ErrorDisplay(error: e.error),
                             };
                           },
                           itemCount: items.length,
                           separatorBuilder: (_, __) =>
                               const SizedBox(height: 5),
-                        ),
-                      ),
-                    );
-                  }),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -116,14 +116,13 @@ class ErrorDisplay extends StatelessWidget {
           style: const TextStyle(fontSize: 20),
           textAlign: TextAlign.center,
         ),
-        if (error is! NoMoreItemsException) ...[
-          const SizedBox(height: 5),
+        const SizedBox(height: 5),
+        if (error is! NoMoreItemsException)
           ElevatedButton(
             style: btnStyle,
             onPressed: () => infiniteControllerRef.read(context).retryOnError(),
             child: const Text('retry'),
           )
-        ]
       ],
     );
   }
