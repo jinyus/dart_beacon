@@ -16,7 +16,7 @@ class Subscription<T> implements Consumer {
     // we need to schedule to ensure it gets registered properly
     if (startNow ||
         _derivedSource?.isEmpty == true ||
-        (_derivedSource != null && _derivedSource!._observers.isEmpty)) {
+        _derivedSource?._observers.isEmpty == true) {
       _schedule();
     } else {
       // For regular beacons with startNow=false, we don't schedule initially
