@@ -215,11 +215,22 @@ abstract class Producer<T> implements Disposable {
     bool startNow = true,
   }) {
     assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
-    final sub = Subscription(
-      this,
-      callback,
-      startNow: startNow,
-    );
+
+    late final Consumer sub;
+    if (_isDerived) {
+      sub = DerivedSubscription<T>(
+        this as DerivedBeacon<T>,
+        callback,
+        startNow: startNow,
+      );
+    } else {
+      sub = Subscription<T>(
+        this,
+        callback,
+        startNow: startNow,
+      );
+    }
+
     _observers.add(sub);
     return sub.dispose;
   }
