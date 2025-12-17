@@ -63,6 +63,7 @@ class _KonamiPageState extends State<KonamiPage> {
         .read(context)
         .keys
         .subscribe((_) => fNode.requestFocus());
+
     super.initState();
   }
 
