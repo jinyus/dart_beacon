@@ -66,6 +66,7 @@ part 'beacons/periodic.dart';
 part 'consumer.dart';
 part 'consumers/effect.dart';
 part 'consumers/subscription.dart';
+part 'consumers/derived_subscription.dart';
 part 'consumers/sync_subscription.dart';
 part 'extensions/chain.dart';
 part 'extensions/wrap.dart';
@@ -89,7 +90,11 @@ abstract class Producer<T> implements Disposable {
   Producer({T? initialValue, String? name})
       : _name = name,
         _observers = [] {
-    if (initialValue != null || _isNullable) {
+    // we don't want to set an initial value for derived, even
+    // if the type is nullable.
+    final isNullableAndNotDerived = _isNullable && !_isDerived;
+
+    if (initialValue != null || isNullableAndNotDerived) {
       _initialValue = initialValue as T;
       _value = initialValue;
       _isEmpty = false;
@@ -215,12 +220,27 @@ abstract class Producer<T> implements Disposable {
     bool startNow = true,
   }) {
     assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
-    final sub = Subscription(
+
+    if (_isDerived) {
+      final sub = DerivedSubscription<T>(
+        this as DerivedBeacon<T>,
+        callback,
+        startNow: startNow,
+      );
+
+      _observers.add(sub);
+
+      return sub.dispose;
+    }
+
+    final sub = Subscription<T>(
       this,
       callback,
       startNow: startNow,
     );
+
     _observers.add(sub);
+
     return sub.dispose;
   }
 

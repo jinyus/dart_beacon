@@ -63,6 +63,7 @@ test_target() {
 publish_and_update_pubignore() {
     cp .gitignore .pubignore &&
         echo test/ | tee -a .pubignore &&
+        echo pubspec_overrides.yaml | tee -a .pubignore &&
         dart pub publish "$@"
     rm .pubignore
 }

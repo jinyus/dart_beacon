@@ -53,6 +53,7 @@ void main() {
     _onCreateCalled = 0;
     _onUpdateCalled = 0;
     _onDisposeCalled = 0;
+    _onWatchCalled = 0;
     _lazyOnCreate = false;
   });
 
@@ -106,6 +107,14 @@ void main() {
 
     expect(_onUpdateCalled, 5);
     expect(_onWatchCalled, 5);
+
+    final b = Beacon.derived(() => a() * 2);
+
+    b.subscribe((_) {});
+    BeaconScheduler.flush();
+
+    // 1 for a in derived and 1 for sub
+    expect(_onWatchCalled, 7);
 
     a.dispose();
     BeaconScheduler.flush();

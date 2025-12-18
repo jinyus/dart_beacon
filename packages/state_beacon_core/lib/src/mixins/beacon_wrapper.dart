@@ -28,6 +28,8 @@ mixin BeaconWrapper<InputT, OutputT> on ReadableBeacon<OutputT> {
   ///
   /// If [startNow] is true, the callback will be called immediately
   /// with the current value of the beacon.
+  ///
+  /// WARNING: Do not cancel another subscription in the callback.
   VoidCallback subscribeSynchronously(
     void Function(OutputT) callback, {
     bool startNow = true,
