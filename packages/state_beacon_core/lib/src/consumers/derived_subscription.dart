@@ -109,9 +109,6 @@ class DerivedSubscription<T> implements Consumer {
   }
 
   @override
-  void markDirty() => stale(DIRTY);
-
-  @override
   void markCheck() => stale(CHECK);
 
   @override
@@ -124,6 +121,9 @@ class DerivedSubscription<T> implements Consumer {
 
   // these should never be called
   // coverage:ignore-start
+  @override
+  void markDirty() => throw UnimplementedError();
+
   @override
   Producer<dynamic>? _producerAtIndex(int index) {
     throw UnimplementedError();

@@ -53,6 +53,7 @@ void main() {
     _onCreateCalled = 0;
     _onUpdateCalled = 0;
     _onDisposeCalled = 0;
+    _onWatchCalled = 0;
     _lazyOnCreate = false;
   });
 
@@ -132,5 +133,16 @@ void main() {
     expect(_onUpdateCalled, equals(0));
     expect(_onDisposeCalled, equals(0));
     expect(_lazyOnCreate, isFalse);
+  });
+
+  test('should call onwatch when subscribed to derived beacon', () {
+    final a = Beacon.writable(0);
+    final b = Beacon.derived(() => a() * 2);
+
+    expect(_onWatchCalled, 0);
+
+    b.subscribe((_) {});
+
+    expect(_onWatchCalled, 1);
   });
 }
