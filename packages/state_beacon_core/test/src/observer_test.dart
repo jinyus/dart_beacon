@@ -108,6 +108,14 @@ void main() {
     expect(_onUpdateCalled, 5);
     expect(_onWatchCalled, 5);
 
+    final b = Beacon.derived(() => a() * 2);
+
+    b.subscribe((_) {});
+    BeaconScheduler.flush();
+
+    // 1 for a in derived and 1 for sub
+    expect(_onWatchCalled, 7);
+
     a.dispose();
     BeaconScheduler.flush();
 
@@ -133,16 +141,5 @@ void main() {
     expect(_onUpdateCalled, equals(0));
     expect(_onDisposeCalled, equals(0));
     expect(_lazyOnCreate, isFalse);
-  });
-
-  test('should call onwatch when subscribed to derived beacon', () {
-    final a = Beacon.writable(0);
-    final b = Beacon.derived(() => a() * 2);
-
-    expect(_onWatchCalled, 0);
-
-    b.subscribe((_) {});
-
-    expect(_onWatchCalled, 1);
   });
 }
