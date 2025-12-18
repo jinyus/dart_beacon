@@ -1,3 +1,7 @@
+# 2.0.1
+
+- [Refactor] Internal efficiency refactor.
+
 # 2.0.0
 
 - [Breaking] `anyBeacon.toStream()` is now `anyBeacon.stream`
