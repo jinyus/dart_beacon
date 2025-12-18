@@ -115,17 +115,6 @@ class DerivedSubscription<T> implements Consumer {
     this.fn, {
     required this.startNow,
   }) {
-    // derived beacons are lazy so they aren't registered as observers
-    // of their sources until they are actually used
-    //
-    //re: producer._observers.isEmpty
-    // If the derived beacon is already initialized and has no observers,
-    // we need to schedule to ensure it gets registered properly
-
-    // if (!producer.isEmpty && producer._observers.isEmpty){}
-  }
-
-  void _init() {
     _shouldRunRegardless = producer.isEmpty;
     if (startNow || _shouldRunRegardless) {
       _schedule();
