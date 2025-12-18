@@ -81,10 +81,12 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.readable](#beaconreadable): Immutable beacon that only emit values, ideal for readonly data.
 -   [Beacon.derived](#beaconderived): Derive values from other beacons, keeping them reactively in sync.
 -   [Beacon.effect](#beaconeffect): React to changes in beacon values.
--   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
 -   [Beacon.future](#beaconfuture): Derive values from asynchronous operations, managing state during computation.
     -   [Properties](#properties)
     -   [Methods](#methods)
+-   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
+-   [BeaconController](#beaconcontroller)
+-   [Dependency Injection](#dependency-injection)
 -   [Beacon.stream](#beaconstream): Create derived beacons from Dart streams. values are wrapped in an `AsyncValue`.
 -   [Beacon.streamRaw](#beaconstreamraw): Like `Beacon.stream`, but it doesn't wrap the value in an `AsyncValue`.
 -   [Beacon.debounced](#beacondebounced): Delay value updates until a specified time has elapsed, preventing rapid or unwanted updates.
@@ -103,7 +105,6 @@ class FutureCounter extends StatelessWidget {
     -   [tryCatch](#asyncvaluetrycatch): Execute a future and return [AsyncData] or [AsyncError].
     -   [optimistic updates](#asyncvaluetrycatch): Update the value optimistically when using tryCatch.
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
--   [BeaconGroup](#beacongroup): Create, reset and dispose and group of beacons.
 -   [Methods](#properties-and-methods): Additional methods for beacons that can be chained.
     -   [subscribe()](#mybeaconsubscribe)
     -   [tostream()](#mybeacontostream)
@@ -123,9 +124,8 @@ class FutureCounter extends StatelessWidget {
     -   [debounce](#mybeacondebounce)
 -   [Debugging](#debugging)
 -   [Disposal](#disposal)
+-   [BeaconScheduler](#beaconscheduler): Configure the scheduler for all beacons.
 -   [Testing](#testing)
--   [BeaconController](#beaconcontroller)
--   [Dependency Injection](#dependency-injection)
 
 [Pitfalls](#pitfalls)
 
@@ -215,39 +215,6 @@ Beacon.effect(() {
 age.value = 20; // Outputs: "You can vote!"
 ```
 
-### BeaconScheduler:
-
-`Effects` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler.
-
-A 60fps scheduler is included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
-
-When testing **synchronous** code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
-
-> [!NOTE]
-> When writing widget tests, manual flushing isn't needed. The queue is automatically flushed when you call `tester.pumpAndSettle()`.
-
-```dart
-final a = Beacon.writable(10);
-var called = 0;
-
-// effect is queued for execution. The scheduler decides when to run the effect
-Beacon.effect(() {
-      print("current value: ${a.value}");
-      called++;
-});
-
-// manually flush the queue to run the all effect immediately
-BeaconScheduler.flush();
-
-expect(called, 1);
-
-a.value = 20; // effect will be queued again.
-
-BeaconScheduler.flush();
-
-expect(called, 2);
-```
-
 ### Beacon.future:
 
 Creates a `FutureBeacon` whose value is derived from an asynchronous computation.
@@ -268,26 +235,26 @@ NB: You can access the last successful data while the beacon is in the `loading`
 Example:
 
 ```dart
-final counter = Beacon.writable(0);
+final pageNum = Beacon.writable(1);
 
 // The future will be recomputed whenever the counter changes
-final futureCounter = Beacon.future(() async {
-  final count = counter.value;
-  await Future.delayed(Duration(seconds: count));
-  return '$count second has passed.';
+final pageArticles = Beacon.future(() async {
+  final currentPage = pageNum.value;
+  final articles = await articleService.getByPage(currentPage)
+  return articles;
 });
 
-class FutureCounter extends StatelessWidget {
-const FutureCounter({super.key});
+class ArticlesPage extends StatelessWidget {
+const ArticlesPage({super.key});
 
-@override
-Widget build(BuildContext context) {
-  return switch (futureCounter.watch(context)) {
-    AsyncData<String>(value: final v) => Text(v),
-    AsyncError(error: final e) => Text('$e'),
-    AsyncLoading() || AsyncIdle() => const CircularProgressIndicator(),
-  };
-}
+  @override
+  Widget build(BuildContext context) {
+    return switch (pageArticles.watch(context)) {
+      AsyncData data => ArticleList(data.value),
+      AsyncError(error: final e) => Text('$e'),
+      AsyncLoading() || AsyncIdle() => const CircularProgressIndicator(),
+    };
+  }
 }
 ```
 
@@ -296,18 +263,16 @@ This can useful when a FutureBeacon depends on another FutureBeacon.
 This functionality is also available to StreamBeacons.
 
 ```dart
-var count = Beacon.writable(0);
+final isAdminBeacon  = Beacon.writable(false);
 
 var firstName = Beacon.future(() async {
-  final val = count.value;
   await Future.delayed(k10ms);
-  return 'Sally $val';
+  return 'Sally';
 });
 
 var lastName = Beacon.future(() async {
-  final val = count.value + 1;
   await Future.delayed(k10ms);
-  return 'Smith $val';
+  return 'Smith';
 });
 
 var fullName = Beacon.future(() async {
@@ -342,28 +307,7 @@ await Future.delayed(k1ms);
 expect(futureBeacon.isError, true);
 ```
 
-#### Properties:
-
-All these methods are also available to `StreamBeacons`.
-
--   `isIdle`
--   `isLoading`
--   `isIdleOrLoading`
--   `isData`
--   `isError`
--   `lastData`: Returns the last successful data value or null. This is useful when you want to display the last valid value while refreshing.
-
-#### Methods:
-
-All these methods with the exception on `reset()` and `overrideWith()` are also available to `StreamBeacons`.
-
--   `start()`: Starts the future if it's in the `idle` state.
--   `reset()`: Resets the beacon by running the callback again. This will enter the `loading` state immediately.
--   `unwrapValue()`: Returns the value if the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
--   `unwrapValueOrNull()`: This is like `unwrapValue()` but it returns null if the beacon is not in the `data` state.
--   `toFuture()`: Returns a future that completes with the value when the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
--   `overrideWith()`: Replaces the current callback and resets the beacon by running the new callback.
--   `updateWith()`: Updates the beacon with the result of the provided future callback.
+#### FutureBeacon.updateWith:
 
 The `updateWith` method allows you to update a FutureBeacon's value with the provided callback. This differs from `overrideWith` because it updates the value only once, while `overrideWith` replaces the original callback supplied to the beacon.
 
@@ -389,6 +333,148 @@ await todosBeacon.updateWith(
   optimisticResult: optimisticTodos,
 );
 ```
+
+#### Properties:
+
+All these methods are also available to `StreamBeacons`.
+
+-   `isIdle`
+-   `isLoading`
+-   `isIdleOrLoading`
+-   `isData`
+-   `isError`
+-   `lastData`: Returns the last successful data value or null. This is useful when you want to display the last valid value while refreshing.
+
+#### Methods:
+
+All these methods with the exception on `reset()` and `overrideWith()` are also available to `StreamBeacons`.
+
+-   `start()`: Starts the future if it's in the `idle` state.
+-   `reset()`: Resets the beacon by running the callback again. This will enter the `loading` state immediately.
+-   `unwrapValue()`: Returns the value if the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `unwrapValueOrNull()`: This is like `unwrapValue()` but it returns null if the beacon is not in the `data` state.
+-   `toFuture()`: Returns a future that completes with the value when the beacon is in the `data` state. This will throw an error if the beacon is not in the `data` state.
+-   `overrideWith()`: Replaces the current callback and resets the beacon by running the new callback.
+-   `updateWith()`: Updates the beacon with the result of the provided future callback.
+
+
+## BeaconGroup:
+
+An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
+keeps track of all beacons and effects created so they can be disposed/reset together.
+This is useful when you're creating multiple beacons in a stateful widget or controller class
+and want to dispose them together. See [BeaconController](#beaconcontroller).
+
+```dart
+ final myGroup = BeaconGroup();
+
+ final name = myGroup.writable('Bob');
+ final age = myGroup.writable(20);
+
+ myGroup.effect(() {
+   print(name.value); // Outputs: Bob
+ });
+
+ age.value = 21;
+ name.value = 'Alice';
+
+ myGroup.resetAll(); // reset beacons but does nothing to the effect
+
+ print(name.value); // Bob
+ print(age.value); // 20
+
+ myGroup.disposeAll();
+
+ print(name.isDisposed); // true
+ print(age.isDisposed); // true
+ // All beacons and effects are disposed
+```
+
+## BeaconController
+
+An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons. use the included [BeaconGroup](#beacongroup)(`B.writable()`) instead of `Beacon.writable()` to create beacons and effects.
+
+NB: All beacons must be created as a `late` variable.
+
+```dart
+class CountController extends BeaconController {
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+}
+```
+
+## Dependency Injection
+
+Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to do this while also managing disposal of both.
+
+NB: You can use another DI library such as `Provider`.
+
+In the example below, the controller will be disposed when the `CounterText` is unmounted:
+
+```dart
+class CountController extends BeaconController {
+  late final count = B.writable(0);
+  late final doubledCount = B.derived(() => count.value * 2);
+}
+
+final countControllerRef = Ref.scoped((ctx) => CountController());
+
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // watch the count beacon and return its value
+    final count = countControllerRef.select(context, (c) => c.count);
+    return Text('$count');
+  }
+}
+```
+
+```dart
+final count = countControllerRef.select(context, (c) => c.count);
+
+// is equivalent to
+final controller = countControllerRef.of(context);
+final count = controller.count.watch(context);
+```
+
+You can also use `select2` and `select3` to watch multiple beacons at once.
+
+```dart
+final (count, doubledCount) = countControllerRef.select2(context, (c) => (c.count, c.doubledCount));
+
+// is equivalent to
+final controller = countControllerRef.of(context);
+final count = controller.count.watch(context);
+final doubledCount = controller.doubledCount.watch(context);
+```
+
+See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+
+You can also use `Ref.scoped` if you wish to provide a top level beacon without putting it in a controller. The beacon will be properly disposed when all widgets that use it are unmounted.
+
+```dart
+final countRef = Ref.scoped((ctx) => Beacon.writable(0));
+final doubledCountRef = Ref.scoped((ctx) => Beacon.derived(() => countRef(ctx).value * 2));
+
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = countRef.watch(context);
+    final doubledCount = doubledCountRef.watch(context);
+    return Text('$count x 2 = $doubledCount');
+  }
+}
+```
+
+> [!NOTE]
+> Even though this is possible, it is recommended to use `BeaconController`s whenever possible. In cases where you only need a single beacon, this can be a convenient way to provide it to a widget.
+
+
+## Other Beacons
 
 ### Beacon.stream:
 
@@ -752,38 +838,6 @@ final postContent = postContentFamily('post-2');
 postContent.subscribe((value) {
   print(value); // Outputs: post content
 });
-```
-
-## BeaconGroup:
-
-An alternative to the global beacon creator ie: `Beacon.writable(0)`; that
-keeps track of all beacons and effects created so they can be disposed/reset together.
-This is useful when you're creating multiple beacons in a stateful widget or controller class
-and want to dispose them together. See [BeaconController](#beaconcontroller).
-
-```dart
- final myGroup = BeaconGroup();
-
- final name = myGroup.writable('Bob');
- final age = myGroup.writable(20);
-
- myGroup.effect(() {
-   print(name.value); // Outputs: Bob
- });
-
- age.value = 21;
- name.value = 'Alice';
-
- myGroup.resetAll(); // reset beacons but does nothing to the effect
-
- print(name.value); // Bob
- print(age.value); // 20
-
- myGroup.disposeAll();
-
- print(name.isDisposed); // true
- print(age.isDisposed); // true
- // All beacons and effects are disposed
 ```
 
 ## Properties and Methods:
@@ -1151,6 +1205,39 @@ expect(c.isDisposed, true);
 // effect is also disposed
 ```
 
+### BeaconScheduler:
+
+`Effects` and `Subscriptions` are not synchronous, their execution is controlled by a scheduler. When a dependency of an `effect` changes, it is added to a queue and the scheduler decides when is the best time to flush the queue. By default, the queue is flushed with a DARTVM microtask which runs on the next loop; this can be changed by setting a custom scheduler.
+
+A 60fps scheduler is included, this limits processing effects to 60 times per second. This can be done by calling `BeaconScheduler.use60FpsScheduler();` in the `main` function. You can also create your own custom scheduler for more advanced use cases. eg: `Gaming`: Synchronize flushing with your game loop.
+
+When testing **synchronous** code, it is necessary to flush the queue manually. This can be done by calling `BeaconScheduler.flush();` in your test.
+
+> [!NOTE]
+> When writing widget tests, manual flushing isn't needed. The queue is automatically flushed when you call `tester.pumpAndSettle()`.
+
+```dart
+final a = Beacon.writable(10);
+var called = 0;
+
+// effect is queued for execution. The scheduler decides when to run the effect
+Beacon.effect(() {
+      print("current value: ${a.value}");
+      called++;
+});
+
+// manually flush the queue to run the all effect immediately
+BeaconScheduler.flush();
+
+expect(called, 1);
+
+a.value = 20; // effect will be queued again.
+
+BeaconScheduler.flush();
+
+expect(called, 2);
+```
+
 ## Testing
 
 Beacons can expose a `Stream` with the `.stream` method. This can be used to test the state of a beacon over time with existing `StreamMatcher`s.
@@ -1204,89 +1291,6 @@ count.value = 20;
 count.value = 30;
 count.value = 40;
 ```
-
-## BeaconController
-
-An abstract mixin class that automatically disposes all beacons and effects created within it. This can be used to create a controller that manages a group of beacons. use the included [BeaconGroup](#beacongroup)(`B.writable()`) instead of `Beacon.writable()` to create beacons and effects.
-
-NB: All beacons must be created as a `late` variable.
-
-```dart
-class CountController extends BeaconController {
-  late final count = B.writable(0);
-  late final doubledCount = B.derived(() => count.value * 2);
-}
-```
-
-## Dependency Injection
-
-Dependency injection refers to the process of providing an instance of a Beacon or BeaconController to your widgets. `state_beacon` ships with a lightweight dependency injection library called [lite_ref](https://pub.dev/packages/lite_ref) that makes it easy and ergonomic to do this while also managing disposal of both.
-
-NB: You can use another DI library such as `Provider`.
-
-In the example below, the controller will be disposed when the `CounterText` is unmounted:
-
-```dart
-class CountController extends BeaconController {
-  late final count = B.writable(0);
-  late final doubledCount = B.derived(() => count.value * 2);
-}
-
-final countControllerRef = Ref.scoped((ctx) => CountController());
-
-class CounterText extends StatelessWidget {
-  const CounterText({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // watch the count beacon and return its value
-    final count = countControllerRef.select(context, (c) => c.count);
-    return Text('$count');
-  }
-}
-```
-
-```dart
-final count = countControllerRef.select(context, (c) => c.count);
-
-// is equivalent to
-final controller = countControllerRef.of(context);
-final count = controller.count.watch(context);
-```
-
-You can also use `select2` and `select3` to watch multiple beacons at once.
-
-```dart
-final (count, doubledCount) = countControllerRef.select2(context, (c) => (c.count, c.doubledCount));
-
-// is equivalent to
-final controller = countControllerRef.of(context);
-final count = controller.count.watch(context);
-final doubledCount = controller.doubledCount.watch(context);
-```
-
-See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
-
-You can also use `Ref.scoped` if you wish to provide a top level beacon without putting it in a controller. The beacon will be properly disposed when all widgets that use it are unmounted.
-
-```dart
-final countRef = Ref.scoped((ctx) => Beacon.writable(0));
-final doubledCountRef = Ref.scoped((ctx) => Beacon.derived(() => countRef(ctx).value * 2));
-
-class CounterText extends StatelessWidget {
-  const CounterText({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final count = countRef.watch(context);
-    final doubledCount = doubledCountRef.watch(context);
-    return Text('$count x 2 = $doubledCount');
-  }
-}
-```
-
-> [!NOTE]
-> Even though this is possible, it is recommended to use `BeaconController`s whenever possible. In cases where you only need a single beacon, this can be a convenient way to provide it to a widget.
 
 ### BeaconControllerMixin
 
