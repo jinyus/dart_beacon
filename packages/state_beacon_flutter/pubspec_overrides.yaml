@@ -1,0 +1,3 @@
+dependency_overrides:
+  state_beacon_core: 
+    path: ../state_beacon_core
