@@ -89,7 +89,11 @@ abstract class Producer<T> implements Disposable {
   Producer({T? initialValue, String? name})
       : _name = name,
         _observers = [] {
-    if (initialValue != null || _isNullable) {
+    // we don't want to set an initial value for derived, even
+    // if the type is nullable.
+    final isNullableAndNotDerived = _isNullable && !_isDerived;
+
+    if (initialValue != null || isNullableAndNotDerived) {
       _initialValue = initialValue as T;
       _value = initialValue;
       _isEmpty = false;
@@ -216,23 +220,25 @@ abstract class Producer<T> implements Disposable {
   }) {
     assert(!_isDisposed, 'Cannot subscribe to a disposed beacon.');
 
-    late final Consumer sub;
     if (_isDerived) {
-      sub = DerivedSubscription<T>(
+      final derivedSub = DerivedSubscription<T>(
         this as DerivedBeacon<T>,
         callback,
         startNow: startNow,
       );
+
+      derivedSub._init();
+      _observers.add(derivedSub);
+      return derivedSub.dispose;
     } else {
-      sub = Subscription<T>(
+      final sub = Subscription<T>(
         this,
         callback,
         startNow: startNow,
       );
+      _observers.add(sub);
+      return sub.dispose;
     }
-
-    _observers.add(sub);
-    return sub.dispose;
   }
 
   void _removeObserver(Consumer observer) {
