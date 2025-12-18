@@ -1,8 +1,6 @@
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
-import '../../common.dart';
-
 void main() {
   test('subscription to beacon should run until disposed', () async {
     final a = Beacon.writable(0);
