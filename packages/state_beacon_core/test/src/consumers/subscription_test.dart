@@ -1,6 +1,8 @@
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:test/test.dart';
 
+import '../../common.dart';
+
 void main() {
   test('subscription to beacon should run until disposed', () async {
     final a = Beacon.writable(0);
@@ -409,4 +411,101 @@ void main() {
       unsub();
     },
   );
+
+  test('should notify subscription if derived has observers', () async {
+    final a = Beacon.writable(1);
+    final d = Beacon.derived(() => a() * 2);
+
+    var sub1Called = 0;
+    var sub2Called = 0;
+
+    d.subscribe((_) => sub1Called++);
+
+    await delay();
+
+    expect(sub1Called, 1);
+    expect(d.listenersCount, 1);
+
+    d.subscribe((_) => sub2Called++, startNow: false);
+
+    await delay();
+
+    expect(sub1Called, 1);
+    expect(sub2Called, 0);
+    expect(d.listenersCount, 2);
+
+    a.increment();
+
+    BeaconScheduler.flush();
+
+    expect(sub1Called, 2);
+    expect(sub2Called, 1);
+    expect(d.listenersCount, 2);
+  });
+
+  test('should notify subscription after peeking with startNow=false', () {
+    final a = Beacon.writable(1);
+    final d = Beacon.derived(() => a() * 2);
+
+    var subCalled = 0;
+
+    d.subscribe((_) => subCalled++, startNow: false);
+
+    expect(d.isEmpty, true);
+
+    d.peek();
+    BeaconScheduler.flush();
+
+    expect(subCalled, 0);
+
+    a.increment();
+
+    BeaconScheduler.flush();
+
+    expect(subCalled, 1);
+  });
+
+  test(
+      'should notify subscription after peeking with '
+      'startNow=false and type is nullable', () {
+    final a = Beacon.writable(1);
+    final d = Beacon.derived<int?>(() => a() * 2);
+
+    var subCalled = 0;
+
+    d.subscribe((_) => subCalled++, startNow: false);
+
+    expect(d.isEmpty, true);
+
+    d.peek();
+    BeaconScheduler.flush();
+
+    expect(subCalled, 0);
+
+    a.increment();
+
+    BeaconScheduler.flush();
+
+    expect(subCalled, 1);
+  });
+
+  test(
+      'should notify subscription after peeking with '
+      'startNow=false and type is nullable for writable', () {
+    final a = Beacon.lazyWritable<int?>();
+
+    var subCalled = 0;
+
+    a.subscribe((_) => subCalled++, startNow: false);
+
+    BeaconScheduler.flush();
+
+    expect(subCalled, 0);
+
+    a.value = 1;
+
+    BeaconScheduler.flush();
+
+    expect(subCalled, 1);
+  });
 }

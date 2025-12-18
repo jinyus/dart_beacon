@@ -117,19 +117,23 @@ class DerivedSubscription<T> implements Consumer {
   }) {
     // derived beacons are lazy so they aren't registered as observers
     // of their sources until they are actually used
+    //
+    //re: producer._observers.isEmpty
     // If the derived beacon is already initialized and has no observers,
     // we need to schedule to ensure it gets registered properly
-    if (startNow ||
-        producer.isEmpty == true ||
-        producer._observers.isEmpty == true) {
+
+    // if (!producer.isEmpty && producer._observers.isEmpty){}
+  }
+
+  void _init() {
+    _shouldRunRegardless = producer.isEmpty;
+    if (startNow || _shouldRunRegardless) {
       _schedule();
     } else {
       // For derived beacons with startNow=false and an existing value,
       // we don't schedule initially but we still mark as CLEAN so
       // future updates will work.
       _status = CLEAN;
-      // Mark that we've already "ran" the initial update (which we're skipping)
-      _ran = true;
     }
 
     assert(() {
@@ -137,6 +141,8 @@ class DerivedSubscription<T> implements Consumer {
       return true;
     }());
   }
+
+  bool _shouldRunRegardless = false;
 
   /// The derived beacon that this subscription is watching.
   final DerivedBeacon<T> producer;
@@ -185,31 +191,27 @@ class DerivedSubscription<T> implements Consumer {
     _status = CLEAN;
   }
 
-  var _ran = false;
-
   @override
   void update() {
-    if (!_ran && !startNow && producer.isEmpty == true) {
-      // special case for derived beacons
-      // startNow is set to false but we must still run now to register the
-      // derived as an observer of its sources.
+    if (_shouldRunRegardless && !startNow) {
+      _shouldRunRegardless = false;
+      _status = CLEAN;
+
+      // the producer got a value before this was run
+      // so we no longer need to peek() to force a value
+      // this happens when .peek() is called directly
+      // after the subscription is created.
+      //
+      // mybeacon.subscribe((_){}, startNow:false);
+      // mybeacon.peek();
+      if (!producer.isEmpty) return;
+
       producer.peek();
       _status = CLEAN;
-      _ran = true;
       return;
     }
 
-    // Skip callback on first run if startNow is false
-    final shouldRunCallback = _ran || startNow;
-
-    // Track if this is the first run
-    _ran = true;
-
-    if (shouldRunCallback) {
-      // If producer is an empty derived, peek() will initialize it
-      // and register it as an observer of its sources.
-      fn(producer.peek());
-    }
+    fn(producer.peek());
 
     // After the update, set the status to
     // clean since we've processed the latest value.
