@@ -66,6 +66,7 @@ part 'beacons/periodic.dart';
 part 'consumer.dart';
 part 'consumers/effect.dart';
 part 'consumers/subscription.dart';
+part 'consumers/derived_subscription.dart';
 part 'consumers/sync_subscription.dart';
 part 'extensions/chain.dart';
 part 'extensions/wrap.dart';
