@@ -58,7 +58,7 @@ void main() {
 
   test('should add beacon to group provided', () {
     final group = BeaconGroup();
-    final beacon = TextEditingBeacon(text: '1', group: group);
+    final beacon = group.textEditing(text: '1');
 
     expect(group.beacons.length, 1);
     expect(group.beacons.first, beacon);
