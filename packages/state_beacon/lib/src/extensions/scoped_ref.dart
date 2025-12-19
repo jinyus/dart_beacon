@@ -1,22 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:state_beacon/state_beacon.dart';
 
-/// A function that takes a [BeaconController] and returns 1 of its beacon.
-typedef BeaconSelector<T, C> = ReadableBeacon<T> Function(C);
-
-/// A function that takes a [BeaconController] and
-/// returns a record of 2 of its beacons.
-typedef BeaconSelector2<T1, T2, C> = (
-  ReadableBeacon<T1>,
-  ReadableBeacon<T2>,
-)
-    Function(C);
-
-/// A function that takes a [BeaconController] and
-/// returns a record of 3 of its beacons.
-typedef BeaconSelector3<T1, T2, T3, C>
-    = (ReadableBeacon<T1>, ReadableBeacon<T2>, ReadableBeacon<T3>) Function(C);
-
 /// Extensions for [ScopedRef] that provide a more convenient way to watch
 /// the beacons in a [BeaconController] instance.
 extension LiteRefBeaconControllerExt<C extends BeaconController>
@@ -51,7 +35,7 @@ extension LiteRefBeaconControllerExt<C extends BeaconController>
   /// ```
   T select<T>(BuildContext context, BeaconSelector<T, C> selector) {
     final controller = of(context);
-    return selector(controller).watch(context);
+    return controller.select(context, selector);
   }
 
   /// Like [select] but watches two beacons and returns a record
@@ -76,8 +60,7 @@ extension LiteRefBeaconControllerExt<C extends BeaconController>
     BeaconSelector2<T1, T2, C> selector,
   ) {
     final controller = of(context);
-    final (beacon1, beacon2) = selector(controller);
-    return (beacon1.watch(context), beacon2.watch(context));
+    return controller.select2(context, selector);
   }
 
   /// Like [select2] but watches three beacons and returns a record
@@ -87,12 +70,7 @@ extension LiteRefBeaconControllerExt<C extends BeaconController>
     BeaconSelector3<T1, T2, T3, C> selector,
   ) {
     final controller = of(context);
-    final (beacon1, beacon2, beacon3) = selector(controller);
-    return (
-      beacon1.watch(context),
-      beacon2.watch(context),
-      beacon3.watch(context)
-    );
+    return controller.select3(context, selector);
   }
 }
 

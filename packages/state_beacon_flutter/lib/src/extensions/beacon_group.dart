@@ -1,5 +1,4 @@
-import 'package:state_beacon_core/state_beacon_core.dart';
-import 'package:state_beacon_flutter/src/notifier/text_editing_controller.dart';
+part of 'extensions.dart';
 
 /// Flutter extensions on BeaconGroup
 extension FlutterBeaconGroupx on BeaconGroup {
