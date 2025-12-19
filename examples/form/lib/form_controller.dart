@@ -8,10 +8,10 @@ class FormController with BeaconController {
   // BeaconController provides a 'B' property which is a BeaconGroup.
   // It allows us to dispose all beacons created in this group
   // when the controller is disposed.
-  late final username = TextEditingBeacon(text: '', group: B);
-  late final email = TextEditingBeacon(text: '', group: B);
-  late final password = TextEditingBeacon(text: '', group: B);
-  late final passwordConfirm = TextEditingBeacon(text: '', group: B);
+  late final username = B.textEditing(text: '');
+  late final email = B.textEditing(text: '');
+  late final password = B.textEditing(text: '');
+  late final passwordConfirm = B.textEditing(text: '');
   late final accountType = B.writable<String?>('Buyer');
   late final categories = B.hashSet<String>({'clothes'});
 

@@ -3,7 +3,7 @@ part of 'search.dart';
 class WeatherController extends BeaconController {
   final WeatherRepository repo;
 
-  late final searchText = TextEditingBeacon(group: B);
+  late final searchText = B.textEditing();
 
   late final searchTextDebounced = searchText
       .filter((_, next) => next.text.trim().isNotEmpty)

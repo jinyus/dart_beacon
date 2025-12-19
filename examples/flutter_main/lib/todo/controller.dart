@@ -2,7 +2,7 @@ part of 'todo.dart';
 
 class TodoController extends BeaconController {
   late final todosBeacon = B.hashMap(<ID, Todo>{});
-  late final inputTextBeacon = TextEditingBeacon(text: '', group: B);
+  late final inputTextBeacon = B.textEditing(text: '');
   late final filterBeacon = B.writable(Filter.all);
 
   late final filteredTodos = B.derived(() {
