@@ -174,21 +174,21 @@ packages:
       path: "../../packages/state_beacon"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   state_beacon_core:
     dependency: "direct overridden"
     description:
       path: "../../packages/state_beacon_core"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   state_beacon_flutter:
     dependency: "direct overridden"
     description:
       path: "../../packages/state_beacon_flutter"
       relative: true
     source: path
-    version: "2.0.0"
+    version: "2.0.1"
   stream_channel:
     dependency: transitive
     description:

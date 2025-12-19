@@ -117,6 +117,16 @@ deps() {
         flutter pub get &&
         cd $CURRENT_DIR/examples/github_search &&
         flutter pub get
+        cd $CURRENT_DIR/examples/form &&
+        flutter pub get
+        cd $CURRENT_DIR/examples/snake_game &&
+        flutter pub get
+        cd $CURRENT_DIR/examples/splash_page &&
+        flutter pub get
+        cd $CURRENT_DIR/examples/tic_tac_toe &&
+        flutter pub get
+        cd $CURRENT_DIR/examples/bench &&
+        flutter pub get
 
 }
 
