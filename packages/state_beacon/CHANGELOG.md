@@ -1,3 +1,20 @@
+# 2.0.2
+
+- [Feature] Add `select`,`select2` and `select3` methods to BeaconController which makes it easier to watch 1-3 beacons from a Controller.
+```dart
+final (age, name) = myController.select2(context, (c) => (c.ageBeacon, c.nameBeacon));
+```
+- [Feature] add BeaconGroup.textEditing() as a more convenient way of creating a TextEditingBeacon that's tied to a group.
+
+### old:
+```dart
+final usernameField = TextEditingBeacon(text:'', group:B)
+```
+### new:
+```dart
+final usernameField =  B.textEditing(text:'')
+```
+
 # 2.0.1
 
 - [Refactor] Internal efficiency refactor.
