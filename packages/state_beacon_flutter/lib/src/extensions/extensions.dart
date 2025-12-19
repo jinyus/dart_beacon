@@ -2,7 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:state_beacon_core/state_beacon_core.dart';
 import 'package:state_beacon_flutter/src/value_notifier_beacon.dart';
+import 'package:state_beacon_flutter/state_beacon_flutter.dart'
+    show TextEditingBeacon;
 
+part 'beacon_controller.dart';
+part 'beacon_group.dart';
 part 'readable.dart';
 part 'watch_observe.dart';
 part 'writable.dart';
