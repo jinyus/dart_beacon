@@ -5,15 +5,16 @@ import 'package:state_beacon/state_beacon.dart';
 
 class GithubController extends BeaconController {
   GithubController(this._repo) {
-    searchTermDebounced.next().then((_) => _results.start());
+    searchTermDebounced.subscribe((_) => _results.start(), startNow: false);
   }
 
   final GithubSearchRepository _repo;
 
-  late final searchTerm = TextEditingBeacon();
+  late final searchTerm = B.textEditing();
 
-  late final searchTermDebounced =
-      searchTerm.filter((_, n) => n.text.isNotEmpty).debounce(k100ms * 5);
+  late final searchTermDebounced = searchTerm
+      .filter((prev, next) => next.text.isNotEmpty)
+      .debounce(k100ms * 5);
 
   late final _results = B.future(
     () => _repo.search(searchTermDebounced.value.text),
