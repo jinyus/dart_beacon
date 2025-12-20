@@ -41,7 +41,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status < newStatus) {
+    if (_status <= newStatus) {
       _status = newStatus;
 
       for (var i = 0; i < _observers.length; i++) {
@@ -63,7 +63,13 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     currentGetsIndex = 0;
 
     _value = _compute();
-    if (_isEmpty) _initialValue = _value;
+    late final bool didUpdate;
+    if (_isEmpty) {
+      _initialValue = _value;
+      didUpdate = true;
+    } else {
+      didUpdate = _previousValue != _value;
+    }
     _isEmpty = false;
 
     // if the sources have changed, update source & observer links
@@ -94,8 +100,6 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
     currentGets = prevGets;
     currentGetsIndex = prevGetsIndex;
     currentConsumer = prevConsumer;
-
-    final didUpdate = _previousValue != _value;
 
     // handles diamond depenendencies if we're the parent of a diamond.
     if (didUpdate && _observers.isNotEmpty) {
