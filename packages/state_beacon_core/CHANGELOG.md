@@ -1,3 +1,7 @@
+# 2.0.2
+
+-[Fix] Nullable derived beacons didn't send notifications in some instances.
+
 # 2.0.1
 
 - [Refactor] Internal efficiency refactor.
