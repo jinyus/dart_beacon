@@ -570,12 +570,17 @@ void main() {
 
     expect(ran, 2);
 
+    // value access so it should wake up and set loading to true
     expect(derivedBeacon.isLoading, true);
     expect(derivedBeacon.unwrapValueOrNull(), null);
 
     BeaconScheduler.flush();
 
     expect(ran, 3);
+    await delay();
+
+    //should execute with the new values
+    expect(derivedBeacon.unwrapValue(), 12 + 21);
 
     num1.increment();
 
@@ -585,7 +590,7 @@ void main() {
 
     await delay(k1ms);
 
-    expect(derivedBeacon.unwrapValue(), 34);
+    expect(derivedBeacon.unwrapValue(), 13 + 21);
 
     expect(ran, 4);
   });
@@ -642,6 +647,47 @@ void main() {
     expect(derivedBeacon.unwrapValue(), 34);
 
     expect(ran, 5);
+  });
+
+  test('should not apply pending updates after going to sleep', () async {
+    final num1 = Beacon.writable<int>(1);
+    final num2 = Beacon.writable<int>(2);
+    final values = <AsyncValue<int>>[];
+
+    final sum = Beacon.future(() async {
+      final sum = num1.value + num2.value;
+      await delay(k10ms);
+      return sum;
+    });
+
+    final unsub = Beacon.effect(() {
+      values.add(sum.value);
+    });
+
+    await delay(k10ms * 2);
+
+    expect(values, [AsyncLoading<int>(), AsyncData(3)]);
+
+    num1.increment();
+
+    BeaconScheduler.flush();
+    expect(values, [AsyncLoading<int>(), AsyncData(3), AsyncLoading<int>()]);
+
+    unsub(); // sleep before value is set
+    expect(sum.lastData, 1 + 2);
+
+    await delay(k10ms * 2);
+
+    // accessing value should awake it and set to loading
+    expect(sum.isLoading, true);
+
+    // lastdata should be 3 even though both values are 2
+    expect(sum.lastData, 1 + 2);
+
+    await delay(k10ms * 2);
+
+    // value is updated after waking up
+    expect(sum.lastData, 2 + 2);
   });
 
   test('should conditionally stop listening to dependencies', () async {
