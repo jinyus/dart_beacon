@@ -63,15 +63,15 @@ test_target() {
 publish_and_update_pubignore() {
     # Backup pubspec_overrides.yaml if it exists
     if [ -f "pubspec_overrides.yaml" ]; then
-        mv pubspec_overrides.yaml pubspec_overrides.yaml.backup
+        mv pubspec_overrides.yaml pubspec_overrides.backup
     fi &&
     cp .gitignore .pubignore &&
         echo test/ | tee -a .pubignore &&
-        echo pubspec_overrides.yaml.backup | tee -a .pubignore &&
+        echo pubspec_overrides.backup | tee -a .pubignore &&
         dart pub publish "$@"
     # Restore pubspec_overrides.yaml if it was backed up
-    if [ -f "pubspec_overrides.yaml.backup" ]; then
-        mv pubspec_overrides.yaml.backup pubspec_overrides.yaml
+    if [ -f "pubspec_overrides.backup" ]; then
+        mv pubspec_overrides.backup pubspec_overrides.yaml
     fi &&
     rm .pubignore
 }
