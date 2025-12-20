@@ -1,3 +1,7 @@
+# 2.0.3
+
+-[Fix] Nullable derived beacons didn't send notifications in some instances.
+
 # 2.0.2
 
 - [Feature] Add `select`,`select2` and `select3` methods to BeaconController which makes it easier to watch 1-3 beacons from a Controller.
