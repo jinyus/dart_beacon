@@ -1,3 +1,6 @@
+# 2.0.4
+- [chore] Update repo links
+
 # 2.0.2
 
 -[Fix] Nullable derived beacons didn't send notifications in some instances.
