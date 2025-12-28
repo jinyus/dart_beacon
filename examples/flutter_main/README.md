@@ -9,5 +9,5 @@ It has the following features:
 -   A Konami game which showcases various types of beacons.
 
 <p align="center">
-  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
+  <img src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
 </p>

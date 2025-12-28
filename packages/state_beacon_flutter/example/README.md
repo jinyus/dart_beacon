@@ -1,4 +1,4 @@
-source code with tests: [examples/counter/lib/main.dart](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart)
+source code with tests: [examples/counter/lib/main.dart](https://github.com/zupat/dart_beacon/blob/main/examples/counter/lib/main.dart)
 
 ```dart
 class Controller extends BeaconController {

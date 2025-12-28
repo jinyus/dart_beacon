@@ -1,7 +1,7 @@
 name: state_beacon_lint
 description: Linting for state_beacon users, designed to prevent common mistakes and provide a better experience.
 version: 0.2.1
-repository: https://github.com/jinyus/dart_beacon
+repository: https://github.com/zupat/dart_beacon
 
 environment:
     sdk: ">=3.0.0 <4.0.0"

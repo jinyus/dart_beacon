@@ -4,7 +4,7 @@
 
 **dart_beacon** is a reactive state management library for Dart and Flutter. It implements a beacon/signal-based reactive system using node coloring for fine-grained reactivity. The project consists of multiple packages and examples.
 
-**Repository**: https://github.com/jinyus/dart_beacon
+**Repository**: https://github.com/zupat/dart_beacon
 
 ## Project Structure
 

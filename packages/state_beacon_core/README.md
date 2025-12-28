@@ -1,23 +1,23 @@
 <p align="center">
-  <img width="650" src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_banner.jpeg?raw=true">
+  <img width="650" src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_banner.jpeg?raw=true">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-purple"> 
-  <a href="https://app.codecov.io/github/jinyus/dart_beacon"><img src="https://img.shields.io/codecov/c/github/jinyus/dart_beacon"></a>
+  <a href="https://app.codecov.io/github/zupat/dart_beacon"><img src="https://img.shields.io/codecov/c/github/zupat/dart_beacon"></a>
   <a href="https://pub.dev/packages/state_beacon"><img src="https://img.shields.io/pub/points/state_beacon?color=blue"></a>
-   <img alt="stars" src="https://img.shields.io/github/stars/jinyus/dart_beacon?style=social"/>
+   <img alt="stars" src="https://img.shields.io/github/stars/zupat/dart_beacon?style=social"/>
 </p>
 
 ## Overview
 
 A Beacon is a reactive primitive(`signal`) and simple state management solution for Dart and Flutter; `state_beacon` leverages the [node coloring technique](https://milomg.dev/2022-12-01/reactivity) created by [Milo Mighdoll](https://x.com/milomg__) and used in the latest versions of [SolidJS](https://www.youtube.com/watch?v=jHDzGYHY2ew&t=5291s) and [reactively](https://github.com/modderme123/reactively).
 
-Flutter web demo([source](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
-<br>All examples: https://github.com/jinyus/dart_beacon/tree/main/examples
+Flutter web demo([source](https://github.com/zupat/dart_beacon/tree/main/examples/flutter_main/lib)): https://flutter-beacon.surge.sh/
+<br>All examples: https://github.com/zupat/dart_beacon/tree/main/examples
 
 <p align="center">
-  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
+  <img src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
 </p>
 
 ## Installation
@@ -450,7 +450,7 @@ final count = controller.count.watch(context);
 final doubledCount = controller.doubledCount.watch(context);
 ```
 
-See the full example with testing [here](https://github.com/jinyus/dart_beacon/blob/main/examples/counter/lib/main.dart).
+See the full example with testing [here](https://github.com/zupat/dart_beacon/blob/main/examples/counter/lib/main.dart).
 
 You can also use `Ref.scoped` if you wish to provide a top level beacon without putting it in a controller. The beacon will be properly disposed when all widgets that use it are unmounted.
 
@@ -594,7 +594,7 @@ final posts = Beacon.future(() => Repository.getPosts(pageNum.value));
 pageNum.setFilter((prev, next) => !posts.isLoading);
 ```
 
-Extracted from the [infinite list example](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib/infinite_list)
+Extracted from the [infinite list example](https://github.com/zupat/dart_beacon/tree/main/examples/flutter_main/lib/infinite_list)
 
 ### Beacon.timestamped:
 
@@ -641,7 +641,7 @@ countBeacon.add(3); // Triggers update and prints [1, 2, 3]
 ```
 
 You may also access the `currentBuffer` as a readable beacon.
-See it in use in the [konami example](https://github.com/jinyus/dart_beacon/tree/main/examples/flutter_main/lib/konami);
+See it in use in the [konami example](https://github.com/zupat/dart_beacon/tree/main/examples/flutter_main/lib/konami);
 
 ### Beacon.bufferedTime:
 
@@ -785,7 +785,7 @@ await AsyncValue.tryCatch(fetchUserData, beacon: beacon);
 await beacon.tryCatch(fetchUserData);
 ```
 
-See it in use in the [shopping cart example](https://github.com/jinyus/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
+See it in use in the [shopping cart example](https://github.com/zupat/dart_beacon/tree/main/examples/shopping_cart/lib/src/cart).
 
 If you want to do optimistic updates, you can supply an optional `optimisticResult` parameter.
 

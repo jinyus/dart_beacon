@@ -291,7 +291,7 @@ accumulated = Beacon.derived(() {
 
 # 0.40.0
 
--   [Feat] Add `BeaconController` for use in Flutter. see [docs](https://github.com/jinyus/dart_beacon/blob/main/packages/state_beacon/README.md#beaconcontroller)
+-   [Feat] Add `BeaconController` for use in Flutter. see [docs](https://github.com/zupat/dart_beacon/blob/main/packages/state_beacon/README.md#beaconcontroller)
 -   [Feat] Implement `Disposable` from [basic_interfaces](https://pub.dev/packages/basic_interfaces) package which makes it autodispsable when used with the [lite_ref](https://pub.dev/packages/lite_ref) package.
 -   [Docs] Add section on `testing` to the README.
 -   [Feat] Add `synchronous` option to wrap and chaining methods. This defaults to `true` which means that wrapper beacons will get all updates.
@@ -454,7 +454,7 @@ final beacon = stream
 await expectLater(beacon.stream, emitsInOrder([1, 3, 5]));
 ```
 
-See [docs](https://github.com/jinyus/dart_beacon?tab=readme-ov-file#mybeaconmap) for more information.
+See [docs](https://github.com/zupat/dart_beacon?tab=readme-ov-file#mybeaconmap) for more information.
 
 # 0.34.2
 

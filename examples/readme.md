@@ -13,7 +13,7 @@ This is an all in one (AIO) example which includes:
 flutter web demo: https://flutter-beacon.surge.sh/
 
 <p align="center">
-  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
+  <img src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_demo.jpg?raw=true">
 </p>
 
 ## skeleton:
@@ -29,5 +29,5 @@ This is the starter template from Very Good Ventures with their ascribed best pr
 This is a sample store front using the structure from the flutter skeleton project.
 
 <p align="center">
-  <img src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_shopping_cart.png?raw=true">
+  <img src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_shopping_cart.png?raw=true">
 </p>

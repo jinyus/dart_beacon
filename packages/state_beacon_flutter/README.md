@@ -1,12 +1,12 @@
 <p align="center">
-  <img width="650" src="https://github.com/jinyus/dart_beacon/blob/main/assets/state_beacon_banner.jpeg?raw=true">
+  <img width="650" src="https://github.com/zupat/dart_beacon/blob/main/assets/state_beacon_banner.jpeg?raw=true">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-purple"> 
-  <a href="https://app.codecov.io/github/jinyus/dart_beacon"><img src="https://img.shields.io/codecov/c/github/jinyus/dart_beacon"></a>
+  <a href="https://app.codecov.io/github/zupat/dart_beacon"><img src="https://img.shields.io/codecov/c/github/zupat/dart_beacon"></a>
   <a href="https://pub.dev/packages/state_beacon"><img src="https://img.shields.io/pub/points/state_beacon?color=blue"></a>
-   <img alt="stars" src="https://img.shields.io/github/stars/jinyus/dart_beacon?style=social"/>
+   <img alt="stars" src="https://img.shields.io/github/stars/zupat/dart_beacon?style=social"/>
 </p>
 
 > [!NOTE]
