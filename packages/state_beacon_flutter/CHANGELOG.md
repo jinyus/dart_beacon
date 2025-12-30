@@ -1,3 +1,9 @@
+# 3.0.0
+
+- [Breaking] `anyBeacon.next()` now throws if the beacon is disposed while waiting for the next value. This is a breaking change because previously it would complete with the current value if the beacon was disposed.
+
+- [Feat] Add `anyBeacon.nextOrNull()` method that returns `null` if the beacon is disposed while waiting for the next value.
+
 # 2.0.4
 
 - [chore] Update repo links
