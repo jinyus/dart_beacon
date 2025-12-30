@@ -63,7 +63,7 @@ void main() {
   });
 
   test(
-    'next should complete with current value if beacon is disposed',
+    'next should throw if beacon is disposed',
     () {
       final beacon = Beacon.writable(0);
 
@@ -71,7 +71,7 @@ void main() {
 
       beacon.dispose();
 
-      expect(futureValue, completion(0));
+      expect(futureValue, throwsException);
     },
   );
 
@@ -89,7 +89,7 @@ void main() {
   );
 
   test(
-    'next should complete with current value if fallback '
+    'next should complete with fallback if fallback '
     'is provided but beacon is not lazy disposed',
     () {
       final beacon = Beacon.writable<int>(50);
@@ -98,7 +98,7 @@ void main() {
 
       beacon.dispose();
 
-      expect(futureValue, completion(50));
+      expect(futureValue, completion(10));
     },
   );
 
@@ -182,7 +182,7 @@ void main() {
   });
 
   test(
-    'next should complete with current value if beacon is disposed/derived',
+    'next should throw if beacon is disposed/derived',
     () async {
       final beacon = Beacon.writable(0);
 
@@ -194,7 +194,7 @@ void main() {
 
       d.dispose();
 
-      expect(futureValue, completion(0));
+      expect(futureValue, throwsException);
     },
   );
 
@@ -214,20 +214,24 @@ void main() {
   );
 
   test(
-    'next should complete with current value if fallback '
+    'next should complete with nextvalue if fallback '
     'is provided but lazy beacon gets a value',
     () async {
       final beacon = Beacon.writable<int>(50);
 
       final d = Beacon.derived(() => beacon.value);
 
+      expect(d.peek(), 50);
+
       final futureValue = d.next(fallback: 10);
+
+      beacon.increment();
 
       await delay();
 
       d.dispose();
 
-      expect(futureValue, completion(50));
+      expect(futureValue, completion(51));
     },
   );
 
@@ -246,4 +250,44 @@ void main() {
       expect(futureValue, throwsException);
     },
   );
+
+  test('next should complete with null if the type is nullable', () {
+    final beacon = Beacon.writable<int?>(0);
+
+    final d = Beacon.derived(() => beacon.value);
+
+    final futureValue = d.next();
+
+    d.dispose();
+
+    expect(futureValue, completion(null));
+  });
+
+  test('should return null if the beacon is disposed while waiting(lazy)', () {
+    final beacon = Beacon.writable(0);
+
+    final d = Beacon.derived(() => beacon.value);
+
+    final futureValue = d.nextOrNull();
+
+    d.dispose();
+
+    expect(futureValue, completion(null));
+  });
+
+  test(
+      'should return null if the beacon is'
+      ' disposed while waiting if it has value', () {
+    final beacon = Beacon.writable(0);
+
+    final d = Beacon.derived(() => beacon.value);
+
+    d.peek(); // force computation so it has value
+
+    final futureValue = d.nextOrNull();
+
+    d.dispose();
+
+    expect(futureValue, completion(null));
+  });
 }
