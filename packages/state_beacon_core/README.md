@@ -107,7 +107,7 @@ class FutureCounter extends StatelessWidget {
 -   [Beacon.family](#beaconfamily): Create and manage a family of related beacons.
 -   [Methods](#properties-and-methods): Additional methods for beacons that can be chained.
     -   [subscribe()](#mybeaconsubscribe)
-    -   [tostream()](#mybeacontostream)
+    -   [stream](#mybeaconstream)
     -   [wrap()](#mywritablewrapanybeacon)
     -   [ingest()](#mywritableingestanystream)
     -   [next()](#mybeaconnext)
