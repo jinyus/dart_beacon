@@ -14,7 +14,7 @@ class InfiniteController extends BeaconController {
         switch (newValue) {
           case AsyncData(value: final newItems):
             final didRefresh =
-                pageNum.peek() == 1 && (pageNum.previousValue ?? 0) > 1;
+                pageNum.peek() == 1 && (pageNum.previousValue ?? 0) >= 1;
 
             if (didRefresh) {
               items.clear();
@@ -59,8 +59,13 @@ class InfiniteController extends BeaconController {
 
   void retryOnError() => rawItems.reset();
 
-  Future<dynamic> refresh() async {
+  Future<String?> refresh() async {
     pageNum.reset(force: true);
-    return rawItems.nextOrNull(filter: (n) => n.isData);
+    final result = await rawItems.nextOrNull(filter: (n) => !n.isLoading);
+
+    return switch (result) {
+      AsyncError e => e.error.toString(),
+      _ => null,
+    };
   }
 }

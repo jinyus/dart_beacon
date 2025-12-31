@@ -9,12 +9,17 @@ class FakeRepo implements PostRepository {
   Future<List<String>> fetchItems(int page, {int limit = 10}) async {
     return pages[page] ?? <String>[];
   }
+
+  @override
+  int refreshed = 0;
 }
 
 class FlakyRepo implements PostRepository {
   final Map<int, List<String>> pages;
   final Set<int> failOncePages;
   final Map<int, int> _calls = {};
+  @override
+  int refreshed = 0;
   FlakyRepo(this.pages, {this.failOncePages = const {}});
 
   @override
@@ -23,6 +28,31 @@ class FlakyRepo implements PostRepository {
     if (failOncePages.contains(page) && _calls[page] == 1) {
       throw Exception('fetch failed for page $page');
     }
+    return pages[page] ?? <String>[];
+  }
+}
+
+class RefreshFailingRepo implements PostRepository {
+  final Map<int, List<String>> pages;
+  int _refreshCount = 0;
+  @override
+  int refreshed = 0;
+
+  RefreshFailingRepo(this.pages);
+
+  @override
+  Future<List<String>> fetchItems(int page, {int limit = 10}) async {
+    if (page == 1) {
+      refreshed++;
+      _refreshCount++;
+
+      if (_refreshCount == 3) {
+        _refreshCount = 0;
+        refreshed = 0; // Reset the refreshed counter too
+        throw Exception('Refresh Failed');
+      }
+    }
+
     return pages[page] ?? <String>[];
   }
 }
@@ -130,5 +160,125 @@ void main() {
     expect(list.whereType<ItemData>().any((d) => d.value.startsWith('p1_new_')),
         isTrue);
     expect(controller.pageNum.value, 1);
+  });
+
+  testWidgets('refresh returns null on success', (tester) async {
+    final repo = FakeRepo({
+      1: List.generate(InfiniteController.pageSize, (i) => 'p1_item_$i'),
+      2: List.generate(InfiniteController.pageSize, (i) => 'p2_item_$i'),
+    });
+    final controller = InfiniteController(repo);
+
+    await tester.pumpAndSettle();
+
+    // Initial load should have pageSize items plus loading sentinel
+    var list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize);
+    expect(list.last, isA<ItemLoading>());
+
+    // Move to page 2
+    controller.loadNextPage();
+    await tester.pumpAndSettle();
+
+    list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize * 2);
+    expect(list.last, isA<ItemLoading>());
+
+    // Refresh should return null on success
+    final error = await controller.refresh();
+    expect(error, isNull);
+  });
+
+  testWidgets('refresh returns error message on failure', (tester) async {
+    final repo = RefreshFailingRepo({
+      1: List.generate(InfiniteController.pageSize, (i) => 'p1_item_$i'),
+      2: List.generate(InfiniteController.pageSize, (i) => 'p2_item_$i'),
+    });
+    final controller = InfiniteController(repo);
+
+    await tester.pumpAndSettle();
+
+    // Initial load
+    var list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize);
+    expect(list.last, isA<ItemLoading>());
+
+    // Move to page 2
+    controller.loadNextPage();
+    await tester.pumpAndSettle();
+
+    list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize * 2);
+    expect(list.last, isA<ItemLoading>());
+
+    // Trigger refresh failure by calling refresh 2 times
+    await controller.refresh(); // 1st refresh
+    final error = await controller.refresh(); // 2nd refresh should fail
+    expect(error, isNotNull);
+    expect(error, contains('Refresh Failed'));
+  });
+
+  testWidgets('refresh resets to page 1 even after multiple pages loaded',
+      (tester) async {
+    final repo = FakeRepo({
+      1: List.generate(InfiniteController.pageSize, (i) => 'p1_item_$i'),
+      2: List.generate(InfiniteController.pageSize, (i) => 'p2_item_$i'),
+      3: List.generate(InfiniteController.pageSize, (i) => 'p3_item_$i'),
+    });
+    final controller = InfiniteController(repo);
+
+    await tester.pumpAndSettle();
+
+    // Load multiple pages
+    controller.loadNextPage();
+    await tester.pumpAndSettle();
+    controller.loadNextPage();
+    await tester.pumpAndSettle();
+
+    var list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize * 3);
+    expect(controller.pageNum.value, 3);
+
+    // Refresh should reset to page 1
+    await controller.refresh();
+    await tester.pumpAndSettle();
+
+    list = controller.items.peek();
+    expect(controller.pageNum.value, 1);
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize);
+    expect(list.last, isA<ItemLoading>());
+  });
+
+  testWidgets('refresh clears items and reloads page 1 data', (tester) async {
+    final repo = FakeRepo({
+      1: List.generate(InfiniteController.pageSize, (i) => 'p1_item_$i'),
+      2: List.generate(InfiniteController.pageSize, (i) => 'p2_item_$i'),
+    });
+    final controller = InfiniteController(repo);
+
+    await tester.pumpAndSettle();
+
+    // Load page 2
+    controller.loadNextPage();
+    await tester.pumpAndSettle();
+
+    var list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize * 2);
+    expect(
+        list.whereType<ItemData>().any((d) => d.value.startsWith('p2_item_')),
+        isTrue);
+
+    // Refresh should clear all items and reload page 1
+    await controller.refresh();
+    await tester.pumpAndSettle();
+
+    list = controller.items.peek();
+    expect(list.whereType<ItemData>().length, InfiniteController.pageSize);
+    expect(
+        list.whereType<ItemData>().any((d) => d.value.startsWith('p2_item_')),
+        isFalse);
+    expect(
+        list.whereType<ItemData>().any((d) => d.value.startsWith('p1_item_')),
+        isTrue);
   });
 }

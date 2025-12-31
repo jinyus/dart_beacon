@@ -10,7 +10,6 @@ class InfiniteListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = infiniteControllerRef.of(context);
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -23,7 +22,22 @@ class InfiniteListPage extends StatelessWidget {
                 const Text('Infinite List', style: k24Text),
                 Expanded(
                   child: RefreshIndicator(
-                    onRefresh: () async => controller.refresh(),
+                    onRefresh: () async {
+                      final error = await controller.refresh();
+                      if (error == null || !context.mounted) return;
+
+                      final textTheme = Theme.of(context).textTheme;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            error,
+                            style: textTheme.headlineSmall
+                                ?.copyWith(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.red.shade400,
+                        ),
+                      );
+                    },
                     child: ScrollConfiguration(
                       behavior: ScrollConfiguration.of(context).copyWith(
                         dragDevices: {
