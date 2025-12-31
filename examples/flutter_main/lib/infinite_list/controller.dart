@@ -12,20 +12,20 @@ class InfiniteController extends BeaconController {
     rawItems.subscribe(
       (newValue) {
         switch (newValue) {
-          case AsyncData(:final value):
+          case AsyncData(value: final newItems):
             final didRefresh =
                 pageNum.peek() == 1 && (pageNum.previousValue ?? 0) > 1;
 
             if (didRefresh) {
               items.clear();
             } else {
-              items.removeLast();
+              items.removeLast(); // remove loading item
             }
 
-            final hasMore = value.length == pageSize;
+            final hasMore = newItems.length == pageSize;
 
             items
-              ..addAll(value.map(ItemData.new))
+              ..addAll(newItems.map(ItemData.new))
               ..add(hasMore ? ItemLoading() : ItemEnd());
 
           case AsyncError(:final error):
