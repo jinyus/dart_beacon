@@ -32,7 +32,7 @@ class InfiniteListPage extends StatelessWidget {
                         },
                       ),
                       child: Builder(builder: (ctx) {
-                        final items = controller.parsedItems.watch(ctx);
+                        final items = controller.items.watch(ctx);
 
                         return ListView.separated(
                           itemBuilder: (context, index) {
@@ -42,6 +42,7 @@ class InfiniteListPage extends StatelessWidget {
                               ItemData d => ItemTile(title: d.value),
                               ItemLoading() => const LoadingIndicator(),
                               ItemError e => ErrorDisplay(error: e.error),
+                              ItemEnd() => const NoMoreItems(),
                             };
                           },
                           itemCount: items.length,
@@ -99,10 +100,26 @@ class _LoadingIndicatorState extends State<LoadingIndicator> {
   }
 }
 
+class NoMoreItems extends StatelessWidget {
+  const NoMoreItems({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(8),
+      child: Text(
+        'No More Items',
+        style: TextStyle(fontSize: 20),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
 class ErrorDisplay extends StatelessWidget {
   const ErrorDisplay({
-    super.key,
     required this.error,
+    super.key,
   });
 
   final Object error;
@@ -117,12 +134,11 @@ class ErrorDisplay extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 5),
-        if (error is! NoMoreItemsException)
-          ElevatedButton(
-            style: btnStyle,
-            onPressed: () => infiniteControllerRef.read(context).retryOnError(),
-            child: const Text('retry'),
-          )
+        ElevatedButton(
+          style: btnStyle,
+          onPressed: () => infiniteControllerRef.read(context).retryOnError(),
+          child: const Text('retry'),
+        ),
       ],
     );
   }

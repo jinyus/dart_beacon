@@ -5,55 +5,62 @@ class InfiniteController extends BeaconController {
 
   final PostRepository repo;
 
-  late final pageNum = B.filtered(1);
-
-  // this re-executes the future when the pageNum changes
-  late final rawItems = B.future(() {
-    final page = pageNum.value;
-    return repo.fetchItems(page, limit: pageSize);
-  });
-
-  late final parsedItems = B.writable(<ListItem>[ItemLoading()]);
-
   InfiniteController(this.repo) {
     // prevent the pageNum from changing when the list is loading
     pageNum.setFilter((_, __) => rawItems.isData);
 
     rawItems.subscribe(
-      (newAsyncValue) {
-        final newList = parsedItems.peek().toList();
+      (newValue) {
+        switch (newValue) {
+          case AsyncData(:final value):
+            final didRefresh =
+                pageNum.peek() == 1 && (pageNum.previousValue ?? 0) > 1;
 
-        // remove the last item if it's an ItemLoading or ItemError
-        if (newList.last is! ItemData) {
-          newList.removeLast();
+            if (didRefresh) {
+              items.clear();
+            } else {
+              items.removeLast();
+            }
+
+            final hasMore = value.length == pageSize;
+
+            items
+              ..addAll(value.map(ItemData.new))
+              ..add(hasMore ? ItemLoading() : ItemEnd());
+
+          case AsyncError(:final error):
+            items
+              ..removeLast()
+              ..add(ItemError(error));
+
+          default:
+            if (items.peek().last is! ItemLoading) {
+              items
+                ..removeLast()
+                ..add(ItemLoading());
+            }
         }
-
-        parsedItems.value = switch (newAsyncValue) {
-          // if successful, add the items to the list
-          AsyncData(value: final lst) => newList
-            ..addAll(lst.map(ItemData.new))
-            ..add(lst.length < pageSize
-                ? ItemError(NoMoreItemsException())
-                : ItemLoading()),
-
-          // if an error occured, add the error to the list
-          AsyncError(:final error) => newList..add(ItemError(error)),
-
-          // add the loading indicator to the list
-          _ => newList..add(ItemLoading()),
-        };
       },
       startNow: false,
     );
   }
 
+  late final pageNum = B.filtered(1);
+
+  // this re-executes the future when the pageNum changes
+  late final rawItems = B.future(() async {
+    final page = pageNum.value;
+    return repo.fetchItems(page, limit: pageSize);
+  });
+
+  late final items = B.list<ListItem>([ItemLoading()]);
+
   void loadNextPage() => pageNum.increment();
 
   void retryOnError() => rawItems.reset();
 
-  Future refresh() async {
-    pageNum.reset();
-    parsedItems.reset();
-    return parsedItems.next();
+  Future<dynamic> refresh() async {
+    pageNum.reset(force: true);
+    return rawItems.nextOrNull(filter: (n) => n.isData);
   }
 }

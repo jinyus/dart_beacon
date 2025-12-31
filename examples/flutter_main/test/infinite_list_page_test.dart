@@ -18,14 +18,14 @@ void main() {
   final infiniteCtrl = MockInfiniteController();
 
   testWidgets('Infinite List Page Test', (WidgetTester tester) async {
-    final parsedItems = Beacon.writable(<ListItem>[ItemLoading()]);
+    final items = Beacon.list(<ListItem>[ItemLoading()]);
     final pageNum = Beacon.filtered(1);
     final rawItems = Beacon.future(
       () => Future.value(['item1', 'item2']),
     );
 
     when(() => infiniteCtrl.rawItems).thenReturn(rawItems);
-    when(() => infiniteCtrl.parsedItems).thenReturn(parsedItems);
+    when(() => infiniteCtrl.items).thenReturn(items);
     when(() => infiniteCtrl.pageNum).thenReturn(pageNum);
 
     await tester.pumpWidget(
@@ -48,7 +48,7 @@ void main() {
       'item2',
     ];
 
-    parsedItems.value = testItems.map(ItemData.new).toList();
+    items.value = testItems.map(ItemData.new).toList();
 
     await tester.pumpAndSettle();
 
@@ -56,12 +56,19 @@ void main() {
 
     expect(find.byType(ItemTile), findsExactly(2));
 
-    parsedItems.value = [ItemError('error')];
+    items.value = [ItemError('error')];
 
     await tester.pumpAndSettle();
 
     expect(find.text('error'), findsOneWidget);
 
     expect(find.byType(ItemTile), findsNothing);
+
+    items.value = testItems.map<ListItem>(ItemData.new).toList()
+      ..add(ItemEnd());
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('No More Items'), findsOneWidget);
   });
 }

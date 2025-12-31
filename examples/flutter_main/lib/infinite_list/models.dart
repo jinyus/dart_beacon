@@ -18,3 +18,5 @@ class ItemError extends ListItem {
   final Object error;
   ItemError(this.error);
 }
+
+class ItemEnd extends ListItem {}
