@@ -138,9 +138,8 @@ class FutureBeacon<T> extends AsyncBeacon<T> {
 
       if (peek() case final AsyncData<T> data) {
         completer.complete(data.value);
-      } else if (!resetIfError && isError) {
-        final error = peek() as AsyncError<T>;
-        completer.completeError(error.error, error.stackTrace);
+      } else if (peek() case final AsyncError<T> e when !resetIfError) {
+        completer.completeError(e.error, e.stackTrace);
       }
     }
 
