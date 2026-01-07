@@ -1,3 +1,7 @@
+# 3.0.1
+
+- [Fix] Bug where subscriptions to derived beacons with startNow=false would not run when the beacon was accessed after the subscription was created but before the next value was emitted.
+
 # 3.0.0
 
 - [Breaking] `anyBeacon.next()` now throws if the beacon is disposed while waiting for the next value. This is a breaking change because previously it would complete with the current value if the beacon was disposed.
