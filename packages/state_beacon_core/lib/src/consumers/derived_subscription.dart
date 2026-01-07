@@ -56,6 +56,14 @@ class DerivedSubscription<T> implements Consumer {
         _schedule();
       }
     }
+
+    // edge case: when derived is re-evaluated after we subscribe
+    // we are marked as dirty when we are not in the CHECK state
+    // so when derived changes again and puts us in the CHECK state
+    // we are DIRTY and never got scheduled.
+    if (!startNow && _status == DIRTY && newStatus == CHECK) {
+      _schedule();
+    }
   }
 
   @override

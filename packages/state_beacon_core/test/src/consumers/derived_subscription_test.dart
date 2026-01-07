@@ -325,4 +325,32 @@ void main() {
 
     expect(subCalled, 1);
   });
+
+  test('should work when accessed after sub when startNow=false', () {
+    final a = Beacon.writable<String>('a');
+    final b = Beacon.writable<int>(0);
+    final derived = Beacon.derived<String>(
+      () {
+        return '${a.value}-${b.value}';
+      },
+      name: 'derived',
+    );
+
+    // BeaconObserver.useLogging();
+
+    expect(derived.value, 'a-0');
+    a.value = 'A';
+
+    var called = 0;
+    derived.subscribe((v) => called++, startNow: false);
+
+    BeaconScheduler.flush();
+    expect(derived.peek(), 'A-0');
+    expect(called, 0);
+
+    b.increment();
+    BeaconScheduler.flush();
+
+    expect(called, 1);
+  });
 }
