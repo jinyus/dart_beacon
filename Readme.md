@@ -992,32 +992,8 @@ Seamlessly chain beacons to create sophisticated reactive pipelines, combining m
 
 ```dart
 // every write to this beacon will be filtered then debounced.
-final searchQuery = Beacon.writable('').filter((prev, next) => next.length > 2).debounce(duration: k500ms);
-```
-
-> [!IMPORTANT]  
-> When chaining beacons, all writes made to the returned beacon will be re-routed to the first writable beacon in the chain. It is recommended to mutate the source beacons directly.
-
-```dart
-const k500ms = Duration(milliseconds: 500);
-
-final count = Beacon.writable(10);
-
-final filteredCount = count
-        .debounce(duration: k500ms),
-        .filter((prev, next) => next > 10);
-
-filteredCount.value = 20;
-// The mutation will be re-routed to count
-// before being passed to the debounced beacon
-// then to the filtered beacon.
-// This is equivalent to count.value = 20;
-
-expect(count.value, equals(20));
-
-await Future.delayed(k500ms);
-
-expect(filteredCount.value, equals(20));
+final searchQueryText = Beacon.writable('');
+final searchQuery = searchQueryText.filter((prev, next) => next.length > 2).debounce(duration: k500ms);
 ```
 
 > [!WARNING]  
