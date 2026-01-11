@@ -48,7 +48,7 @@ class DerivedSubscription<T> implements Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status <= newStatus) {
+    if (_status < newStatus) {
       final oldStatus = _status;
       _status = newStatus;
 
