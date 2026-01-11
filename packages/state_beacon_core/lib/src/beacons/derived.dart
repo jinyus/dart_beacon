@@ -41,7 +41,7 @@ class DerivedBeacon<T> extends ReadableBeacon<T> with Consumer {
 
   @override
   void stale(Status newStatus) {
-    if (_status <= newStatus) {
+    if (_status < newStatus) {
       _status = newStatus;
 
       for (var i = 0; i < _observers.length; i++) {
